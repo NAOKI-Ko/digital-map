@@ -1,0 +1,23 @@
+# Nuxt build and generated files
+.nuxt
+.output
+.data
+.nitro
+.cache
+dist
+
+# Dependencies
+node_modules
+
+# Local environment
+.env
+.env.*
+!.env.example
+
+# Logs and OS files
+*.log
+.DS_Store
+
+# Local uploads are persisted through a mounted volume
+public/uploads/*
+!public/uploads/.gitkeep
