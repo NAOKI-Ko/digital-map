@@ -3,8 +3,22 @@ import {
   ABSOLUTE_ZOOM_LIMITS,
   createFloorZoomConstraints,
   createMapViewerOptions,
+  getSpotMarkerPresentation,
   VIEWER_CAMERA_CONSTRAINTS,
 } from '../app/composables/useMapViewer'
+import type { MapViewerSpot } from '../shared/types/map-viewer'
+
+const baseSpot: MapViewerSpot = {
+  id: 'spot-1',
+  name: 'テストスポット',
+  category: '温泉',
+  lat: 35.7,
+  lng: 139.7,
+  pinIconType: 'preset',
+  pinIconId: null,
+  pinIconImageUrl: null,
+  pinColor: '#C7401F',
+}
 
 describe('MapViewerのカメラ制約', () => {
   it('閲覧モードへdesign.md 4.2のpitch/bearing制約を渡す', () => {
@@ -50,5 +64,27 @@ describe('フロアごとのズーム制約', () => {
 
   it('非有限値は安全な初期ズームとして扱う', () => {
     expect(createFloorZoomConstraints(Number.NaN)).toEqual({ minZoom: 0, maxZoom: 5 })
+  })
+})
+
+describe('Markerの表示内容', () => {
+  it('カテゴリの既定プリセットと保存色を反映する', () => {
+    expect(getSpotMarkerPresentation(baseSpot)).toEqual({
+      color: '#C7401F',
+      customImageUrl: null,
+      symbol: '♨',
+    })
+  })
+
+  it('カスタムピンでは画像URLを使い文字アイコンを表示しない', () => {
+    expect(getSpotMarkerPresentation({
+      ...baseSpot,
+      pinIconType: 'custom',
+      pinIconImageUrl: '/uploads/custom.png',
+    })).toEqual({
+      color: '#C7401F',
+      customImageUrl: '/uploads/custom.png',
+      symbol: null,
+    })
   })
 })

@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import PinPlacementMap from '~/components/admin/PinPlacementMap.vue'
+import { defineAsyncComponent } from 'vue'
 import type { LatLng } from '~~/lib/geo'
 import type { MapFloorListResponse } from '~~/shared/types/floor'
 import type { AdminSpotListResponse, AdminSpotSummary, PositionedAdminSpotSummary, SpotPositionResponse } from '~~/shared/types/spot'
 
 definePageMeta({ layout: 'admin', middleware: 'auth' })
+
+const LazyMapViewer = defineAsyncComponent(() => import('~/components/map/MapViewer.vue'))
 
 const route = useRoute()
 const mapId = route.params.mapId as string
@@ -99,7 +101,15 @@ async function saveMovedSpot(value: { spotId: string, lat: number, lng: number }
 
       <div class="mt-5 grid gap-5 xl:grid-cols-[1fr_20rem]">
         <ClientOnly>
-          <PinPlacementMap :key="`${selectedFloor.id}-${mapRevision}`" v-model="position" :floor="selectedFloor" :spots="positionedFloorSpots" @spot-moved="saveMovedSpot" />
+          <LazyMapViewer
+            :key="`${selectedFloor.id}-${mapRevision}`"
+            v-model="position"
+            :floor="selectedFloor"
+            :spots="positionedFloorSpots"
+            mode="edit"
+            label="ピン配置地図"
+            @spot-moved="saveMovedSpot"
+          />
           <template #fallback><div class="h-[38rem] animate-pulse rounded-xl bg-stone-100" /></template>
         </ClientOnly>
         <aside class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
