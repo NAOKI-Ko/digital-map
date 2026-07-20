@@ -31,7 +31,7 @@ const floor = toRef(props, 'floor')
 const spots = toRef(props, 'spots')
 const position = toRef(props, 'modelValue')
 const selectedSpotId = toRef(props, 'selectedSpotId')
-const { floorError, mapError } = useMapViewer(container, {
+const { floorError, geolocationAvailable, mapError } = useMapViewer(container, {
   floor,
   spots,
   position,
@@ -65,6 +65,12 @@ const { floorError, mapError } = useMapViewer(container, {
       >
         {{ floorError }}
       </div>
+      <p
+        v-if="geolocationAvailable"
+        class="pointer-events-none absolute bottom-3 left-3 max-w-xs rounded-lg bg-white/90 px-3 py-2 text-xs leading-5 text-stone-600 shadow"
+      >
+        現在地はイラスト上のおおよその目安です。
+      </p>
     </div>
     <p v-if="mapError" role="alert" class="mt-3 text-sm text-red-600">
       {{ mapError }}

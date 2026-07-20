@@ -1,5 +1,5 @@
 import { onBeforeUnmount, onMounted, readonly, ref, shallowRef, watch, type Ref } from 'vue'
-import type { Map as MapLibreMap, MapOptions, Marker, StyleSpecification } from 'maplibre-gl'
+import type { GeolocateControl, Map as MapLibreMap, MapOptions, Marker, StyleSpecification } from 'maplibre-gl'
 import { getFloorGeoReference, getGeoReferenceBounds, toImageCoordinates, type LatLng } from '~~/lib/geo'
 import { defaultPinIconId, getPinIconPreset } from '~~/shared/constants/spot'
 import type { MapViewerFloor, MapViewerSpot } from '~~/shared/types/map-viewer'
@@ -63,6 +63,12 @@ export function getFloorLayerIds(floorId: string) {
   }
 }
 
+export function shouldEnableGeolocate(mode: MapViewerMode, floor: MapViewerFloor) {
+  return mode === 'view'
+    && floor.isOutdoor
+    && getFloorGeoReference(floor) !== null
+}
+
 export function createMapViewerStyle(mode: MapViewerMode): StyleSpecification {
   if (mode === 'edit') {
     return {
@@ -124,8 +130,10 @@ export function useMapViewer(
   const mapError = ref('')
   const floorError = ref('')
   const isReady = ref(false)
+  const geolocationAvailable = ref(false)
   let draftMarker: Marker | null = null
   let spotMarkers: Marker[] = []
+  let geolocateControl: GeolocateControl | null = null
   let activeSourceId: string | null = null
   let activeLayerId: string | null = null
 
@@ -152,6 +160,7 @@ export function useMapViewer(
         showFloor(options.floor.value, false)
         syncSpotMarkers()
         syncDraftMarker(options.position.value)
+        syncGeolocateControl(options.floor.value)
         options.onReady?.(instance)
       })
 
@@ -177,11 +186,34 @@ export function useMapViewer(
     draftMarker = null
     spotMarkers.forEach(marker => marker.remove())
     spotMarkers = []
+    removeGeolocateControl()
     removeFloorImage()
     map.value?.remove()
     map.value = null
     maplibre.value = null
     isReady.value = false
+  }
+
+  function removeGeolocateControl() {
+    const instance = map.value
+    if (instance && geolocateControl && instance.hasControl(geolocateControl)) {
+      instance.removeControl(geolocateControl)
+    }
+    geolocateControl = null
+    geolocationAvailable.value = false
+  }
+
+  function syncGeolocateControl(floor: MapViewerFloor) {
+    removeGeolocateControl()
+    const instance = map.value
+    const currentMaplibre = maplibre.value
+    if (!instance || !currentMaplibre || !shouldEnableGeolocate(options.mode, floor)) return
+
+    geolocateControl = new currentMaplibre.GeolocateControl({
+      trackUserLocation: true,
+    })
+    instance.addControl(geolocateControl, 'top-right')
+    geolocationAvailable.value = true
   }
 
   function syncSpotMarkers() {
@@ -336,6 +368,7 @@ export function useMapViewer(
     showFloor(floor, true)
     syncSpotMarkers()
     syncDraftMarker(options.position.value)
+    syncGeolocateControl(floor)
   }, { deep: true })
 
   return {
@@ -343,10 +376,12 @@ export function useMapViewer(
     mapError: readonly(mapError),
     floorError: readonly(floorError),
     isReady: readonly(isReady),
+    geolocationAvailable: readonly(geolocationAvailable),
     initialize,
     destroy,
     showFloor,
     removeFloorImage,
+    syncGeolocateControl,
     syncSpotMarkers,
     syncDraftMarker,
   }

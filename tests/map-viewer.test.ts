@@ -5,9 +5,10 @@ import {
   createMapViewerOptions,
   getFloorLayerIds,
   getSpotMarkerPresentation,
+  shouldEnableGeolocate,
   VIEWER_CAMERA_CONSTRAINTS,
 } from '../app/composables/useMapViewer'
-import type { MapViewerSpot } from '../shared/types/map-viewer'
+import type { MapViewerFloor, MapViewerSpot } from '../shared/types/map-viewer'
 
 const baseSpot: MapViewerSpot = {
   id: 'spot-1',
@@ -19,6 +20,21 @@ const baseSpot: MapViewerSpot = {
   pinIconId: null,
   pinIconImageUrl: null,
   pinColor: '#C7401F',
+}
+
+const outdoorFloor: MapViewerFloor = {
+  id: 'floor-1',
+  name: '屋外',
+  illustrationUrl: '/uploads/floor.png',
+  isOutdoor: true,
+  topLeftLat: 35.7,
+  topLeftLng: 139.7,
+  topRightLat: 35.7,
+  topRightLng: 139.8,
+  bottomRightLat: 35.6,
+  bottomRightLng: 139.8,
+  bottomLeftLat: 35.6,
+  bottomLeftLng: 139.7,
 }
 
 describe('MapViewerのカメラ制約', () => {
@@ -96,5 +112,23 @@ describe('フロアimageソースの識別子', () => {
       sourceId: 'floor-floor-123',
       layerId: 'floor-floor-123-layer',
     })
+  })
+})
+
+describe('GeolocateControlの追加判定', () => {
+  it('屋外・ジオリファレンス済みの閲覧モードだけ有効にする', () => {
+    expect(shouldEnableGeolocate('view', outdoorFloor)).toBe(true)
+  })
+
+  it('isOutdoor=falseのフロアでは追加しない', () => {
+    expect(shouldEnableGeolocate('view', { ...outdoorFloor, isOutdoor: false })).toBe(false)
+  })
+
+  it('四隅座標が未設定なら屋外でも追加しない', () => {
+    expect(shouldEnableGeolocate('view', { ...outdoorFloor, topLeftLat: null })).toBe(false)
+  })
+
+  it('ピン配置エディタでは追加しない', () => {
+    expect(shouldEnableGeolocate('edit', outdoorFloor)).toBe(false)
   })
 })
