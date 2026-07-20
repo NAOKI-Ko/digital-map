@@ -44,3 +44,10 @@ export interface AdminSpotResponse {
 export interface SpotPhotosResponse {
   photos: string[]
 }
+
+export interface SpotPositionResponse {
+  position: {
+    lat: number
+    lng: number
+  }
+}

@@ -2,15 +2,20 @@
 import PinPlacementMap from '~/components/admin/PinPlacementMap.vue'
 import type { LatLng } from '~~/lib/geo'
 import type { MapFloorListResponse } from '~~/shared/types/floor'
+import type { AdminSpotListResponse, SpotPositionResponse } from '~~/shared/types/spot'
 
 definePageMeta({ layout: 'admin', middleware: 'auth' })
 
 const route = useRoute()
 const mapId = route.params.mapId as string
 const { data, error, status } = await useFetch<MapFloorListResponse>(`/api/maps/${mapId}/floors`)
+const { data: spotData, refresh: refreshSpots } = await useFetch<AdminSpotListResponse>(`/api/maps/${mapId}/spots`)
 const selectedFloorId = ref('')
 const position = ref<LatLng | null>(null)
 const selectedFloor = computed(() => data.value?.floors.find(floor => floor.id === selectedFloorId.value))
+const selectedFloorSpots = computed(() => spotData.value?.spots.filter(spot => spot.floorId === selectedFloorId.value) ?? [])
+const moveStatus = ref('')
+const mapRevision = ref(0)
 
 watch(() => data.value?.floors, (floors) => {
   if (floors?.length && !floors.some(floor => floor.id === selectedFloorId.value)) {
@@ -42,6 +47,30 @@ function isGeoreferenced() {
     && floor.bottomRightLat !== null && floor.bottomRightLng !== null
     && floor.bottomLeftLat !== null && floor.bottomLeftLng !== null
 }
+
+async function saveMovedSpot(value: { spotId: string, lat: number, lng: number }) {
+  moveStatus.value = '位置を保存しています…'
+  try {
+    const response = await $fetch<SpotPositionResponse>(`/api/maps/${mapId}/spots/${value.spotId}/position`, {
+      method: 'PATCH',
+      body: { lat: value.lat, lng: value.lng },
+    })
+    if (spotData.value) {
+      spotData.value = {
+        ...spotData.value,
+        spots: spotData.value.spots.map(spot => spot.id === value.spotId
+          ? { ...spot, ...response.position, updatedAt: new Date().toISOString() }
+          : spot),
+      }
+    }
+    moveStatus.value = 'ピンの位置を保存しました。'
+  }
+  catch {
+    moveStatus.value = '位置を保存できませんでした。元の位置へ戻します。'
+    await refreshSpots()
+    mapRevision.value += 1
+  }
+}
 </script>
 
 <template>
@@ -65,7 +94,7 @@ function isGeoreferenced() {
 
       <div class="mt-5 grid gap-5 xl:grid-cols-[1fr_20rem]">
         <ClientOnly>
-          <PinPlacementMap :key="selectedFloor.id" v-model="position" :floor="selectedFloor" />
+          <PinPlacementMap :key="`${selectedFloor.id}-${mapRevision}`" v-model="position" :floor="selectedFloor" :spots="selectedFloorSpots" @spot-moved="saveMovedSpot" />
           <template #fallback><div class="h-[38rem] animate-pulse rounded-xl bg-stone-100" /></template>
         </ClientOnly>
         <aside class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
@@ -76,6 +105,19 @@ function isGeoreferenced() {
           </div>
           <p v-else class="mt-4 text-sm leading-6 text-stone-600">まだピンはありません。地図上の登録したい場所をクリックしてください。</p>
           <button type="button" :disabled="!position" class="mt-5 w-full rounded-lg bg-terracotta-600 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50" @click="startRegistration">この位置でスポット登録へ</button>
+          <p v-if="moveStatus" role="status" class="mt-4 text-xs leading-5 text-stone-600">{{ moveStatus }}</p>
+
+          <div class="mt-6 border-t border-stone-200 pt-5">
+            <h2 class="font-bold text-stone-900">既存スポット</h2>
+            <p class="mt-1 text-xs text-stone-500">地図上の黒いピンをドラッグして位置を調整できます。</p>
+            <p v-if="selectedFloorSpots.length === 0" class="mt-3 text-sm text-stone-600">このフロアにはまだありません。</p>
+            <ul v-else class="mt-3 space-y-2">
+              <li v-for="spot in selectedFloorSpots" :key="spot.id" class="rounded-lg bg-stone-100 p-3">
+                <NuxtLink :to="`/admin/maps/${mapId}/spots/${spot.id}`" class="text-sm font-semibold text-stone-900 hover:text-terracotta-700">{{ spot.name }}</NuxtLink>
+                <p class="mt-1 font-mono text-[0.7rem] text-stone-500">{{ spot.lat.toFixed(6) }}, {{ spot.lng.toFixed(6) }}</p>
+              </li>
+            </ul>
+          </div>
         </aside>
       </div>
     </template>

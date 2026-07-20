@@ -3,9 +3,15 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import type { Map as MapLibreMap, Marker } from 'maplibre-gl'
 import { createDefaultGeoReference, getGeoReferenceBounds, toImageCoordinates, type GeoReferenceCoordinates, type LatLng } from '~~/lib/geo'
 import type { MapFloorItem } from '~~/shared/types/floor'
+import type { AdminSpotSummary } from '~~/shared/types/spot'
 
 const props = defineProps<{
   floor: MapFloorItem
+  spots: AdminSpotSummary[]
+}>()
+
+const emit = defineEmits<{
+  spotMoved: [value: { spotId: string, lat: number, lng: number }]
 }>()
 
 const position = defineModel<LatLng | null>({ required: true })
@@ -13,6 +19,7 @@ const container = useTemplateRef<HTMLDivElement>('container')
 const mapError = ref('')
 let map: MapLibreMap | undefined
 let draftMarker: Marker | undefined
+let spotMarkers: Marker[] = []
 
 onMounted(async () => {
   if (!container.value) return
@@ -44,21 +51,42 @@ onMounted(async () => {
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right')
 
     map.on('load', () => {
-      if (!map || !geoReference) return
-      map.addSource('floor-illustration', {
-        type: 'image',
-        url: props.floor.illustrationUrl,
-        coordinates: toImageCoordinates(geoReference),
-      })
-      map.addLayer({
-        id: 'floor-illustration',
-        type: 'raster',
-        source: 'floor-illustration',
-        paint: { 'raster-opacity': 0.82 },
+      if (!map) return
+      if (geoReference) {
+        map.addSource('floor-illustration', {
+          type: 'image',
+          url: props.floor.illustrationUrl,
+          coordinates: toImageCoordinates(geoReference),
+        })
+        map.addLayer({
+          id: 'floor-illustration',
+          type: 'raster',
+          source: 'floor-illustration',
+          paint: { 'raster-opacity': 0.82 },
+        })
+      }
+
+      spotMarkers = props.spots.map((spot) => {
+        const element = document.createElement('button')
+        element.type = 'button'
+        element.className = 'existing-spot-marker'
+        element.textContent = spot.name.slice(0, 1)
+        element.setAttribute('aria-label', `${spot.name}をドラッグして位置調整`)
+        element.title = `${spot.name}をドラッグして位置調整`
+        element.addEventListener('click', event => event.stopPropagation())
+        const marker = new maplibregl.Marker({ element, draggable: true })
+          .setLngLat([spot.lng, spot.lat])
+          .addTo(map!)
+        marker.on('dragend', () => {
+          const lngLat = marker.getLngLat()
+          emit('spotMoved', { spotId: spot.id, lat: lngLat.lat, lng: lngLat.lng })
+        })
+        return marker
       })
     })
 
     map.on('click', (event) => {
+      if ((event.originalEvent.target as HTMLElement | null)?.closest('.existing-spot-marker')) return
       position.value = { lat: event.lngLat.lat, lng: event.lngLat.lng }
       if (!map) return
       if (!draftMarker) {
@@ -80,6 +108,8 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   draftMarker?.remove()
+  spotMarkers.forEach(marker => marker.remove())
+  spotMarkers = []
   map?.remove()
   draftMarker = undefined
   map = undefined
@@ -111,3 +141,24 @@ function getFloorGeoReference(floor: MapFloorItem): GeoReferenceCoordinates | nu
     <p v-if="mapError" role="alert" class="mt-3 text-sm text-red-600">{{ mapError }}</p>
   </div>
 </template>
+
+<style>
+.existing-spot-marker {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-items: center;
+  border: 3px solid white;
+  border-radius: 9999px;
+  background: #292524;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 35%);
+  color: white;
+  cursor: grab;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.existing-spot-marker:active {
+  cursor: grabbing;
+}
+</style>
