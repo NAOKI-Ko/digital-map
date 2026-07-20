@@ -10,3 +10,11 @@ export interface AdminMapSummary {
 export interface AdminMapListResponse {
   maps: AdminMapSummary[]
 }
+
+export interface AdminMapDetail extends AdminMapSummary {
+  createdAt: string
+}
+
+export interface AdminMapResponse {
+  map: AdminMapDetail
+}
