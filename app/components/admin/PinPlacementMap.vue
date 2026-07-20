@@ -4,6 +4,7 @@ import type { Map as MapLibreMap, Marker } from 'maplibre-gl'
 import { createDefaultGeoReference, getGeoReferenceBounds, toImageCoordinates, type GeoReferenceCoordinates, type LatLng } from '~~/lib/geo'
 import type { MapFloorItem } from '~~/shared/types/floor'
 import type { AdminSpotSummary } from '~~/shared/types/spot'
+import { defaultPinIconId, getPinIconPreset } from '~~/shared/constants/spot'
 
 const props = defineProps<{
   floor: MapFloorItem
@@ -70,9 +71,22 @@ onMounted(async () => {
         const element = document.createElement('button')
         element.type = 'button'
         element.className = 'existing-spot-marker'
-        element.textContent = spot.name.slice(0, 1)
+        element.style.setProperty('--pin-color', spot.pinColor)
         element.setAttribute('aria-label', `${spot.name}をドラッグして位置調整`)
         element.title = `${spot.name}をドラッグして位置調整`
+        const shape = document.createElement('span')
+        shape.className = 'existing-spot-marker__shape'
+        const content = document.createElement(spot.pinIconType === 'custom' && spot.pinIconImageUrl ? 'img' : 'span')
+        content.className = 'existing-spot-marker__content'
+        if (content instanceof HTMLImageElement && spot.pinIconImageUrl) {
+          content.src = spot.pinIconImageUrl
+          content.alt = ''
+        }
+        else {
+          content.textContent = getPinIconPreset(spot.pinIconId ?? defaultPinIconId(spot.category)).symbol
+        }
+        shape.append(content)
+        element.append(shape)
         element.addEventListener('click', event => event.stopPropagation())
         const marker = new maplibregl.Marker({ element, draggable: true })
           .setLngLat([spot.lng, spot.lat])
@@ -144,18 +158,34 @@ function getFloorGeoReference(floor: MapFloorItem): GeoReferenceCoordinates | nu
 
 <style>
 .existing-spot-marker {
+  width: 2.75rem;
+  height: 3.25rem;
+  border: 0;
+  background: transparent;
+  cursor: grab;
+  padding: 0;
+}
+
+.existing-spot-marker__shape {
   display: grid;
   width: 2.5rem;
   height: 2.5rem;
   place-items: center;
   border: 3px solid white;
-  border-radius: 9999px;
-  background: #292524;
+  border-radius: 9999px 9999px 9999px 0;
+  background: var(--pin-color);
   box-shadow: 0 2px 8px rgb(0 0 0 / 35%);
   color: white;
-  cursor: grab;
-  font-size: 0.8rem;
-  font-weight: 700;
+  font-size: 0.75rem;
+  font-weight: 800;
+  transform: rotate(-45deg);
+}
+
+.existing-spot-marker__content {
+  width: 1.55rem;
+  height: 1.55rem;
+  object-fit: cover;
+  transform: rotate(45deg);
 }
 
 .existing-spot-marker:active {

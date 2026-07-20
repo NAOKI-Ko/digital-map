@@ -7,6 +7,10 @@ export interface AdminSpotSummary {
   lat: number
   lng: number
   isPublished: boolean
+  pinIconType: 'preset' | 'custom'
+  pinIconId: string | null
+  pinIconImageUrl: string | null
+  pinColor: string
   updatedAt: string
 }
 
@@ -29,10 +33,6 @@ export interface AdminSpotDetail extends AdminSpotSummary {
   hoursText: string | null
   holidayText: string | null
   phone: string | null
-  pinIconType: 'preset' | 'custom'
-  pinIconId: string | null
-  pinIconImageUrl: string | null
-  pinColor: string
   createdAt: string
 }
 
@@ -49,5 +49,14 @@ export interface SpotPositionResponse {
   position: {
     lat: number
     lng: number
+  }
+}
+
+export interface SpotPinDesignResponse {
+  design: {
+    pinIconType: 'preset' | 'custom'
+    pinIconId: string | null
+    pinIconImageUrl: string | null
+    pinColor: string
   }
 }
