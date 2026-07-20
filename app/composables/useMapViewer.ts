@@ -1,10 +1,13 @@
 import { onBeforeUnmount, onMounted, readonly, ref, shallowRef, type Ref } from 'vue'
 import type { Map as MapLibreMap, MapOptions, StyleSpecification } from 'maplibre-gl'
+import { getFloorGeoReference, getGeoReferenceBounds, toImageCoordinates } from '~~/lib/geo'
+import type { MapViewerFloor } from '~~/shared/types/map-viewer'
 
 export type MapViewerMode = 'view' | 'edit'
 
 export interface UseMapViewerOptions {
   mode: MapViewerMode
+  floor: Readonly<Ref<MapViewerFloor>>
   onReady?: (map: MapLibreMap) => void
 }
 
@@ -50,6 +53,7 @@ export function useMapViewer(
 ) {
   const map = shallowRef<MapLibreMap | null>(null)
   const mapError = ref('')
+  const floorError = ref('')
   const isReady = ref(false)
 
   async function initialize() {
@@ -66,6 +70,7 @@ export function useMapViewer(
       instance.once('load', () => {
         if (map.value !== instance) return
         isReady.value = true
+        showFloor(options.floor.value)
         options.onReady?.(instance)
       })
     }
@@ -81,14 +86,52 @@ export function useMapViewer(
     isReady.value = false
   }
 
+  function showFloor(floor: MapViewerFloor) {
+    const instance = map.value
+    const coordinates = getFloorGeoReference(floor)
+    if (!instance || !isReady.value) return false
+
+    if (!coordinates) {
+      floorError.value = 'このフロアはイラストの四隅座標が未設定、または正しくありません。'
+      return false
+    }
+
+    floorError.value = ''
+    const sourceId = `floor-${floor.id}`
+    const layerId = `${sourceId}-layer`
+    instance.addSource(sourceId, {
+      type: 'image',
+      url: floor.illustrationUrl,
+      coordinates: toImageCoordinates(coordinates),
+    })
+    instance.addLayer({
+      id: layerId,
+      type: 'raster',
+      source: sourceId,
+      paint: { 'raster-opacity': options.mode === 'edit' ? 0.82 : 1 },
+    })
+
+    const bounds = getGeoReferenceBounds(coordinates)
+    if (bounds) {
+      instance.fitBounds([bounds.southwest, bounds.northeast], {
+        padding: 64,
+        maxZoom: 20,
+        duration: 0,
+      })
+    }
+    return true
+  }
+
   onMounted(initialize)
   onBeforeUnmount(destroy)
 
   return {
     map: readonly(map),
     mapError: readonly(mapError),
+    floorError: readonly(floorError),
     isReady: readonly(isReady),
     initialize,
     destroy,
+    showFloor,
   }
 }
