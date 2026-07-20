@@ -40,3 +40,7 @@ export interface AdminSpotResponse {
   spot: AdminSpotDetail
   floors: SpotListFilterFloor[]
 }
+
+export interface SpotPhotosResponse {
+  photos: string[]
+}

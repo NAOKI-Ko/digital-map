@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import SpotPhotoManager from '~/components/admin/SpotPhotoManager.vue'
 import SpotForm from '~/components/admin/SpotForm.vue'
 import type { SpotFormInput } from '~~/shared/schemas/spot'
 import type { AdminSpotResponse } from '~~/shared/types/spot'
@@ -61,6 +62,14 @@ async function updateSpot(input: SpotFormInput) {
       <div v-if="successMessage" role="status" class="mt-6 rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{{ successMessage }}</div>
       <section class="mt-8 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
         <SpotForm :floors="data.floors" :initial-value="initialValue" :is-submitting="isSubmitting" @submit="updateSpot" />
+      </section>
+      <section class="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+        <SpotPhotoManager
+          :map-id="mapId"
+          :spot-id="spotId"
+          :initial-photos="data.spot.photos"
+          @updated="data.spot.photos = $event"
+        />
       </section>
     </template>
   </div>
