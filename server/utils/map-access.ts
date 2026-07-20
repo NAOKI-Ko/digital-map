@@ -59,7 +59,7 @@ export async function requireOwnedSpot(event: H3Event) {
       id: spotId,
       floor: { mapId: map.id },
     },
-    select: { id: true, floorId: true },
+    select: { id: true, floorId: true, lat: true, lng: true, isPublished: true },
   })
 
   if (!spot) {

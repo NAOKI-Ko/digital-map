@@ -17,6 +17,7 @@ const isPreviewOpen = ref(false)
 const errorMessage = ref('')
 const successMessage = ref('')
 const pinPreset = computed(() => getPinIconPreset(props.spot.pinIconId))
+const hasCoordinates = computed(() => props.spot.lat !== null && props.spot.lng !== null)
 
 async function togglePublication() {
   isSaving.value = true
@@ -63,12 +64,13 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleKeydown))
         <p class="mt-2 max-w-2xl text-sm leading-6 text-stone-600">
           公開にすると、マップ全体の公開後に閲覧者へ表示される対象になります。下書きのスポットは公開側には表示されません。
         </p>
+        <p v-if="!hasCoordinates" class="mt-2 text-sm font-semibold text-amber-700">位置が未設定のため公開できません。基本情報の緯度と経度を設定してください。</p>
       </div>
       <div class="flex flex-wrap gap-3">
         <button type="button" class="rounded-lg border border-stone-300 px-4 py-2.5 text-sm font-semibold text-stone-700 hover:bg-stone-50" @click="isPreviewOpen = true">
           プレビューを表示
         </button>
-        <button type="button" :disabled="isSaving" class="rounded-lg px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-60" :class="spot.isPublished ? 'bg-stone-700 hover:bg-stone-800' : 'bg-emerald-700 hover:bg-emerald-800'" @click="togglePublication">
+        <button type="button" :disabled="isSaving || (!spot.isPublished && !hasCoordinates)" class="rounded-lg px-4 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50" :class="spot.isPublished ? 'bg-stone-700 hover:bg-stone-800' : 'bg-emerald-700 hover:bg-emerald-800'" @click="togglePublication">
           {{ isSaving ? '変更中…' : spot.isPublished ? '下書きに戻す' : 'スポットを公開する' }}
         </button>
       </div>

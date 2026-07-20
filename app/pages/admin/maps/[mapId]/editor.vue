@@ -2,7 +2,7 @@
 import PinPlacementMap from '~/components/admin/PinPlacementMap.vue'
 import type { LatLng } from '~~/lib/geo'
 import type { MapFloorListResponse } from '~~/shared/types/floor'
-import type { AdminSpotListResponse, SpotPositionResponse } from '~~/shared/types/spot'
+import type { AdminSpotListResponse, AdminSpotSummary, PositionedAdminSpotSummary, SpotPositionResponse } from '~~/shared/types/spot'
 
 definePageMeta({ layout: 'admin', middleware: 'auth' })
 
@@ -14,6 +14,7 @@ const selectedFloorId = ref('')
 const position = ref<LatLng | null>(null)
 const selectedFloor = computed(() => data.value?.floors.find(floor => floor.id === selectedFloorId.value))
 const selectedFloorSpots = computed(() => spotData.value?.spots.filter(spot => spot.floorId === selectedFloorId.value) ?? [])
+const positionedFloorSpots = computed(() => selectedFloorSpots.value.filter(hasPosition))
 const moveStatus = ref('')
 const mapRevision = ref(0)
 
@@ -26,6 +27,10 @@ watch(() => data.value?.floors, (floors) => {
 watch(selectedFloorId, () => position.value = null)
 
 useHead({ title: 'ピン配置エディタ | デジタルマップ' })
+
+function hasPosition(spot: AdminSpotSummary): spot is PositionedAdminSpotSummary {
+  return spot.lat !== null && spot.lng !== null
+}
 
 function startRegistration() {
   if (!selectedFloor.value || !position.value) return
@@ -94,7 +99,7 @@ async function saveMovedSpot(value: { spotId: string, lat: number, lng: number }
 
       <div class="mt-5 grid gap-5 xl:grid-cols-[1fr_20rem]">
         <ClientOnly>
-          <PinPlacementMap :key="`${selectedFloor.id}-${mapRevision}`" v-model="position" :floor="selectedFloor" :spots="selectedFloorSpots" @spot-moved="saveMovedSpot" />
+          <PinPlacementMap :key="`${selectedFloor.id}-${mapRevision}`" v-model="position" :floor="selectedFloor" :spots="positionedFloorSpots" @spot-moved="saveMovedSpot" />
           <template #fallback><div class="h-[38rem] animate-pulse rounded-xl bg-stone-100" /></template>
         </ClientOnly>
         <aside class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
@@ -114,7 +119,8 @@ async function saveMovedSpot(value: { spotId: string, lat: number, lng: number }
             <ul v-else class="mt-3 space-y-2">
               <li v-for="spot in selectedFloorSpots" :key="spot.id" class="rounded-lg bg-stone-100 p-3">
                 <NuxtLink :to="`/admin/maps/${mapId}/spots/${spot.id}`" class="text-sm font-semibold text-stone-900 hover:text-terracotta-700">{{ spot.name }}</NuxtLink>
-                <p class="mt-1 font-mono text-[0.7rem] text-stone-500">{{ spot.lat.toFixed(6) }}, {{ spot.lng.toFixed(6) }}</p>
+                <p v-if="spot.lat !== null && spot.lng !== null" class="mt-1 font-mono text-[0.7rem] text-stone-500">{{ spot.lat.toFixed(6) }}, {{ spot.lng.toFixed(6) }}</p>
+                <p v-else class="mt-1 text-xs font-medium text-amber-700">位置未設定（地図をクリックして新規登録するか、編集画面で入力してください）</p>
               </li>
             </ul>
           </div>

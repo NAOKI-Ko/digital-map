@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import GeoReferenceEditor from '~/components/admin/GeoReferenceEditor.vue'
-import { createDefaultGeoReference, type GeoReferenceCoordinates } from '~~/lib/geo'
+import type { GeoReferenceCoordinates } from '~~/lib/geo'
 import type { GeoReferenceInput } from '~~/shared/schemas/georeference'
 import type { MapFloorItem, MapFloorListResponse, MapFloorResponse } from '~~/shared/types/floor'
 
@@ -14,7 +14,7 @@ const mapId = route.params.mapId as string
 const floorId = route.params.floorId as string
 const { data, error, status } = await useFetch<MapFloorListResponse>(`/api/maps/${mapId}/floors`)
 const floor = computed(() => data.value?.floors.find(item => item.id === floorId))
-const coordinates = ref<GeoReferenceCoordinates>(createDefaultGeoReference())
+const coordinates = ref<GeoReferenceCoordinates | null>(null)
 const isSaving = ref(false)
 const saveError = ref('')
 const successMessage = ref('')
@@ -27,14 +27,14 @@ useHead(() => ({
   title: `ジオリファレンス - ${floor.value?.name ?? 'フロア'} | デジタルマップ`,
 }))
 
-function coordinatesFromFloor(value: MapFloorItem): GeoReferenceCoordinates {
+function coordinatesFromFloor(value: MapFloorItem): GeoReferenceCoordinates | null {
   if (
     value.topLeftLat === null || value.topLeftLng === null
     || value.topRightLat === null || value.topRightLng === null
     || value.bottomRightLat === null || value.bottomRightLng === null
     || value.bottomLeftLat === null || value.bottomLeftLng === null
   ) {
-    return createDefaultGeoReference()
+    return null
   }
 
   return {
@@ -59,7 +59,7 @@ function toInput(value: GeoReferenceCoordinates): GeoReferenceInput {
 }
 
 async function save() {
-  if (!floor.value) return
+  if (!floor.value || !coordinates.value) return
   isSaving.value = true
   saveError.value = ''
   successMessage.value = ''
@@ -108,7 +108,7 @@ async function save() {
       <div v-if="saveError" role="alert" class="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{{ saveError }}</div>
       <div v-if="successMessage" role="status" class="mt-4 rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{{ successMessage }}</div>
       <div class="mt-5 flex justify-end">
-        <button type="button" :disabled="isSaving" class="rounded-lg bg-terracotta-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60" @click="save">
+        <button type="button" :disabled="isSaving || !coordinates" class="rounded-lg bg-terracotta-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60" @click="save">
           {{ isSaving ? '保存中…' : '四隅の座標を保存する' }}
         </button>
       </div>

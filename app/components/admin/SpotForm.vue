@@ -19,8 +19,8 @@ const props = withDefaults(defineProps<{
     hoursText: '',
     holidayText: '',
     phone: '',
-    lat: 35.681236,
-    lng: 139.767125,
+    lat: null,
+    lng: null,
   }),
   isSubmitting: false,
   submitLabel: '保存する',
@@ -118,7 +118,7 @@ function useGeocodeResult(result: { lat: number, lng: number }) {
 
     <section class="border-t border-stone-200 pt-8">
       <h2 class="text-lg font-bold text-stone-900">位置</h2>
-      <p class="mt-1 text-sm text-stone-600">住所検索または緯度・経度の直接入力で位置を指定します。</p>
+      <p class="mt-1 text-sm text-stone-600">住所検索または緯度・経度の直接入力で位置を指定します。位置は後から設定できますが、未設定のスポットは公開できません。</p>
       <div class="mt-5">
         <AddressGeocoder @select="useGeocodeResult" />
       </div>

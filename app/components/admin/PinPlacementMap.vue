@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import 'maplibre-gl/dist/maplibre-gl.css'
 import type { Map as MapLibreMap, Marker } from 'maplibre-gl'
-import { createDefaultGeoReference, getGeoReferenceBounds, toImageCoordinates, type GeoReferenceCoordinates, type LatLng } from '~~/lib/geo'
+import { getGeoReferenceBounds, getLatLngBounds, toImageCoordinates, type GeoReferenceCoordinates, type LatLng } from '~~/lib/geo'
 import type { MapFloorItem } from '~~/shared/types/floor'
-import type { AdminSpotSummary } from '~~/shared/types/spot'
+import type { PositionedAdminSpotSummary } from '~~/shared/types/spot'
 import { defaultPinIconId, getPinIconPreset } from '~~/shared/constants/spot'
 
 const props = defineProps<{
   floor: MapFloorItem
-  spots: AdminSpotSummary[]
+  spots: PositionedAdminSpotSummary[]
 }>()
 
 const emit = defineEmits<{
@@ -28,8 +28,9 @@ onMounted(async () => {
   try {
     const maplibregl = await import('maplibre-gl')
     const geoReference = getFloorGeoReference(props.floor)
-    const initialReference = geoReference ?? createDefaultGeoReference()
-    const bounds = getGeoReferenceBounds(initialReference)
+    const bounds = geoReference
+      ? getGeoReferenceBounds(geoReference)
+      : getLatLngBounds(props.spots.map(spot => ({ lat: spot.lat, lng: spot.lng })))
     map = new maplibregl.Map({
       container: container.value,
       style: {
@@ -44,8 +45,9 @@ onMounted(async () => {
         },
         layers: [{ id: 'osm', type: 'raster', source: 'osm' }],
       },
-      bounds: [bounds.southwest, bounds.northeast],
-      fitBoundsOptions: { padding: 70, maxZoom: 18 },
+      ...(bounds
+        ? { bounds: [bounds.southwest, bounds.northeast], fitBoundsOptions: { padding: 70, maxZoom: 18 } }
+        : { center: [0, 0], zoom: 1 }),
       maxPitch: 0,
       dragRotate: false,
     })

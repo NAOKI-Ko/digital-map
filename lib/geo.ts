@@ -26,20 +26,21 @@ export function toImageCoordinates(coordinates: GeoReferenceCoordinates): MapLib
   ]
 }
 
-export function createDefaultGeoReference(center: LatLng = { lat: 35.681236, lng: 139.767125 }): GeoReferenceCoordinates {
-  const latitudeOffset = 0.0015
-  const longitudeOffset = 0.002
-
+export function createGeoReferenceFromBounds(bounds: { southwest: LatLng, northeast: LatLng }): GeoReferenceCoordinates {
   return {
-    topLeft: { lat: center.lat + latitudeOffset, lng: center.lng - longitudeOffset },
-    topRight: { lat: center.lat + latitudeOffset, lng: center.lng + longitudeOffset },
-    bottomRight: { lat: center.lat - latitudeOffset, lng: center.lng + longitudeOffset },
-    bottomLeft: { lat: center.lat - latitudeOffset, lng: center.lng - longitudeOffset },
+    topLeft: { lat: bounds.northeast.lat, lng: bounds.southwest.lng },
+    topRight: { lat: bounds.northeast.lat, lng: bounds.northeast.lng },
+    bottomRight: { lat: bounds.southwest.lat, lng: bounds.northeast.lng },
+    bottomLeft: { lat: bounds.southwest.lat, lng: bounds.southwest.lng },
   }
 }
 
 export function getGeoReferenceBounds(coordinates: GeoReferenceCoordinates) {
-  const points = Object.values(coordinates)
+  return getLatLngBounds(Object.values(coordinates))
+}
+
+export function getLatLngBounds(points: LatLng[]) {
+  if (points.length === 0) return null
   const lngs = points.map(point => point.lng)
   const lats = points.map(point => point.lat)
 

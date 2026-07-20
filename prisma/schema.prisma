@@ -74,8 +74,8 @@ model Spot {
   name            String
   category        String
   description     String?
-  lat             Float
-  lng             Float
+  lat             Float?
+  lng             Float?
   photosJson      Json     @default("[]")
   hoursText       String?
   holidayText     String?

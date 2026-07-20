@@ -4,14 +4,19 @@ export interface AdminSpotSummary {
   floorName: string
   name: string
   category: string
-  lat: number
-  lng: number
+  lat: number | null
+  lng: number | null
   isPublished: boolean
   pinIconType: 'preset' | 'custom'
   pinIconId: string | null
   pinIconImageUrl: string | null
   pinColor: string
   updatedAt: string
+}
+
+export type PositionedAdminSpotSummary = AdminSpotSummary & {
+  lat: number
+  lng: number
 }
 
 export interface SpotListFilterFloor {

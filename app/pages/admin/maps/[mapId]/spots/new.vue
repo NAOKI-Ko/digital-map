@@ -10,10 +10,17 @@ const route = useRoute()
 const mapId = route.params.mapId as string
 const { data } = await useFetch<MapFloorListResponse>(`/api/maps/${mapId}/floors`)
 const floors = computed(() => data.value?.floors.map(floor => ({ id: floor.id, name: floor.name })) ?? [])
+
+function parseCoordinate(value: unknown, minimum: number, maximum: number) {
+  if (typeof value !== 'string' || value.trim() === '') return null
+  const parsed = Number(value)
+  return Number.isFinite(parsed) && parsed >= minimum && parsed <= maximum ? parsed : null
+}
+
 const initialValue = computed<SpotFormInput>(() => {
   const requestedFloorId = typeof route.query.floorId === 'string' ? route.query.floorId : ''
-  const requestedLat = Number(route.query.lat)
-  const requestedLng = Number(route.query.lng)
+  const requestedLat = parseCoordinate(route.query.lat, -90, 90)
+  const requestedLng = parseCoordinate(route.query.lng, -180, 180)
   return {
     floorId: floors.value.some(floor => floor.id === requestedFloorId) ? requestedFloorId : '',
     name: '',
@@ -22,8 +29,8 @@ const initialValue = computed<SpotFormInput>(() => {
     hoursText: '',
     holidayText: '',
     phone: '',
-    lat: Number.isFinite(requestedLat) && requestedLat >= -90 && requestedLat <= 90 ? requestedLat : 35.681236,
-    lng: Number.isFinite(requestedLng) && requestedLng >= -180 && requestedLng <= 180 ? requestedLng : 139.767125,
+    lat: requestedLat !== null && requestedLng !== null ? requestedLat : null,
+    lng: requestedLat !== null && requestedLng !== null ? requestedLng : null,
   }
 })
 const isSubmitting = ref(false)

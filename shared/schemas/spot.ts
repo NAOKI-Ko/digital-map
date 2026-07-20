@@ -1,6 +1,10 @@
 import { z } from 'zod'
 
 const optionalText = (maximum: number, message: string) => z.string().trim().max(maximum, message)
+const optionalCoordinate = (minimum: number, maximum: number, message: string) => z.preprocess(
+  value => value === '' || value === undefined ? null : value,
+  z.number({ error: message }).finite().min(minimum, message).max(maximum, message).nullable(),
+)
 
 export const spotFormSchema = z.object({
   floorId: z.string().min(1, 'フロアを選択してください。'),
@@ -13,8 +17,14 @@ export const spotFormSchema = z.object({
     value => !value || /^[0-9+()\-ー―‐\s]+$/.test(value),
     '電話番号の形式を確認してください。',
   ),
-  lat: z.number({ error: '緯度を入力してください。' }).finite().min(-90, '緯度は-90〜90で入力してください。').max(90, '緯度は-90〜90で入力してください。'),
-  lng: z.number({ error: '経度を入力してください。' }).finite().min(-180, '経度は-180〜180で入力してください。').max(180, '経度は-180〜180で入力してください。'),
+  lat: optionalCoordinate(-90, 90, '緯度は-90〜90で入力してください。'),
+  lng: optionalCoordinate(-180, 180, '経度は-180〜180で入力してください。'),
+}).superRefine((value, context) => {
+  if ((value.lat === null) !== (value.lng === null)) {
+    const message = '緯度と経度は両方入力するか、両方空欄にしてください。'
+    context.addIssue({ code: 'custom', path: ['lat'], message })
+    context.addIssue({ code: 'custom', path: ['lng'], message })
+  }
 })
 
 export const spotPublishSchema = z.object({

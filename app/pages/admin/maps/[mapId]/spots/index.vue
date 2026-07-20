@@ -106,7 +106,8 @@ function formatDate(value: string) {
                   <span class="rounded-full bg-stone-100 px-2.5 py-1 text-xs text-stone-700">{{ spot.category }}</span>
                   <span class="rounded-full px-2.5 py-1 text-xs font-semibold" :class="spot.isPublished ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'">{{ spot.isPublished ? '公開' : '下書き' }}</span>
                 </div>
-                <p class="mt-2 text-sm text-stone-600">{{ spot.floorName }} · lat {{ spot.lat.toFixed(6) }}, lng {{ spot.lng.toFixed(6) }}</p>
+                <p v-if="spot.lat !== null && spot.lng !== null" class="mt-2 text-sm text-stone-600">{{ spot.floorName }} · lat {{ spot.lat.toFixed(6) }}, lng {{ spot.lng.toFixed(6) }}</p>
+                <p v-else class="mt-2 text-sm font-medium text-amber-700">{{ spot.floorName }} · 位置未設定</p>
                 <p class="mt-1 text-xs text-stone-500">最終更新 {{ formatDate(spot.updatedAt) }}</p>
               </div>
               <NuxtLink :to="`/admin/maps/${mapId}/spots/${spot.id}`" class="text-sm font-semibold text-terracotta-700 hover:text-terracotta-900">編集する →</NuxtLink>

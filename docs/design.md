@@ -90,8 +90,8 @@ model Spot {
   name             String
   category         String
   description      String?
-  lat              Float
-  lng              Float
+  lat              Float?  // 下書きでは未設定可。公開時はlat/lngの両方が必須
+  lng              Float?
   photosJson       Json     @default("[]")
   hoursText        String?
   holidayText      String?
@@ -180,7 +180,7 @@ if (floor.isOutdoor) {
 ## 6. セキュリティ・認可
 
 - 管理画面配下は全てNuxtのルートミドルウェア(`middleware/auth.ts`)でセッションチェックを通す
-- 公開マップ画面・APIは認証不要だが、`isPublished === true`のマップ・スポットのみを返す
+- 公開マップ画面・APIは認証不要だが、`isPublished === true`のマップ・スポットのみを返す。座標未設定のスポットは公開不可とし、公開APIにも含めない
 
 ## 7. ディレクトリ構造
 
