@@ -14,6 +14,7 @@ FROM base AS builder
 
 COPY . .
 RUN pnpm install --frozen-lockfile
+RUN pnpm typecheck
 RUN pnpm build
 
 FROM base AS runtime
