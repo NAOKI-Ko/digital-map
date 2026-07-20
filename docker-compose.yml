@@ -11,6 +11,7 @@ services:
       DATABASE_URL: postgresql://digital_map:digital_map@postgres:5432/digital_map?schema=public
       HOST: 0.0.0.0
       NUXT_SESSION_PASSWORD: ${NUXT_SESSION_PASSWORD:-local-session-password-change-before-production}
+      NUXT_UPLOAD_DIR: /app/.output/public/uploads
       PORT: 3000
     ports:
       - '3000:3000'

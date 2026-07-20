@@ -7,6 +7,7 @@ export default defineNuxtConfig({
     typeCheck: true,
   },
   runtimeConfig: {
+    uploadDir: '',
     session: {
       maxAge: 60 * 60 * 24 * 7,
     },
