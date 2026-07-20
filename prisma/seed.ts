@@ -12,6 +12,27 @@ const tenantSlug = process.env.SEED_TENANT_SLUG ?? 'default'
 const adminEmail = (process.env.SEED_ADMIN_EMAIL ?? 'admin@example.com').toLowerCase()
 const adminPassword = process.env.SEED_ADMIN_PASSWORD ?? 'change-me-before-production'
 
+const verificationMaps = [
+  {
+    name: '湯かおり温泉郷(テスト)',
+    slug: 'test-yukaori-onsen',
+    floor: {
+      id: 'seed-floor-yukaori-onsen',
+      name: '全体マップ',
+      illustrationUrl: '/uploads/sample-onsen-illustration.png',
+    },
+  },
+  {
+    name: '里山リゾート みのりの杜(テスト)',
+    slug: 'test-satoyama-minori-resort',
+    floor: {
+      id: 'seed-floor-satoyama-minori-resort',
+      name: '全体マップ',
+      illustrationUrl: '/uploads/sample-satoyama-resort-illustration.png',
+    },
+  },
+] as const
+
 const adapter = new PrismaPg({ connectionString })
 const prisma = new PrismaClient({ adapter })
 
@@ -46,6 +67,52 @@ async function main() {
   })
 
   console.info(`管理者を作成しました: ${admin.email} (${tenant.name})`)
+
+  for (const verificationMap of verificationMaps) {
+    const map = await prisma.map.upsert({
+      where: { slug: verificationMap.slug },
+      update: {
+        tenantId: tenant.id,
+        name: verificationMap.name,
+        isPublished: false,
+      },
+      create: {
+        tenantId: tenant.id,
+        name: verificationMap.name,
+        slug: verificationMap.slug,
+        isPublished: false,
+      },
+    })
+
+    await prisma.mapFloor.upsert({
+      where: { id: verificationMap.floor.id },
+      update: {
+        mapId: map.id,
+        name: verificationMap.floor.name,
+        illustrationUrl: verificationMap.floor.illustrationUrl,
+        order: 0,
+        isOutdoor: true,
+      },
+      create: {
+        id: verificationMap.floor.id,
+        mapId: map.id,
+        name: verificationMap.floor.name,
+        illustrationUrl: verificationMap.floor.illustrationUrl,
+        order: 0,
+        topLeftLat: null,
+        topLeftLng: null,
+        topRightLat: null,
+        topRightLng: null,
+        bottomRightLat: null,
+        bottomRightLng: null,
+        bottomLeftLat: null,
+        bottomLeftLng: null,
+        isOutdoor: true,
+      },
+    })
+
+    console.info(`実地確認用マップを作成しました: ${verificationMap.name}`)
+  }
 }
 
 main()

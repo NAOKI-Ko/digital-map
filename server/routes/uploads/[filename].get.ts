@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
   const filename = getRouterParam(event, 'filename') ?? ''
   const mimeType = mimeTypeForFilename(filename)
 
-  if (!mimeType || basename(filename) !== filename || !/^[0-9a-f-]+\.(?:png|jpg)$/.test(filename)) {
+  if (!mimeType || basename(filename) !== filename || !/^[0-9A-Za-z][0-9A-Za-z_-]*\.(?:png|jpg)$/.test(filename)) {
     throw createError({ statusCode: 404, statusMessage: '画像が見つかりません。' })
   }
 
