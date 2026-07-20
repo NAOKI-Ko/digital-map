@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AddressGeocoder from '~/components/admin/AddressGeocoder.vue'
 import { useForm } from 'vee-validate'
 import { spotCategorySuggestions } from '~~/shared/constants/spot'
 import { spotFormSchema, type SpotFormInput } from '~~/shared/schemas/spot'
@@ -29,7 +30,7 @@ const emit = defineEmits<{
   submit: [input: SpotFormInput]
 }>()
 
-const { defineField, errors, handleSubmit, resetForm, setErrors } = useForm<SpotFormInput>({
+const { defineField, errors, handleSubmit, resetForm, setErrors, setFieldValue } = useForm<SpotFormInput>({
   initialValues: props.initialValue,
 })
 
@@ -57,6 +58,11 @@ const submit = handleSubmit((values) => {
 
   emit('submit', result.data)
 })
+
+function useGeocodeResult(result: { lat: number, lng: number }) {
+  setFieldValue('lat', result.lat)
+  setFieldValue('lng', result.lng)
+}
 </script>
 
 <template>
@@ -112,7 +118,10 @@ const submit = handleSubmit((values) => {
 
     <section class="border-t border-stone-200 pt-8">
       <h2 class="text-lg font-bold text-stone-900">位置</h2>
-      <p class="mt-1 text-sm text-stone-600">現在は数値で入力できます。後続のピン配置エディタでも調整できます。</p>
+      <p class="mt-1 text-sm text-stone-600">住所検索または緯度・経度の直接入力で位置を指定します。</p>
+      <div class="mt-5">
+        <AddressGeocoder @select="useGeocodeResult" />
+      </div>
       <div class="mt-5 grid gap-5 sm:grid-cols-2">
         <div>
           <label for="spot-lat" class="text-sm font-semibold text-stone-800">緯度（lat）</label>
