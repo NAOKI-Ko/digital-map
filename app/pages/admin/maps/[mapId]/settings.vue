@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import ImageUploader from '~/components/admin/ImageUploader.vue'
 import MapNameForm from '~/components/admin/MapNameForm.vue'
 import type { MapNameInput } from '~~/shared/schemas/map'
 import type { AdminMapResponse } from '~~/shared/types/map'
@@ -15,7 +14,6 @@ const { data, error, status } = await useFetch<AdminMapResponse>(`/api/maps/${ma
 const isSubmitting = ref(false)
 const submitError = ref('')
 const successMessage = ref('')
-const latestIllustrationUrl = ref('')
 
 useHead(() => ({
   title: `${data.value?.map.name ?? 'マップ設定'} | デジタルマップ`,
@@ -99,17 +97,14 @@ async function saveMap(input: MapNameInput) {
 
       <section class="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
         <h2 class="text-lg font-bold text-stone-900">
-          イラスト画像
+          イラスト画像とフロア
         </h2>
         <p class="mt-2 text-sm leading-6 text-stone-600">
-          フロアの土台に使う画像をアップロードします。フロアへの登録は次の画面で行います。
+          フロアごとにイラスト画像を登録し、表示順や屋外・屋内を設定します。
         </p>
-        <div class="mt-6">
-          <ImageUploader @uploaded="latestIllustrationUrl = $event.url" />
-        </div>
-        <p v-if="latestIllustrationUrl" class="mt-3 break-all text-xs text-stone-500">
-          保存先: {{ latestIllustrationUrl }}
-        </p>
+        <NuxtLink :to="`/admin/maps/${mapId}/floors`" class="mt-5 inline-flex rounded-lg bg-stone-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-stone-700">
+          フロアを管理する
+        </NuxtLink>
       </section>
     </template>
   </div>
