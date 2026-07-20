@@ -110,7 +110,10 @@ async function saveMap(input: MapNameInput) {
       <section class="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
         <h2 class="text-lg font-bold text-stone-900">スポット</h2>
         <p class="mt-2 text-sm leading-6 text-stone-600">登録済みスポットを検索し、情報や公開状態を管理します。</p>
-        <NuxtLink :to="`/admin/maps/${mapId}/spots`" class="mt-5 inline-flex rounded-lg bg-stone-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-stone-700">スポット一覧を開く</NuxtLink>
+        <div class="mt-5 flex flex-wrap gap-3">
+          <NuxtLink :to="`/admin/maps/${mapId}/spots`" class="inline-flex rounded-lg bg-stone-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-stone-700">スポット一覧を開く</NuxtLink>
+          <NuxtLink :to="`/admin/maps/${mapId}/editor`" class="inline-flex rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-sm font-semibold text-stone-800 hover:bg-stone-100">地図からピンを置く</NuxtLink>
+        </div>
       </section>
     </template>
   </div>

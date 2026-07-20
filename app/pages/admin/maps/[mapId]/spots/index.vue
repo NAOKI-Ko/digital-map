@@ -43,7 +43,7 @@ function formatDate(value: string) {
         <h1 class="mt-1 text-2xl font-bold tracking-tight text-stone-900 sm:text-3xl">スポット一覧</h1>
         <p class="mt-2 text-sm text-stone-600">店名・カテゴリを検索し、フロアや公開状態で絞り込めます。</p>
       </div>
-      <NuxtLink :to="`/admin/maps/${mapId}/spots/new`" class="rounded-lg bg-terracotta-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-terracotta-700">新しいスポットを登録</NuxtLink>
+      <NuxtLink :to="`/admin/maps/${mapId}/editor`" class="rounded-lg bg-terracotta-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-terracotta-700">新しいスポットを登録</NuxtLink>
     </header>
 
     <form class="mt-8 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm" @submit.prevent="search">
