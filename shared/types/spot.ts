@@ -60,3 +60,10 @@ export interface SpotPinDesignResponse {
     pinColor: string
   }
 }
+
+export interface SpotPublishResponse {
+  publication: {
+    isPublished: boolean
+    updatedAt: string
+  }
+}

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import PinDesignEditor from '~/components/admin/PinDesignEditor.vue'
 import SpotPhotoManager from '~/components/admin/SpotPhotoManager.vue'
+import SpotPublishPanel from '~/components/admin/SpotPublishPanel.vue'
 import SpotForm from '~/components/admin/SpotForm.vue'
 import type { SpotFormInput } from '~~/shared/schemas/spot'
 import type { AdminSpotResponse } from '~~/shared/types/spot'
@@ -78,6 +79,14 @@ async function updateSpot(input: SpotFormInput) {
           :spot-id="spotId"
           :category="data.spot.category"
           :initial-value="data.spot"
+          @updated="Object.assign(data.spot, $event)"
+        />
+      </section>
+      <section class="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+        <SpotPublishPanel
+          :map-id="mapId"
+          :spot-id="spotId"
+          :spot="data.spot"
           @updated="Object.assign(data.spot, $event)"
         />
       </section>

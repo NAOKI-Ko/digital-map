@@ -17,4 +17,9 @@ export const spotFormSchema = z.object({
   lng: z.number({ error: '経度を入力してください。' }).finite().min(-180, '経度は-180〜180で入力してください。').max(180, '経度は-180〜180で入力してください。'),
 })
 
+export const spotPublishSchema = z.object({
+  isPublished: z.boolean(),
+})
+
 export type SpotFormInput = z.infer<typeof spotFormSchema>
+export type SpotPublishInput = z.infer<typeof spotPublishSchema>
