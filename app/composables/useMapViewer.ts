@@ -55,6 +55,14 @@ export function getSpotMarkerPresentation(spot: MapViewerSpot) {
   }
 }
 
+export function getFloorLayerIds(floorId: string) {
+  const sourceId = `floor-${floorId}`
+  return {
+    sourceId,
+    layerId: `${sourceId}-layer`,
+  }
+}
+
 export function createMapViewerStyle(mode: MapViewerMode): StyleSpecification {
   if (mode === 'edit') {
     return {
@@ -118,6 +126,8 @@ export function useMapViewer(
   const isReady = ref(false)
   let draftMarker: Marker | null = null
   let spotMarkers: Marker[] = []
+  let activeSourceId: string | null = null
+  let activeLayerId: string | null = null
 
   async function initialize() {
     if (!container.value || map.value) return
@@ -139,7 +149,7 @@ export function useMapViewer(
       instance.once('load', () => {
         if (map.value !== instance) return
         isReady.value = true
-        showFloor(options.floor.value)
+        showFloor(options.floor.value, false)
         syncSpotMarkers()
         syncDraftMarker(options.position.value)
         options.onReady?.(instance)
@@ -167,6 +177,7 @@ export function useMapViewer(
     draftMarker = null
     spotMarkers.forEach(marker => marker.remove())
     spotMarkers = []
+    removeFloorImage()
     map.value?.remove()
     map.value = null
     maplibre.value = null
@@ -247,10 +258,26 @@ export function useMapViewer(
     draftMarker.setLngLat([position.lng, position.lat])
   }
 
-  function showFloor(floor: MapViewerFloor) {
+  function removeFloorImage() {
+    const instance = map.value
+    if (!instance) return
+
+    if (activeLayerId && instance.getLayer(activeLayerId)) {
+      instance.removeLayer(activeLayerId)
+    }
+    if (activeSourceId && instance.getSource(activeSourceId)) {
+      instance.removeSource(activeSourceId)
+    }
+    activeLayerId = null
+    activeSourceId = null
+  }
+
+  function showFloor(floor: MapViewerFloor, animate = true) {
     const instance = map.value
     const coordinates = getFloorGeoReference(floor)
     if (!instance || !isReady.value) return false
+
+    removeFloorImage()
 
     if (!coordinates) {
       floorError.value = 'このフロアはイラストの四隅座標が未設定、または正しくありません。'
@@ -258,8 +285,7 @@ export function useMapViewer(
     }
 
     floorError.value = ''
-    const sourceId = `floor-${floor.id}`
-    const layerId = `${sourceId}-layer`
+    const { sourceId, layerId } = getFloorLayerIds(floor.id)
     instance.addSource(sourceId, {
       type: 'image',
       url: floor.illustrationUrl,
@@ -271,17 +297,30 @@ export function useMapViewer(
       source: sourceId,
       paint: { 'raster-opacity': options.mode === 'edit' ? 0.82 : 1 },
     })
+    activeSourceId = sourceId
+    activeLayerId = layerId
 
     const bounds = getGeoReferenceBounds(coordinates)
     if (bounds) {
-      instance.fitBounds([bounds.southwest, bounds.northeast], {
+      const camera = instance.cameraForBounds([bounds.southwest, bounds.northeast], {
         padding: 64,
         maxZoom: 20,
-        duration: 0,
       })
-      const zoomConstraints = createFloorZoomConstraints(instance.getZoom())
-      instance.setMinZoom(zoomConstraints.minZoom)
-      instance.setMaxZoom(zoomConstraints.maxZoom)
+      if (camera) {
+        const targetZoom = camera.zoom ?? instance.getZoom()
+        instance.setMinZoom(ABSOLUTE_ZOOM_LIMITS.minZoom)
+        instance.setMaxZoom(ABSOLUTE_ZOOM_LIMITS.maxZoom)
+        const zoomConstraints = createFloorZoomConstraints(targetZoom)
+        instance.setMinZoom(zoomConstraints.minZoom)
+        instance.setMaxZoom(zoomConstraints.maxZoom)
+        instance.easeTo({
+          center: camera.center,
+          zoom: targetZoom,
+          bearing: instance.getBearing(),
+          pitch: instance.getPitch(),
+          duration: animate ? 700 : 0,
+        })
+      }
     }
     return true
   }
@@ -292,6 +331,12 @@ export function useMapViewer(
   watch(() => options.spots.value, syncSpotMarkers, { deep: true })
   watch(() => options.position.value, syncDraftMarker, { deep: true })
   watch(() => options.selectedSpotId.value, syncSpotMarkers)
+  watch(() => options.floor.value, (floor) => {
+    if (!isReady.value) return
+    showFloor(floor, true)
+    syncSpotMarkers()
+    syncDraftMarker(options.position.value)
+  }, { deep: true })
 
   return {
     map: readonly(map),
@@ -301,6 +346,7 @@ export function useMapViewer(
     initialize,
     destroy,
     showFloor,
+    removeFloorImage,
     syncSpotMarkers,
     syncDraftMarker,
   }

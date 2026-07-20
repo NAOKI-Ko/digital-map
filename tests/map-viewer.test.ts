@@ -3,6 +3,7 @@ import {
   ABSOLUTE_ZOOM_LIMITS,
   createFloorZoomConstraints,
   createMapViewerOptions,
+  getFloorLayerIds,
   getSpotMarkerPresentation,
   VIEWER_CAMERA_CONSTRAINTS,
 } from '../app/composables/useMapViewer'
@@ -85,6 +86,15 @@ describe('Markerの表示内容', () => {
       color: '#C7401F',
       customImageUrl: '/uploads/custom.png',
       symbol: null,
+    })
+  })
+})
+
+describe('フロアimageソースの識別子', () => {
+  it('sourceとlayerへ衝突しない同一フロア接頭辞を付ける', () => {
+    expect(getFloorLayerIds('floor-123')).toEqual({
+      sourceId: 'floor-floor-123',
+      layerId: 'floor-floor-123-layer',
     })
   })
 })

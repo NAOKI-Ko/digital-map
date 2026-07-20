@@ -102,7 +102,7 @@ async function saveMovedSpot(value: { spotId: string, lat: number, lng: number }
       <div class="mt-5 grid gap-5 xl:grid-cols-[1fr_20rem]">
         <ClientOnly>
           <LazyMapViewer
-            :key="`${selectedFloor.id}-${mapRevision}`"
+            :key="mapRevision"
             v-model="position"
             :floor="selectedFloor"
             :spots="positionedFloorSpots"
