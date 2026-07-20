@@ -45,3 +45,26 @@ export async function requireOwnedFloor(event: H3Event) {
 
   return { session, map, floor }
 }
+
+export async function requireOwnedSpot(event: H3Event) {
+  const { session, map } = await requireOwnedMap(event)
+  const spotId = getRouterParam(event, 'spotId')
+
+  if (!spotId) {
+    throw createError({ statusCode: 400, statusMessage: 'スポットIDが必要です。' })
+  }
+
+  const spot = await prisma.spot.findFirst({
+    where: {
+      id: spotId,
+      floor: { mapId: map.id },
+    },
+    select: { id: true, floorId: true },
+  })
+
+  if (!spot) {
+    throw createError({ statusCode: 404, statusMessage: 'スポットが見つかりません。' })
+  }
+
+  return { session, map, spot }
+}

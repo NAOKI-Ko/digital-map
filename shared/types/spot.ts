@@ -22,3 +22,21 @@ export interface AdminSpotListResponse {
     floors: SpotListFilterFloor[]
   }
 }
+
+export interface AdminSpotDetail extends AdminSpotSummary {
+  description: string | null
+  photos: string[]
+  hoursText: string | null
+  holidayText: string | null
+  phone: string | null
+  pinIconType: 'preset' | 'custom'
+  pinIconId: string | null
+  pinIconImageUrl: string | null
+  pinColor: string
+  createdAt: string
+}
+
+export interface AdminSpotResponse {
+  spot: AdminSpotDetail
+  floors: SpotListFilterFloor[]
+}
