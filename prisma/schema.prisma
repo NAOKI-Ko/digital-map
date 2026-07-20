@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client"
+  output   = "./generated"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Tenant {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  users     User[]
+  maps      Map[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  id           String   @id @default(cuid())
+  tenantId     String
+  tenant       Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  email        String   @unique
+  passwordHash String
+  role         String   @default("admin")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([tenantId])
+}
+
+model Map {
+  id          String     @id @default(cuid())
+  tenantId    String
+  tenant      Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  name        String
+  slug        String     @unique
+  isPublished Boolean    @default(false)
+  floors      MapFloor[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([tenantId])
+}
+
+model MapFloor {
+  id              String   @id @default(cuid())
+  mapId           String
+  map             Map      @relation(fields: [mapId], references: [id], onDelete: Cascade)
+  name            String
+  illustrationUrl String
+  order           Int      @default(0)
+  topLeftLat      Float?
+  topLeftLng      Float?
+  topRightLat     Float?
+  topRightLng     Float?
+  bottomRightLat  Float?
+  bottomRightLng  Float?
+  bottomLeftLat   Float?
+  bottomLeftLng   Float?
+  isOutdoor       Boolean  @default(true)
+  spots           Spot[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([mapId, order])
+}
+
+model Spot {
+  id              String   @id @default(cuid())
+  floorId         String
+  floor           MapFloor @relation(fields: [floorId], references: [id], onDelete: Cascade)
+  name            String
+  category        String
+  description     String?
+  lat             Float
+  lng             Float
+  photosJson      Json     @default("[]")
+  hoursText       String?
+  holidayText     String?
+  phone           String?
+  pinIconType     String   @default("preset")
+  pinIconId       String?
+  pinIconImageUrl String?
+  pinColor        String   @default("#C7401F")
+  isPublished     Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([floorId])
+  @@index([floorId, isPublished])
+  @@index([category])
+}
