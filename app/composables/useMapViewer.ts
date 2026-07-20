@@ -5,6 +5,32 @@ import type { MapViewerFloor } from '~~/shared/types/map-viewer'
 
 export type MapViewerMode = 'view' | 'edit'
 
+export const VIEWER_CAMERA_CONSTRAINTS = {
+  view: {
+    bearing: 0,
+    pitch: 45,
+    minPitch: 0,
+    maxPitch: 70,
+    dragRotate: true,
+    touchPitch: true,
+    pitchWithRotate: true,
+  },
+  edit: {
+    bearing: 0,
+    pitch: 0,
+    minPitch: 0,
+    maxPitch: 0,
+    dragRotate: false,
+    touchPitch: false,
+    pitchWithRotate: false,
+  },
+} as const
+
+export const ABSOLUTE_ZOOM_LIMITS = {
+  minZoom: 0,
+  maxZoom: 24,
+} as const
+
 export interface UseMapViewerOptions {
   mode: MapViewerMode
   floor: Readonly<Ref<MapViewerFloor>>
@@ -38,12 +64,28 @@ export function createMapViewerStyle(mode: MapViewerMode): StyleSpecification {
   }
 }
 
-export function createInitialMapOptions(container: HTMLElement, mode: MapViewerMode): MapOptions {
+export function createMapViewerOptions(container: HTMLElement | string, mode: MapViewerMode): MapOptions {
+  const camera = VIEWER_CAMERA_CONSTRAINTS[mode]
   return {
     container,
     style: createMapViewerStyle(mode),
     center: [0, 0],
     zoom: 1,
+    minZoom: ABSOLUTE_ZOOM_LIMITS.minZoom,
+    maxZoom: ABSOLUTE_ZOOM_LIMITS.maxZoom,
+    ...camera,
+  }
+}
+
+export function createFloorZoomConstraints(fittedZoom: number) {
+  const requestedZoom = Number.isFinite(fittedZoom) ? fittedZoom : 1
+  const safeZoom = Math.min(
+    ABSOLUTE_ZOOM_LIMITS.maxZoom,
+    Math.max(ABSOLUTE_ZOOM_LIMITS.minZoom, requestedZoom),
+  )
+  return {
+    minZoom: Math.max(ABSOLUTE_ZOOM_LIMITS.minZoom, safeZoom - 3),
+    maxZoom: Math.min(ABSOLUTE_ZOOM_LIMITS.maxZoom, safeZoom + 4),
   }
 }
 
@@ -64,8 +106,13 @@ export function useMapViewer(
         import('maplibre-gl'),
         import('maplibre-gl/dist/maplibre-gl.css'),
       ])
-      const instance = new maplibregl.Map(createInitialMapOptions(container.value, options.mode))
+      const instance = new maplibregl.Map(createMapViewerOptions(container.value, options.mode))
       map.value = instance
+      instance.addControl(new maplibregl.NavigationControl({
+        showCompass: options.mode === 'view',
+        showZoom: true,
+        visualizePitch: options.mode === 'view',
+      }), 'top-right')
 
       instance.once('load', () => {
         if (map.value !== instance) return
@@ -118,6 +165,9 @@ export function useMapViewer(
         maxZoom: 20,
         duration: 0,
       })
+      const zoomConstraints = createFloorZoomConstraints(instance.getZoom())
+      instance.setMinZoom(zoomConstraints.minZoom)
+      instance.setMaxZoom(zoomConstraints.maxZoom)
     }
     return true
   }
