@@ -10,10 +10,16 @@ RUN apt-get update \
 
 WORKDIR /app
 
-FROM base AS builder
+FROM base AS dependencies
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+RUN pnpm install --frozen-lockfile --ignore-scripts
+
+FROM dependencies AS builder
 
 COPY . .
-RUN pnpm install --frozen-lockfile
+RUN pnpm rebuild @parcel/watcher @prisma/engines esbuild prisma
+RUN pnpm postinstall
 RUN pnpm typecheck
 RUN pnpm build
 
