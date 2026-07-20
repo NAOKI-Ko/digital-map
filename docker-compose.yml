@@ -1,0 +1,36 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://digital_map:digital_map@postgres:5432/digital_map?schema=public
+      HOST: 0.0.0.0
+      PORT: 3000
+    ports:
+      - '3000:3000'
+    volumes:
+      - uploads:/app/.output/public/uploads
+
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: digital_map
+      POSTGRES_USER: digital_map
+      POSTGRES_PASSWORD: digital_map
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U digital_map -d digital_map']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+  uploads:

@@ -1,0 +1,11 @@
+.git
+.nuxt
+.output
+node_modules
+public/uploads/*
+!public/uploads/.gitkeep
+*.log
+.DS_Store
+.env
+.env.*
+!.env.example
