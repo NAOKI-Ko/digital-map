@@ -2,6 +2,7 @@
 import { defineAsyncComponent } from 'vue'
 import CategoryFilter from '~/components/map/CategoryFilter.vue'
 import FloorTabs from '~/components/map/FloorTabs.vue'
+import MapOperationHint from '~/components/map/MapOperationHint.vue'
 import SpotDetailCard from '~/components/map/SpotDetailCard.vue'
 import type { MapViewerSpot } from '~~/shared/types/map-viewer'
 import type { PublicMapResponse } from '~~/shared/types/public-map'
@@ -115,6 +116,8 @@ function selectSpot(spot: MapViewerSpot) {
             <div class="h-[calc(100svh-4rem)] animate-pulse bg-stone-200" />
           </template>
         </ClientOnly>
+
+        <MapOperationHint :storage-key="`digital-map:operation-hint:${data.map.slug}`" />
       </section>
 
       <SpotDetailCard
