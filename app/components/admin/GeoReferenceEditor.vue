@@ -72,7 +72,6 @@ onMounted(async () => {
       ...(bounds
         ? { bounds: [bounds.southwest, bounds.northeast], fitBoundsOptions: { padding: 96, maxZoom: 18 } }
         : { center: [138, 36], zoom: 5 }),
-      maxBounds: [[-180, -85], [180, 85]],
       renderWorldCopies: false,
       maxPitch: 0,
       dragRotate: false,
