@@ -1,8 +1,14 @@
 <script setup lang="ts">
 import 'maplibre-gl/dist/maplibre-gl.css'
-import type { Map as MapLibreMap, Marker } from 'maplibre-gl'
+import type { ImageSource, Map as MapLibreMap, Marker } from 'maplibre-gl'
 import { getGeoReferenceStep } from '~/composables/useGeoReference'
-import type { LatLng } from '~~/lib/geo'
+import {
+  computeFloorCorners,
+  getGeoReferenceBounds,
+  toImageCoordinates,
+  type CompleteFloorGeoReference,
+  type LatLng,
+} from '~~/lib/geo'
 import type { GeoReferenceDraft } from '~~/shared/types/georeference'
 
 const props = defineProps<{
@@ -15,10 +21,16 @@ const draft = defineModel<GeoReferenceDraft>({ required: true })
 const illustration = useTemplateRef<HTMLImageElement>('illustration')
 const mapContainer = useTemplateRef<HTMLDivElement>('mapContainer')
 const mapError = ref('')
+const previewError = ref('')
+const previewReady = ref(false)
 const step = computed(() => getGeoReferenceStep(draft.value))
 let map: MapLibreMap | undefined
 let maplibre: typeof import('maplibre-gl') | undefined
 let referenceMarkers: Marker[] = []
+let lastPreviewSignature = ''
+
+const PREVIEW_SOURCE_ID = 'georeference-preview'
+const PREVIEW_LAYER_ID = 'georeference-preview-layer'
 
 const stepTitle = computed(() => ({
   'a-image': '基準点A：イラストの目印を選ぶ',
@@ -63,7 +75,10 @@ onMounted(async () => {
       dragRotate: false,
     })
     map.addControl(new maplibre.NavigationControl({ showCompass: false }), 'top-right')
-    map.on('load', renderReferenceMarkers)
+    map.on('load', () => {
+      renderReferenceMarkers()
+      renderPreview()
+    })
     map.on('click', (event) => {
       if (step.value === 'a-map') {
         draft.value.refALat = event.lngLat.lat
@@ -77,6 +92,7 @@ onMounted(async () => {
         return
       }
       renderReferenceMarkers()
+      renderPreview()
     })
   }
   catch (error) {
@@ -92,7 +108,10 @@ onBeforeUnmount(() => {
   maplibre = undefined
 })
 
-watch(draft, () => renderReferenceMarkers(), { deep: true })
+watch(draft, () => {
+  renderReferenceMarkers()
+  renderPreview()
+}, { deep: true })
 
 function selectIllustrationPoint(event: MouseEvent) {
   if (!illustration.value || !['a-image', 'b-image'].includes(step.value)) return
@@ -189,6 +208,74 @@ function clearReferenceMarkers() {
   referenceMarkers = []
 }
 
+function renderPreview() {
+  if (!map || !map.isStyleLoaded()) return
+  const complete = completeGeoReference()
+  if (!complete) {
+    removePreview()
+    return
+  }
+
+  try {
+    const corners = computeFloorCorners(complete)
+    const coordinates = toImageCoordinates(corners)
+    const source = map.getSource(PREVIEW_SOURCE_ID) as ImageSource | undefined
+
+    if (source) {
+      source.setCoordinates(coordinates)
+    }
+    else {
+      map.addSource(PREVIEW_SOURCE_ID, {
+        type: 'image',
+        url: props.illustrationUrl,
+        coordinates,
+      })
+      map.addLayer({
+        id: PREVIEW_LAYER_ID,
+        type: 'raster',
+        source: PREVIEW_SOURCE_ID,
+        paint: { 'raster-opacity': 0.55 },
+      })
+    }
+
+    const signature = JSON.stringify(complete)
+    if (signature !== lastPreviewSignature) {
+      const bounds = getGeoReferenceBounds(corners)
+      map.fitBounds([bounds.southwest, bounds.northeast], { padding: 64, maxZoom: 18, duration: 700 })
+      lastPreviewSignature = signature
+    }
+    previewReady.value = true
+    previewError.value = ''
+  }
+  catch (error) {
+    removePreview()
+    previewError.value = error instanceof Error ? error.message : 'プレビューを計算できませんでした。'
+  }
+}
+
+function removePreview() {
+  if (map?.getLayer(PREVIEW_LAYER_ID)) map.removeLayer(PREVIEW_LAYER_ID)
+  if (map?.getSource(PREVIEW_SOURCE_ID)) map.removeSource(PREVIEW_SOURCE_ID)
+  previewReady.value = false
+  lastPreviewSignature = ''
+}
+
+function completeGeoReference(): CompleteFloorGeoReference | null {
+  if (step.value !== 'preview') return null
+  return {
+    imageWidth: props.imageWidth,
+    imageHeight: props.imageHeight,
+    refAPixelX: draft.value.refAPixelX!,
+    refAPixelY: draft.value.refAPixelY!,
+    refALat: draft.value.refALat!,
+    refALng: draft.value.refALng!,
+    refBPixelX: draft.value.refBPixelX!,
+    refBPixelY: draft.value.refBPixelY!,
+    refBLat: draft.value.refBLat!,
+    refBLng: draft.value.refBLng!,
+  }
+}
+
 function focusLocation(position: LatLng) {
   map?.easeTo({ center: [position.lng, position.lat], zoom: 17, duration: 600 })
 }
@@ -232,7 +319,10 @@ defineExpose({ focusLocation })
       </section>
 
       <section>
-        <h2 class="text-sm font-bold text-stone-900">2. 実地図上の同じ場所</h2>
+        <div class="flex items-center justify-between gap-3">
+          <h2 class="text-sm font-bold text-stone-900">2. 実地図上の同じ場所</h2>
+          <span v-if="previewReady" class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">半透明プレビュー表示中</span>
+        </div>
         <div class="relative mt-2 overflow-hidden rounded-xl border border-stone-300 bg-stone-100">
           <div ref="mapContainer" class="h-[36rem] w-full" aria-label="基準点を選ぶ実地図" />
           <div v-if="step === 'a-map' || step === 'b-map'" class="pointer-events-none absolute bottom-3 left-3 right-3 rounded-lg bg-white/95 px-4 py-3 text-center text-sm font-semibold text-stone-800 shadow">
@@ -240,6 +330,8 @@ defineExpose({ focusLocation })
           </div>
         </div>
         <p v-if="mapError" role="alert" class="mt-2 text-sm text-red-600">{{ mapError }}</p>
+        <p v-if="previewError" role="alert" class="mt-2 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800">{{ previewError }}</p>
+        <p v-if="previewReady" class="mt-2 text-xs leading-5 text-stone-600">半透明のイラストと道路・建物の重なりを確認し、大きくずれている場合はAまたはBを選び直してください。</p>
       </section>
     </div>
   </div>

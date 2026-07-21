@@ -124,7 +124,7 @@ function getErrorMessage(error: unknown) {
       <div class="mt-5 flex flex-wrap justify-end gap-3">
         <NuxtLink v-if="cameFromEditor" :to="backPath" class="rounded-lg border border-stone-300 bg-white px-5 py-2.5 text-sm font-semibold text-stone-700 hover:bg-stone-50">ピン配置エディタに戻る</NuxtLink>
         <button type="button" :disabled="isSaving || !isGeoReferenceDraftComplete(draft)" class="rounded-lg bg-terracotta-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60" @click="save">
-          {{ isSaving ? '保存中…' : 'プレビューして保存' }}
+          {{ isSaving ? '保存中…' : 'この内容で保存' }}
         </button>
       </div>
     </template>
