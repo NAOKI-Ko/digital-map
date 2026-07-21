@@ -78,9 +78,10 @@ onMounted(async () => {
       dragRotate: false,
     })
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right')
-    map.on('load', () => {
+    map.on('load', async () => {
       if (!rectangle.value && map) {
         rectangle.value = createDefaultRectangleFromMap(map)
+        await nextTick()
       }
       safelyRenderRectangle()
       bindRectangleDragging()
@@ -100,7 +101,14 @@ onBeforeUnmount(() => {
   maplibre = undefined
 })
 
-watch(rectangle, () => updateVisuals(), { deep: true })
+watch(rectangle, async () => {
+  await nextTick()
+  if (map?.isStyleLoaded() && !map.getSource(IMAGE_SOURCE_ID)) {
+    safelyRenderRectangle()
+    return
+  }
+  updateVisuals()
+}, { deep: true })
 
 function createDefaultRectangleFromMap(currentMap: MapLibreMap) {
   const bounds = currentMap.getBounds()
