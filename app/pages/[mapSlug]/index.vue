@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { defineAsyncComponent } from 'vue'
+import CategoryFilter from '~/components/map/CategoryFilter.vue'
 import SpotDetailCard from '~/components/map/SpotDetailCard.vue'
 import type { MapViewerSpot } from '~~/shared/types/map-viewer'
 import type { PublicMapResponse } from '~~/shared/types/public-map'
@@ -13,6 +14,7 @@ const { data, error, status } = await useFetch<PublicMapResponse>(
 )
 const selectedFloorId = ref('')
 const selectedSpotId = ref<string | null>(null)
+const selectedCategory = ref('')
 
 const selectedFloor = computed(() => (
   data.value?.map.floors.find(floor => floor.id === selectedFloorId.value)
@@ -22,6 +24,13 @@ const selectedSpot = computed(() => (
   selectedFloor.value?.spots.find(spot => spot.id === selectedSpotId.value)
   ?? null
 ))
+const categories = computed(() => (
+  [...new Set(selectedFloor.value?.spots.map(spot => spot.category) ?? [])]
+    .sort((left, right) => left.localeCompare(right, 'ja'))
+))
+const visibleSpots = computed(() => selectedFloor.value?.spots.filter(spot => (
+  selectedCategory.value === '' || spot.category === selectedCategory.value
+)) ?? [])
 
 watch(() => data.value?.map.floors, (floors) => {
   if (!floors?.length) {
@@ -35,6 +44,13 @@ watch(() => data.value?.map.floors, (floors) => {
 
 watch(selectedFloorId, () => {
   selectedSpotId.value = null
+  selectedCategory.value = ''
+})
+
+watch(selectedCategory, () => {
+  if (!visibleSpots.value.some(spot => spot.id === selectedSpotId.value)) {
+    selectedSpotId.value = null
+  }
 })
 
 useHead(() => ({
@@ -73,20 +89,28 @@ function selectSpot(spot: MapViewerSpot) {
         </div>
       </header>
 
-      <ClientOnly>
-        <LazyMapViewer
-          :floor="selectedFloor"
-          :spots="selectedFloor.spots"
-          mode="view"
-          :selected-spot-id="selectedSpotId"
-          height="calc(100svh - 4rem)"
-          :label="`${data.map.name} ${selectedFloor.name}`"
-          @spot-selected="selectSpot"
-        />
-        <template #fallback>
-          <div class="h-[calc(100svh-4rem)] animate-pulse bg-stone-200" />
-        </template>
-      </ClientOnly>
+      <section class="relative">
+        <div class="pointer-events-none absolute inset-x-3 top-3 z-20 sm:inset-x-5">
+          <div class="pointer-events-auto">
+            <CategoryFilter v-model="selectedCategory" :categories="categories" />
+          </div>
+        </div>
+
+        <ClientOnly>
+          <LazyMapViewer
+            :floor="selectedFloor"
+            :spots="visibleSpots"
+            mode="view"
+            :selected-spot-id="selectedSpotId"
+            height="calc(100svh - 4rem)"
+            :label="`${data.map.name} ${selectedFloor.name}`"
+            @spot-selected="selectSpot"
+          />
+          <template #fallback>
+            <div class="h-[calc(100svh-4rem)] animate-pulse bg-stone-200" />
+          </template>
+        </ClientOnly>
+      </section>
 
       <SpotDetailCard
         v-if="selectedSpot"
