@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import ImageUploader from '~/components/admin/ImageUploader.vue'
+import { getFloorGeoReference } from '~~/lib/geo'
 import type { FloorCreateInput, FloorUpdateInput } from '~~/shared/schemas/floor'
 import { floorCreateSchema, floorUpdateSchema } from '~~/shared/schemas/floor'
 import type { MapFloorItem, MapFloorListResponse, MapFloorResponse } from '~~/shared/types/floor'
@@ -18,6 +19,10 @@ const createInput = reactive<FloorCreateInput>({ name: '', illustrationUrl: '', 
 const createError = ref('')
 const isCreating = ref(false)
 const busyFloorId = ref('')
+
+function isFloorGeoreferenced(floor: MapFloorItem) {
+  return getFloorGeoReference(floor) !== null
+}
 
 useHead(() => ({
   title: `フロア管理 - ${mapData.value?.map.name ?? 'マップ'} | デジタルマップ`,
@@ -190,7 +195,12 @@ async function deleteFloor(floor: MapFloorItem) {
             <div>
               <div class="flex flex-wrap items-start justify-between gap-3">
                 <div class="flex-1">
-                  <label :for="`floor-name-${floor.id}`" class="text-xs font-semibold text-stone-500">フロア名</label>
+                  <div class="flex flex-wrap items-center gap-2">
+                    <label :for="`floor-name-${floor.id}`" class="text-xs font-semibold text-stone-500">フロア名</label>
+                    <span class="rounded-full px-2.5 py-1 text-xs font-semibold" :class="isFloorGeoreferenced(floor) ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'">
+                      {{ isFloorGeoreferenced(floor) ? 'ジオリファレンス設定済み' : 'ジオリファレンス未設定' }}
+                    </span>
+                  </div>
                   <input :id="`floor-name-${floor.id}`" v-model="floor.name" maxlength="50" class="mt-1 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm">
                 </div>
                 <div class="flex gap-2">
@@ -204,7 +214,7 @@ async function deleteFloor(floor: MapFloorItem) {
               </label>
               <p class="mt-2 text-xs text-stone-500">登録スポット: {{ floor.spotCount }}件</p>
               <div class="mt-4 flex flex-wrap gap-3">
-                <NuxtLink :to="`/admin/maps/${mapId}/floors/${floor.id}/georeference`" class="rounded-lg border border-terracotta-300 bg-terracotta-50 px-4 py-2 text-sm font-semibold text-terracotta-800 hover:bg-terracotta-100">ジオリファレンスを設定</NuxtLink>
+                <NuxtLink :to="`/admin/maps/${mapId}/floors/${floor.id}/georeference`" class="rounded-lg border border-terracotta-300 bg-terracotta-50 px-4 py-2 text-sm font-semibold text-terracotta-800 hover:bg-terracotta-100">{{ isFloorGeoreferenced(floor) ? 'ジオリファレンスを調整' : 'ジオリファレンスを設定' }}</NuxtLink>
                 <button type="button" :disabled="busyFloorId === floor.id" class="rounded-lg bg-stone-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60" @click="updateFloor(floor)">変更を保存</button>
                 <button type="button" :disabled="busyFloorId === floor.id" class="rounded-lg px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-50 disabled:opacity-60" @click="deleteFloor(floor)">削除</button>
               </div>

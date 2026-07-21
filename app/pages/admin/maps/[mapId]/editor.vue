@@ -12,13 +12,17 @@ const route = useRoute()
 const mapId = route.params.mapId as string
 const { data, error, status } = await useFetch<MapFloorListResponse>(`/api/maps/${mapId}/floors`)
 const { data: spotData, refresh: refreshSpots } = await useFetch<AdminSpotListResponse>(`/api/maps/${mapId}/spots`)
-const selectedFloorId = ref('')
+const requestedFloorId = typeof route.query.floorId === 'string' ? route.query.floorId : ''
+const selectedFloorId = ref(requestedFloorId)
 const position = ref<LatLng | null>(null)
 const selectedFloor = computed(() => data.value?.floors.find(floor => floor.id === selectedFloorId.value))
 const selectedFloorSpots = computed(() => spotData.value?.spots.filter(spot => spot.floorId === selectedFloorId.value) ?? [])
 const positionedFloorSpots = computed(() => selectedFloorSpots.value.filter(hasPosition))
 const moveStatus = ref('')
 const mapRevision = ref(0)
+const geoReferenceEditorPath = computed(() => selectedFloor.value
+  ? `/admin/maps/${mapId}/floors/${selectedFloor.value.id}/georeference?from=editor`
+  : '')
 
 watch(() => data.value?.floors, (floors) => {
   if (floors?.length && !floors.some(floor => floor.id === selectedFloorId.value)) {
@@ -97,7 +101,10 @@ async function saveMovedSpot(value: { spotId: string, lat: number, lng: number }
         <button v-for="floor in data.floors" :key="floor.id" type="button" role="tab" :aria-selected="floor.id === selectedFloorId" class="rounded-full px-4 py-2 text-sm font-semibold" :class="floor.id === selectedFloorId ? 'bg-stone-900 text-white' : 'bg-white text-stone-700 shadow-sm'" @click="selectedFloorId = floor.id">{{ floor.name }}</button>
       </div>
 
-      <div v-if="!isGeoreferenced()" class="mt-4 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-800">このフロアはジオリファレンス未設定です。通常地図上にはピンを置けますが、先に四隅を設定することをおすすめします。</div>
+      <div v-if="!isGeoreferenced()" class="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-800">
+        <span>このフロアはジオリファレンス未設定です。通常地図上にはピンを置けますが、先に四隅を設定することをおすすめします。</span>
+        <NuxtLink :to="geoReferenceEditorPath" class="shrink-0 rounded-lg bg-amber-800 px-4 py-2 font-semibold text-white hover:bg-amber-900">ジオリファレンスを設定</NuxtLink>
+      </div>
 
       <div class="mt-5 grid gap-5 xl:grid-cols-[1fr_20rem]">
         <ClientOnly>
@@ -108,6 +115,7 @@ async function saveMovedSpot(value: { spotId: string, lat: number, lng: number }
             :spots="positionedFloorSpots"
             mode="edit"
             label="ピン配置地図"
+            :floor-error-action-to="geoReferenceEditorPath"
             @spot-moved="saveMovedSpot"
           />
           <template #fallback><div class="h-[38rem] animate-pulse rounded-xl bg-stone-100" /></template>

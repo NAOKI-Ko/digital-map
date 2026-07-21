@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import GeoReferenceEditor from '~/components/admin/GeoReferenceEditor.vue'
-import type { GeoReferenceCoordinates } from '~~/lib/geo'
+import { normalizeGeoReferenceLongitudes, type GeoReferenceCoordinates } from '~~/lib/geo'
 import type { GeoReferenceInput } from '~~/shared/schemas/georeference'
 import type { MapFloorItem, MapFloorListResponse, MapFloorResponse } from '~~/shared/types/floor'
 
@@ -18,6 +18,10 @@ const coordinates = ref<GeoReferenceCoordinates | null>(null)
 const isSaving = ref(false)
 const saveError = ref('')
 const successMessage = ref('')
+const cameFromEditor = computed(() => route.query.from === 'editor')
+const backPath = computed(() => cameFromEditor.value
+  ? { path: `/admin/maps/${mapId}/editor`, query: { floorId } }
+  : `/admin/maps/${mapId}/floors`)
 
 watch(floor, (value) => {
   if (value) coordinates.value = coordinatesFromFloor(value)
@@ -46,15 +50,16 @@ function coordinatesFromFloor(value: MapFloorItem): GeoReferenceCoordinates | nu
 }
 
 function toInput(value: GeoReferenceCoordinates): GeoReferenceInput {
+  const normalized = normalizeGeoReferenceLongitudes(value)
   return {
-    topLeftLat: value.topLeft.lat,
-    topLeftLng: value.topLeft.lng,
-    topRightLat: value.topRight.lat,
-    topRightLng: value.topRight.lng,
-    bottomRightLat: value.bottomRight.lat,
-    bottomRightLng: value.bottomRight.lng,
-    bottomLeftLat: value.bottomLeft.lat,
-    bottomLeftLng: value.bottomLeft.lng,
+    topLeftLat: normalized.topLeft.lat,
+    topLeftLng: normalized.topLeft.lng,
+    topRightLat: normalized.topRight.lat,
+    topRightLng: normalized.topRight.lng,
+    bottomRightLat: normalized.bottomRight.lat,
+    bottomRightLng: normalized.bottomRight.lng,
+    bottomLeftLat: normalized.bottomLeft.lat,
+    bottomLeftLng: normalized.bottomLeft.lng,
   }
 }
 
@@ -87,7 +92,7 @@ async function save() {
 
 <template>
   <div class="max-w-6xl">
-    <NuxtLink :to="`/admin/maps/${mapId}/floors`" class="text-sm font-medium text-stone-600 hover:text-stone-900">← フロア管理に戻る</NuxtLink>
+    <NuxtLink :to="backPath" class="text-sm font-medium text-stone-600 hover:text-stone-900">← {{ cameFromEditor ? 'ピン配置エディタに戻る' : 'フロア管理に戻る' }}</NuxtLink>
 
     <section v-if="status === 'pending'" class="mt-8 rounded-xl bg-white p-8 text-sm text-stone-600">読み込んでいます…</section>
     <section v-else-if="error || !floor" class="mt-8 rounded-xl bg-red-50 p-8 text-sm text-red-700">フロアが見つかりません。</section>
@@ -107,7 +112,8 @@ async function save() {
 
       <div v-if="saveError" role="alert" class="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{{ saveError }}</div>
       <div v-if="successMessage" role="status" class="mt-4 rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{{ successMessage }}</div>
-      <div class="mt-5 flex justify-end">
+      <div class="mt-5 flex flex-wrap justify-end gap-3">
+        <NuxtLink v-if="cameFromEditor" :to="backPath" class="rounded-lg border border-stone-300 bg-white px-5 py-2.5 text-sm font-semibold text-stone-700 hover:bg-stone-50">ピン配置エディタに戻る</NuxtLink>
         <button type="button" :disabled="isSaving || !coordinates" class="rounded-lg bg-terracotta-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60" @click="save">
           {{ isSaving ? '保存中…' : '四隅の座標を保存する' }}
         </button>

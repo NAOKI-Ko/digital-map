@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 import {
   getFloorGeoReference,
   isValidGeoReference,
+  normalizeGeoReferenceLongitudes,
+  normalizeLongitude,
   toImageCoordinates,
   type GeoReferenceCoordinates,
   type GeoReferenceFields,
@@ -41,6 +43,27 @@ describe('ジオリファレンス変換', () => {
 
   it('座標が1つでもnullなら未設定として扱う', () => {
     expect(getFloorGeoReference({ ...validFloor, bottomLeftLng: null })).toBeNull()
+  })
+
+  it.each([
+    [0, 0],
+    [180, -180],
+    [-180, -180],
+    [181, -179],
+    [-181, 179],
+    [541, -179],
+    [-541, 179],
+  ])('経度%fを[-180, 180)の範囲へ正規化する', (input, expected) => {
+    expect(normalizeLongitude(input)).toBe(expected)
+  })
+
+  it('四隅すべての周回済み経度を正規化する', () => {
+    expect(normalizeGeoReferenceLongitudes({
+      topLeft: { lat: 35.7, lng: -220.3 },
+      topRight: { lat: 35.7, lng: 499.8 },
+      bottomRight: { lat: 35.6, lng: 859.8 },
+      bottomLeft: { lat: 35.6, lng: 139.7 },
+    })).toEqual(validCoordinates)
   })
 })
 

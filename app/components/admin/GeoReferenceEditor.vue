@@ -4,6 +4,9 @@ import type { ImageSource, Map as MapLibreMap, Marker } from 'maplibre-gl'
 import {
   createGeoReferenceFromBounds,
   getGeoReferenceBounds,
+  isValidLatLng,
+  normalizeGeoReferenceLongitudes,
+  normalizeLongitude,
   toImageCoordinates,
   type GeoReferenceCoordinates,
   type LatLng,
@@ -53,16 +56,24 @@ onMounted(async () => {
       ...(bounds
         ? { bounds: [bounds.southwest, bounds.northeast], fitBoundsOptions: { padding: 80, maxZoom: 18 } }
         : { center: [0, 0], zoom: 1 }),
+      renderWorldCopies: false,
       maxPitch: 0,
       dragRotate: false,
     })
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right')
+    map.on('moveend', () => {
+      if (!map) return
+      const center = map.getCenter()
+      const normalizedLng = normalizeLongitude(center.lng)
+      if (normalizedLng !== center.lng) map.setCenter([normalizedLng, center.lat])
+    })
 
     map.on('load', () => {
-      addIllustrationAndMarkers()
+      safelyAddIllustrationAndMarkers()
     })
   }
-  catch {
+  catch (error) {
+    console.error('GeoReferenceEditorの初期化に失敗しました。', error)
     mapError.value = '地図を初期化できませんでした。WebGLが有効か確認してください。'
   }
 })
@@ -79,28 +90,62 @@ function setCorner(key: keyof GeoReferenceCoordinates, value: LatLng) {
   if (!coordinates.value) return
   coordinates.value = {
     ...coordinates.value,
-    [key]: value,
+    [key]: { lat: value.lat, lng: normalizeLongitude(value.lng) },
   }
 
   const source = map?.getSource('floor-illustration') as ImageSource | undefined
   source?.setCoordinates(toImageCoordinates(coordinates.value))
 }
 
-function initializeFromViewport() {
+async function initializeFromViewport() {
   if (!map) return
   const bounds = map.getBounds()
-  coordinates.value = createGeoReferenceFromBounds({
+  coordinates.value = normalizeGeoReferenceLongitudes(createGeoReferenceFromBounds({
     southwest: { lat: bounds.getSouth(), lng: bounds.getWest() },
     northeast: { lat: bounds.getNorth(), lng: bounds.getEast() },
-  })
-  addIllustrationAndMarkers()
+  }))
+  await nextTick()
+  safelyAddIllustrationAndMarkers()
+}
+
+function safelyAddIllustrationAndMarkers() {
+  try {
+    const markerCount = addIllustrationAndMarkers()
+    if (coordinates.value && markerCount !== corners.length) {
+      throw new Error(`四隅Markerの生成数が不正です: ${markerCount}`)
+    }
+    mapError.value = ''
+  }
+  catch (error) {
+    const message = error instanceof Error ? error.message : '不明なエラー'
+    console.error(`GeoReferenceEditorの配置処理に失敗しました: ${message}`)
+    mapError.value = 'イラストを配置できませんでした。地図を読み込み直して再度お試しください。'
+  }
 }
 
 function addIllustrationAndMarkers() {
-  if (!map || !maplibre || !coordinates.value) return
+  if (!map || !maplibre || !coordinates.value) return markers.length
   const currentMap = map
   const currentMaplibre = maplibre
-  const currentCoordinates = coordinates.value
+  const bounds = currentMap.getBounds()
+  const fallbackCoordinates = normalizeGeoReferenceLongitudes(createGeoReferenceFromBounds({
+    southwest: { lat: bounds.getSouth(), lng: bounds.getWest() },
+    northeast: { lat: bounds.getNorth(), lng: bounds.getEast() },
+  }))
+  const rawCoordinates = coordinates.value as Partial<Record<keyof GeoReferenceCoordinates, LatLng>>
+  const safeCorner = (key: keyof GeoReferenceCoordinates) => {
+    const candidate = rawCoordinates[key]
+    if (!candidate) return fallbackCoordinates[key]
+    const normalized = { lat: candidate.lat, lng: normalizeLongitude(candidate.lng) }
+    return isValidLatLng(normalized) ? normalized : fallbackCoordinates[key]
+  }
+  const currentCoordinates: GeoReferenceCoordinates = {
+    topLeft: safeCorner('topLeft'),
+    topRight: safeCorner('topRight'),
+    bottomRight: safeCorner('bottomRight'),
+    bottomLeft: safeCorner('bottomLeft'),
+  }
+  coordinates.value = currentCoordinates
 
   if (!currentMap.getSource('floor-illustration')) {
     currentMap.addSource('floor-illustration', {
@@ -125,15 +170,16 @@ function addIllustrationAndMarkers() {
     element.title = `${corner.label}をドラッグ`
     const position = currentCoordinates[corner.key]
     const marker = new currentMaplibre.Marker({ element, draggable: true })
-      .setLngLat([position.lng, position.lat])
-      .addTo(currentMap)
+    marker.setLngLat([position.lng, position.lat])
+    marker.addTo(currentMap)
 
     marker.on('drag', () => {
       const lngLat = marker.getLngLat()
-      setCorner(corner.key, { lat: lngLat.lat, lng: lngLat.lng })
+      setCorner(corner.key, { lat: lngLat.lat, lng: normalizeLongitude(lngLat.lng) })
     })
     return marker
   })
+  return markers.length
 }
 </script>
 

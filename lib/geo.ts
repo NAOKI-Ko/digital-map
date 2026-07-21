@@ -28,6 +28,25 @@ export type MapLibreImageCoordinates = [
   [number, number],
 ]
 
+/** MapLibreが世界を周回した際の経度を[-180, 180)へ戻す。 */
+export function normalizeLongitude(lng: number) {
+  if (!Number.isFinite(lng)) return lng
+  if (lng >= -180 && lng < 180) return lng
+  const wrapped = ((lng + 180) % 360 + 360) % 360 - 180
+  return Number(wrapped.toFixed(12))
+}
+
+export function normalizeGeoReferenceLongitudes(
+  coordinates: GeoReferenceCoordinates,
+): GeoReferenceCoordinates {
+  return {
+    topLeft: { ...coordinates.topLeft, lng: normalizeLongitude(coordinates.topLeft.lng) },
+    topRight: { ...coordinates.topRight, lng: normalizeLongitude(coordinates.topRight.lng) },
+    bottomRight: { ...coordinates.bottomRight, lng: normalizeLongitude(coordinates.bottomRight.lng) },
+    bottomLeft: { ...coordinates.bottomLeft, lng: normalizeLongitude(coordinates.bottomLeft.lng) },
+  }
+}
+
 export function toImageCoordinates(coordinates: GeoReferenceCoordinates): MapLibreImageCoordinates {
   return [
     [coordinates.topLeft.lng, coordinates.topLeft.lat],

@@ -11,6 +11,7 @@ const props = withDefaults(defineProps<{
   selectedSpotId?: string | null
   height?: string
   label?: string
+  floorErrorActionTo?: string | null
 }>(), {
   spots: () => [],
   mode: 'view',
@@ -18,6 +19,7 @@ const props = withDefaults(defineProps<{
   selectedSpotId: null,
   height: '38rem',
   label: 'デジタルマップ',
+  floorErrorActionTo: null,
 })
 
 const emit = defineEmits<{
@@ -61,9 +63,11 @@ const { floorError, geolocationAvailable, mapError } = useMapViewer(container, {
       </div>
       <div
         v-if="floorError"
-        class="pointer-events-none absolute inset-x-4 top-1/2 mx-auto max-w-md -translate-y-1/2 rounded-xl bg-white/95 p-5 text-center text-sm font-semibold text-stone-700 shadow-lg"
+        class="absolute inset-x-4 top-1/2 mx-auto max-w-md -translate-y-1/2 rounded-xl bg-white/95 p-5 text-center text-sm font-semibold text-stone-700 shadow-lg"
+        :class="{ 'pointer-events-none': !floorErrorActionTo }"
       >
-        {{ floorError }}
+        <p>{{ floorError }}</p>
+        <NuxtLink v-if="floorErrorActionTo" :to="floorErrorActionTo" class="mt-4 inline-flex rounded-lg bg-terracotta-600 px-4 py-2 text-sm font-semibold text-white hover:bg-terracotta-700">ジオリファレンスを設定</NuxtLink>
       </div>
       <p
         v-if="geolocationAvailable"
