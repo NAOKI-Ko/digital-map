@@ -196,8 +196,6 @@ function addRectangleLayersAndMarkers() {
     element.className = 'geo-resize-handle'
     element.setAttribute('aria-label', `${corner.label}をドラッグして矩形をリサイズ`)
     element.title = `${corner.label}をドラッグしてリサイズ`
-    element.addEventListener('mousedown', event => event.stopPropagation())
-    element.addEventListener('touchstart', event => event.stopPropagation(), { passive: true })
     const position = getRectangleCorners(currentRectangle)[corner.key]
     const marker = new maplibre!.Marker({ element, draggable: true })
       .setLngLat([position.lng, position.lat])
@@ -244,6 +242,7 @@ function bindRectangleDragging() {
 }
 
 function startRectangleMouseDrag(event: MapMouseEvent) {
+  if (isResizeHandleEvent(event.originalEvent)) return
   startRectangleDrag(event.lngLat)
   map?.on('mousemove', continueRectangleMouseDrag)
   map?.once('mouseup', finishRectangleMouseDrag)
@@ -259,6 +258,7 @@ function finishRectangleMouseDrag() {
 }
 
 function startRectangleTouchDrag(event: MapTouchEvent) {
+  if (isResizeHandleEvent(event.originalEvent)) return
   startRectangleDrag(event.lngLat)
   map?.on('touchmove', continueRectangleTouchDrag)
   map?.once('touchend', finishRectangleTouchDrag)
@@ -299,6 +299,10 @@ function finishRectangleDrag() {
   dragState = null
   map?.dragPan.enable()
   if (map) map.getCanvas().style.cursor = 'move'
+}
+
+function isResizeHandleEvent(event: MouseEvent | TouchEvent) {
+  return event.target instanceof Element && event.target.closest('.geo-resize-handle') !== null
 }
 
 function focusLocation(position: LatLng) {
