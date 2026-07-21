@@ -117,7 +117,9 @@ function selectSpot(spot: MapViewerSpot) {
           </template>
         </ClientOnly>
 
-        <MapOperationHint :storage-key="`digital-map:operation-hint:${data.map.slug}`" />
+        <ClientOnly>
+          <MapOperationHint :storage-key="`digital-map:operation-hint:${data.map.slug}`" />
+        </ClientOnly>
       </section>
 
       <SpotDetailCard
