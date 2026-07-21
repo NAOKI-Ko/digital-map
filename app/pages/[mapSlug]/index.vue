@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { defineAsyncComponent } from 'vue'
 import CategoryFilter from '~/components/map/CategoryFilter.vue'
+import FloorTabs from '~/components/map/FloorTabs.vue'
 import SpotDetailCard from '~/components/map/SpotDetailCard.vue'
 import type { MapViewerSpot } from '~~/shared/types/map-viewer'
 import type { PublicMapResponse } from '~~/shared/types/public-map'
@@ -91,7 +92,11 @@ function selectSpot(spot: MapViewerSpot) {
 
       <section class="relative">
         <div class="pointer-events-none absolute inset-x-3 top-3 z-20 sm:inset-x-5">
-          <div class="pointer-events-auto">
+          <div class="pointer-events-auto space-y-2">
+            <FloorTabs
+              v-model="selectedFloorId"
+              :floors="data.map.floors"
+            />
             <CategoryFilter v-model="selectedCategory" :categories="categories" />
           </div>
         </div>
