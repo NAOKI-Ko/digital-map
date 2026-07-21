@@ -70,7 +70,6 @@ onMounted(async () => {
       center: initialMapCenter(),
       zoom: hasAnyMapPoint() ? 15 : 5,
       renderWorldCopies: false,
-      maxBounds: [[-180, -85], [180, 85]],
       maxPitch: 0,
       dragRotate: false,
     })
