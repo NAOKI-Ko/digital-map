@@ -101,12 +101,8 @@ async function main() {
         order: 0,
         topLeftLat: null,
         topLeftLng: null,
-        topRightLat: null,
-        topRightLng: null,
         bottomRightLat: null,
         bottomRightLng: null,
-        bottomLeftLat: null,
-        bottomLeftLng: null,
         isOutdoor: true,
       },
     })

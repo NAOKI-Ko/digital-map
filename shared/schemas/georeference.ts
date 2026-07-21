@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { getGeoReferenceValidationError } from '../../lib/geo'
 
 const latitude = z.number().finite().min(-90).max(90)
 const longitude = z.number().finite().min(-180).max(180)
@@ -6,25 +7,16 @@ const longitude = z.number().finite().min(-180).max(180)
 export const geoReferenceSchema = z.object({
   topLeftLat: latitude,
   topLeftLng: longitude,
-  topRightLat: latitude,
-  topRightLng: longitude,
   bottomRightLat: latitude,
   bottomRightLng: longitude,
-  bottomLeftLat: latitude,
-  bottomLeftLng: longitude,
 }).superRefine((value, context) => {
-  const corners = [
-    `${value.topLeftLat},${value.topLeftLng}`,
-    `${value.topRightLat},${value.topRightLng}`,
-    `${value.bottomRightLat},${value.bottomRightLng}`,
-    `${value.bottomLeftLat},${value.bottomLeftLng}`,
-  ]
+  const message = getGeoReferenceValidationError({
+    topLeft: { lat: value.topLeftLat, lng: value.topLeftLng },
+    bottomRight: { lat: value.bottomRightLat, lng: value.bottomRightLng },
+  })
 
-  if (new Set(corners).size !== 4) {
-    context.addIssue({
-      code: 'custom',
-      message: '四隅はそれぞれ異なる位置に設定してください。',
-    })
+  if (message) {
+    context.addIssue({ code: 'custom', message })
   }
 })
 

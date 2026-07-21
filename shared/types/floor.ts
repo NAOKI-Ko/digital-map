@@ -6,12 +6,8 @@ export interface MapFloorItem {
   order: number
   topLeftLat: number | null
   topLeftLng: number | null
-  topRightLat: number | null
-  topRightLng: number | null
   bottomRightLat: number | null
   bottomRightLng: number | null
-  bottomLeftLat: number | null
-  bottomLeftLng: number | null
   isOutdoor: boolean
   spotCount: number
   createdAt: string

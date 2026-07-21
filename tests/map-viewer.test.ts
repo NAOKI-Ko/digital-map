@@ -29,12 +29,8 @@ const outdoorFloor: MapViewerFloor = {
   isOutdoor: true,
   topLeftLat: 35.7,
   topLeftLng: 139.7,
-  topRightLat: 35.7,
-  topRightLng: 139.8,
   bottomRightLat: 35.6,
   bottomRightLng: 139.8,
-  bottomLeftLat: 35.6,
-  bottomLeftLng: 139.7,
 }
 
 describe('MapViewerのカメラ制約', () => {
@@ -124,7 +120,7 @@ describe('GeolocateControlの追加判定', () => {
     expect(shouldEnableGeolocate('view', { ...outdoorFloor, isOutdoor: false })).toBe(false)
   })
 
-  it('四隅座標が未設定なら屋外でも追加しない', () => {
+  it('矩形座標が未設定なら屋外でも追加しない', () => {
     expect(shouldEnableGeolocate('view', { ...outdoorFloor, topLeftLat: null })).toBe(false)
   })
 

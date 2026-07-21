@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { defineAsyncComponent } from 'vue'
-import type { LatLng } from '~~/lib/geo'
+import { getFloorGeoReference, type LatLng } from '~~/lib/geo'
 import type { MapFloorListResponse } from '~~/shared/types/floor'
 import type { AdminSpotListResponse, AdminSpotSummary, PositionedAdminSpotSummary, SpotPositionResponse } from '~~/shared/types/spot'
 
@@ -52,11 +52,7 @@ function startRegistration() {
 
 function isGeoreferenced() {
   const floor = selectedFloor.value
-  return floor
-    && floor.topLeftLat !== null && floor.topLeftLng !== null
-    && floor.topRightLat !== null && floor.topRightLng !== null
-    && floor.bottomRightLat !== null && floor.bottomRightLng !== null
-    && floor.bottomLeftLat !== null && floor.bottomLeftLng !== null
+  return floor ? getFloorGeoReference(floor) !== null : false
 }
 
 async function saveMovedSpot(value: { spotId: string, lat: number, lng: number }) {
@@ -102,7 +98,7 @@ async function saveMovedSpot(value: { spotId: string, lat: number, lng: number }
       </div>
 
       <div v-if="!isGeoreferenced()" class="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-800">
-        <span>このフロアはジオリファレンス未設定です。通常地図上にはピンを置けますが、先に四隅を設定することをおすすめします。</span>
+        <span>このフロアはジオリファレンス未設定です。通常地図上にはピンを置けますが、先にイラストの表示範囲を設定することをおすすめします。</span>
         <NuxtLink :to="geoReferenceEditorPath" class="shrink-0 rounded-lg bg-amber-800 px-4 py-2 font-semibold text-white hover:bg-amber-900">ジオリファレンスを設定</NuxtLink>
       </div>
 

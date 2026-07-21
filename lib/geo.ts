@@ -3,23 +3,20 @@ export interface LatLng {
   lng: number
 }
 
-export interface GeoReferenceCoordinates {
+/** 軸に沿った矩形を、保存対象である左上・右下の2点で表す。 */
+export interface GeoReferenceRectangle {
   topLeft: LatLng
-  topRight: LatLng
   bottomRight: LatLng
-  bottomLeft: LatLng
 }
 
 export interface GeoReferenceFields {
   topLeftLat: number | null
   topLeftLng: number | null
-  topRightLat: number | null
-  topRightLng: number | null
   bottomRightLat: number | null
   bottomRightLng: number | null
-  bottomLeftLat: number | null
-  bottomLeftLng: number | null
 }
+
+export type GeoReferenceCorner = 'topLeft' | 'topRight' | 'bottomRight' | 'bottomLeft'
 
 export type MapLibreImageCoordinates = [
   [number, number],
@@ -27,6 +24,10 @@ export type MapLibreImageCoordinates = [
   [number, number],
   [number, number],
 ]
+
+export const MIN_GEOREFERENCE_SPAN = 0.000001
+export const MAX_GEOREFERENCE_SPAN = 2
+export const DEFAULT_RECTANGLE_VIEWPORT_RATIO = 0.4
 
 /** MapLibreが世界を周回した際の経度を[-180, 180)へ戻す。 */
 export function normalizeLongitude(lng: number) {
@@ -36,23 +37,37 @@ export function normalizeLongitude(lng: number) {
   return Number(wrapped.toFixed(12))
 }
 
-export function normalizeGeoReferenceLongitudes(
-  coordinates: GeoReferenceCoordinates,
-): GeoReferenceCoordinates {
+export function normalizeGeoReferenceRectangle(
+  rectangle: GeoReferenceRectangle,
+): GeoReferenceRectangle {
   return {
-    topLeft: { ...coordinates.topLeft, lng: normalizeLongitude(coordinates.topLeft.lng) },
-    topRight: { ...coordinates.topRight, lng: normalizeLongitude(coordinates.topRight.lng) },
-    bottomRight: { ...coordinates.bottomRight, lng: normalizeLongitude(coordinates.bottomRight.lng) },
-    bottomLeft: { ...coordinates.bottomLeft, lng: normalizeLongitude(coordinates.bottomLeft.lng) },
+    topLeft: { ...rectangle.topLeft, lng: normalizeLongitude(rectangle.topLeft.lng) },
+    bottomRight: { ...rectangle.bottomRight, lng: normalizeLongitude(rectangle.bottomRight.lng) },
   }
 }
 
-export function toImageCoordinates(coordinates: GeoReferenceCoordinates): MapLibreImageCoordinates {
+export function getRectangleCorners(rectangle: GeoReferenceRectangle) {
+  return {
+    topLeft: rectangle.topLeft,
+    topRight: {
+      lat: rectangle.topLeft.lat,
+      lng: rectangle.bottomRight.lng,
+    },
+    bottomRight: rectangle.bottomRight,
+    bottomLeft: {
+      lat: rectangle.bottomRight.lat,
+      lng: rectangle.topLeft.lng,
+    },
+  } satisfies Record<GeoReferenceCorner, LatLng>
+}
+
+export function toImageCoordinates(rectangle: GeoReferenceRectangle): MapLibreImageCoordinates {
+  const corners = getRectangleCorners(rectangle)
   return [
-    [coordinates.topLeft.lng, coordinates.topLeft.lat],
-    [coordinates.topRight.lng, coordinates.topRight.lat],
-    [coordinates.bottomRight.lng, coordinates.bottomRight.lat],
-    [coordinates.bottomLeft.lng, coordinates.bottomLeft.lat],
+    [corners.topLeft.lng, corners.topLeft.lat],
+    [corners.topRight.lng, corners.topRight.lat],
+    [corners.bottomRight.lng, corners.bottomRight.lat],
+    [corners.bottomLeft.lng, corners.bottomLeft.lat],
   ]
 }
 
@@ -65,85 +80,137 @@ export function isValidLatLng(value: LatLng) {
     && value.lng <= 180
 }
 
-export function isValidGeoReference(coordinates: GeoReferenceCoordinates) {
-  const corners = [
-    coordinates.topLeft,
-    coordinates.topRight,
-    coordinates.bottomRight,
-    coordinates.bottomLeft,
-  ]
+export function getGeoReferenceValidationError(rectangle: GeoReferenceRectangle) {
+  if (!isValidLatLng(rectangle.topLeft) || !isValidLatLng(rectangle.bottomRight)) {
+    return '緯度経度の値を確認してください。'
+  }
 
-  if (!corners.every(isValidLatLng)) return false
-  if (new Set(corners.map(corner => `${corner.lat},${corner.lng}`)).size !== corners.length) return false
-
-  const [topLeft, topRight, bottomRight, bottomLeft] = corners as [LatLng, LatLng, LatLng, LatLng]
-  if (
-    segmentsIntersect(topLeft, topRight, bottomRight, bottomLeft)
-    || segmentsIntersect(topRight, bottomRight, bottomLeft, topLeft)
-  ) return false
-
-  return Math.abs(corners.reduce((area, corner, index) => {
-    const next = corners[(index + 1) % corners.length]!
-    return area + corner.lng * next.lat - next.lng * corner.lat
-  }, 0)) > Number.EPSILON
+  const latitudeSpan = rectangle.topLeft.lat - rectangle.bottomRight.lat
+  const longitudeSpan = rectangle.bottomRight.lng - rectangle.topLeft.lng
+  if (latitudeSpan <= 0 || longitudeSpan <= 0) {
+    return '左上は右下より北かつ西に設定してください。'
+  }
+  if (latitudeSpan < MIN_GEOREFERENCE_SPAN || longitudeSpan < MIN_GEOREFERENCE_SPAN) {
+    return '矩形の幅と高さを確保してください。'
+  }
+  if (latitudeSpan > MAX_GEOREFERENCE_SPAN || longitudeSpan > MAX_GEOREFERENCE_SPAN) {
+    return `設定範囲は緯度・経度とも${MAX_GEOREFERENCE_SPAN}度以内にしてください。`
+  }
+  return null
 }
 
-export function getFloorGeoReference(floor: GeoReferenceFields): GeoReferenceCoordinates | null {
+export function isValidGeoReference(rectangle: GeoReferenceRectangle) {
+  return getGeoReferenceValidationError(rectangle) === null
+}
+
+export function getFloorGeoReference(floor: GeoReferenceFields): GeoReferenceRectangle | null {
   const values = [
     floor.topLeftLat,
     floor.topLeftLng,
-    floor.topRightLat,
-    floor.topRightLng,
     floor.bottomRightLat,
     floor.bottomRightLng,
-    floor.bottomLeftLat,
-    floor.bottomLeftLng,
   ]
   if (values.some(value => value === null)) return null
 
-  const coordinates: GeoReferenceCoordinates = {
+  const rectangle: GeoReferenceRectangle = {
     topLeft: { lat: floor.topLeftLat!, lng: floor.topLeftLng! },
-    topRight: { lat: floor.topRightLat!, lng: floor.topRightLng! },
     bottomRight: { lat: floor.bottomRightLat!, lng: floor.bottomRightLng! },
-    bottomLeft: { lat: floor.bottomLeftLat!, lng: floor.bottomLeftLng! },
   }
 
-  return isValidGeoReference(coordinates) ? coordinates : null
+  return isValidGeoReference(rectangle) ? rectangle : null
 }
 
-export function createGeoReferenceFromBounds(bounds: { southwest: LatLng, northeast: LatLng }): GeoReferenceCoordinates {
+export function createGeoReferenceFromBounds(bounds: {
+  southwest: LatLng
+  northeast: LatLng
+}): GeoReferenceRectangle {
   return {
     topLeft: { lat: bounds.northeast.lat, lng: bounds.southwest.lng },
-    topRight: { lat: bounds.northeast.lat, lng: bounds.northeast.lng },
     bottomRight: { lat: bounds.southwest.lat, lng: bounds.northeast.lng },
-    bottomLeft: { lat: bounds.southwest.lat, lng: bounds.southwest.lng },
   }
 }
 
-export function getGeoReferenceBounds(coordinates: GeoReferenceCoordinates) {
-  return getLatLngBounds(Object.values(coordinates))
-}
-
-export function getLatLngBounds(points: LatLng[]) {
-  if (points.length === 0) return null
-  const lngs = points.map(point => point.lng)
-  const lats = points.map(point => point.lat)
+/** 現在の表示範囲中央へ、表示幅・高さの40%（最大2度）の初期矩形を作る。 */
+export function createDefaultGeoReferenceRectangle(bounds: {
+  southwest: LatLng
+  northeast: LatLng
+}, viewportRatio = DEFAULT_RECTANGLE_VIEWPORT_RATIO): GeoReferenceRectangle {
+  const west = Math.max(-180, Math.min(180, bounds.southwest.lng))
+  const east = Math.max(-180, Math.min(180, bounds.northeast.lng))
+  const south = Math.max(-90, Math.min(90, bounds.southwest.lat))
+  const north = Math.max(-90, Math.min(90, bounds.northeast.lat))
+  const centerLng = (west + east) / 2
+  const centerLat = (south + north) / 2
+  const width = Math.min(
+    MAX_GEOREFERENCE_SPAN,
+    Math.max(MIN_GEOREFERENCE_SPAN, Math.abs(east - west) * viewportRatio),
+  )
+  const height = Math.min(
+    MAX_GEOREFERENCE_SPAN,
+    Math.max(MIN_GEOREFERENCE_SPAN, Math.abs(north - south) * viewportRatio),
+  )
+  const left = Math.max(-180, Math.min(180 - width, centerLng - width / 2))
+  const bottom = Math.max(-90, Math.min(90 - height, centerLat - height / 2))
 
   return {
-    southwest: [Math.min(...lngs), Math.min(...lats)] as [number, number],
-    northeast: [Math.max(...lngs), Math.max(...lats)] as [number, number],
+    topLeft: { lat: bottom + height, lng: left },
+    bottomRight: { lat: bottom, lng: left + width },
   }
 }
 
-function segmentsIntersect(startA: LatLng, endA: LatLng, startB: LatLng, endB: LatLng) {
-  const orientation = (start: LatLng, end: LatLng, point: LatLng) =>
-    (end.lng - start.lng) * (point.lat - start.lat)
-    - (end.lat - start.lat) * (point.lng - start.lng)
+export function resizeGeoReferenceRectangle(
+  rectangle: GeoReferenceRectangle,
+  corner: GeoReferenceCorner,
+  position: LatLng,
+): GeoReferenceRectangle {
+  const topLeft = { ...rectangle.topLeft }
+  const bottomRight = { ...rectangle.bottomRight }
+  const touchesTop = corner === 'topLeft' || corner === 'topRight'
+  const touchesLeft = corner === 'topLeft' || corner === 'bottomLeft'
 
-  const first = orientation(startA, endA, startB)
-  const second = orientation(startA, endA, endB)
-  const third = orientation(startB, endB, startA)
-  const fourth = orientation(startB, endB, endA)
+  if (touchesTop) {
+    topLeft.lat = clamp(position.lat, bottomRight.lat + MIN_GEOREFERENCE_SPAN, bottomRight.lat + MAX_GEOREFERENCE_SPAN)
+  }
+  else {
+    bottomRight.lat = clamp(position.lat, topLeft.lat - MAX_GEOREFERENCE_SPAN, topLeft.lat - MIN_GEOREFERENCE_SPAN)
+  }
 
-  return first * second < 0 && third * fourth < 0
+  if (touchesLeft) {
+    topLeft.lng = clamp(position.lng, bottomRight.lng - MAX_GEOREFERENCE_SPAN, bottomRight.lng - MIN_GEOREFERENCE_SPAN)
+  }
+  else {
+    bottomRight.lng = clamp(position.lng, topLeft.lng + MIN_GEOREFERENCE_SPAN, topLeft.lng + MAX_GEOREFERENCE_SPAN)
+  }
+
+  topLeft.lat = clamp(topLeft.lat, -90, 90)
+  topLeft.lng = clamp(topLeft.lng, -180, 180)
+  bottomRight.lat = clamp(bottomRight.lat, -90, 90)
+  bottomRight.lng = clamp(bottomRight.lng, -180, 180)
+  return { topLeft, bottomRight }
+}
+
+export function moveGeoReferenceRectangle(
+  rectangle: GeoReferenceRectangle,
+  delta: LatLng,
+): GeoReferenceRectangle {
+  const latitudeSpan = rectangle.topLeft.lat - rectangle.bottomRight.lat
+  const longitudeSpan = rectangle.bottomRight.lng - rectangle.topLeft.lng
+  const left = clamp(rectangle.topLeft.lng + delta.lng, -180, 180 - longitudeSpan)
+  const bottom = clamp(rectangle.bottomRight.lat + delta.lat, -90, 90 - latitudeSpan)
+
+  return {
+    topLeft: { lat: bottom + latitudeSpan, lng: left },
+    bottomRight: { lat: bottom, lng: left + longitudeSpan },
+  }
+}
+
+export function getGeoReferenceBounds(rectangle: GeoReferenceRectangle) {
+  return {
+    southwest: [rectangle.topLeft.lng, rectangle.bottomRight.lat] as [number, number],
+    northeast: [rectangle.bottomRight.lng, rectangle.topLeft.lat] as [number, number],
+  }
+}
+
+function clamp(value: number, minimum: number, maximum: number) {
+  return Math.min(maximum, Math.max(minimum, value))
 }

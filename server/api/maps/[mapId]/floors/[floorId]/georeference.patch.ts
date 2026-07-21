@@ -8,7 +8,7 @@ export default defineEventHandler(async (event): Promise<MapFloorResponse> => {
   if (!result.success) {
     throw createError({
       statusCode: 422,
-      statusMessage: result.error.issues[0]?.message ?? '四隅の座標を確認してください。',
+      statusMessage: result.error.issues[0]?.message ?? '矩形の範囲を確認してください。',
     })
   }
 

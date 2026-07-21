@@ -22,12 +22,8 @@ export function buildPublicMapQuery(slug: string) {
           order: true,
           topLeftLat: true,
           topLeftLng: true,
-          topRightLat: true,
-          topRightLng: true,
           bottomRightLat: true,
           bottomRightLng: true,
-          bottomLeftLat: true,
-          bottomLeftLng: true,
           isOutdoor: true,
           spots: {
             where: {
@@ -79,12 +75,8 @@ export function serializePublicMap(record: PublicMapRecord | null): PublicMap | 
       order: floor.order,
       topLeftLat: floor.topLeftLat,
       topLeftLng: floor.topLeftLng,
-      topRightLat: floor.topRightLat,
-      topRightLng: floor.topRightLng,
       bottomRightLat: floor.bottomRightLat,
       bottomRightLng: floor.bottomRightLng,
-      bottomLeftLat: floor.bottomLeftLat,
-      bottomLeftLng: floor.bottomLeftLng,
       isOutdoor: floor.isOutdoor,
       spots: floor.spots.flatMap((spot) => {
         if (!spot.isPublished || spot.lat === null || spot.lng === null) return []

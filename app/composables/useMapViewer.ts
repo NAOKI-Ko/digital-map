@@ -312,7 +312,7 @@ export function useMapViewer(
     removeFloorImage()
 
     if (!coordinates) {
-      floorError.value = 'このフロアはイラストの四隅座標が未設定、または正しくありません。'
+      floorError.value = 'このフロアはイラストの矩形範囲が未設定、または正しくありません。'
       return false
     }
 

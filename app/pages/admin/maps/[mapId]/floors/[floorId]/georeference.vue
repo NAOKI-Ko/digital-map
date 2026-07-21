@@ -1,8 +1,16 @@
 <script setup lang="ts">
+import AddressGeocoder from '~/components/admin/AddressGeocoder.vue'
 import GeoReferenceEditor from '~/components/admin/GeoReferenceEditor.vue'
-import { normalizeGeoReferenceLongitudes, type GeoReferenceCoordinates } from '~~/lib/geo'
+import {
+  getFloorGeoReference,
+  getGeoReferenceValidationError,
+  normalizeGeoReferenceRectangle,
+  type GeoReferenceRectangle,
+  type LatLng,
+} from '~~/lib/geo'
 import type { GeoReferenceInput } from '~~/shared/schemas/georeference'
-import type { MapFloorItem, MapFloorListResponse, MapFloorResponse } from '~~/shared/types/floor'
+import type { MapFloorListResponse, MapFloorResponse } from '~~/shared/types/floor'
+import type { GeocodeResult } from '~~/shared/types/geocode'
 
 definePageMeta({
   layout: 'admin',
@@ -14,7 +22,8 @@ const mapId = route.params.mapId as string
 const floorId = route.params.floorId as string
 const { data, error, status } = await useFetch<MapFloorListResponse>(`/api/maps/${mapId}/floors`)
 const floor = computed(() => data.value?.floors.find(item => item.id === floorId))
-const coordinates = ref<GeoReferenceCoordinates | null>(null)
+const rectangle = ref<GeoReferenceRectangle | null>(null)
+const geoReferenceEditor = useTemplateRef<{ focusLocation: (position: LatLng) => void }>('geoReferenceEditor')
 const isSaving = ref(false)
 const saveError = ref('')
 const successMessage = ref('')
@@ -24,47 +33,34 @@ const backPath = computed(() => cameFromEditor.value
   : `/admin/maps/${mapId}/floors`)
 
 watch(floor, (value) => {
-  if (value) coordinates.value = coordinatesFromFloor(value)
+  if (value) rectangle.value = getFloorGeoReference(value)
 }, { immediate: true })
 
 useHead(() => ({
   title: `ジオリファレンス - ${floor.value?.name ?? 'フロア'} | デジタルマップ`,
 }))
 
-function coordinatesFromFloor(value: MapFloorItem): GeoReferenceCoordinates | null {
-  if (
-    value.topLeftLat === null || value.topLeftLng === null
-    || value.topRightLat === null || value.topRightLng === null
-    || value.bottomRightLat === null || value.bottomRightLng === null
-    || value.bottomLeftLat === null || value.bottomLeftLng === null
-  ) {
-    return null
-  }
-
-  return {
-    topLeft: { lat: value.topLeftLat, lng: value.topLeftLng },
-    topRight: { lat: value.topRightLat, lng: value.topRightLng },
-    bottomRight: { lat: value.bottomRightLat, lng: value.bottomRightLng },
-    bottomLeft: { lat: value.bottomLeftLat, lng: value.bottomLeftLng },
-  }
-}
-
-function toInput(value: GeoReferenceCoordinates): GeoReferenceInput {
-  const normalized = normalizeGeoReferenceLongitudes(value)
+function toInput(value: GeoReferenceRectangle): GeoReferenceInput {
+  const normalized = normalizeGeoReferenceRectangle(value)
   return {
     topLeftLat: normalized.topLeft.lat,
     topLeftLng: normalized.topLeft.lng,
-    topRightLat: normalized.topRight.lat,
-    topRightLng: normalized.topRight.lng,
     bottomRightLat: normalized.bottomRight.lat,
     bottomRightLng: normalized.bottomRight.lng,
-    bottomLeftLat: normalized.bottomLeft.lat,
-    bottomLeftLng: normalized.bottomLeft.lng,
   }
 }
 
+function focusSearchResult(result: GeocodeResult) {
+  geoReferenceEditor.value?.focusLocation({ lat: result.lat, lng: result.lng })
+}
+
 async function save() {
-  if (!floor.value || !coordinates.value) return
+  if (!floor.value || !rectangle.value) return
+  const validationError = getGeoReferenceValidationError(rectangle.value)
+  if (validationError) {
+    saveError.value = validationError
+    return
+  }
   isSaving.value = true
   saveError.value = ''
   successMessage.value = ''
@@ -72,17 +68,18 @@ async function save() {
   try {
     const response = await $fetch<MapFloorResponse>(`/api/maps/${mapId}/floors/${floorId}/georeference`, {
       method: 'PATCH',
-      body: toInput(coordinates.value),
+      body: toInput(rectangle.value),
     })
     if (data.value) {
       data.value = {
         floors: data.value.floors.map(item => item.id === floorId ? response.floor : item),
       }
     }
-    successMessage.value = '四隅の座標を保存しました。'
+    rectangle.value = getFloorGeoReference(response.floor)
+    successMessage.value = 'イラストを表示する矩形範囲を保存しました。'
   }
   catch {
-    saveError.value = '座標を保存できませんでした。四隅の位置を確認してください。'
+    saveError.value = '範囲を保存できませんでした。矩形の位置と大きさを確認してください。'
   }
   finally {
     isSaving.value = false
@@ -100,22 +97,27 @@ async function save() {
       <header class="mt-5">
         <p class="text-sm font-medium text-terracotta-700">{{ floor.name }}</p>
         <h1 class="mt-1 text-2xl font-bold tracking-tight text-stone-900 sm:text-3xl">ジオリファレンス設定</h1>
-        <p class="mt-2 text-sm text-stone-600">通常の地図上でイラストの四隅を合わせ、実世界の緯度経度と対応づけます。</p>
+        <p class="mt-2 text-sm text-stone-600">対象エリアへ赤い矩形を移動・リサイズし、イラストのおおよその表示範囲を決めます。</p>
       </header>
+
+      <section class="mt-8">
+        <AddressGeocoder @select="focusSearchResult" />
+      </section>
 
       <section class="mt-8 rounded-2xl border border-stone-200 bg-white p-4 shadow-sm sm:p-6">
         <ClientOnly>
-          <GeoReferenceEditor v-model="coordinates" :illustration-url="floor.illustrationUrl" :initial-coordinates="coordinatesFromFloor(floor)" />
+          <GeoReferenceEditor ref="geoReferenceEditor" v-model="rectangle" :illustration-url="floor.illustrationUrl" :initial-rectangle="getFloorGeoReference(floor)" />
           <template #fallback><div class="h-[34rem] animate-pulse rounded-xl bg-stone-100" /></template>
         </ClientOnly>
+        <p class="mt-4 text-xs leading-5 text-stone-500">デフォルメが強いイラストほど、道路や建物を厳密に一致させる必要はありません。現在地表示の目安として大体の範囲を合わせてください。</p>
       </section>
 
       <div v-if="saveError" role="alert" class="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{{ saveError }}</div>
       <div v-if="successMessage" role="status" class="mt-4 rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{{ successMessage }}</div>
       <div class="mt-5 flex flex-wrap justify-end gap-3">
         <NuxtLink v-if="cameFromEditor" :to="backPath" class="rounded-lg border border-stone-300 bg-white px-5 py-2.5 text-sm font-semibold text-stone-700 hover:bg-stone-50">ピン配置エディタに戻る</NuxtLink>
-        <button type="button" :disabled="isSaving || !coordinates" class="rounded-lg bg-terracotta-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60" @click="save">
-          {{ isSaving ? '保存中…' : '四隅の座標を保存する' }}
+        <button type="button" :disabled="isSaving || !rectangle" class="rounded-lg bg-terracotta-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60" @click="save">
+          {{ isSaving ? '保存中…' : 'この範囲で保存' }}
         </button>
       </div>
     </template>

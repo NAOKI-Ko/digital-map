@@ -53,12 +53,8 @@ model MapFloor {
   order           Int      @default(0)
   topLeftLat      Float?
   topLeftLng      Float?
-  topRightLat     Float?
-  topRightLng     Float?
   bottomRightLat  Float?
   bottomRightLng  Float?
-  bottomLeftLat   Float?
-  bottomLeftLng   Float?
   isOutdoor       Boolean  @default(true)
   spots           Spot[]
   createdAt       DateTime @default(now())

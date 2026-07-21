@@ -1,35 +1,51 @@
 <script setup lang="ts">
 import 'maplibre-gl/dist/maplibre-gl.css'
-import type { ImageSource, Map as MapLibreMap, Marker } from 'maplibre-gl'
+import type {
+  GeoJSONSource,
+  ImageSource,
+  Map as MapLibreMap,
+  MapMouseEvent,
+  MapTouchEvent,
+  Marker,
+} from 'maplibre-gl'
 import {
-  createGeoReferenceFromBounds,
+  createDefaultGeoReferenceRectangle,
   getGeoReferenceBounds,
-  isValidLatLng,
-  normalizeGeoReferenceLongitudes,
+  getRectangleCorners,
+  moveGeoReferenceRectangle,
   normalizeLongitude,
+  resizeGeoReferenceRectangle,
   toImageCoordinates,
-  type GeoReferenceCoordinates,
+  type GeoReferenceCorner,
+  type GeoReferenceRectangle,
   type LatLng,
 } from '~~/lib/geo'
 
 const props = defineProps<{
   illustrationUrl: string
-  initialCoordinates: GeoReferenceCoordinates | null
+  initialRectangle: GeoReferenceRectangle | null
 }>()
 
-const coordinates = defineModel<GeoReferenceCoordinates | null>({ required: true })
+const rectangle = defineModel<GeoReferenceRectangle | null>({ required: true })
 const container = useTemplateRef<HTMLDivElement>('container')
 const mapError = ref('')
 let map: MapLibreMap | undefined
 let maplibre: typeof import('maplibre-gl') | undefined
 let markers: Marker[] = []
+let dragState: { pointer: LatLng, rectangle: GeoReferenceRectangle } | null = null
+
+const IMAGE_SOURCE_ID = 'floor-illustration'
+const IMAGE_LAYER_ID = 'floor-illustration-layer'
+const RECTANGLE_SOURCE_ID = 'georeference-rectangle'
+const RECTANGLE_FILL_LAYER_ID = 'georeference-rectangle-fill'
+const RECTANGLE_LINE_LAYER_ID = 'georeference-rectangle-line'
 
 const corners = [
   { key: 'topLeft', label: '左上' },
   { key: 'topRight', label: '右上' },
   { key: 'bottomRight', label: '右下' },
   { key: 'bottomLeft', label: '左下' },
-] as const
+] as const satisfies readonly { key: GeoReferenceCorner, label: string }[]
 
 onMounted(async () => {
   if (!container.value) return
@@ -37,8 +53,8 @@ onMounted(async () => {
   try {
     const maplibregl = await import('maplibre-gl')
     maplibre = maplibregl
-    coordinates.value = props.initialCoordinates
-    const bounds = coordinates.value ? getGeoReferenceBounds(coordinates.value) : null
+    rectangle.value = props.initialRectangle
+    const bounds = rectangle.value ? getGeoReferenceBounds(rectangle.value) : null
     map = new maplibregl.Map({
       container: container.value,
       style: {
@@ -54,22 +70,20 @@ onMounted(async () => {
         layers: [{ id: 'osm', type: 'raster', source: 'osm' }],
       },
       ...(bounds
-        ? { bounds: [bounds.southwest, bounds.northeast], fitBoundsOptions: { padding: 80, maxZoom: 18 } }
-        : { center: [0, 0], zoom: 1 }),
+        ? { bounds: [bounds.southwest, bounds.northeast], fitBoundsOptions: { padding: 96, maxZoom: 18 } }
+        : { center: [138, 36], zoom: 5 }),
+      maxBounds: [[-180, -85], [180, 85]],
       renderWorldCopies: false,
       maxPitch: 0,
       dragRotate: false,
     })
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right')
-    map.on('moveend', () => {
-      if (!map) return
-      const center = map.getCenter()
-      const normalizedLng = normalizeLongitude(center.lng)
-      if (normalizedLng !== center.lng) map.setCenter([normalizedLng, center.lat])
-    })
-
     map.on('load', () => {
-      safelyAddIllustrationAndMarkers()
+      if (!rectangle.value && map) {
+        rectangle.value = createDefaultRectangleFromMap(map)
+      }
+      safelyRenderRectangle()
+      bindRectangleDragging()
     })
   }
   catch (error) {
@@ -86,78 +100,84 @@ onBeforeUnmount(() => {
   maplibre = undefined
 })
 
-function setCorner(key: keyof GeoReferenceCoordinates, value: LatLng) {
-  if (!coordinates.value) return
-  coordinates.value = {
-    ...coordinates.value,
-    [key]: { lat: value.lat, lng: normalizeLongitude(value.lng) },
-  }
+watch(rectangle, () => updateVisuals(), { deep: true })
 
-  const source = map?.getSource('floor-illustration') as ImageSource | undefined
-  source?.setCoordinates(toImageCoordinates(coordinates.value))
-}
-
-async function initializeFromViewport() {
-  if (!map) return
-  const bounds = map.getBounds()
-  coordinates.value = normalizeGeoReferenceLongitudes(createGeoReferenceFromBounds({
+function createDefaultRectangleFromMap(currentMap: MapLibreMap) {
+  const bounds = currentMap.getBounds()
+  return createDefaultGeoReferenceRectangle({
     southwest: { lat: bounds.getSouth(), lng: bounds.getWest() },
     northeast: { lat: bounds.getNorth(), lng: bounds.getEast() },
-  }))
-  await nextTick()
-  safelyAddIllustrationAndMarkers()
+  })
 }
 
-function safelyAddIllustrationAndMarkers() {
+function setRectangle(value: GeoReferenceRectangle) {
+  rectangle.value = value
+  updateVisuals()
+}
+
+function rectangleGeoJson(value: GeoReferenceRectangle) {
+  const cornersByName = getRectangleCorners(value)
+  return {
+    type: 'Feature' as const,
+    properties: {},
+    geometry: {
+      type: 'Polygon' as const,
+      coordinates: [[
+        [cornersByName.topLeft.lng, cornersByName.topLeft.lat],
+        [cornersByName.topRight.lng, cornersByName.topRight.lat],
+        [cornersByName.bottomRight.lng, cornersByName.bottomRight.lat],
+        [cornersByName.bottomLeft.lng, cornersByName.bottomLeft.lat],
+        [cornersByName.topLeft.lng, cornersByName.topLeft.lat],
+      ]],
+    },
+  }
+}
+
+function safelyRenderRectangle() {
   try {
-    const markerCount = addIllustrationAndMarkers()
-    if (coordinates.value && markerCount !== corners.length) {
-      throw new Error(`四隅Markerの生成数が不正です: ${markerCount}`)
-    }
+    addRectangleLayersAndMarkers()
     mapError.value = ''
   }
   catch (error) {
-    const message = error instanceof Error ? error.message : '不明なエラー'
-    console.error(`GeoReferenceEditorの配置処理に失敗しました: ${message}`)
+    console.error('GeoReferenceEditorの矩形描画に失敗しました。', error)
     mapError.value = 'イラストを配置できませんでした。地図を読み込み直して再度お試しください。'
   }
 }
 
-function addIllustrationAndMarkers() {
-  if (!map || !maplibre || !coordinates.value) return markers.length
-  const currentMap = map
-  const currentMaplibre = maplibre
-  const bounds = currentMap.getBounds()
-  const fallbackCoordinates = normalizeGeoReferenceLongitudes(createGeoReferenceFromBounds({
-    southwest: { lat: bounds.getSouth(), lng: bounds.getWest() },
-    northeast: { lat: bounds.getNorth(), lng: bounds.getEast() },
-  }))
-  const rawCoordinates = coordinates.value as Partial<Record<keyof GeoReferenceCoordinates, LatLng>>
-  const safeCorner = (key: keyof GeoReferenceCoordinates) => {
-    const candidate = rawCoordinates[key]
-    if (!candidate) return fallbackCoordinates[key]
-    const normalized = { lat: candidate.lat, lng: normalizeLongitude(candidate.lng) }
-    return isValidLatLng(normalized) ? normalized : fallbackCoordinates[key]
-  }
-  const currentCoordinates: GeoReferenceCoordinates = {
-    topLeft: safeCorner('topLeft'),
-    topRight: safeCorner('topRight'),
-    bottomRight: safeCorner('bottomRight'),
-    bottomLeft: safeCorner('bottomLeft'),
-  }
-  coordinates.value = currentCoordinates
+function addRectangleLayersAndMarkers() {
+  if (!map || !maplibre || !rectangle.value) return
+  const currentRectangle = rectangle.value
 
-  if (!currentMap.getSource('floor-illustration')) {
-    currentMap.addSource('floor-illustration', {
+  if (!map.getSource(IMAGE_SOURCE_ID)) {
+    map.addSource(IMAGE_SOURCE_ID, {
       type: 'image',
       url: props.illustrationUrl,
-      coordinates: toImageCoordinates(currentCoordinates),
+      coordinates: toImageCoordinates(currentRectangle),
     })
-    currentMap.addLayer({
-      id: 'floor-illustration',
+    map.addLayer({
+      id: IMAGE_LAYER_ID,
       type: 'raster',
-      source: 'floor-illustration',
-      paint: { 'raster-opacity': 0.72 },
+      source: IMAGE_SOURCE_ID,
+      paint: { 'raster-opacity': 0.55 },
+    })
+  }
+
+  if (!map.getSource(RECTANGLE_SOURCE_ID)) {
+    map.addSource(RECTANGLE_SOURCE_ID, {
+      type: 'geojson',
+      data: rectangleGeoJson(currentRectangle),
+    })
+    map.addLayer({
+      id: RECTANGLE_FILL_LAYER_ID,
+      type: 'fill',
+      source: RECTANGLE_SOURCE_ID,
+      paint: { 'fill-color': '#dc2626', 'fill-opacity': 0.1 },
+    })
+    map.addLayer({
+      id: RECTANGLE_LINE_LAYER_ID,
+      type: 'line',
+      source: RECTANGLE_SOURCE_ID,
+      paint: { 'line-color': '#dc2626', 'line-width': 4 },
     })
   }
 
@@ -165,70 +185,178 @@ function addIllustrationAndMarkers() {
   markers = corners.map((corner) => {
     const element = document.createElement('button')
     element.type = 'button'
-    element.className = 'geo-corner-marker'
-    element.textContent = corner.label
-    element.title = `${corner.label}をドラッグ`
-    const position = currentCoordinates[corner.key]
-    const marker = new currentMaplibre.Marker({ element, draggable: true })
-    marker.setLngLat([position.lng, position.lat])
-    marker.addTo(currentMap)
+    element.className = 'geo-resize-handle'
+    element.setAttribute('aria-label', `${corner.label}をドラッグして矩形をリサイズ`)
+    element.title = `${corner.label}をドラッグしてリサイズ`
+    const position = getRectangleCorners(currentRectangle)[corner.key]
+    const marker = new maplibre!.Marker({ element, draggable: true })
+      .setLngLat([position.lng, position.lat])
+      .addTo(map!)
 
     marker.on('drag', () => {
+      if (!rectangle.value) return
       const lngLat = marker.getLngLat()
-      setCorner(corner.key, { lat: lngLat.lat, lng: normalizeLongitude(lngLat.lng) })
+      setRectangle(resizeGeoReferenceRectangle(rectangle.value, corner.key, {
+        lat: lngLat.lat,
+        lng: normalizeLongitude(lngLat.lng),
+      }))
     })
-    marker.on('dragend', () => {
-      const lngLat = marker.getLngLat()
-      const normalizedLng = normalizeLongitude(lngLat.lng)
-      marker.setLngLat([normalizedLng, lngLat.lat])
-      setCorner(corner.key, { lat: lngLat.lat, lng: normalizedLng })
-    })
+    marker.on('dragend', updateVisuals)
     return marker
   })
-  return markers.length
 }
+
+function updateVisuals() {
+  if (!map || !rectangle.value || !map.isStyleLoaded()) return
+  const currentRectangle = rectangle.value
+  const imageSource = map.getSource(IMAGE_SOURCE_ID) as ImageSource | undefined
+  imageSource?.setCoordinates(toImageCoordinates(currentRectangle))
+  const rectangleSource = map.getSource(RECTANGLE_SOURCE_ID) as GeoJSONSource | undefined
+  rectangleSource?.setData(rectangleGeoJson(currentRectangle))
+
+  const positions = getRectangleCorners(currentRectangle)
+  corners.forEach((corner, index) => {
+    const position = positions[corner.key]
+    markers[index]?.setLngLat([position.lng, position.lat])
+  })
+}
+
+function bindRectangleDragging() {
+  if (!map) return
+  map.on('mouseenter', RECTANGLE_FILL_LAYER_ID, () => {
+    if (map) map.getCanvas().style.cursor = 'move'
+  })
+  map.on('mouseleave', RECTANGLE_FILL_LAYER_ID, () => {
+    if (map && !dragState) map.getCanvas().style.cursor = ''
+  })
+  map.on('mousedown', RECTANGLE_FILL_LAYER_ID, startRectangleMouseDrag)
+  map.on('touchstart', RECTANGLE_FILL_LAYER_ID, startRectangleTouchDrag)
+}
+
+function startRectangleMouseDrag(event: MapMouseEvent) {
+  startRectangleDrag(event.lngLat)
+  map?.on('mousemove', continueRectangleMouseDrag)
+  map?.once('mouseup', finishRectangleMouseDrag)
+}
+
+function continueRectangleMouseDrag(event: MapMouseEvent) {
+  continueRectangleDrag(event.lngLat)
+}
+
+function finishRectangleMouseDrag() {
+  map?.off('mousemove', continueRectangleMouseDrag)
+  finishRectangleDrag()
+}
+
+function startRectangleTouchDrag(event: MapTouchEvent) {
+  startRectangleDrag(event.lngLat)
+  map?.on('touchmove', continueRectangleTouchDrag)
+  map?.once('touchend', finishRectangleTouchDrag)
+}
+
+function continueRectangleTouchDrag(event: MapTouchEvent) {
+  continueRectangleDrag(event.lngLat)
+}
+
+function finishRectangleTouchDrag() {
+  map?.off('touchmove', continueRectangleTouchDrag)
+  finishRectangleDrag()
+}
+
+function startRectangleDrag(position: { lat: number, lng: number }) {
+  if (!map || !rectangle.value) return
+  dragState = {
+    pointer: { lat: position.lat, lng: normalizeLongitude(position.lng) },
+    rectangle: {
+      topLeft: { ...rectangle.value.topLeft },
+      bottomRight: { ...rectangle.value.bottomRight },
+    },
+  }
+  map.dragPan.disable()
+  map.getCanvas().style.cursor = 'grabbing'
+}
+
+function continueRectangleDrag(position: { lat: number, lng: number }) {
+  if (!dragState) return
+  const current = { lat: position.lat, lng: normalizeLongitude(position.lng) }
+  setRectangle(moveGeoReferenceRectangle(dragState.rectangle, {
+    lat: current.lat - dragState.pointer.lat,
+    lng: current.lng - dragState.pointer.lng,
+  }))
+}
+
+function finishRectangleDrag() {
+  dragState = null
+  map?.dragPan.enable()
+  if (map) map.getCanvas().style.cursor = 'move'
+}
+
+function focusLocation(position: LatLng) {
+  if (!map) return
+  const currentMap = map
+  currentMap.easeTo({
+    center: [normalizeLongitude(position.lng), position.lat],
+    zoom: Math.max(currentMap.getZoom(), 14),
+    duration: 600,
+  })
+  currentMap.once('moveend', () => {
+    const current = rectangle.value
+    if (current) {
+      const center = {
+        lat: (current.topLeft.lat + current.bottomRight.lat) / 2,
+        lng: (current.topLeft.lng + current.bottomRight.lng) / 2,
+      }
+      setRectangle(moveGeoReferenceRectangle(current, {
+        lat: position.lat - center.lat,
+        lng: normalizeLongitude(position.lng) - center.lng,
+      }))
+    }
+    else {
+      setRectangle(createDefaultRectangleFromMap(currentMap))
+    }
+  })
+}
+
+defineExpose({ focusLocation })
 </script>
 
 <template>
   <div>
     <div class="relative overflow-hidden rounded-xl border border-stone-300 bg-stone-100">
       <div ref="container" class="h-[34rem] w-full" aria-label="ジオリファレンス設定地図" />
-      <div v-if="coordinates" class="pointer-events-none absolute left-3 top-3 max-w-xs rounded-lg bg-white/95 px-4 py-3 text-xs leading-5 text-stone-700 shadow">
-        色付きの「左上・右上・右下・左下」をドラッグし、イラストの四隅を地図上の位置に合わせてください。
-      </div>
-      <div v-else class="absolute inset-x-4 top-1/2 mx-auto max-w-sm -translate-y-1/2 rounded-xl bg-white/95 p-5 text-center shadow-lg">
-        <p class="text-sm font-semibold text-stone-900">四隅の座標は未設定です</p>
-        <p class="mt-2 text-xs leading-5 text-stone-600">地図を対象地域まで移動・拡大し、現在の表示範囲へイラストを配置してください。</p>
-        <button type="button" class="mt-4 rounded-lg bg-terracotta-600 px-4 py-2 text-sm font-semibold text-white" @click="initializeFromViewport">現在の表示範囲に配置</button>
+      <div class="pointer-events-none absolute left-3 top-3 max-w-xs rounded-lg bg-white/95 px-4 py-3 text-xs leading-5 text-stone-700 shadow">
+        赤い矩形の内側をドラッグして移動し、四隅の丸いハンドルで大きさを調整してください。回転はできません。
       </div>
     </div>
     <p v-if="mapError" role="alert" class="mt-3 text-sm text-red-600">{{ mapError }}</p>
 
-    <dl v-if="coordinates" class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-      <div v-for="corner in corners" :key="corner.key" class="rounded-lg bg-stone-100 p-3 text-xs">
-        <dt class="font-semibold text-stone-700">{{ corner.label }}</dt>
-        <dd class="mt-1 font-mono text-stone-600">lat {{ coordinates[corner.key].lat.toFixed(6) }}</dd>
-        <dd class="font-mono text-stone-600">lng {{ coordinates[corner.key].lng.toFixed(6) }}</dd>
+    <dl v-if="rectangle" class="mt-4 grid gap-3 sm:grid-cols-2">
+      <div class="rounded-lg bg-stone-100 p-3 text-xs">
+        <dt class="font-semibold text-stone-700">左上</dt>
+        <dd class="mt-1 font-mono text-stone-600">lat {{ rectangle.topLeft.lat.toFixed(6) }}</dd>
+        <dd class="font-mono text-stone-600">lng {{ rectangle.topLeft.lng.toFixed(6) }}</dd>
+      </div>
+      <div class="rounded-lg bg-stone-100 p-3 text-xs">
+        <dt class="font-semibold text-stone-700">右下</dt>
+        <dd class="mt-1 font-mono text-stone-600">lat {{ rectangle.bottomRight.lat.toFixed(6) }}</dd>
+        <dd class="font-mono text-stone-600">lng {{ rectangle.bottomRight.lng.toFixed(6) }}</dd>
       </div>
     </dl>
   </div>
 </template>
 
 <style>
-.geo-corner-marker {
-  width: 2.75rem;
-  height: 2.75rem;
+.geo-resize-handle {
+  width: 1.5rem;
+  height: 1.5rem;
   border: 3px solid white;
   border-radius: 9999px;
-  background: #c7401f;
+  background: #dc2626;
   box-shadow: 0 2px 8px rgb(0 0 0 / 35%);
-  color: white;
-  cursor: grab;
-  font-size: 0.7rem;
-  font-weight: 700;
+  cursor: nwse-resize;
 }
 
-.geo-corner-marker:active {
+.geo-resize-handle:active {
   cursor: grabbing;
 }
 </style>
