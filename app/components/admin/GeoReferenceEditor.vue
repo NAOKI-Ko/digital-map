@@ -107,7 +107,7 @@ watch(rectangle, async () => {
     safelyRenderRectangle()
     return
   }
-  updateVisuals()
+  updateVisuals(rectangle.value)
 }, { deep: true })
 
 function createDefaultRectangleFromMap(currentMap: MapLibreMap) {
@@ -120,7 +120,7 @@ function createDefaultRectangleFromMap(currentMap: MapLibreMap) {
 
 function setRectangle(value: GeoReferenceRectangle) {
   rectangle.value = value
-  updateVisuals()
+  updateVisuals(value)
 }
 
 function rectangleGeoJson(value: GeoReferenceRectangle) {
@@ -209,14 +209,14 @@ function addRectangleLayersAndMarkers() {
         lng: normalizeLongitude(lngLat.lng),
       }))
     })
-    marker.on('dragend', updateVisuals)
+    marker.on('dragend', () => updateVisuals())
     return marker
   })
 }
 
-function updateVisuals() {
-  if (!map || !rectangle.value || !map.isStyleLoaded()) return
-  const currentRectangle = rectangle.value
+function updateVisuals(value: GeoReferenceRectangle | null = rectangle.value) {
+  if (!map || !value || !map.isStyleLoaded()) return
+  const currentRectangle = value
   const imageSource = map.getSource(IMAGE_SOURCE_ID) as ImageSource | undefined
   imageSource?.setCoordinates(toImageCoordinates(currentRectangle))
   const rectangleSource = map.getSource(RECTANGLE_SOURCE_ID) as GeoJSONSource | undefined
