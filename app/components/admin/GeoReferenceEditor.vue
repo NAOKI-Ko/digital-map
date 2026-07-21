@@ -177,6 +177,12 @@ function addIllustrationAndMarkers() {
       const lngLat = marker.getLngLat()
       setCorner(corner.key, { lat: lngLat.lat, lng: normalizeLongitude(lngLat.lng) })
     })
+    marker.on('dragend', () => {
+      const lngLat = marker.getLngLat()
+      const normalizedLng = normalizeLongitude(lngLat.lng)
+      marker.setLngLat([normalizedLng, lngLat.lat])
+      setCorner(corner.key, { lat: lngLat.lat, lng: normalizedLng })
+    })
     return marker
   })
   return markers.length
