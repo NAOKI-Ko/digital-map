@@ -1,6 +1,6 @@
 import { onBeforeUnmount, onMounted, readonly, ref, shallowRef, watch, type Ref } from 'vue'
 import type { GeolocateControl, Map as MapLibreMap, MapOptions, Marker, StyleSpecification } from 'maplibre-gl'
-import { getFloorGeoReference, getGeoReferenceBounds, toImageCoordinates, type LatLng } from '~~/lib/geo'
+import { getFloorCorners, getGeoReferenceBounds, toImageCoordinates, type LatLng } from '~~/lib/geo'
 import { defaultPinIconId, getPinIconPreset } from '~~/shared/constants/spot'
 import type { MapViewerFloor, MapViewerSpot } from '~~/shared/types/map-viewer'
 
@@ -66,7 +66,7 @@ export function getFloorLayerIds(floorId: string) {
 export function shouldEnableGeolocate(mode: MapViewerMode, floor: MapViewerFloor) {
   return mode === 'view'
     && floor.isOutdoor
-    && getFloorGeoReference(floor) !== null
+    && getFloorCorners(floor) !== null
 }
 
 export function createMapViewerStyle(mode: MapViewerMode): StyleSpecification {
@@ -306,13 +306,13 @@ export function useMapViewer(
 
   function showFloor(floor: MapViewerFloor, animate = true) {
     const instance = map.value
-    const coordinates = getFloorGeoReference(floor)
+    const corners = getFloorCorners(floor)
     if (!instance || !isReady.value) return false
 
     removeFloorImage()
 
-    if (!coordinates) {
-      floorError.value = 'このフロアはイラストの矩形範囲が未設定、または正しくありません。'
+    if (!corners) {
+      floorError.value = 'このフロアは2点合わせが未設定、または正しくありません。'
       return false
     }
 
@@ -321,7 +321,7 @@ export function useMapViewer(
     instance.addSource(sourceId, {
       type: 'image',
       url: floor.illustrationUrl,
-      coordinates: toImageCoordinates(coordinates),
+      coordinates: toImageCoordinates(corners),
     })
     instance.addLayer({
       id: layerId,
@@ -332,7 +332,7 @@ export function useMapViewer(
     activeSourceId = sourceId
     activeLayerId = layerId
 
-    const bounds = getGeoReferenceBounds(coordinates)
+    const bounds = getGeoReferenceBounds(corners)
     if (bounds) {
       const camera = instance.cameraForBounds([bounds.southwest, bounds.northeast], {
         padding: 64,

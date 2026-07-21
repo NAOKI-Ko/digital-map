@@ -1,6 +1,6 @@
-import type { GeoReferenceFields } from '../../lib/geo'
+import type { FloorGeoReferenceFields } from '../../lib/geo'
 
-export interface MapViewerFloor extends GeoReferenceFields {
+export interface MapViewerFloor extends FloorGeoReferenceFields {
   id: string
   name: string
   illustrationUrl: string

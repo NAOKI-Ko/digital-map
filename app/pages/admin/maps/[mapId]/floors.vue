@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import ImageUploader from '~/components/admin/ImageUploader.vue'
-import { getFloorGeoReference } from '~~/lib/geo'
+import { getFloorCorners } from '~~/lib/geo'
 import type { FloorCreateInput, FloorUpdateInput } from '~~/shared/schemas/floor'
 import { floorCreateSchema, floorUpdateSchema } from '~~/shared/schemas/floor'
 import type { MapFloorItem, MapFloorListResponse, MapFloorResponse } from '~~/shared/types/floor'
@@ -28,7 +28,7 @@ const isCreating = ref(false)
 const busyFloorId = ref('')
 
 function isFloorGeoreferenced(floor: MapFloorItem) {
-  return getFloorGeoReference(floor) !== null
+  return getFloorCorners(floor) !== null
 }
 
 useHead(() => ({
