@@ -33,6 +33,7 @@ let map: MapLibreMap | undefined
 let maplibre: typeof import('maplibre-gl') | undefined
 let markers: Marker[] = []
 let dragState: { pointer: LatLng, rectangle: GeoReferenceRectangle } | null = null
+let shouldResizeOnFirstSearch = props.initialRectangle === null
 
 const IMAGE_SOURCE_ID = 'floor-illustration'
 const IMAGE_LAYER_ID = 'floor-illustration-layer'
@@ -300,7 +301,7 @@ function focusLocation(position: LatLng) {
   })
   currentMap.once('moveend', () => {
     const current = rectangle.value
-    if (current) {
+    if (current && !shouldResizeOnFirstSearch) {
       const center = {
         lat: (current.topLeft.lat + current.bottomRight.lat) / 2,
         lng: (current.topLeft.lng + current.bottomRight.lng) / 2,
@@ -312,6 +313,7 @@ function focusLocation(position: LatLng) {
     }
     else {
       setRectangle(createDefaultRectangleFromMap(currentMap))
+      shouldResizeOnFirstSearch = false
     }
   })
 }
