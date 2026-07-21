@@ -27,10 +27,16 @@ const outdoorFloor: MapViewerFloor = {
   name: '屋外',
   illustrationUrl: '/uploads/floor.png',
   isOutdoor: true,
-  topLeftLat: 35.7,
-  topLeftLng: 139.7,
-  bottomRightLat: 35.6,
-  bottomRightLng: 139.8,
+  imageWidth: 1000,
+  imageHeight: 500,
+  refAPixelX: 0,
+  refAPixelY: 0,
+  refALat: 35.7,
+  refALng: 139.7,
+  refBPixelX: 1000,
+  refBPixelY: 0,
+  refBLat: 35.7,
+  refBLng: 139.71,
 }
 
 describe('MapViewerのカメラ制約', () => {
@@ -120,8 +126,8 @@ describe('GeolocateControlの追加判定', () => {
     expect(shouldEnableGeolocate('view', { ...outdoorFloor, isOutdoor: false })).toBe(false)
   })
 
-  it('矩形座標が未設定なら屋外でも追加しない', () => {
-    expect(shouldEnableGeolocate('view', { ...outdoorFloor, topLeftLat: null })).toBe(false)
+  it('基準点が未設定なら屋外でも追加しない', () => {
+    expect(shouldEnableGeolocate('view', { ...outdoorFloor, refALat: null })).toBe(false)
   })
 
   it('ピン配置エディタでは追加しない', () => {

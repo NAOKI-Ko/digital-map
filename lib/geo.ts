@@ -133,7 +133,18 @@ export function getGeoReferenceValidationError(floor: CompleteFloorGeoReference)
 }
 
 function getGeoReferenceInputError(floor: CompleteFloorGeoReference) {
-  const values = Object.values(floor)
+  const values = [
+    floor.imageWidth,
+    floor.imageHeight,
+    floor.refAPixelX,
+    floor.refAPixelY,
+    floor.refALat,
+    floor.refALng,
+    floor.refBPixelX,
+    floor.refBPixelY,
+    floor.refBLat,
+    floor.refBLng,
+  ]
   if (values.some(value => !Number.isFinite(value))) {
     return '基準点の値を確認してください。'
   }

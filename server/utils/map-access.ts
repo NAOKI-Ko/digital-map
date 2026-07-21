@@ -36,7 +36,7 @@ export async function requireOwnedFloor(event: H3Event) {
       id: floorId,
       mapId: map.id,
     },
-    select: { id: true, mapId: true, order: true },
+    select: { id: true, mapId: true, order: true, imageWidth: true, imageHeight: true },
   })
 
   if (!floor) {
