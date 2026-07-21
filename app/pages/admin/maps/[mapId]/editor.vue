@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { defineAsyncComponent } from 'vue'
-import { getFloorGeoReference, type LatLng } from '~~/lib/geo'
+import { getFloorCorners, type LatLng } from '~~/lib/geo'
 import type { MapFloorListResponse } from '~~/shared/types/floor'
 import type { AdminSpotListResponse, AdminSpotSummary, PositionedAdminSpotSummary, SpotPositionResponse } from '~~/shared/types/spot'
 
@@ -52,7 +52,7 @@ function startRegistration() {
 
 function isGeoreferenced() {
   const floor = selectedFloor.value
-  return floor ? getFloorGeoReference(floor) !== null : false
+  return floor ? getFloorCorners(floor) !== null : false
 }
 
 async function saveMovedSpot(value: { spotId: string, lat: number, lng: number }) {
