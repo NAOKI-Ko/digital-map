@@ -50,11 +50,17 @@ model MapFloor {
   map             Map      @relation(fields: [mapId], references: [id], onDelete: Cascade)
   name            String
   illustrationUrl String
+  imageWidth      Int?
+  imageHeight     Int?
   order           Int      @default(0)
-  topLeftLat      Float?
-  topLeftLng      Float?
-  bottomRightLat  Float?
-  bottomRightLng  Float?
+  refAPixelX      Float?
+  refAPixelY      Float?
+  refALat         Float?
+  refALng         Float?
+  refBPixelX      Float?
+  refBPixelY      Float?
+  refBLat         Float?
+  refBLng         Float?
   isOutdoor       Boolean  @default(true)
   spots           Spot[]
   createdAt       DateTime @default(now())

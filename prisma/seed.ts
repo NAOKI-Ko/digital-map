@@ -99,10 +99,6 @@ async function main() {
         name: verificationMap.floor.name,
         illustrationUrl: verificationMap.floor.illustrationUrl,
         order: 0,
-        topLeftLat: null,
-        topLeftLng: null,
-        bottomRightLat: null,
-        bottomRightLng: null,
         isOutdoor: true,
       },
     })
