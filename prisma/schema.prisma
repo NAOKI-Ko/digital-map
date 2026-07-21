@@ -50,8 +50,8 @@ model MapFloor {
   map             Map      @relation(fields: [mapId], references: [id], onDelete: Cascade)
   name            String
   illustrationUrl String
-  imageWidth      Int?
-  imageHeight     Int?
+  imageWidth      Int
+  imageHeight     Int
   order           Int      @default(0)
   refAPixelX      Float?
   refAPixelY      Float?

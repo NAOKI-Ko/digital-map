@@ -20,8 +20,8 @@ export interface PublicFloor {
   id: string
   name: string
   illustrationUrl: string
-  imageWidth: number | null
-  imageHeight: number | null
+  imageWidth: number
+  imageHeight: number
   order: number
   refAPixelX: number | null
   refAPixelY: number | null
