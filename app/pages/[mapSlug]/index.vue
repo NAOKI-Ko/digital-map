@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { defineAsyncComponent } from 'vue'
+import SpotDetailCard from '~/components/map/SpotDetailCard.vue'
 import type { MapViewerSpot } from '~~/shared/types/map-viewer'
 import type { PublicMapResponse } from '~~/shared/types/public-map'
 
@@ -16,6 +17,10 @@ const selectedSpotId = ref<string | null>(null)
 const selectedFloor = computed(() => (
   data.value?.map.floors.find(floor => floor.id === selectedFloorId.value)
   ?? data.value?.map.floors[0]
+))
+const selectedSpot = computed(() => (
+  selectedFloor.value?.spots.find(spot => spot.id === selectedSpotId.value)
+  ?? null
 ))
 
 watch(() => data.value?.map.floors, (floors) => {
@@ -82,6 +87,12 @@ function selectSpot(spot: MapViewerSpot) {
           <div class="h-[calc(100svh-4rem)] animate-pulse bg-stone-200" />
         </template>
       </ClientOnly>
+
+      <SpotDetailCard
+        v-if="selectedSpot"
+        :spot="selectedSpot"
+        @close="selectedSpotId = null"
+      />
     </template>
   </main>
 </template>
