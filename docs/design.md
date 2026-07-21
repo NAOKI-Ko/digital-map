@@ -68,17 +68,12 @@ model MapFloor {
   name             String
   illustrationUrl  String
   order            Int     @default(0)
-  // ジオリファレンス: MapLibreの image source coordinates 仕様に合わせ、
-  // 画像の四隅[左上, 右上, 右下, 左下]に対応する緯度経度を保持する
-  // (矩形に限らず、回転・台形状のイラストにも対応できる)
+  // ジオリファレンス: 軸に沿った矩形の左上・右下のみを保持する。
+  // MapLibreへ渡す右上・左下は表示時に算出する。
   topLeftLat       Float?
   topLeftLng       Float?
-  topRightLat      Float?
-  topRightLng      Float?
   bottomRightLat   Float?
   bottomRightLng   Float?
-  bottomLeftLat    Float?
-  bottomLeftLng    Float?
   isOutdoor        Boolean @default(true) // false の場合、現在地機能を無効化(地下街等)
   spots            Spot[]
 }
@@ -110,7 +105,18 @@ model Spot {
 
 ### 4.1 イラストのジオリファレンス(image source)
 
-MapLibreの`image`ソースは、画像の四隅に緯度経度を対応づけることで、通常の地図タイルの代わりに任意の画像をレンダリングできる。矩形に限らず台形・回転した配置も指定できるため、デフォルメイラストでも「見た目に近い配置」に寄せて登録できる。
+MapLibreの`image`ソースへは画像の四隅を渡す必要があるが、永続化するのは軸に沿った矩形の左上(`topLeft`)・右下(`bottomRight`)の2点だけとする。右上・左下は表示時に算出し、回転・台形・ねじれを許可しない。
+
+```ts
+const topRight = {
+  lat: floor.topLeftLat,
+  lng: floor.bottomRightLng,
+};
+const bottomLeft = {
+  lat: floor.bottomRightLat,
+  lng: floor.topLeftLng,
+};
+```
 
 ```ts
 map.addSource(`floor-${floor.id}`, {
@@ -118,9 +124,9 @@ map.addSource(`floor-${floor.id}`, {
   url: floor.illustrationUrl,
   coordinates: [
     [floor.topLeftLng, floor.topLeftLat],
-    [floor.topRightLng, floor.topRightLat],
+    [topRight.lng, topRight.lat],
     [floor.bottomRightLng, floor.bottomRightLat],
-    [floor.bottomLeftLng, floor.bottomLeftLat],
+    [bottomLeft.lng, bottomLeft.lat],
   ],
 });
 map.addLayer({
@@ -130,7 +136,18 @@ map.addLayer({
 });
 ```
 
-管理画面のフロア設定UIでは、地図(通常のOSMベースマップ)上でイラストの四隅をドラッグして位置合わせできるようにする(プラチナマップの「マップイメージ上でクリックして緯度経度を設定」と同様の体験)。
+管理画面では、住所検索またはパン・ズームで対象地域へ移動し、地図中央に表示した赤い矩形をドラッグして移動、四隅のハンドルでリサイズする。矩形内にはイラストを半透明でリアルタイム表示する。初期矩形は現在の表示範囲の中央40%を目安に生成し、最大緯度差・経度差がそれぞれ2度を超えないようクランプする。
+
+保存時は次を検証する。
+
+- 2点が有限値かつ緯度`-90〜90`、経度`-180〜180`の範囲内である
+- `topLeft.lat > bottomRight.lat`かつ`topLeft.lng < bottomRight.lng`である
+- 緯度差・経度差が0より大きく、それぞれ2度以下である
+- 日付変更線をまたぐ矩形はMVPでは扱わない。経度を周回させず、住所検索で対象地域側へ移動してから配置する
+
+#### 設計判断の記録: 4隅個別方式の廃止
+
+当初は左上・右上・右下・左下を個別にドラッグできる方式だったが、ねじれ・台形など数学的に不正または意図しない形を作成でき、日付変更線付近の経度正規化も複雑化した。また、非エンジニアに4対応点を合わせてもらう操作は直感的でなかった。MVPのデフォルメイラストは厳密な測地補正を目的としないため、位置と大きさだけを調整する軸沿い矩形へ単純化し、回転は導入しない。
 
 ### 4.2 傾き・回転・ズームの制約
 
@@ -159,7 +176,7 @@ const map = new maplibregl.Map({
 
 ### 4.4 フロア切り替え
 
-フロアタブが切り替わったら、現在の`image`ソース・レイヤーを`removeLayer`/`removeSource`し、新しいフロアの`image`ソースを追加する。`map.easeTo()`で該当フロアの中心座標へ滑らかに移動する。
+フロアタブが切り替わったら、現在の`image`ソース・レイヤーを`removeLayer`/`removeSource`し、新しいフロアの`image`ソースを追加する。左上・右下から得た矩形を`fitBounds`/`cameraForBounds`へ渡し、`map.easeTo()`で矩形全体が収まる視点へ滑らかに移動する。ピン配置エディタの初回表示でも同じ矩形へ自動的に合わせる。
 
 ### 4.5 現在地表示
 
@@ -196,7 +213,7 @@ if (floor.isOutdoor) {
 │   │   │   ├── SpotList.vue
 │   │   │   ├── PinDesignPicker.vue        … ⑥-2 ピンデザイン選択
 │   │   │   ├── FloorManager.vue
-│   │   │   └── GeoReferenceEditor.vue     … イラスト四隅の緯度経度合わせUI
+│   │   │   └── GeoReferenceEditor.vue     … イラスト矩形の移動・リサイズUI
 │   │   ├── map/
 │   │   │   ├── MapViewer.vue              … MapLibre本体(公開側・エディタ両方から使う)
 │   │   │   ├── SpotDetailCard.vue
@@ -205,7 +222,7 @@ if (floor.isOutdoor) {
 │   │   └── ui/                            … 汎用UIパーツ(Button, Modal等)
 │   ├── composables/
 │   │   ├── useMapViewer.ts                … MapLibre初期化・破棄・pitch/bearing制御
-│   │   ├── useGeoReference.ts             … 四隅座標の編集ロジック
+│   │   ├── useGeoReference.ts             … ジオリファレンス矩形の編集ロジック
 │   │   └── useAuth.ts
 │   ├── layouts/
 │   │   ├── default.vue                    … 公開側レイアウト
@@ -264,7 +281,7 @@ if (floor.isOutdoor) {
 │   └── middleware/
 │       └── 00.auth-check.ts               … 管理API用の認可チェック(admin配下のAPIに一括適用)
 ├── lib/
-│   └── geo.ts                             … 四隅座標のバリデーション等、サーバー/クライアント共通ロジック
+│   └── geo.ts                             … 矩形2点の検証・MapLibre用4隅座標への変換等の共通ロジック
 ├── prisma/
 │   ├── schema.prisma
 │   ├── seed.ts
