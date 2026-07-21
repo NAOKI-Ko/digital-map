@@ -2,7 +2,7 @@
 import AddressGeocoder from '~/components/admin/AddressGeocoder.vue'
 import GeoReferenceWizard from '~/components/admin/GeoReferenceWizard.vue'
 import { createEmptyGeoReferenceDraft, isGeoReferenceDraftComplete } from '~/composables/useGeoReference'
-import type { LatLng } from '~~/lib/geo'
+import { getGeoReferenceValidationError, type CompleteFloorGeoReference, type LatLng } from '~~/lib/geo'
 import type { MapFloorListResponse, MapFloorResponse } from '~~/shared/types/floor'
 import type { GeocodeResult } from '~~/shared/types/geocode'
 import type { GeoReferenceDraft } from '~~/shared/types/georeference'
@@ -27,6 +27,24 @@ const backPath = computed(() => cameFromEditor.value
   ? { path: `/admin/maps/${mapId}/editor`, query: { floorId } }
   : `/admin/maps/${mapId}/floors`)
 const hasImageDimensions = computed(() => Boolean(floor.value?.imageWidth && floor.value?.imageHeight))
+const completeGeoReference = computed<CompleteFloorGeoReference | null>(() => {
+  if (!floor.value?.imageWidth || !floor.value.imageHeight || !isGeoReferenceDraftComplete(draft.value)) return null
+  return {
+    imageWidth: floor.value.imageWidth,
+    imageHeight: floor.value.imageHeight,
+    refAPixelX: draft.value.refAPixelX!,
+    refAPixelY: draft.value.refAPixelY!,
+    refALat: draft.value.refALat!,
+    refALng: draft.value.refALng!,
+    refBPixelX: draft.value.refBPixelX!,
+    refBPixelY: draft.value.refBPixelY!,
+    refBLat: draft.value.refBLat!,
+    refBLng: draft.value.refBLng!,
+  }
+})
+const validationError = computed(() => completeGeoReference.value
+  ? getGeoReferenceValidationError(completeGeoReference.value)
+  : null)
 
 watch(floor, (value) => {
   if (!value) return
@@ -52,6 +70,10 @@ function focusSearchResult(result: GeocodeResult) {
 
 async function save() {
   if (!floor.value || !isGeoReferenceDraftComplete(draft.value)) return
+  if (validationError.value) {
+    saveError.value = validationError.value
+    return
+  }
   isSaving.value = true
   saveError.value = ''
   successMessage.value = ''
@@ -120,10 +142,11 @@ function getErrorMessage(error: unknown) {
       </section>
 
       <div v-if="saveError" role="alert" class="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{{ saveError }}</div>
+      <div v-else-if="validationError" role="alert" class="mt-4 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-800">{{ validationError }}</div>
       <div v-if="successMessage" role="status" class="mt-4 rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{{ successMessage }}</div>
       <div class="mt-5 flex flex-wrap justify-end gap-3">
         <NuxtLink v-if="cameFromEditor" :to="backPath" class="rounded-lg border border-stone-300 bg-white px-5 py-2.5 text-sm font-semibold text-stone-700 hover:bg-stone-50">ピン配置エディタに戻る</NuxtLink>
-        <button type="button" :disabled="isSaving || !isGeoReferenceDraftComplete(draft)" class="rounded-lg bg-terracotta-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60" @click="save">
+        <button type="button" :disabled="isSaving || !isGeoReferenceDraftComplete(draft) || Boolean(validationError)" class="rounded-lg bg-terracotta-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60" @click="save">
           {{ isSaving ? '保存中…' : 'この内容で保存' }}
         </button>
       </div>

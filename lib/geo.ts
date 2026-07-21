@@ -84,10 +84,8 @@ export function getReferencePointDistances(floor: CompleteFloorGeoReference) {
  * 相似変換を求め、画像の4隅を緯度経度へ変換する。
  */
 export function computeFloorCorners(floor: CompleteFloorGeoReference): FloorCorners {
-  if (!Number.isFinite(floor.imageWidth) || !Number.isFinite(floor.imageHeight)
-    || floor.imageWidth <= 0 || floor.imageHeight <= 0) {
-    throw new Error('画像の幅と高さを確認してください。')
-  }
+  const inputError = getGeoReferenceInputError(floor)
+  if (inputError) throw new Error(inputError)
 
   const origin = { lat: floor.refALat, lng: floor.refALng }
   const bMeters = lngLatToLocalMeters(floor.refBLat, floor.refBLng, origin.lat, origin.lng)
@@ -120,6 +118,40 @@ export function computeFloorCorners(floor: CompleteFloorGeoReference): FloorCorn
     bottomRight: corner(floor.imageWidth, floor.imageHeight),
     bottomLeft: corner(0, floor.imageHeight),
   }
+}
+
+export function getGeoReferenceValidationError(floor: CompleteFloorGeoReference) {
+  const inputError = getGeoReferenceInputError(floor)
+  if (inputError) return inputError
+
+  const { pixelDistance, meterDistance } = getReferencePointDistances(floor)
+  if (pixelDistance < MIN_REFERENCE_PIXEL_DISTANCE || meterDistance < MIN_REFERENCE_METER_DISTANCE) {
+    return REFERENCE_DISTANCE_ERROR
+  }
+
+  return null
+}
+
+function getGeoReferenceInputError(floor: CompleteFloorGeoReference) {
+  const values = Object.values(floor)
+  if (values.some(value => !Number.isFinite(value))) {
+    return '基準点の値を確認してください。'
+  }
+  if (!Number.isInteger(floor.imageWidth) || !Number.isInteger(floor.imageHeight)
+    || floor.imageWidth <= 0 || floor.imageHeight <= 0) {
+    return '画像の幅と高さを確認してください。'
+  }
+  if (!isValidLatLng({ lat: floor.refALat, lng: floor.refALng })
+    || !isValidLatLng({ lat: floor.refBLat, lng: floor.refBLng })) {
+    return '基準点の緯度経度を確認してください。'
+  }
+  if (floor.refAPixelX < 0 || floor.refAPixelX > floor.imageWidth
+    || floor.refBPixelX < 0 || floor.refBPixelX > floor.imageWidth
+    || floor.refAPixelY < 0 || floor.refAPixelY > floor.imageHeight
+    || floor.refBPixelY < 0 || floor.refBPixelY > floor.imageHeight) {
+    return 'イラスト上の基準点を画像の内側で選んでください。'
+  }
+  return null
 }
 
 export function getCompleteFloorGeoReference(
