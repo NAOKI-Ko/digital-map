@@ -3,20 +3,34 @@ export interface LatLng {
   lng: number
 }
 
-/** 軸に沿った矩形を、保存対象である左上・右下の2点で表す。 */
-export interface GeoReferenceRectangle {
-  topLeft: LatLng
-  bottomRight: LatLng
+export interface FloorGeoReferenceFields {
+  imageWidth: number | null
+  imageHeight: number | null
+  refAPixelX: number | null
+  refAPixelY: number | null
+  refALat: number | null
+  refALng: number | null
+  refBPixelX: number | null
+  refBPixelY: number | null
+  refBLat: number | null
+  refBLng: number | null
 }
 
-export interface GeoReferenceFields {
-  topLeftLat: number | null
-  topLeftLng: number | null
-  bottomRightLat: number | null
-  bottomRightLng: number | null
+export interface CompleteFloorGeoReference {
+  imageWidth: number
+  imageHeight: number
+  refAPixelX: number
+  refAPixelY: number
+  refALat: number
+  refALng: number
+  refBPixelX: number
+  refBPixelY: number
+  refBLat: number
+  refBLng: number
 }
 
-export type GeoReferenceCorner = 'topLeft' | 'topRight' | 'bottomRight' | 'bottomLeft'
+export type FloorCornerName = 'topLeft' | 'topRight' | 'bottomRight' | 'bottomLeft'
+export type FloorCorners = Record<FloorCornerName, LatLng>
 
 export type MapLibreImageCoordinates = [
   [number, number],
@@ -25,50 +39,144 @@ export type MapLibreImageCoordinates = [
   [number, number],
 ]
 
-export const MIN_GEOREFERENCE_SPAN = 0.000001
-export const MAX_GEOREFERENCE_SPAN = 2
-export const DEFAULT_RECTANGLE_VIEWPORT_RATIO = 0.4
+export const MIN_REFERENCE_PIXEL_DISTANCE = 50
+export const MIN_REFERENCE_METER_DISTANCE = 20
+export const REFERENCE_DISTANCE_ERROR = '基準点が近すぎます。もっと離れた目印を選んでください。'
 
-/** MapLibreが世界を周回した際の経度を[-180, 180)へ戻す。 */
-export function normalizeLongitude(lng: number) {
-  if (!Number.isFinite(lng)) return lng
-  if (lng >= -180 && lng < 180) return lng
-  const wrapped = ((lng + 180) % 360 + 360) % 360 - 180
-  return Number(wrapped.toFixed(12))
-}
+const EARTH_RADIUS_METERS = 6_378_137
 
-export function normalizeGeoReferenceRectangle(
-  rectangle: GeoReferenceRectangle,
-): GeoReferenceRectangle {
+function lngLatToLocalMeters(lat: number, lng: number, originLat: number, originLng: number) {
+  const radians = Math.PI / 180
   return {
-    topLeft: { ...rectangle.topLeft, lng: normalizeLongitude(rectangle.topLeft.lng) },
-    bottomRight: { ...rectangle.bottomRight, lng: normalizeLongitude(rectangle.bottomRight.lng) },
+    x: (lng - originLng) * radians * EARTH_RADIUS_METERS * Math.cos(originLat * radians),
+    y: (lat - originLat) * radians * EARTH_RADIUS_METERS,
   }
 }
 
-export function getRectangleCorners(rectangle: GeoReferenceRectangle) {
+function localMetersToLngLat(x: number, y: number, originLat: number, originLng: number): LatLng {
+  const degrees = 180 / Math.PI
   return {
-    topLeft: rectangle.topLeft,
-    topRight: {
-      lat: rectangle.topLeft.lat,
-      lng: rectangle.bottomRight.lng,
-    },
-    bottomRight: rectangle.bottomRight,
-    bottomLeft: {
-      lat: rectangle.bottomRight.lat,
-      lng: rectangle.topLeft.lng,
-    },
-  } satisfies Record<GeoReferenceCorner, LatLng>
+    lat: originLat + (y / EARTH_RADIUS_METERS) * degrees,
+    lng: originLng + (x / (EARTH_RADIUS_METERS * Math.cos(originLat * Math.PI / 180))) * degrees,
+  }
 }
 
-export function toImageCoordinates(rectangle: GeoReferenceRectangle): MapLibreImageCoordinates {
-  const corners = getRectangleCorners(rectangle)
+export function getReferencePointDistances(floor: CompleteFloorGeoReference) {
+  const pixelDistance = Math.hypot(
+    floor.refBPixelX - floor.refAPixelX,
+    floor.refBPixelY - floor.refAPixelY,
+  )
+  const bMeters = lngLatToLocalMeters(
+    floor.refBLat,
+    floor.refBLng,
+    floor.refALat,
+    floor.refALng,
+  )
+
+  return {
+    pixelDistance,
+    meterDistance: Math.hypot(bMeters.x, bMeters.y),
+  }
+}
+
+/**
+ * イラスト上と実地図上の対応点A・Bから、一様縮尺・回転・平行移動だけの
+ * 相似変換を求め、画像の4隅を緯度経度へ変換する。
+ */
+export function computeFloorCorners(floor: CompleteFloorGeoReference): FloorCorners {
+  if (!Number.isFinite(floor.imageWidth) || !Number.isFinite(floor.imageHeight)
+    || floor.imageWidth <= 0 || floor.imageHeight <= 0) {
+    throw new Error('画像の幅と高さを確認してください。')
+  }
+
+  const origin = { lat: floor.refALat, lng: floor.refALng }
+  const bMeters = lngLatToLocalMeters(floor.refBLat, floor.refBLng, origin.lat, origin.lng)
+  const pxDx = floor.refBPixelX - floor.refAPixelX
+  const pxDy = floor.refBPixelY - floor.refAPixelY
+  const { pixelDistance, meterDistance } = getReferencePointDistances(floor)
+
+  if (pixelDistance < MIN_REFERENCE_PIXEL_DISTANCE || meterDistance < MIN_REFERENCE_METER_DISTANCE) {
+    throw new Error(REFERENCE_DISTANCE_ERROR)
+  }
+
+  const scale = meterDistance / pixelDistance
+  const pixelAngle = Math.atan2(-pxDy, pxDx)
+  const metersAngle = Math.atan2(bMeters.y, bMeters.x)
+  const rotation = metersAngle - pixelAngle
+  const cos = Math.cos(rotation)
+  const sin = Math.sin(rotation)
+
+  function corner(px: number, py: number): LatLng {
+    const dx = px - floor.refAPixelX
+    const dy = -(py - floor.refAPixelY)
+    const x = (dx * cos - dy * sin) * scale
+    const y = (dx * sin + dy * cos) * scale
+    return localMetersToLngLat(x, y, origin.lat, origin.lng)
+  }
+
+  return {
+    topLeft: corner(0, 0),
+    topRight: corner(floor.imageWidth, 0),
+    bottomRight: corner(floor.imageWidth, floor.imageHeight),
+    bottomLeft: corner(0, floor.imageHeight),
+  }
+}
+
+export function getCompleteFloorGeoReference(
+  floor: FloorGeoReferenceFields,
+): CompleteFloorGeoReference | null {
+  const values = [
+    floor.imageWidth,
+    floor.imageHeight,
+    floor.refAPixelX,
+    floor.refAPixelY,
+    floor.refALat,
+    floor.refALng,
+    floor.refBPixelX,
+    floor.refBPixelY,
+    floor.refBLat,
+    floor.refBLng,
+  ]
+
+  if (values.some(value => value === null || !Number.isFinite(value))) return null
+  if (floor.imageWidth! <= 0 || floor.imageHeight! <= 0) return null
+
+  return floor as CompleteFloorGeoReference
+}
+
+export function getFloorCorners(floor: FloorGeoReferenceFields): FloorCorners | null {
+  const complete = getCompleteFloorGeoReference(floor)
+  if (!complete) return null
+
+  try {
+    return computeFloorCorners(complete)
+  }
+  catch {
+    return null
+  }
+}
+
+export function toImageCoordinates(corners: FloorCorners): MapLibreImageCoordinates {
   return [
     [corners.topLeft.lng, corners.topLeft.lat],
     [corners.topRight.lng, corners.topRight.lat],
     [corners.bottomRight.lng, corners.bottomRight.lat],
     [corners.bottomLeft.lng, corners.bottomLeft.lat],
   ]
+}
+
+export function getGeoReferenceBounds(corners: FloorCorners) {
+  const points = Object.values(corners)
+  return {
+    southwest: [
+      Math.min(...points.map(point => point.lng)),
+      Math.min(...points.map(point => point.lat)),
+    ] as [number, number],
+    northeast: [
+      Math.max(...points.map(point => point.lng)),
+      Math.max(...points.map(point => point.lat)),
+    ] as [number, number],
+  }
 }
 
 export function isValidLatLng(value: LatLng) {
@@ -78,139 +186,4 @@ export function isValidLatLng(value: LatLng) {
     && value.lat <= 90
     && value.lng >= -180
     && value.lng <= 180
-}
-
-export function getGeoReferenceValidationError(rectangle: GeoReferenceRectangle) {
-  if (!isValidLatLng(rectangle.topLeft) || !isValidLatLng(rectangle.bottomRight)) {
-    return '緯度経度の値を確認してください。'
-  }
-
-  const latitudeSpan = rectangle.topLeft.lat - rectangle.bottomRight.lat
-  const longitudeSpan = rectangle.bottomRight.lng - rectangle.topLeft.lng
-  if (latitudeSpan <= 0 || longitudeSpan <= 0) {
-    return '左上は右下より北かつ西に設定してください。'
-  }
-  if (latitudeSpan < MIN_GEOREFERENCE_SPAN || longitudeSpan < MIN_GEOREFERENCE_SPAN) {
-    return '矩形の幅と高さを確保してください。'
-  }
-  if (latitudeSpan > MAX_GEOREFERENCE_SPAN || longitudeSpan > MAX_GEOREFERENCE_SPAN) {
-    return `設定範囲は緯度・経度とも${MAX_GEOREFERENCE_SPAN}度以内にしてください。`
-  }
-  return null
-}
-
-export function isValidGeoReference(rectangle: GeoReferenceRectangle) {
-  return getGeoReferenceValidationError(rectangle) === null
-}
-
-export function getFloorGeoReference(floor: GeoReferenceFields): GeoReferenceRectangle | null {
-  const values = [
-    floor.topLeftLat,
-    floor.topLeftLng,
-    floor.bottomRightLat,
-    floor.bottomRightLng,
-  ]
-  if (values.some(value => value === null)) return null
-
-  const rectangle: GeoReferenceRectangle = {
-    topLeft: { lat: floor.topLeftLat!, lng: floor.topLeftLng! },
-    bottomRight: { lat: floor.bottomRightLat!, lng: floor.bottomRightLng! },
-  }
-
-  return isValidGeoReference(rectangle) ? rectangle : null
-}
-
-export function createGeoReferenceFromBounds(bounds: {
-  southwest: LatLng
-  northeast: LatLng
-}): GeoReferenceRectangle {
-  return {
-    topLeft: { lat: bounds.northeast.lat, lng: bounds.southwest.lng },
-    bottomRight: { lat: bounds.southwest.lat, lng: bounds.northeast.lng },
-  }
-}
-
-/** 現在の表示範囲中央へ、表示幅・高さの40%（最大2度）の初期矩形を作る。 */
-export function createDefaultGeoReferenceRectangle(bounds: {
-  southwest: LatLng
-  northeast: LatLng
-}, viewportRatio = DEFAULT_RECTANGLE_VIEWPORT_RATIO): GeoReferenceRectangle {
-  const west = Math.max(-180, Math.min(180, bounds.southwest.lng))
-  const east = Math.max(-180, Math.min(180, bounds.northeast.lng))
-  const south = Math.max(-90, Math.min(90, bounds.southwest.lat))
-  const north = Math.max(-90, Math.min(90, bounds.northeast.lat))
-  const centerLng = (west + east) / 2
-  const centerLat = (south + north) / 2
-  const width = Math.min(
-    MAX_GEOREFERENCE_SPAN,
-    Math.max(MIN_GEOREFERENCE_SPAN, Math.abs(east - west) * viewportRatio),
-  )
-  const height = Math.min(
-    MAX_GEOREFERENCE_SPAN,
-    Math.max(MIN_GEOREFERENCE_SPAN, Math.abs(north - south) * viewportRatio),
-  )
-  const left = Math.max(-180, Math.min(180 - width, centerLng - width / 2))
-  const bottom = Math.max(-90, Math.min(90 - height, centerLat - height / 2))
-
-  return {
-    topLeft: { lat: bottom + height, lng: left },
-    bottomRight: { lat: bottom, lng: left + width },
-  }
-}
-
-export function resizeGeoReferenceRectangle(
-  rectangle: GeoReferenceRectangle,
-  corner: GeoReferenceCorner,
-  position: LatLng,
-): GeoReferenceRectangle {
-  const topLeft = { ...rectangle.topLeft }
-  const bottomRight = { ...rectangle.bottomRight }
-  const touchesTop = corner === 'topLeft' || corner === 'topRight'
-  const touchesLeft = corner === 'topLeft' || corner === 'bottomLeft'
-
-  if (touchesTop) {
-    topLeft.lat = clamp(position.lat, bottomRight.lat + MIN_GEOREFERENCE_SPAN, bottomRight.lat + MAX_GEOREFERENCE_SPAN)
-  }
-  else {
-    bottomRight.lat = clamp(position.lat, topLeft.lat - MAX_GEOREFERENCE_SPAN, topLeft.lat - MIN_GEOREFERENCE_SPAN)
-  }
-
-  if (touchesLeft) {
-    topLeft.lng = clamp(position.lng, bottomRight.lng - MAX_GEOREFERENCE_SPAN, bottomRight.lng - MIN_GEOREFERENCE_SPAN)
-  }
-  else {
-    bottomRight.lng = clamp(position.lng, topLeft.lng + MIN_GEOREFERENCE_SPAN, topLeft.lng + MAX_GEOREFERENCE_SPAN)
-  }
-
-  topLeft.lat = clamp(topLeft.lat, -90, 90)
-  topLeft.lng = clamp(topLeft.lng, -180, 180)
-  bottomRight.lat = clamp(bottomRight.lat, -90, 90)
-  bottomRight.lng = clamp(bottomRight.lng, -180, 180)
-  return { topLeft, bottomRight }
-}
-
-export function moveGeoReferenceRectangle(
-  rectangle: GeoReferenceRectangle,
-  delta: LatLng,
-): GeoReferenceRectangle {
-  const latitudeSpan = rectangle.topLeft.lat - rectangle.bottomRight.lat
-  const longitudeSpan = rectangle.bottomRight.lng - rectangle.topLeft.lng
-  const left = clamp(rectangle.topLeft.lng + delta.lng, -180, 180 - longitudeSpan)
-  const bottom = clamp(rectangle.bottomRight.lat + delta.lat, -90, 90 - latitudeSpan)
-
-  return {
-    topLeft: { lat: bottom + latitudeSpan, lng: left },
-    bottomRight: { lat: bottom, lng: left + longitudeSpan },
-  }
-}
-
-export function getGeoReferenceBounds(rectangle: GeoReferenceRectangle) {
-  return {
-    southwest: [rectangle.topLeft.lng, rectangle.bottomRight.lat] as [number, number],
-    northeast: [rectangle.bottomRight.lng, rectangle.topLeft.lat] as [number, number],
-  }
-}
-
-function clamp(value: number, minimum: number, maximum: number) {
-  return Math.min(maximum, Math.max(minimum, value))
 }
