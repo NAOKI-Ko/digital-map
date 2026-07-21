@@ -11,6 +11,7 @@ export default defineEventHandler(async (event): Promise<ImageUploadResponse> =>
   }
 
   const validated = validateImage(file.data, file.type, file.filename)
+  const dimensions = readImageDimensions(file.data, validated.mimeType)
   const filename = `${randomUUID()}${validated.extension}`
   const uploadDirectory = getUploadDirectory(event)
 
@@ -23,6 +24,8 @@ export default defineEventHandler(async (event): Promise<ImageUploadResponse> =>
       filename,
       mimeType: validated.mimeType,
       size: file.data.length,
+      width: dimensions.width,
+      height: dimensions.height,
     },
   }
 })

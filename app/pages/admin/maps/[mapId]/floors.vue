@@ -5,6 +5,7 @@ import type { FloorCreateInput, FloorUpdateInput } from '~~/shared/schemas/floor
 import { floorCreateSchema, floorUpdateSchema } from '~~/shared/schemas/floor'
 import type { MapFloorItem, MapFloorListResponse, MapFloorResponse } from '~~/shared/types/floor'
 import type { AdminMapResponse } from '~~/shared/types/map'
+import type { UploadedImage } from '~~/shared/types/upload'
 
 definePageMeta({
   layout: 'admin',
@@ -15,7 +16,13 @@ const route = useRoute()
 const mapId = route.params.mapId as string
 const { data: mapData } = await useFetch<AdminMapResponse>(`/api/maps/${mapId}`)
 const { data, error, status } = await useFetch<MapFloorListResponse>(`/api/maps/${mapId}/floors`)
-const createInput = reactive<FloorCreateInput>({ name: '', illustrationUrl: '', isOutdoor: true })
+const createInput = reactive<FloorCreateInput>({
+  name: '',
+  illustrationUrl: '',
+  imageWidth: 0,
+  imageHeight: 0,
+  isOutdoor: true,
+})
 const createError = ref('')
 const isCreating = ref(false)
 const busyFloorId = ref('')
@@ -28,8 +35,10 @@ useHead(() => ({
   title: `フロア管理 - ${mapData.value?.map.name ?? 'マップ'} | デジタルマップ`,
 }))
 
-function useUploadedImage(url: string) {
-  createInput.illustrationUrl = url
+function useUploadedImage(image: UploadedImage) {
+  createInput.illustrationUrl = image.url
+  createInput.imageWidth = image.width
+  createInput.imageHeight = image.height
   createError.value = ''
 }
 
@@ -50,7 +59,13 @@ async function createFloor() {
     if (data.value) {
       data.value = { floors: [...data.value.floors, response.floor] }
     }
-    Object.assign(createInput, { name: '', illustrationUrl: '', isOutdoor: true })
+    Object.assign(createInput, {
+      name: '',
+      illustrationUrl: '',
+      imageWidth: 0,
+      imageHeight: 0,
+      isOutdoor: true,
+    })
   }
   catch {
     createError.value = 'フロアを追加できませんでした。もう一度お試しください。'
@@ -157,7 +172,7 @@ async function deleteFloor(floor: MapFloorItem) {
     <section class="mt-8 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
       <h2 class="text-lg font-bold text-stone-900">フロアを追加</h2>
       <div class="mt-6 grid gap-6 lg:grid-cols-2">
-        <ImageUploader label="フロアイラスト" @uploaded="useUploadedImage($event.url)" />
+        <ImageUploader label="フロアイラスト" @uploaded="useUploadedImage" />
         <form class="space-y-5" @submit.prevent="createFloor">
           <div>
             <label for="new-floor-name" class="text-sm font-semibold text-stone-800">フロア名</label>

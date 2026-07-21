@@ -20,6 +20,11 @@ const allowedFiles = {
 
 export type AllowedImageMimeType = keyof typeof allowedFiles
 
+export interface ImageDimensions {
+  width: number
+  height: number
+}
+
 export function getUploadDirectory(event?: H3Event) {
   const configuredDirectory = event ? useRuntimeConfig(event).uploadDir : ''
 
@@ -64,6 +69,67 @@ export function validateImage(data: Buffer, mimeType?: string, originalName?: st
     mimeType: typedMimeType,
     extension: definition.extension,
   }
+}
+
+export function readImageDimensions(data: Buffer, mimeType: AllowedImageMimeType): ImageDimensions {
+  if (mimeType === 'image/png') {
+    if (data.length < 24) {
+      throw invalidImageDimensionsError()
+    }
+
+    const width = data.readUInt32BE(16)
+    const height = data.readUInt32BE(20)
+    return validateImageDimensions(width, height)
+  }
+
+  let offset = 2
+  while (offset < data.length) {
+    if (data[offset] !== 0xff) {
+      offset += 1
+      continue
+    }
+
+    while (data[offset] === 0xff) offset += 1
+    const marker = data[offset]
+    offset += 1
+
+    if (marker === undefined || marker === 0xd9 || marker === 0xda) break
+    if (marker === 0xd8 || (marker >= 0xd0 && marker <= 0xd7)) continue
+    if (offset + 2 > data.length) break
+
+    const segmentLength = data.readUInt16BE(offset)
+    if (segmentLength < 2 || offset + segmentLength > data.length) break
+
+    if (isJpegStartOfFrame(marker) && segmentLength >= 7) {
+      const height = data.readUInt16BE(offset + 3)
+      const width = data.readUInt16BE(offset + 5)
+      return validateImageDimensions(width, height)
+    }
+
+    offset += segmentLength
+  }
+
+  throw invalidImageDimensionsError()
+}
+
+function isJpegStartOfFrame(marker: number) {
+  return [0xc0, 0xc1, 0xc2, 0xc3, 0xc5, 0xc6, 0xc7, 0xc9, 0xca, 0xcb, 0xcd, 0xce, 0xcf]
+    .includes(marker)
+}
+
+function validateImageDimensions(width: number, height: number): ImageDimensions {
+  if (!Number.isInteger(width) || !Number.isInteger(height) || width <= 0 || height <= 0) {
+    throw invalidImageDimensionsError()
+  }
+
+  return { width, height }
+}
+
+function invalidImageDimensionsError() {
+  return createError({
+    statusCode: 415,
+    statusMessage: '画像の幅と高さを読み取れませんでした。',
+  })
 }
 
 export function mimeTypeForFilename(filename: string) {

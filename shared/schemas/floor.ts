@@ -8,6 +8,8 @@ const localUploadUrlSchema = z.string().regex(
 export const floorCreateSchema = z.object({
   name: z.string().trim().min(1, 'フロア名を入力してください。').max(50, 'フロア名は50文字以内で入力してください。'),
   illustrationUrl: localUploadUrlSchema,
+  imageWidth: z.number().int().positive('画像の幅を読み取れませんでした。'),
+  imageHeight: z.number().int().positive('画像の高さを読み取れませんでした。'),
   isOutdoor: z.boolean().default(true),
 })
 

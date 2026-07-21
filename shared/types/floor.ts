@@ -3,11 +3,17 @@ export interface MapFloorItem {
   mapId: string
   name: string
   illustrationUrl: string
+  imageWidth: number | null
+  imageHeight: number | null
   order: number
-  topLeftLat: number | null
-  topLeftLng: number | null
-  bottomRightLat: number | null
-  bottomRightLng: number | null
+  refAPixelX: number | null
+  refAPixelY: number | null
+  refALat: number | null
+  refALng: number | null
+  refBPixelX: number | null
+  refBPixelY: number | null
+  refBLat: number | null
+  refBLng: number | null
   isOutdoor: boolean
   spotCount: number
   createdAt: string

@@ -3,6 +3,8 @@ export interface UploadedImage {
   filename: string
   mimeType: 'image/png' | 'image/jpeg'
   size: number
+  width: number
+  height: number
 }
 
 export interface ImageUploadResponse {
