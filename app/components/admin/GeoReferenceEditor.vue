@@ -196,6 +196,8 @@ function addRectangleLayersAndMarkers() {
     element.className = 'geo-resize-handle'
     element.setAttribute('aria-label', `${corner.label}をドラッグして矩形をリサイズ`)
     element.title = `${corner.label}をドラッグしてリサイズ`
+    element.addEventListener('mousedown', event => event.stopPropagation())
+    element.addEventListener('touchstart', event => event.stopPropagation(), { passive: true })
     const position = getRectangleCorners(currentRectangle)[corner.key]
     const marker = new maplibre!.Marker({ element, draggable: true })
       .setLngLat([position.lng, position.lat])
