@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import PublicSharePanel from '~/components/admin/PublicSharePanel.vue'
+import { buildPublicMapUrl } from '~~/shared/utils/public-url'
 import type { AdminMapResponse } from '~~/shared/types/map'
 import type { MapPublicationResponse } from '~~/shared/types/map-publication'
 
@@ -10,6 +12,10 @@ const { data, error, status } = await useFetch<AdminMapResponse>(`/api/maps/${ma
 const isSaving = ref(false)
 const errorMessage = ref('')
 const successMessage = ref('')
+const requestUrl = useRequestURL()
+const publicUrl = computed(() => data.value
+  ? buildPublicMapUrl(requestUrl.origin, data.value.map.slug)
+  : '')
 
 useHead(() => ({
   title: `${data.value?.map.name ?? '公開設定'} | デジタルマップ`,
@@ -99,6 +105,20 @@ async function togglePublication() {
         <p v-if="errorMessage" role="alert" class="mt-5 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{{ errorMessage }}</p>
         <p v-if="successMessage" role="status" class="mt-5 rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{{ successMessage }}</p>
       </section>
+
+      <div class="mt-6">
+        <ClientOnly>
+          <PublicSharePanel
+            :map-name="data.map.name"
+            :map-slug="data.map.slug"
+            :public-url="publicUrl"
+            :is-published="data.map.isPublished"
+          />
+          <template #fallback>
+            <section class="h-96 animate-pulse rounded-2xl bg-stone-200" />
+          </template>
+        </ClientOnly>
+      </div>
     </template>
   </div>
 </template>
