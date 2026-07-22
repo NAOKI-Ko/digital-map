@@ -42,8 +42,37 @@ export type MapLibreImageCoordinates = [
 export const MIN_REFERENCE_PIXEL_DISTANCE = 50
 export const MIN_REFERENCE_METER_DISTANCE = 20
 export const REFERENCE_DISTANCE_ERROR = '基準点が近すぎます。もっと離れた目印を選んでください。'
+export const INDOOR_PSEUDO_ORIGIN = { lat: 0, lng: 0 } as const
+export const INDOOR_PSEUDO_EXTENT_DEG = 0.01
 
 const EARTH_RADIUS_METERS = 6_378_137
+
+/**
+ * 現在地を使用しない屋内フロア向けに、画像の縦横比を保った疑似座標を返す。
+ * 屋外用の2点合わせとは独立しており、実世界の位置を表すものではない。
+ */
+export function computeIndoorPseudoCorners(imageWidth: number, imageHeight: number): FloorCorners {
+  if (!Number.isFinite(imageWidth) || !Number.isFinite(imageHeight)
+    || imageWidth <= 0 || imageHeight <= 0) {
+    throw new Error('画像の幅と高さを確認してください。')
+  }
+
+  const aspect = imageWidth / imageHeight
+  const halfLng = aspect >= 1
+    ? INDOOR_PSEUDO_EXTENT_DEG / 2
+    : (INDOOR_PSEUDO_EXTENT_DEG * aspect) / 2
+  const halfLat = aspect >= 1
+    ? (INDOOR_PSEUDO_EXTENT_DEG / aspect) / 2
+    : INDOOR_PSEUDO_EXTENT_DEG / 2
+  const { lat, lng } = INDOOR_PSEUDO_ORIGIN
+
+  return {
+    topLeft: { lat: lat + halfLat, lng: lng - halfLng },
+    topRight: { lat: lat + halfLat, lng: lng + halfLng },
+    bottomRight: { lat: lat - halfLat, lng: lng + halfLng },
+    bottomLeft: { lat: lat - halfLat, lng: lng - halfLng },
+  }
+}
 
 function lngLatToLocalMeters(lat: number, lng: number, originLat: number, originLng: number) {
   const radians = Math.PI / 180
