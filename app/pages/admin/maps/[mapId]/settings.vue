@@ -115,6 +115,19 @@ async function saveMap(input: MapNameInput) {
           <NuxtLink :to="`/admin/maps/${mapId}/editor`" class="inline-flex rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-sm font-semibold text-stone-800 hover:bg-stone-100">地図からピンを置く</NuxtLink>
         </div>
       </section>
+
+      <section class="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+        <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <div class="flex items-center gap-3">
+              <h2 class="text-lg font-bold text-stone-900">公開設定</h2>
+              <span class="rounded-full px-2.5 py-1 text-xs font-semibold" :class="data.map.isPublished ? 'bg-emerald-100 text-emerald-800' : 'bg-stone-100 text-stone-700'">{{ data.map.isPublished ? '公開中' : '下書き' }}</span>
+            </div>
+            <p class="mt-2 text-sm leading-6 text-stone-600">マップの公開状態を切り替え、閲覧者向けURLを管理します。</p>
+          </div>
+          <NuxtLink :to="`/admin/maps/${mapId}/publish`" class="inline-flex shrink-0 justify-center rounded-lg bg-terracotta-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-terracotta-700">公開設定を開く</NuxtLink>
+        </div>
+      </section>
     </template>
   </div>
 </template>
