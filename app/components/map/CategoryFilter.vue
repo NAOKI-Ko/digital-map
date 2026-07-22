@@ -12,7 +12,7 @@ defineEmits<{
 <template>
   <div
     v-if="categories.length"
-    class="flex max-w-full gap-2 overflow-x-auto px-1 pb-1"
+    class="flex max-w-full overscroll-x-contain gap-2 overflow-x-auto px-1 pb-1"
     role="group"
     aria-label="カテゴリで絞り込み"
   >

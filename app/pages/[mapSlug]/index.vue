@@ -67,32 +67,32 @@ function selectSpot(spot: MapViewerSpot) {
 </script>
 
 <template>
-  <main class="min-h-screen bg-stone-100 text-stone-900">
-    <div v-if="status === 'pending'" class="grid min-h-screen place-items-center px-6 text-sm text-stone-600">
+  <main class="h-[100svh] overflow-hidden bg-stone-100 text-stone-900">
+    <div v-if="status === 'pending'" class="grid h-full place-items-center px-6 text-sm text-stone-600">
       マップを読み込んでいます…
     </div>
-    <div v-else-if="error" class="grid min-h-screen place-items-center px-6">
+    <div v-else-if="error" class="grid h-full place-items-center px-6">
       <section class="max-w-md rounded-2xl bg-white p-8 text-center shadow-sm">
         <p class="text-sm font-semibold text-red-700">公開マップを表示できません</p>
         <p class="mt-3 text-sm leading-6 text-stone-600">URLが正しいか、マップが公開中かをご確認ください。</p>
       </section>
     </div>
-    <div v-else-if="!data?.map.floors.length" class="grid min-h-screen place-items-center px-6">
+    <div v-else-if="!data?.map.floors.length" class="grid h-full place-items-center px-6">
       <section class="max-w-md rounded-2xl bg-white p-8 text-center shadow-sm">
         <h1 class="text-xl font-bold">{{ data?.map.name }}</h1>
         <p class="mt-3 text-sm text-stone-600">閲覧できるフロアがまだありません。</p>
       </section>
     </div>
     <template v-else-if="selectedFloor">
-      <header class="flex min-h-16 items-center border-b border-stone-200 bg-white px-4 py-3 sm:px-6">
-        <div>
+      <header class="flex h-16 items-center border-b border-stone-200 bg-white px-4 sm:px-6">
+        <div class="min-w-0">
           <p class="text-xs font-semibold tracking-widest text-terracotta-700">DIGITAL MAP</p>
-          <h1 class="mt-0.5 text-lg font-bold tracking-tight sm:text-xl">{{ data.map.name }}</h1>
+          <h1 class="mt-0.5 truncate text-lg font-bold tracking-tight sm:text-xl">{{ data.map.name }}</h1>
         </div>
       </header>
 
-      <section class="relative">
-        <div class="pointer-events-none absolute inset-x-3 top-3 z-20 sm:inset-x-5">
+      <section class="relative min-h-0">
+        <div class="pointer-events-none absolute left-3 right-[3.75rem] top-3 z-20 sm:left-5 sm:right-20">
           <div class="pointer-events-auto space-y-2">
             <FloorTabs
               v-model="selectedFloorId"

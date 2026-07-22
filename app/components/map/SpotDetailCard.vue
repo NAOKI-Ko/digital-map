@@ -28,7 +28,7 @@ defineEmits<{
         >
       </div>
 
-      <div class="relative p-5 sm:p-6">
+      <div class="relative px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-5 sm:p-6">
         <button
           type="button"
           class="absolute right-4 top-4 grid size-10 place-items-center rounded-full bg-stone-100 text-xl leading-none text-stone-700 hover:bg-stone-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-900"

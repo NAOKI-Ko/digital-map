@@ -14,7 +14,7 @@ defineEmits<{
 <template>
   <div
     v-if="floors.length > 1"
-    class="flex max-w-full gap-2 overflow-x-auto px-1 pb-1"
+    class="flex max-w-full overscroll-x-contain gap-2 overflow-x-auto px-1 pb-1"
     role="tablist"
     aria-label="フロアを切り替え"
   >
