@@ -180,7 +180,7 @@ async function deleteFloor(floor: MapFloorItem) {
           </div>
           <label class="flex items-start gap-3 rounded-lg bg-stone-50 p-4 text-sm text-stone-700">
             <input v-model="createInput.isOutdoor" type="checkbox" class="mt-0.5 h-4 w-4 rounded border-stone-300 text-terracotta-600">
-            <span><strong class="block text-stone-900">屋外フロア</strong>現在地表示を利用できるフロアとして登録します。</span>
+            <span><strong class="block text-stone-900">屋外フロア</strong>現在地表示と2点合わせを利用するフロアとして登録します。チェックを外すと、屋内用の範囲を自動設定します。</span>
           </label>
           <p v-if="createInput.illustrationUrl" class="break-all text-xs text-emerald-700">画像を選択済み: {{ createInput.illustrationUrl }}</p>
           <p v-if="createError" role="alert" class="text-sm text-red-600">{{ createError }}</p>
@@ -228,8 +228,9 @@ async function deleteFloor(floor: MapFloorItem) {
               </div>
               <label class="mt-4 flex items-center gap-2 text-sm text-stone-700">
                 <input v-model="floor.isOutdoor" type="checkbox" class="h-4 w-4 rounded border-stone-300 text-terracotta-600">
-                屋外（現在地表示あり）
+                屋外（現在地表示・2点合わせあり）
               </label>
+              <p v-if="!floor.isOutdoor" class="mt-2 text-xs leading-5 text-sky-700">屋内では画像の縦横比から表示範囲を自動設定します。保存済みの基準点は削除されません。</p>
               <p class="mt-2 text-xs text-stone-500">登録スポット: {{ floor.spotCount }}件</p>
               <div class="mt-4 flex flex-wrap gap-3">
                 <NuxtLink v-if="floor.isOutdoor" :to="`/admin/maps/${mapId}/floors/${floor.id}/georeference`" class="rounded-lg border border-terracotta-300 bg-terracotta-50 px-4 py-2 text-sm font-semibold text-terracotta-800 hover:bg-terracotta-100">{{ isFloorGeoreferenced(floor) ? 'ジオリファレンスを調整' : 'ジオリファレンスを設定' }}</NuxtLink>

@@ -113,6 +113,11 @@ function getErrorMessage(error: unknown) {
 
     <section v-if="status === 'pending'" class="mt-8 rounded-xl bg-white p-8 text-sm text-stone-600">読み込んでいます…</section>
     <section v-else-if="error || !floor" class="mt-8 rounded-xl bg-red-50 p-8 text-sm text-red-700">フロアが見つかりません。</section>
+    <section v-else-if="!floor.isOutdoor" class="mt-8 rounded-2xl border border-sky-200 bg-sky-50 p-8 text-sm leading-6 text-sky-900">
+      <h1 class="text-xl font-bold">屋内フロアは2点合わせ不要です</h1>
+      <p class="mt-3">画像の縦横比から表示範囲を自動設定するため、ジオリファレンスの操作はありません。屋外へ戻した場合は、以前保存した基準点を再び使用します。</p>
+      <NuxtLink :to="backPath" class="mt-5 inline-flex rounded-lg bg-sky-800 px-4 py-2 font-semibold text-white hover:bg-sky-900">{{ cameFromEditor ? 'ピン配置エディタに戻る' : 'フロア管理に戻る' }}</NuxtLink>
+    </section>
     <template v-else>
       <header class="mt-5">
         <p class="text-sm font-medium text-terracotta-700">{{ floor.name }}</p>
