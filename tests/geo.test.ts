@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   computeFloorCorners,
+  computeIndoorPseudoCorners,
   getFloorCorners,
   getGeoReferenceBounds,
   getGeoReferenceValidationError,
@@ -102,6 +103,68 @@ describe('computeFloorCorners', () => {
       refBLat: 35,
       refBLng: 139,
     }))).toThrow(REFERENCE_DISTANCE_ERROR)
+  })
+})
+
+describe('computeIndoorPseudoCorners', () => {
+  it.each([
+    ['横長', 2000, 1000, 0.01, 0.005],
+    ['縦長', 1000, 2000, 0.005, 0.01],
+    ['正方形', 1000, 1000, 0.01, 0.01],
+  ])('%s画像の縦横比を保った範囲を返す', (_label, width, height, expectedLngSpan, expectedLatSpan) => {
+    const corners = computeIndoorPseudoCorners(width, height)
+    const lngSpan = corners.topRight.lng - corners.topLeft.lng
+    const latSpan = corners.topLeft.lat - corners.bottomLeft.lat
+
+    expect(lngSpan).toBeCloseTo(expectedLngSpan, 10)
+    expect(latSpan).toBeCloseTo(expectedLatSpan, 10)
+    expect(lngSpan / latSpan).toBeCloseTo(width / height, 10)
+    expect(corners.topLeft).toEqual({ lat: expectedLatSpan / 2, lng: -expectedLngSpan / 2 })
+    expect(corners.bottomRight).toEqual({ lat: -expectedLatSpan / 2, lng: expectedLngSpan / 2 })
+  })
+
+  it.each([
+    [0, 1000],
+    [1000, 0],
+    [Number.NaN, 1000],
+  ])('不正な画像寸法(%s × %s)を拒否する', (width, height) => {
+    expect(() => computeIndoorPseudoCorners(width, height))
+      .toThrow('画像の幅と高さを確認してください。')
+  })
+})
+
+describe('屋外・屋内の4隅振り分け', () => {
+  it('屋外では2点合わせの結果を返す', () => {
+    expect(getFloorCorners({ ...baseFloor, isOutdoor: true }))
+      .toEqual(computeFloorCorners(baseFloor))
+  })
+
+  it('屋外で基準点が未設定ならnullを返す', () => {
+    expect(getFloorCorners({ ...baseFloor, isOutdoor: true, refBLng: null })).toBeNull()
+  })
+
+  it('屋内では基準点を使わず画像寸法から自動算出する', () => {
+    expect(getFloorCorners({
+      ...baseFloor,
+      isOutdoor: false,
+      refAPixelX: null,
+      refAPixelY: null,
+      refALat: null,
+      refALng: null,
+      refBPixelX: null,
+      refBPixelY: null,
+      refBLat: null,
+      refBLng: null,
+    })).toEqual(computeIndoorPseudoCorners(baseFloor.imageWidth, baseFloor.imageHeight))
+  })
+
+  it('屋内でも画像寸法が不正ならnullを返す', () => {
+    expect(getFloorCorners({
+      ...baseFloor,
+      isOutdoor: false,
+      imageWidth: 0,
+      imageHeight: 0,
+    })).toBeNull()
   })
 })
 
