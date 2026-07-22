@@ -21,8 +21,13 @@ const positionedFloorSpots = computed(() => selectedFloorSpots.value.filter(hasP
 const moveStatus = ref('')
 const mapRevision = ref(0)
 const geoReferenceEditorPath = computed(() => selectedFloor.value
+  && selectedFloor.value.isOutdoor
   ? `/admin/maps/${mapId}/floors/${selectedFloor.value.id}/georeference?from=editor`
   : '')
+const shouldShowGeoReferenceWarning = computed(() => {
+  const floor = selectedFloor.value
+  return Boolean(floor?.isOutdoor && getFloorCorners(floor) === null)
+})
 
 watch(() => data.value?.floors, (floors) => {
   if (floors?.length && !floors.some(floor => floor.id === selectedFloorId.value)) {
@@ -48,11 +53,6 @@ function startRegistration() {
       lng: position.value.lng.toString(),
     },
   })
-}
-
-function isGeoreferenced() {
-  const floor = selectedFloor.value
-  return floor ? getFloorCorners(floor) !== null : false
 }
 
 async function saveMovedSpot(value: { spotId: string, lat: number, lng: number }) {
@@ -97,7 +97,7 @@ async function saveMovedSpot(value: { spotId: string, lat: number, lng: number }
         <button v-for="floor in data.floors" :key="floor.id" type="button" role="tab" :aria-selected="floor.id === selectedFloorId" class="rounded-full px-4 py-2 text-sm font-semibold" :class="floor.id === selectedFloorId ? 'bg-stone-900 text-white' : 'bg-white text-stone-700 shadow-sm'" @click="selectedFloorId = floor.id">{{ floor.name }}</button>
       </div>
 
-      <div v-if="!isGeoreferenced()" class="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-800">
+      <div v-if="shouldShowGeoReferenceWarning" class="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-800">
         <span>このフロアはジオリファレンス未設定です。通常地図上にはピンを置けますが、先にイラストの表示範囲を設定することをおすすめします。</span>
         <NuxtLink :to="geoReferenceEditorPath" class="shrink-0 rounded-lg bg-amber-800 px-4 py-2 font-semibold text-white hover:bg-amber-900">ジオリファレンスを設定</NuxtLink>
       </div>
@@ -111,7 +111,7 @@ async function saveMovedSpot(value: { spotId: string, lat: number, lng: number }
             :spots="positionedFloorSpots"
             mode="edit"
             label="ピン配置地図"
-            :floor-error-action-to="geoReferenceEditorPath"
+            :floor-error-action-to="geoReferenceEditorPath || null"
             @spot-moved="saveMovedSpot"
           />
           <template #fallback><div class="h-[38rem] animate-pulse rounded-xl bg-stone-100" /></template>
