@@ -44,14 +44,6 @@ async function copyPublicUrl() {
   }
 }
 
-function downloadQrCode() {
-  if (!qrDataUrl.value) return
-  const link = document.createElement('a')
-  link.href = qrDataUrl.value
-  link.download = `${props.mapSlug}-qr.png`
-  link.click()
-}
-
 onMounted(() => {
   isMounted = true
   void generateQrCode()
@@ -80,7 +72,13 @@ watch(() => props.publicUrl, () => {
 
         <div class="mt-5 flex flex-wrap gap-3">
           <a :href="publicUrl" target="_blank" rel="noopener" class="inline-flex rounded-lg bg-stone-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-stone-700">公開ページを開く</a>
-          <button type="button" :disabled="!qrDataUrl" class="rounded-lg bg-terracotta-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-terracotta-700 disabled:opacity-50" @click="downloadQrCode">QR画像をダウンロード</button>
+          <a
+            v-if="qrDataUrl"
+            :href="qrDataUrl"
+            :download="`${mapSlug}-qr.png`"
+            class="rounded-lg bg-terracotta-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-terracotta-700"
+          >QR画像をダウンロード</a>
+          <span v-else class="rounded-lg bg-terracotta-600 px-4 py-2.5 text-sm font-semibold text-white opacity-50">QR画像をダウンロード</span>
         </div>
 
         <p v-if="!isPublished" class="mt-5 rounded-lg bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-800">
