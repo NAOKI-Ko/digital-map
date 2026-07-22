@@ -121,6 +121,21 @@ export function createFloorZoomConstraints(fittedZoom: number) {
   }
 }
 
+interface PositionableMarker {
+  setLngLat: (lngLat: [number, number]) => unknown
+  addTo: (map: MapLibreMap) => unknown
+}
+
+export function addMarkerAtPosition<T extends PositionableMarker>(
+  marker: T,
+  instance: MapLibreMap,
+  position: LatLng,
+) {
+  marker.setLngLat([position.lng, position.lat])
+  marker.addTo(instance)
+  return marker
+}
+
 export function useMapViewer(
   container: Readonly<Ref<HTMLElement | null>>,
   options: UseMapViewerOptions,
@@ -285,7 +300,12 @@ export function useMapViewer(
     }
 
     if (!draftMarker) {
-      draftMarker = new currentMaplibre.Marker({ color: '#C7401F' }).addTo(instance)
+      draftMarker = addMarkerAtPosition(
+        new currentMaplibre.Marker({ color: '#C7401F' }),
+        instance,
+        position,
+      )
+      return
     }
     draftMarker.setLngLat([position.lng, position.lat])
   }

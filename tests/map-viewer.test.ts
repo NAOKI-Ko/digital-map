@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   ABSOLUTE_ZOOM_LIMITS,
+  addMarkerAtPosition,
   createFloorZoomConstraints,
   createMapViewerOptions,
   getFloorLayerIds,
@@ -8,6 +9,7 @@ import {
   shouldEnableGeolocate,
   VIEWER_CAMERA_CONSTRAINTS,
 } from '../app/composables/useMapViewer'
+import type { Map as MapLibreMap } from 'maplibre-gl'
 import type { MapViewerFloor, MapViewerSpot } from '../shared/types/map-viewer'
 
 const baseSpot: MapViewerSpot = {
@@ -105,6 +107,25 @@ describe('Markerの表示内容', () => {
       customImageUrl: '/uploads/custom.png',
       symbol: null,
     })
+  })
+
+  it('仮ピンは座標を設定してから地図へ追加する', () => {
+    const calls: string[] = []
+    const marker = {
+      setLngLat(lngLat: [number, number]) {
+        calls.push(`setLngLat:${lngLat.join(',')}`)
+      },
+      addTo() {
+        calls.push('addTo')
+      },
+    }
+
+    expect(addMarkerAtPosition(
+      marker,
+      {} as MapLibreMap,
+      { lat: 35.7, lng: 139.7 },
+    )).toBe(marker)
+    expect(calls).toEqual(['setLngLat:139.7,35.7', 'addTo'])
   })
 })
 
