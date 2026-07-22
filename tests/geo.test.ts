@@ -112,7 +112,7 @@ describe('2点合わせのバリデーションとMapLibre変換', () => {
   })
 
   it('値が1つでもnullなら未設定として扱う', () => {
-    expect(getFloorCorners({ ...baseFloor, refBLng: null })).toBeNull()
+    expect(getFloorCorners({ ...baseFloor, isOutdoor: true, refBLng: null })).toBeNull()
   })
 
   it('4隅をMapLibre image sourceの順序と[lng, lat]形式へ変換する', () => {

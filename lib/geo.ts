@@ -16,6 +16,10 @@ export interface FloorGeoReferenceFields {
   refBLng: number | null
 }
 
+export interface FloorCornerFields extends FloorGeoReferenceFields {
+  isOutdoor: boolean
+}
+
 export interface CompleteFloorGeoReference {
   imageWidth: number
   imageHeight: number
@@ -216,7 +220,16 @@ export function getCompleteFloorGeoReference(
   return floor as CompleteFloorGeoReference
 }
 
-export function getFloorCorners(floor: FloorGeoReferenceFields): FloorCorners | null {
+export function getFloorCorners(floor: FloorCornerFields): FloorCorners | null {
+  if (!floor.isOutdoor) {
+    try {
+      return computeIndoorPseudoCorners(floor.imageWidth ?? 0, floor.imageHeight ?? 0)
+    }
+    catch {
+      return null
+    }
+  }
+
   const complete = getCompleteFloorGeoReference(floor)
   if (!complete) return null
 
