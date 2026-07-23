@@ -1,6 +1,6 @@
 import { onBeforeUnmount, onMounted, readonly, ref, shallowRef, watch, type Ref } from 'vue'
 import type { GeolocateControl, Map as MapLibreMap, MapOptions, Marker, StyleSpecification } from 'maplibre-gl'
-import { getFloorCorners, getGeoReferenceBounds, toImageCoordinates, type LatLng } from '~~/lib/geo'
+import { getFloorCorners, getGeoReferenceBounds, isGeoReferenced, toImageCoordinates, type LatLng } from '~~/lib/geo'
 import { defaultPinIconId, getPinIconPreset } from '~~/shared/constants/spot'
 import type { MapViewerFloor, MapViewerSpot } from '~~/shared/types/map-viewer'
 
@@ -66,7 +66,7 @@ export function getFloorLayerIds(floorId: string) {
 export function shouldEnableGeolocate(mode: MapViewerMode, floor: MapViewerFloor) {
   return mode === 'view'
     && floor.isOutdoor
-    && getFloorCorners(floor) !== null
+    && isGeoReferenced(floor)
 }
 
 export function createMapViewerStyle(mode: MapViewerMode): StyleSpecification {

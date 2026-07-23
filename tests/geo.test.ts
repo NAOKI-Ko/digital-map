@@ -133,20 +133,20 @@ describe('computeFallbackCorners', () => {
   })
 })
 
-describe('屋外・屋内の4隅振り分け', () => {
-  it('屋外では2点合わせの結果を返す', () => {
-    expect(getFloorCorners({ ...baseFloor, isOutdoor: true }))
+describe('ジオリファレンス設定有無による4隅振り分け', () => {
+  it('基準点がすべて設定済みなら2点合わせの結果を返す', () => {
+    expect(getFloorCorners(baseFloor))
       .toEqual(computeFloorCorners(baseFloor))
   })
 
-  it('屋外で基準点が未設定ならnullを返す', () => {
-    expect(getFloorCorners({ ...baseFloor, isOutdoor: true, refBLng: null })).toBeNull()
+  it('基準点が一部未設定なら画像寸法から自動算出する', () => {
+    expect(getFloorCorners({ ...baseFloor, refBLng: null }))
+      .toEqual(computeFallbackCorners(baseFloor.imageWidth, baseFloor.imageHeight))
   })
 
-  it('屋内では基準点を使わず画像寸法から自動算出する', () => {
+  it('基準点がすべて未設定でも画像寸法から自動算出する', () => {
     expect(getFloorCorners({
       ...baseFloor,
-      isOutdoor: false,
       refAPixelX: null,
       refAPixelY: null,
       refALat: null,
@@ -158,10 +158,17 @@ describe('屋外・屋内の4隅振り分け', () => {
     })).toEqual(computeFallbackCorners(baseFloor.imageWidth, baseFloor.imageHeight))
   })
 
-  it('屋内でも画像寸法が不正ならnullを返す', () => {
+  it('未設定かつ画像寸法が不正ならnullを返す', () => {
     expect(getFloorCorners({
       ...baseFloor,
-      isOutdoor: false,
+      refAPixelX: null,
+      refAPixelY: null,
+      refALat: null,
+      refALng: null,
+      refBPixelX: null,
+      refBPixelY: null,
+      refBLat: null,
+      refBLng: null,
       imageWidth: 0,
       imageHeight: 0,
     })).toBeNull()
@@ -175,7 +182,8 @@ describe('2点合わせのバリデーションとMapLibre変換', () => {
   })
 
   it('値が1つでもnullなら未設定として扱う', () => {
-    expect(getFloorCorners({ ...baseFloor, isOutdoor: true, refBLng: null })).toBeNull()
+    expect(getFloorCorners({ ...baseFloor, refBLng: null }))
+      .toEqual(computeFallbackCorners(baseFloor.imageWidth, baseFloor.imageHeight))
   })
 
   it('4隅をMapLibre image sourceの順序と[lng, lat]形式へ変換する', () => {

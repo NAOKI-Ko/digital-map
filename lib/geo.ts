@@ -16,10 +16,6 @@ export interface FloorGeoReferenceFields {
   refBLng: number | null
 }
 
-export interface FloorCornerFields extends FloorGeoReferenceFields {
-  isOutdoor: boolean
-}
-
 export interface CompleteFloorGeoReference {
   imageWidth: number
   imageHeight: number
@@ -50,6 +46,16 @@ export const FALLBACK_ORIGIN = { lat: 0, lng: 0 } as const
 export const FALLBACK_EXTENT_DEG = 0.01
 
 const EARTH_RADIUS_METERS = 6_378_137
+const GEO_REFERENCE_FIELDS = [
+  'refAPixelX',
+  'refAPixelY',
+  'refALat',
+  'refALng',
+  'refBPixelX',
+  'refBPixelY',
+  'refBLat',
+  'refBLng',
+] as const
 
 /**
  * ジオリファレンス未設定のフロア向けに、画像の縦横比を保った疑似座標を返す。
@@ -201,27 +207,27 @@ function getGeoReferenceInputError(floor: CompleteFloorGeoReference) {
 export function getCompleteFloorGeoReference(
   floor: FloorGeoReferenceFields,
 ): CompleteFloorGeoReference | null {
-  const values = [
-    floor.imageWidth,
-    floor.imageHeight,
-    floor.refAPixelX,
-    floor.refAPixelY,
-    floor.refALat,
-    floor.refALng,
-    floor.refBPixelX,
-    floor.refBPixelY,
-    floor.refBLat,
-    floor.refBLng,
-  ]
-
-  if (values.some(value => value === null || !Number.isFinite(value))) return null
-  if (floor.imageWidth! <= 0 || floor.imageHeight! <= 0) return null
+  if (!isGeoReferenced(floor)) return null
+  if (floor.imageWidth === null || floor.imageHeight === null
+    || !Number.isFinite(floor.imageWidth) || !Number.isFinite(floor.imageHeight)
+    || floor.imageWidth <= 0 || floor.imageHeight <= 0) return null
 
   return floor as CompleteFloorGeoReference
 }
 
-export function getFloorCorners(floor: FloorCornerFields): FloorCorners | null {
-  if (!floor.isOutdoor) {
+/**
+ * 基準点A・Bの8項目がすべて有限数として保存されている場合だけ、
+ * ジオリファレンス設定済みと判定する。
+ */
+export function isGeoReferenced(floor: FloorGeoReferenceFields): boolean {
+  return GEO_REFERENCE_FIELDS.every((field) => {
+    const value = floor[field]
+    return value !== null && Number.isFinite(value)
+  })
+}
+
+export function getFloorCorners(floor: FloorGeoReferenceFields): FloorCorners | null {
+  if (!isGeoReferenced(floor)) {
     try {
       return computeFallbackCorners(floor.imageWidth ?? 0, floor.imageHeight ?? 0)
     }
