@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import ImageUploader from '~/components/admin/ImageUploader.vue'
-import { defaultPinIconId, getPinIconPreset, pinIconPresets } from '~~/shared/constants/spot'
-import type { PinIconType } from '~~/shared/constants/spot'
+import { defaultPinIconId, getPinIconPreset, pinIconPresets, type PinIconType } from '~~/shared/constants/spot'
 import { pinDesignSchema, type PinDesignInput } from '~~/shared/schemas/pin-design'
 import type { SpotPinDesignResponse } from '~~/shared/types/spot'
+import { getPinColorVariants } from '~~/shared/utils/pin-style'
 
 const props = defineProps<{
   mapId: string
@@ -38,6 +38,14 @@ const selectedPreset = computed(() => getPinIconPreset(design.pinIconId))
 const usesUploadedImage = computed(() => design.pinIconType === 'custom' || design.pinIconType === 'illustration')
 const uploadHeading = computed(() => design.pinIconType === 'illustration' ? '直置きイラスト' : 'カスタム画像')
 const uploadLabel = computed(() => design.pinIconType === 'illustration' ? '直置きイラスト画像' : 'カスタムピン画像')
+const previewStyle = computed(() => {
+  const colors = getPinColorVariants(design.pinColor)
+  return {
+    '--pin-color': colors.base,
+    '--pin-color-light': colors.light,
+    '--pin-color-dark': colors.dark,
+  }
+})
 
 watch(() => props.initialValue, (value) => {
   Object.assign(design, value, { pinIconId: value.pinIconId ?? defaultPinIconId(props.category) })
@@ -128,10 +136,20 @@ async function save() {
 
       <aside class="rounded-xl bg-stone-100 p-5 text-center">
         <h3 class="text-sm font-semibold text-stone-700">プレビュー</h3>
-        <div class="mt-6 flex justify-center">
-          <div class="pin-design-preview" :style="{ '--pin-color': design.pinColor }">
+        <div class="mt-6 flex min-h-20 items-center justify-center">
+          <div v-if="design.pinIconType === 'illustration' && design.pinIconImageUrl" class="pin-design-marker pin-design-marker--illustration">
+            <span class="pin-design-preview-shadow" aria-hidden="true" />
+            <img :src="design.pinIconImageUrl" alt="直置きイラストのプレビュー" class="pin-design-illustration-preview">
+          </div>
+          <div v-else-if="design.pinIconType === 'illustration'" class="grid h-16 min-w-28 place-items-center rounded-lg border border-dashed border-stone-300 bg-white px-3 text-xs text-stone-400">
+            画像未設定
+          </div>
+          <div v-else class="pin-design-marker">
+            <span class="pin-design-preview-shadow" aria-hidden="true" />
+            <div class="pin-design-preview" :style="previewStyle">
             <img v-if="design.pinIconType === 'custom' && design.pinIconImageUrl" :src="design.pinIconImageUrl" alt="カスタムピンのプレビュー" class="h-8 w-8 rounded-full bg-white object-cover">
             <span v-else>{{ selectedPreset.symbol }}</span>
+            </div>
           </div>
         </div>
         <p class="mt-5 text-xs text-stone-500">地図上では常に正面を向いて表示されます。</p>
@@ -145,15 +163,48 @@ async function save() {
 </template>
 
 <style>
+.pin-design-marker {
+  position: relative;
+  display: inline-flex;
+  min-width: 4rem;
+  height: 4.75rem;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.pin-design-marker--illustration {
+  width: max-content;
+  min-width: 3rem;
+  height: 4rem;
+}
+
+.pin-design-preview-shadow {
+  position: absolute;
+  bottom: 0.1rem;
+  left: 50%;
+  width: 2.25rem;
+  height: 0.625rem;
+  border-radius: 50%;
+  background: rgb(37 48 58 / 28%);
+  filter: blur(2px);
+  transform: translateX(-50%);
+}
+
 .pin-design-preview {
+  position: relative;
+  z-index: 1;
   display: grid;
   width: 4rem;
   height: 4rem;
   place-items: center;
   border: 4px solid white;
   border-radius: 9999px 9999px 9999px 0;
-  background: var(--pin-color);
-  box-shadow: 0 4px 12px rgb(0 0 0 / 25%);
+  background-color: var(--pin-color);
+  background-image: radial-gradient(circle at 32% 28%, var(--pin-color-light), var(--pin-color) 55%, var(--pin-color-dark));
+  box-shadow:
+    0 7px 12px rgb(37 48 58 / 35%),
+    inset -3px -3px 6px rgb(0 0 0 / 25%),
+    inset 2px 2px 4px rgb(255 255 255 / 35%);
   color: white;
   font-size: 1.25rem;
   font-weight: 800;
@@ -162,5 +213,16 @@ async function save() {
 
 .pin-design-preview > * {
   transform: rotate(45deg);
+}
+
+.pin-design-illustration-preview {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: auto;
+  height: 3rem;
+  max-width: 10rem;
+  object-fit: contain;
+  filter: drop-shadow(0 5px 5px rgb(37 48 58 / 32%));
 }
 </style>

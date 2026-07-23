@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { getPinIconPreset } from '~~/shared/constants/spot'
 import type { AdminSpotDetail, SpotPublishResponse } from '~~/shared/types/spot'
+import { getPinColorVariants } from '~~/shared/utils/pin-style'
 
 const props = defineProps<{
   mapId: string
@@ -18,6 +19,14 @@ const errorMessage = ref('')
 const successMessage = ref('')
 const pinPreset = computed(() => getPinIconPreset(props.spot.pinIconId))
 const hasCoordinates = computed(() => props.spot.lat !== null && props.spot.lng !== null)
+const pinStyle = computed(() => {
+  const colors = getPinColorVariants(props.spot.pinColor)
+  return {
+    '--pin-color': colors.base,
+    '--pin-color-light': colors.light,
+    '--pin-color-dark': colors.dark,
+  }
+})
 
 async function togglePublication() {
   isSaving.value = true
@@ -86,9 +95,13 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleKeydown))
             <img v-if="spot.photos[0]" :src="spot.photos[0]" :alt="`${spot.name}の代表写真`" class="h-full w-full object-cover">
             <div v-else class="grid h-full place-items-center text-sm text-stone-500">写真は登録されていません</div>
             <div class="absolute bottom-0 left-5 translate-y-1/2">
-              <div class="spot-preview-pin" :style="{ '--pin-color': spot.pinColor }">
-                <img v-if="spot.pinIconType === 'custom' && spot.pinIconImageUrl" :src="spot.pinIconImageUrl" alt="" class="h-7 w-7 rounded-full bg-white object-cover">
-                <span v-else>{{ pinPreset.symbol }}</span>
+              <div class="spot-preview-marker" :class="{ 'spot-preview-marker--illustration': spot.pinIconType === 'illustration' }">
+                <span class="spot-preview-shadow" aria-hidden="true" />
+                <img v-if="spot.pinIconType === 'illustration' && spot.pinIconImageUrl" :src="spot.pinIconImageUrl" alt="" class="spot-preview-illustration">
+                <div v-else class="spot-preview-pin" :style="pinStyle">
+                  <img v-if="spot.pinIconType === 'custom' && spot.pinIconImageUrl" :src="spot.pinIconImageUrl" alt="" class="h-7 w-7 rounded-full bg-white object-cover">
+                  <span v-else>{{ pinPreset.symbol }}</span>
+                </div>
               </div>
             </div>
             <button type="button" aria-label="プレビューを閉じる" class="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full bg-white/95 text-xl text-stone-700 shadow" @click="isPreviewOpen = false">×</button>
@@ -117,15 +130,47 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleKeydown))
 </template>
 
 <style>
+.spot-preview-marker {
+  position: relative;
+  display: inline-flex;
+  width: 3.5rem;
+  height: 4.25rem;
+  justify-content: center;
+}
+
+.spot-preview-marker--illustration {
+  width: max-content;
+  min-width: 3rem;
+  height: 3.75rem;
+}
+
+.spot-preview-shadow {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 2rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: rgb(37 48 58 / 28%);
+  filter: blur(2px);
+  transform: translateX(-50%);
+}
+
 .spot-preview-pin {
+  position: relative;
+  z-index: 1;
   display: grid;
   width: 3.5rem;
   height: 3.5rem;
   place-items: center;
   border: 3px solid white;
   border-radius: 9999px 9999px 9999px 0;
-  background: var(--pin-color);
-  box-shadow: 0 4px 12px rgb(0 0 0 / 25%);
+  background-color: var(--pin-color);
+  background-image: radial-gradient(circle at 32% 28%, var(--pin-color-light), var(--pin-color) 55%, var(--pin-color-dark));
+  box-shadow:
+    0 6px 10px rgb(37 48 58 / 35%),
+    inset -3px -3px 6px rgb(0 0 0 / 25%),
+    inset 2px 2px 4px rgb(255 255 255 / 35%);
   color: white;
   font-weight: 800;
   transform: rotate(-45deg);
@@ -133,5 +178,16 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleKeydown))
 
 .spot-preview-pin > * {
   transform: rotate(45deg);
+}
+
+.spot-preview-illustration {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: auto;
+  height: 3rem;
+  max-width: 10rem;
+  object-fit: contain;
+  filter: drop-shadow(0 5px 5px rgb(37 48 58 / 32%));
 }
 </style>
