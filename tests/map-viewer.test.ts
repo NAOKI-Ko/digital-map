@@ -8,6 +8,8 @@ import {
   getSpotMarkerPresentation,
   shouldEnableGeolocate,
   VIEWER_CAMERA_CONSTRAINTS,
+  ZOOM_IN_ALLOWANCE,
+  ZOOM_OUT_ALLOWANCE,
 } from '../app/composables/useMapViewer'
 import type { Map as MapLibreMap } from 'maplibre-gl'
 import type { MapViewerFloor, MapViewerSpot } from '../shared/types/map-viewer'
@@ -72,18 +74,20 @@ describe('MapViewerのカメラ制約', () => {
 })
 
 describe('フロアごとのズーム制約', () => {
-  it('フィット後のズームから縮小3・拡大4の範囲を作る', () => {
-    expect(createFloorZoomConstraints(17)).toEqual({ minZoom: 14, maxZoom: 21 })
+  it('フィット後のズームから縮小2.5・拡大6の範囲を作る', () => {
+    expect(createFloorZoomConstraints(17)).toEqual({ minZoom: 14.5, maxZoom: 23 })
+    expect(ZOOM_OUT_ALLOWANCE).toBe(2.5)
+    expect(ZOOM_IN_ALLOWANCE).toBe(6)
   })
 
   it('MapLibreに設定可能な絶対範囲を越えない', () => {
-    expect(createFloorZoomConstraints(-10)).toEqual({ minZoom: 0, maxZoom: 4 })
-    expect(createFloorZoomConstraints(30)).toEqual({ minZoom: 21, maxZoom: 24 })
+    expect(createFloorZoomConstraints(-10)).toEqual({ minZoom: 0, maxZoom: 6 })
+    expect(createFloorZoomConstraints(30)).toEqual({ minZoom: 21.5, maxZoom: 24 })
     expect(ABSOLUTE_ZOOM_LIMITS).toEqual({ minZoom: 0, maxZoom: 24 })
   })
 
   it('非有限値は安全な初期ズームとして扱う', () => {
-    expect(createFloorZoomConstraints(Number.NaN)).toEqual({ minZoom: 0, maxZoom: 5 })
+    expect(createFloorZoomConstraints(Number.NaN)).toEqual({ minZoom: 0, maxZoom: 7 })
   })
 })
 

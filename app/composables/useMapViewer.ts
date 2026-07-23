@@ -31,6 +31,8 @@ export const ABSOLUTE_ZOOM_LIMITS = {
   minZoom: 0,
   maxZoom: 24,
 } as const
+export const ZOOM_OUT_ALLOWANCE = 2.5
+export const ZOOM_IN_ALLOWANCE = 6
 
 export interface UseMapViewerOptions {
   mode: MapViewerMode
@@ -114,8 +116,8 @@ export function createFloorZoomConstraints(fittedZoom: number) {
     Math.max(ABSOLUTE_ZOOM_LIMITS.minZoom, requestedZoom),
   )
   return {
-    minZoom: Math.max(ABSOLUTE_ZOOM_LIMITS.minZoom, safeZoom - 3),
-    maxZoom: Math.min(ABSOLUTE_ZOOM_LIMITS.maxZoom, safeZoom + 4),
+    minZoom: Math.max(ABSOLUTE_ZOOM_LIMITS.minZoom, safeZoom - ZOOM_OUT_ALLOWANCE),
+    maxZoom: Math.min(ABSOLUTE_ZOOM_LIMITS.maxZoom, safeZoom + ZOOM_IN_ALLOWANCE),
   }
 }
 
@@ -352,14 +354,15 @@ export function useMapViewer(
 
     const bounds = getGeoReferenceBounds(corners)
     if (bounds) {
+      // 前のフロアの相対制約がカメラ計算へ影響しないよう、毎回いったん解除する。
+      instance.setMinZoom(ABSOLUTE_ZOOM_LIMITS.minZoom)
+      instance.setMaxZoom(ABSOLUTE_ZOOM_LIMITS.maxZoom)
       const camera = instance.cameraForBounds([bounds.southwest, bounds.northeast], {
         padding: 64,
         maxZoom: 20,
       })
       if (camera) {
         const targetZoom = camera.zoom ?? instance.getZoom()
-        instance.setMinZoom(ABSOLUTE_ZOOM_LIMITS.minZoom)
-        instance.setMaxZoom(ABSOLUTE_ZOOM_LIMITS.maxZoom)
         const zoomConstraints = createFloorZoomConstraints(targetZoom)
         instance.setMinZoom(zoomConstraints.minZoom)
         instance.setMaxZoom(zoomConstraints.maxZoom)
