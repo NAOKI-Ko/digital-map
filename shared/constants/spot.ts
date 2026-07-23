@@ -75,6 +75,19 @@ export function defaultPinIconId(category: string): PinIconPresetId {
   return mapping[category] ?? 'kanji:●'
 }
 
+export function defaultMaterialSymbolId(category: string): MaterialSymbolPresetId {
+  const mapping: Record<string, MaterialSymbolPresetId> = {
+    '飲食': 'material:restaurant',
+    '買い物': 'material:storefront',
+    '観光': 'material:museum',
+    '温泉': 'material:hot_tub',
+    '宿泊': 'material:hotel',
+    '駐車場': 'material:local_parking',
+    '公共施設': 'material:wc',
+  }
+  return mapping[category] ?? 'material:directions_walk'
+}
+
 export function isSupportedPinIconId(id: string) {
   if (materialSymbolPresets.some(preset => preset.id === id)) return true
   return kanjiIconPresets.some(preset =>
