@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   computeFloorCorners,
-  computeIndoorPseudoCorners,
+  computeFallbackCorners,
   getFloorCorners,
   getGeoReferenceBounds,
   getGeoReferenceValidationError,
@@ -106,13 +106,13 @@ describe('computeFloorCorners', () => {
   })
 })
 
-describe('computeIndoorPseudoCorners', () => {
+describe('computeFallbackCorners', () => {
   it.each([
     ['横長', 2000, 1000, 0.01, 0.005],
     ['縦長', 1000, 2000, 0.005, 0.01],
     ['正方形', 1000, 1000, 0.01, 0.01],
   ])('%s画像の縦横比を保った範囲を返す', (_label, width, height, expectedLngSpan, expectedLatSpan) => {
-    const corners = computeIndoorPseudoCorners(width, height)
+    const corners = computeFallbackCorners(width, height)
     const lngSpan = corners.topRight.lng - corners.topLeft.lng
     const latSpan = corners.topLeft.lat - corners.bottomLeft.lat
 
@@ -128,7 +128,7 @@ describe('computeIndoorPseudoCorners', () => {
     [1000, 0],
     [Number.NaN, 1000],
   ])('不正な画像寸法(%s × %s)を拒否する', (width, height) => {
-    expect(() => computeIndoorPseudoCorners(width, height))
+    expect(() => computeFallbackCorners(width, height))
       .toThrow('画像の幅と高さを確認してください。')
   })
 })
@@ -155,7 +155,7 @@ describe('屋外・屋内の4隅振り分け', () => {
       refBPixelY: null,
       refBLat: null,
       refBLng: null,
-    })).toEqual(computeIndoorPseudoCorners(baseFloor.imageWidth, baseFloor.imageHeight))
+    })).toEqual(computeFallbackCorners(baseFloor.imageWidth, baseFloor.imageHeight))
   })
 
   it('屋内でも画像寸法が不正ならnullを返す', () => {

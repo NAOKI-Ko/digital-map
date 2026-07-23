@@ -46,16 +46,16 @@ export type MapLibreImageCoordinates = [
 export const MIN_REFERENCE_PIXEL_DISTANCE = 50
 export const MIN_REFERENCE_METER_DISTANCE = 20
 export const REFERENCE_DISTANCE_ERROR = '基準点が近すぎます。もっと離れた目印を選んでください。'
-export const INDOOR_PSEUDO_ORIGIN = { lat: 0, lng: 0 } as const
-export const INDOOR_PSEUDO_EXTENT_DEG = 0.01
+export const FALLBACK_ORIGIN = { lat: 0, lng: 0 } as const
+export const FALLBACK_EXTENT_DEG = 0.01
 
 const EARTH_RADIUS_METERS = 6_378_137
 
 /**
- * 現在地を使用しない屋内フロア向けに、画像の縦横比を保った疑似座標を返す。
- * 屋外用の2点合わせとは独立しており、実世界の位置を表すものではない。
+ * ジオリファレンス未設定のフロア向けに、画像の縦横比を保った疑似座標を返す。
+ * 2点合わせとは独立しており、実世界の位置を表すものではない。
  */
-export function computeIndoorPseudoCorners(imageWidth: number, imageHeight: number): FloorCorners {
+export function computeFallbackCorners(imageWidth: number, imageHeight: number): FloorCorners {
   if (!Number.isFinite(imageWidth) || !Number.isFinite(imageHeight)
     || imageWidth <= 0 || imageHeight <= 0) {
     throw new Error('画像の幅と高さを確認してください。')
@@ -63,12 +63,12 @@ export function computeIndoorPseudoCorners(imageWidth: number, imageHeight: numb
 
   const aspect = imageWidth / imageHeight
   const halfLng = aspect >= 1
-    ? INDOOR_PSEUDO_EXTENT_DEG / 2
-    : (INDOOR_PSEUDO_EXTENT_DEG * aspect) / 2
+    ? FALLBACK_EXTENT_DEG / 2
+    : (FALLBACK_EXTENT_DEG * aspect) / 2
   const halfLat = aspect >= 1
-    ? (INDOOR_PSEUDO_EXTENT_DEG / aspect) / 2
-    : INDOOR_PSEUDO_EXTENT_DEG / 2
-  const { lat, lng } = INDOOR_PSEUDO_ORIGIN
+    ? (FALLBACK_EXTENT_DEG / aspect) / 2
+    : FALLBACK_EXTENT_DEG / 2
+  const { lat, lng } = FALLBACK_ORIGIN
 
   return {
     topLeft: { lat: lat + halfLat, lng: lng - halfLng },
@@ -223,7 +223,7 @@ export function getCompleteFloorGeoReference(
 export function getFloorCorners(floor: FloorCornerFields): FloorCorners | null {
   if (!floor.isOutdoor) {
     try {
-      return computeIndoorPseudoCorners(floor.imageWidth ?? 0, floor.imageHeight ?? 0)
+      return computeFallbackCorners(floor.imageWidth ?? 0, floor.imageHeight ?? 0)
     }
     catch {
       return null
