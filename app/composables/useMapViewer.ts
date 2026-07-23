@@ -302,6 +302,9 @@ export function useMapViewer(
         : `${spot.name}の詳細を表示`)
       element.title = spot.name
 
+      const groundShadow = document.createElement('span')
+      groundShadow.className = 'map-viewer-marker__ground-shadow'
+      groundShadow.setAttribute('aria-hidden', 'true')
       const shape = document.createElement('span')
       shape.className = 'map-viewer-marker__shape'
       const content = document.createElement(presentation.customImageUrl ? 'img' : 'span')
@@ -314,7 +317,7 @@ export function useMapViewer(
         content.textContent = presentation.symbol
       }
       shape.append(content)
-      element.append(shape)
+      element.append(groundShadow, shape)
       element.addEventListener('click', (event) => {
         event.stopPropagation()
         options.onSpotSelected?.(spot)

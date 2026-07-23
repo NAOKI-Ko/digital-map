@@ -91,6 +91,7 @@ const { floorError, geolocationAreaMessage, geolocationAvailable, mapError } = u
 
 <style>
 .map-viewer-marker {
+  position: relative;
   width: 2.75rem;
   height: 3.25rem;
   border: 0;
@@ -99,7 +100,22 @@ const { floorError, geolocationAreaMessage, geolocationAvailable, mapError } = u
   padding: 0;
 }
 
+.map-viewer-marker__ground-shadow {
+  position: absolute;
+  bottom: 0.1rem;
+  left: 50%;
+  width: 1.625rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: rgb(37 48 58 / 28%);
+  filter: blur(2px);
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
 .map-viewer-marker__shape {
+  position: relative;
+  z-index: 1;
   display: grid;
   width: 2.5rem;
   height: 2.5rem;
