@@ -1,12 +1,12 @@
 import { z } from 'zod'
-import { pinIconPresets, pinIconTypes } from '~~/shared/constants/spot'
+import { isSupportedPinIconId, pinIconTypes } from '~~/shared/constants/spot'
 import { uploadedImageUrlSchema } from '~~/shared/schemas/photo'
-
-const presetIds = pinIconPresets.map(preset => preset.id) as [string, ...string[]]
 
 export const pinDesignSchema = z.object({
   pinIconType: z.enum(pinIconTypes),
-  pinIconId: z.enum(presetIds).nullable(),
+  pinIconId: z.string()
+    .refine(isSupportedPinIconId, 'プリセットアイコンを選択してください。')
+    .nullable(),
   pinIconImageUrl: uploadedImageUrlSchema.nullable(),
   pinColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'ピン色を選択してください。'),
 }).superRefine((value, context) => {

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import ImageUploader from '~/components/admin/ImageUploader.vue'
-import { defaultPinIconId, getPinIconPreset, pinIconPresets, type PinIconType } from '~~/shared/constants/spot'
+import { getPinIconPreset, normalizePinIconId, pinIconPresets, type PinIconType } from '~~/shared/constants/spot'
 import { pinDesignSchema, type PinDesignInput } from '~~/shared/schemas/pin-design'
 import type { SpotPinDesignResponse } from '~~/shared/types/spot'
 import { getPinColorVariants } from '~~/shared/utils/pin-style'
@@ -23,7 +23,7 @@ const emit = defineEmits<{
 
 const design = reactive<PinDesignInput>({
   ...props.initialValue,
-  pinIconId: props.initialValue.pinIconId ?? defaultPinIconId(props.category),
+  pinIconId: normalizePinIconId(props.initialValue.pinIconId, props.category),
 })
 const isSaving = ref(false)
 const errorMessage = ref('')
@@ -48,7 +48,7 @@ const previewStyle = computed(() => {
 })
 
 watch(() => props.initialValue, (value) => {
-  Object.assign(design, value, { pinIconId: value.pinIconId ?? defaultPinIconId(props.category) })
+  Object.assign(design, value, { pinIconId: normalizePinIconId(value.pinIconId, props.category) })
 }, { deep: true })
 
 function useCustomImage(url: string) {

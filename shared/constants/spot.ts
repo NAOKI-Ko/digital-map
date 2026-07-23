@@ -9,16 +9,18 @@ export const spotCategorySuggestions = [
   'その他',
 ] as const
 
-export const pinIconPresets = [
-  { id: 'food', label: '飲食', symbol: '食' },
-  { id: 'shopping', label: '買い物', symbol: '買' },
-  { id: 'sightseeing', label: '観光', symbol: '観' },
-  { id: 'hot-spring', label: '温泉', symbol: '♨' },
-  { id: 'lodging', label: '宿泊', symbol: '宿' },
-  { id: 'parking', label: '駐車場', symbol: 'P' },
-  { id: 'information', label: '案内', symbol: 'i' },
-  { id: 'default', label: 'その他', symbol: '●' },
+export const kanjiIconPresets = [
+  { id: 'kanji:食', legacyId: 'food', label: '飲食', symbol: '食' },
+  { id: 'kanji:買', legacyId: 'shopping', label: '買い物', symbol: '買' },
+  { id: 'kanji:観', legacyId: 'sightseeing', label: '観光', symbol: '観' },
+  { id: 'kanji:♨', legacyId: 'hot-spring', label: '温泉', symbol: '♨' },
+  { id: 'kanji:宿', legacyId: 'lodging', label: '宿泊', symbol: '宿' },
+  { id: 'kanji:P', legacyId: 'parking', label: '駐車場', symbol: 'P' },
+  { id: 'kanji:i', legacyId: 'information', label: '案内', symbol: 'i' },
+  { id: 'kanji:●', legacyId: 'default', label: 'その他', symbol: '●' },
 ] as const
+
+export const pinIconPresets = kanjiIconPresets
 
 export const materialSymbolPresets = [
   { id: 'material:restaurant', name: 'restaurant', label: 'レストラン' },
@@ -50,6 +52,8 @@ export const materialSymbolNames = materialSymbolPresets
 
 export type PinIconPresetId = typeof pinIconPresets[number]['id']
 export type MaterialSymbolPresetId = typeof materialSymbolPresets[number]['id']
+export type PinIconId = PinIconPresetId | MaterialSymbolPresetId
+export type PinIconFamily = 'kanji' | 'material'
 export const pinIconTypes = ['preset', 'custom', 'illustration'] as const
 export type PinIconType = typeof pinIconTypes[number]
 
@@ -58,19 +62,62 @@ export function normalizePinIconType(value: string | null | undefined): PinIconT
   return 'preset'
 }
 
-export function getPinIconPreset(id: string | null | undefined) {
-  return pinIconPresets.find(preset => preset.id === id) ?? pinIconPresets.at(-1)!
-}
-
 export function defaultPinIconId(category: string): PinIconPresetId {
   const mapping: Record<string, PinIconPresetId> = {
-    '飲食': 'food',
-    '買い物': 'shopping',
-    '観光': 'sightseeing',
-    '温泉': 'hot-spring',
-    '宿泊': 'lodging',
-    '駐車場': 'parking',
-    '公共施設': 'information',
+    '飲食': 'kanji:食',
+    '買い物': 'kanji:買',
+    '観光': 'kanji:観',
+    '温泉': 'kanji:♨',
+    '宿泊': 'kanji:宿',
+    '駐車場': 'kanji:P',
+    '公共施設': 'kanji:i',
   }
-  return mapping[category] ?? 'default'
+  return mapping[category] ?? 'kanji:●'
+}
+
+export function isSupportedPinIconId(id: string) {
+  if (materialSymbolPresets.some(preset => preset.id === id)) return true
+  return kanjiIconPresets.some(preset =>
+    preset.id === id
+    || preset.legacyId === id
+    || preset.symbol === id,
+  )
+}
+
+export function getPinIconPreset(id: string | null | undefined, category = '') {
+  const fallbackId = defaultPinIconId(category)
+  const fallback = kanjiIconPresets.find(preset => preset.id === fallbackId)!
+
+  if (id?.startsWith('material:')) {
+    const materialPreset = materialSymbolPresets.find(preset => preset.id === id)
+    if (materialPreset) {
+      return {
+        family: 'material' as const,
+        id: materialPreset.id,
+        label: materialPreset.label,
+        symbol: materialPreset.name,
+      }
+    }
+  }
+
+  const value = id?.startsWith('kanji:') ? id.slice('kanji:'.length) : id
+  const kanjiPreset = kanjiIconPresets.find(preset =>
+    preset.id === id
+    || preset.legacyId === value
+    || preset.symbol === value,
+  ) ?? fallback
+
+  return {
+    family: 'kanji' as const,
+    id: kanjiPreset.id,
+    label: kanjiPreset.label,
+    symbol: kanjiPreset.symbol,
+  }
+}
+
+export function normalizePinIconId(
+  id: string | null | undefined,
+  category = '',
+): PinIconId {
+  return getPinIconPreset(id, category).id
 }

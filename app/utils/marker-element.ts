@@ -1,4 +1,4 @@
-import { defaultPinIconId, getPinIconPreset } from '~~/shared/constants/spot'
+import { getPinIconPreset } from '~~/shared/constants/spot'
 import type { MapViewerSpot } from '~~/shared/types/map-viewer'
 import { getPinColorVariants } from '~~/shared/utils/pin-style'
 
@@ -18,7 +18,7 @@ export function getSpotMarkerPresentation(spot: MapViewerSpot) {
     darkColor: colors.dark,
     imageUrl: type === 'preset' ? null : spot.pinIconImageUrl,
     symbol: type === 'preset'
-      ? getPinIconPreset(spot.pinIconId ?? defaultPinIconId(spot.category)).symbol
+      ? getPinIconPreset(spot.pinIconId, spot.category).symbol
       : null,
   }
 }
