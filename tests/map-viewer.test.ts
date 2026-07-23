@@ -7,12 +7,12 @@ import {
   GEOLOCATE_CONTROL_OPTIONS,
   GEOLOCATION_OUTSIDE_MESSAGE,
   getFloorLayerIds,
-  getSpotMarkerPresentation,
   shouldEnableGeolocate,
   VIEWER_CAMERA_CONSTRAINTS,
   ZOOM_IN_ALLOWANCE,
   ZOOM_OUT_ALLOWANCE,
 } from '../app/composables/useMapViewer'
+import { getSpotMarkerPresentation } from '../app/utils/marker-element'
 import type { Map as MapLibreMap } from 'maplibre-gl'
 import type { MapViewerFloor, MapViewerSpot } from '../shared/types/map-viewer'
 import { getPinColorVariants, mixHexColor } from '../shared/utils/pin-style'
@@ -97,10 +97,11 @@ describe('フロアごとのズーム制約', () => {
 describe('Markerの表示内容', () => {
   it('カテゴリの既定プリセットと保存色を反映する', () => {
     expect(getSpotMarkerPresentation(baseSpot)).toEqual({
+      type: 'preset',
       color: '#C7401F',
       lightColor: '#DD8C79',
       darkColor: '#772613',
-      customImageUrl: null,
+      imageUrl: null,
       symbol: '♨',
     })
   })
@@ -111,12 +112,36 @@ describe('Markerの表示内容', () => {
       pinIconType: 'custom',
       pinIconImageUrl: '/uploads/custom.png',
     })).toEqual({
+      type: 'custom',
       color: '#C7401F',
       lightColor: '#DD8C79',
       darkColor: '#772613',
-      customImageUrl: '/uploads/custom.png',
+      imageUrl: '/uploads/custom.png',
       symbol: null,
     })
+  })
+
+  it('イラスト直置きでは台座用文字を使わず画像URLを返す', () => {
+    expect(getSpotMarkerPresentation({
+      ...baseSpot,
+      pinIconType: 'illustration',
+      pinIconImageUrl: '/uploads/illustration.png',
+    })).toEqual({
+      type: 'illustration',
+      color: '#C7401F',
+      lightColor: '#DD8C79',
+      darkColor: '#772613',
+      imageUrl: '/uploads/illustration.png',
+      symbol: null,
+    })
+  })
+
+  it('画像URLが欠けた保存データは壊れた画像ではなくpresetへ戻す', () => {
+    expect(getSpotMarkerPresentation({
+      ...baseSpot,
+      pinIconType: 'illustration',
+      pinIconImageUrl: null,
+    }).type).toBe('preset')
   })
 
   it('color-mix非対応環境向けに明色と暗色をsRGBで算出する', () => {

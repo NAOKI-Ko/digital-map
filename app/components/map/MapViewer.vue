@@ -100,6 +100,12 @@ const { floorError, geolocationAreaMessage, geolocationAvailable, mapError } = u
   padding: 0;
 }
 
+.map-viewer-marker--illustration {
+  width: max-content;
+  min-width: 2rem;
+  height: 3.5rem;
+}
+
 .map-viewer-marker__ground-shadow {
   position: absolute;
   bottom: 0.1rem;
@@ -111,6 +117,11 @@ const { floorError, geolocationAreaMessage, geolocationAvailable, mapError } = u
   filter: blur(2px);
   pointer-events: none;
   transform: translateX(-50%);
+}
+
+.map-viewer-marker--illustration .map-viewer-marker__ground-shadow {
+  bottom: 0.05rem;
+  width: min(70%, 4rem);
 }
 
 .map-viewer-marker__shape {
@@ -147,6 +158,23 @@ const { floorError, geolocationAreaMessage, geolocationAvailable, mapError } = u
   transform: rotate(45deg);
 }
 
+.map-viewer-marker__illustration {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: max-content;
+  filter: drop-shadow(0 5px 5px rgb(37 48 58 / 32%));
+  transition: scale 150ms ease, filter 150ms ease;
+}
+
+.map-viewer-marker__illustration-image {
+  display: block;
+  width: auto;
+  height: 3rem;
+  max-width: 10rem;
+  object-fit: contain;
+}
+
 .map-viewer-marker--selected .map-viewer-marker__shape,
 .map-viewer-marker:focus-visible .map-viewer-marker__shape {
   box-shadow:
@@ -154,6 +182,14 @@ const { floorError, geolocationAreaMessage, geolocationAvailable, mapError } = u
     0 7px 12px rgb(37 48 58 / 45%),
     inset -3px -3px 6px rgb(0 0 0 / 25%),
     inset 2px 2px 4px rgb(255 255 255 / 35%);
+  scale: 1.12;
+}
+
+.map-viewer-marker--selected .map-viewer-marker__illustration,
+.map-viewer-marker:focus-visible .map-viewer-marker__illustration {
+  filter:
+    drop-shadow(0 0 3px rgb(255 255 255 / 95%))
+    drop-shadow(0 6px 6px rgb(37 48 58 / 42%));
   scale: 1.12;
 }
 

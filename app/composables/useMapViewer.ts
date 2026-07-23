@@ -1,9 +1,8 @@
 import { onBeforeUnmount, onMounted, readonly, ref, shallowRef, watch, type Ref } from 'vue'
 import type { GeolocateControl, Map as MapLibreMap, MapOptions, Marker, StyleSpecification } from 'maplibre-gl'
 import { getFloorCorners, getGeoReferenceBounds, isGeoReferenced, isWithinFloorArea, toImageCoordinates, type FloorCorners, type LatLng } from '~~/lib/geo'
-import { defaultPinIconId, getPinIconPreset } from '~~/shared/constants/spot'
 import type { MapViewerFloor, MapViewerSpot } from '~~/shared/types/map-viewer'
-import { getPinColorVariants } from '~~/shared/utils/pin-style'
+import { createSpotMarkerElement } from '~/utils/marker-element'
 
 export type MapViewerMode = 'view' | 'edit'
 
@@ -51,20 +50,6 @@ export interface UseMapViewerOptions {
   onPositionChanged?: (position: LatLng) => void
   onSpotMoved?: (value: { spotId: string, lat: number, lng: number }) => void
   onSpotSelected?: (spot: MapViewerSpot) => void
-}
-
-export function getSpotMarkerPresentation(spot: MapViewerSpot) {
-  const customImageUrl = spot.pinIconType === 'custom' ? spot.pinIconImageUrl : null
-  const colors = getPinColorVariants(spot.pinColor)
-  return {
-    color: colors.base,
-    lightColor: colors.light,
-    darkColor: colors.dark,
-    customImageUrl,
-    symbol: customImageUrl
-      ? null
-      : getPinIconPreset(spot.pinIconId ?? defaultPinIconId(spot.category)).symbol,
-  }
 }
 
 export function getFloorLayerIds(floorId: string) {
@@ -289,38 +274,10 @@ export function useMapViewer(
     if (!instance || !currentMaplibre || !isReady.value) return
 
     spotMarkers = options.spots.value.map((spot) => {
-      const presentation = getSpotMarkerPresentation(spot)
-      const element = document.createElement('button')
-      element.type = 'button'
-      element.className = 'map-viewer-marker'
-      element.classList.toggle('map-viewer-marker--selected', spot.id === options.selectedSpotId.value)
-      element.style.setProperty('--pin-color', presentation.color)
-      element.style.setProperty('--pin-color-light', presentation.lightColor)
-      element.style.setProperty('--pin-color-dark', presentation.darkColor)
-      element.setAttribute('aria-label', options.mode === 'edit'
-        ? `${spot.name}をドラッグして位置調整`
-        : `${spot.name}の詳細を表示`)
-      element.title = spot.name
-
-      const groundShadow = document.createElement('span')
-      groundShadow.className = 'map-viewer-marker__ground-shadow'
-      groundShadow.setAttribute('aria-hidden', 'true')
-      const shape = document.createElement('span')
-      shape.className = 'map-viewer-marker__shape'
-      const content = document.createElement(presentation.customImageUrl ? 'img' : 'span')
-      content.className = 'map-viewer-marker__content'
-      if (content instanceof HTMLImageElement && presentation.customImageUrl) {
-        content.src = presentation.customImageUrl
-        content.alt = ''
-      }
-      else {
-        content.textContent = presentation.symbol
-      }
-      shape.append(content)
-      element.append(groundShadow, shape)
-      element.addEventListener('click', (event) => {
-        event.stopPropagation()
-        options.onSpotSelected?.(spot)
+      const element = createSpotMarkerElement(spot, {
+        mode: options.mode,
+        selected: spot.id === options.selectedSpotId.value,
+        onSelected: () => options.onSpotSelected?.(spot),
       })
 
       const marker = new currentMaplibre.Marker({
