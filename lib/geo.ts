@@ -44,6 +44,7 @@ export const MIN_REFERENCE_METER_DISTANCE = 20
 export const REFERENCE_DISTANCE_ERROR = '基準点が近すぎます。もっと離れた目印を選んでください。'
 export const FALLBACK_ORIGIN = { lat: 0, lng: 0 } as const
 export const FALLBACK_EXTENT_DEG = 0.01
+export const AREA_MARGIN_METERS = 300
 
 const EARTH_RADIUS_METERS = 6_378_137
 const GEO_REFERENCE_FIELDS = [
@@ -268,6 +269,51 @@ export function getGeoReferenceBounds(corners: FloorCorners) {
       Math.max(...points.map(point => point.lat)),
     ] as [number, number],
   }
+}
+
+function distanceMeters(from: LatLng, to: LatLng) {
+  const radians = Math.PI / 180
+  const fromLat = from.lat * radians
+  const toLat = to.lat * radians
+  const latDelta = (to.lat - from.lat) * radians
+  const lngDelta = (to.lng - from.lng) * radians
+  const haversine = Math.sin(latDelta / 2) ** 2
+    + Math.cos(fromLat) * Math.cos(toLat) * Math.sin(lngDelta / 2) ** 2
+
+  return 2 * EARTH_RADIUS_METERS * Math.asin(Math.min(1, Math.sqrt(haversine)))
+}
+
+function getFloorAreaCenter(corners: FloorCorners): LatLng {
+  const points = Object.values(corners)
+  const radians = Math.PI / 180
+  const averageSinLng = points.reduce((sum, point) => sum + Math.sin(point.lng * radians), 0)
+  const averageCosLng = points.reduce((sum, point) => sum + Math.cos(point.lng * radians), 0)
+
+  return {
+    lat: points.reduce((sum, point) => sum + point.lat, 0) / points.length,
+    lng: Math.atan2(averageSinLng, averageCosLng) / radians,
+  }
+}
+
+/**
+ * フロア4隅を含む円へ許容マージンを加え、現在地が表示対象エリア内か判定する。
+ */
+export function isWithinFloorArea(
+  userLat: number,
+  userLng: number,
+  corners: FloorCorners,
+  marginMeters = AREA_MARGIN_METERS,
+) {
+  if (!isValidLatLng({ lat: userLat, lng: userLng })
+    || !Number.isFinite(marginMeters) || marginMeters < 0) return false
+
+  const center = getFloorAreaCenter(corners)
+  const floorRadius = Math.max(
+    ...Object.values(corners).map(corner => distanceMeters(center, corner)),
+  )
+
+  return distanceMeters(center, { lat: userLat, lng: userLng })
+    <= floorRadius + marginMeters
 }
 
 export function isValidLatLng(value: LatLng) {
