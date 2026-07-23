@@ -106,8 +106,17 @@ const { floorError, geolocationAreaMessage, geolocationAvailable, mapError } = u
   place-items: center;
   border: 3px solid white;
   border-radius: 9999px 9999px 9999px 0;
-  background: var(--pin-color);
-  box-shadow: 0 2px 8px rgb(0 0 0 / 35%);
+  background-color: var(--pin-color);
+  background-image: radial-gradient(
+    circle at 32% 28%,
+    var(--pin-color-light) 0%,
+    var(--pin-color) 55%,
+    var(--pin-color-dark) 100%
+  );
+  box-shadow:
+    0 6px 10px rgb(37 48 58 / 35%),
+    inset -3px -3px 6px rgb(0 0 0 / 25%),
+    inset 2px 2px 4px rgb(255 255 255 / 35%);
   color: white;
   font-size: 0.75rem;
   font-weight: 800;
@@ -124,7 +133,11 @@ const { floorError, geolocationAreaMessage, geolocationAvailable, mapError } = u
 
 .map-viewer-marker--selected .map-viewer-marker__shape,
 .map-viewer-marker:focus-visible .map-viewer-marker__shape {
-  box-shadow: 0 0 0 4px rgb(255 255 255 / 80%), 0 3px 12px rgb(0 0 0 / 45%);
+  box-shadow:
+    0 0 0 4px rgb(255 255 255 / 80%),
+    0 7px 12px rgb(37 48 58 / 45%),
+    inset -3px -3px 6px rgb(0 0 0 / 25%),
+    inset 2px 2px 4px rgb(255 255 255 / 35%);
   scale: 1.12;
 }
 

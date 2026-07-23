@@ -3,6 +3,7 @@ import type { GeolocateControl, Map as MapLibreMap, MapOptions, Marker, StyleSpe
 import { getFloorCorners, getGeoReferenceBounds, isGeoReferenced, isWithinFloorArea, toImageCoordinates, type FloorCorners, type LatLng } from '~~/lib/geo'
 import { defaultPinIconId, getPinIconPreset } from '~~/shared/constants/spot'
 import type { MapViewerFloor, MapViewerSpot } from '~~/shared/types/map-viewer'
+import { getPinColorVariants } from '~~/shared/utils/pin-style'
 
 export type MapViewerMode = 'view' | 'edit'
 
@@ -54,8 +55,11 @@ export interface UseMapViewerOptions {
 
 export function getSpotMarkerPresentation(spot: MapViewerSpot) {
   const customImageUrl = spot.pinIconType === 'custom' ? spot.pinIconImageUrl : null
+  const colors = getPinColorVariants(spot.pinColor)
   return {
-    color: spot.pinColor,
+    color: colors.base,
+    lightColor: colors.light,
+    darkColor: colors.dark,
     customImageUrl,
     symbol: customImageUrl
       ? null
@@ -291,6 +295,8 @@ export function useMapViewer(
       element.className = 'map-viewer-marker'
       element.classList.toggle('map-viewer-marker--selected', spot.id === options.selectedSpotId.value)
       element.style.setProperty('--pin-color', presentation.color)
+      element.style.setProperty('--pin-color-light', presentation.lightColor)
+      element.style.setProperty('--pin-color-dark', presentation.darkColor)
       element.setAttribute('aria-label', options.mode === 'edit'
         ? `${spot.name}をドラッグして位置調整`
         : `${spot.name}の詳細を表示`)

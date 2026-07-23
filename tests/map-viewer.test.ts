@@ -15,6 +15,7 @@ import {
 } from '../app/composables/useMapViewer'
 import type { Map as MapLibreMap } from 'maplibre-gl'
 import type { MapViewerFloor, MapViewerSpot } from '../shared/types/map-viewer'
+import { getPinColorVariants, mixHexColor } from '../shared/utils/pin-style'
 
 const baseSpot: MapViewerSpot = {
   id: 'spot-1',
@@ -97,6 +98,8 @@ describe('Markerの表示内容', () => {
   it('カテゴリの既定プリセットと保存色を反映する', () => {
     expect(getSpotMarkerPresentation(baseSpot)).toEqual({
       color: '#C7401F',
+      lightColor: '#DD8C79',
+      darkColor: '#772613',
       customImageUrl: null,
       symbol: '♨',
     })
@@ -109,8 +112,28 @@ describe('Markerの表示内容', () => {
       pinIconImageUrl: '/uploads/custom.png',
     })).toEqual({
       color: '#C7401F',
+      lightColor: '#DD8C79',
+      darkColor: '#772613',
       customImageUrl: '/uploads/custom.png',
       symbol: null,
+    })
+  })
+
+  it('color-mix非対応環境向けに明色と暗色をsRGBで算出する', () => {
+    expect(getPinColorVariants('#2563eb')).toEqual({
+      base: '#2563EB',
+      light: '#7CA1F3',
+      dark: '#163B8D',
+    })
+    expect(mixHexColor('#000000', 'white')).toBe('#666666')
+    expect(mixHexColor('#FFFFFF', 'black')).toBe('#999999')
+  })
+
+  it('不正な保存色は既定色へフォールバックする', () => {
+    expect(getPinColorVariants('not-a-color')).toEqual({
+      base: '#C7401F',
+      light: '#DD8C79',
+      dark: '#772613',
     })
   })
 
