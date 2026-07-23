@@ -1,6 +1,6 @@
 import { onBeforeUnmount, onMounted, readonly, ref, shallowRef, watch, type Ref } from 'vue'
 import type { GeolocateControl, Map as MapLibreMap, MapOptions, Marker, StyleSpecification } from 'maplibre-gl'
-import { getFloorCorners, getGeoReferenceBounds, isGeoReferenced, toImageCoordinates, type LatLng } from '~~/lib/geo'
+import { getFloorCorners, getGeoReferenceBounds, isGeoReferenced, isWithinFloorArea, toImageCoordinates, type FloorCorners, type LatLng } from '~~/lib/geo'
 import { defaultPinIconId, getPinIconPreset } from '~~/shared/constants/spot'
 import type { MapViewerFloor, MapViewerSpot } from '~~/shared/types/map-viewer'
 
@@ -33,6 +33,12 @@ export const ABSOLUTE_ZOOM_LIMITS = {
 } as const
 export const ZOOM_OUT_ALLOWANCE = 2.5
 export const ZOOM_IN_ALLOWANCE = 6
+export const GEOLOCATION_OUTSIDE_MESSAGE = '現在地はこのマップのエリアから離れているようです'
+export const GEOLOCATE_CONTROL_OPTIONS = {
+  trackUserLocation: true,
+  showUserLocation: false,
+  showAccuracyCircle: false,
+} as const
 
 export interface UseMapViewerOptions {
   mode: MapViewerMode
@@ -146,9 +152,12 @@ export function useMapViewer(
   const floorError = ref('')
   const isReady = ref(false)
   const geolocationAvailable = ref(false)
+  const geolocationAreaMessage = ref('')
   let draftMarker: Marker | null = null
   let spotMarkers: Marker[] = []
   let geolocateControl: GeolocateControl | null = null
+  let geolocateHandler: ((position: GeolocationPosition) => void) | null = null
+  let currentLocationMarker: Marker | null = null
   let activeSourceId: string | null = null
   let activeLayerId: string | null = null
 
@@ -211,11 +220,18 @@ export function useMapViewer(
 
   function removeGeolocateControl() {
     const instance = map.value
+    if (geolocateControl && geolocateHandler) {
+      geolocateControl.off('geolocate', geolocateHandler)
+    }
     if (instance && geolocateControl && instance.hasControl(geolocateControl)) {
       instance.removeControl(geolocateControl)
     }
+    currentLocationMarker?.remove()
+    currentLocationMarker = null
     geolocateControl = null
+    geolocateHandler = null
     geolocationAvailable.value = false
+    geolocationAreaMessage.value = ''
   }
 
   function syncGeolocateControl(floor: MapViewerFloor) {
@@ -224,9 +240,38 @@ export function useMapViewer(
     const currentMaplibre = maplibre.value
     if (!instance || !currentMaplibre || !shouldEnableGeolocate(floor)) return
 
-    geolocateControl = new currentMaplibre.GeolocateControl({
-      trackUserLocation: true,
-    })
+    // 標準マーカーは判定より先に表示されるため無効化し、範囲内だけ独自表示する。
+    geolocateControl = new currentMaplibre.GeolocateControl(GEOLOCATE_CONTROL_OPTIONS)
+    geolocateHandler = (position) => {
+      const corners = getFloorCorners(floor)
+      const lat = position.coords.latitude
+      const lng = position.coords.longitude
+      const isInside = corners !== null && isWithinFloorArea(lat, lng, corners)
+
+      if (!isInside) {
+        currentLocationMarker?.remove()
+        currentLocationMarker = null
+        geolocationAreaMessage.value = GEOLOCATION_OUTSIDE_MESSAGE
+        if (corners) fitFloorBounds(corners, true)
+        return
+      }
+
+      geolocationAreaMessage.value = ''
+      if (!currentLocationMarker) {
+        const element = document.createElement('div')
+        element.className = 'map-viewer-current-location-marker'
+        element.setAttribute('role', 'img')
+        element.setAttribute('aria-label', '現在地')
+        currentLocationMarker = addMarkerAtPosition(
+          new currentMaplibre.Marker({ element }),
+          instance,
+          { lat, lng },
+        )
+        return
+      }
+      currentLocationMarker.setLngLat([lng, lat])
+    }
+    geolocateControl.on('geolocate', geolocateHandler)
     instance.addControl(geolocateControl, 'top-right')
     geolocationAvailable.value = true
   }
@@ -324,6 +369,33 @@ export function useMapViewer(
     activeSourceId = null
   }
 
+  function fitFloorBounds(corners: FloorCorners, animate: boolean) {
+    const instance = map.value
+    if (!instance) return
+
+    const bounds = getGeoReferenceBounds(corners)
+    // 前のフロアの相対制約がカメラ計算へ影響しないよう、毎回いったん解除する。
+    instance.setMinZoom(ABSOLUTE_ZOOM_LIMITS.minZoom)
+    instance.setMaxZoom(ABSOLUTE_ZOOM_LIMITS.maxZoom)
+    const camera = instance.cameraForBounds([bounds.southwest, bounds.northeast], {
+      padding: 64,
+      maxZoom: 20,
+    })
+    if (!camera) return
+
+    const targetZoom = camera.zoom ?? instance.getZoom()
+    const zoomConstraints = createFloorZoomConstraints(targetZoom)
+    instance.setMinZoom(zoomConstraints.minZoom)
+    instance.setMaxZoom(zoomConstraints.maxZoom)
+    instance.easeTo({
+      center: camera.center,
+      zoom: targetZoom,
+      bearing: instance.getBearing(),
+      pitch: instance.getPitch(),
+      duration: animate ? 700 : 0,
+    })
+  }
+
   function showFloor(floor: MapViewerFloor, animate = true) {
     const instance = map.value
     const corners = getFloorCorners(floor)
@@ -352,29 +424,7 @@ export function useMapViewer(
     activeSourceId = sourceId
     activeLayerId = layerId
 
-    const bounds = getGeoReferenceBounds(corners)
-    if (bounds) {
-      // 前のフロアの相対制約がカメラ計算へ影響しないよう、毎回いったん解除する。
-      instance.setMinZoom(ABSOLUTE_ZOOM_LIMITS.minZoom)
-      instance.setMaxZoom(ABSOLUTE_ZOOM_LIMITS.maxZoom)
-      const camera = instance.cameraForBounds([bounds.southwest, bounds.northeast], {
-        padding: 64,
-        maxZoom: 20,
-      })
-      if (camera) {
-        const targetZoom = camera.zoom ?? instance.getZoom()
-        const zoomConstraints = createFloorZoomConstraints(targetZoom)
-        instance.setMinZoom(zoomConstraints.minZoom)
-        instance.setMaxZoom(zoomConstraints.maxZoom)
-        instance.easeTo({
-          center: camera.center,
-          zoom: targetZoom,
-          bearing: instance.getBearing(),
-          pitch: instance.getPitch(),
-          duration: animate ? 700 : 0,
-        })
-      }
-    }
+    fitFloorBounds(corners, animate)
     return true
   }
 
@@ -398,6 +448,7 @@ export function useMapViewer(
     floorError: readonly(floorError),
     isReady: readonly(isReady),
     geolocationAvailable: readonly(geolocationAvailable),
+    geolocationAreaMessage: readonly(geolocationAreaMessage),
     initialize,
     destroy,
     showFloor,

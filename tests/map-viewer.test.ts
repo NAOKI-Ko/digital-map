@@ -4,6 +4,8 @@ import {
   addMarkerAtPosition,
   createFloorZoomConstraints,
   createMapViewerOptions,
+  GEOLOCATE_CONTROL_OPTIONS,
+  GEOLOCATION_OUTSIDE_MESSAGE,
   getFloorLayerIds,
   getSpotMarkerPresentation,
   shouldEnableGeolocate,
@@ -152,5 +154,15 @@ describe('GeolocateControlの追加判定', () => {
 
   it('ジオリファレンス済みならピン配置エディタでも有効にする', () => {
     expect(shouldEnableGeolocate(geoReferencedFloor)).toBe(true)
+  })
+
+  it('標準マーカーを抑制し、エリア判定後の独自表示へ切り替える', () => {
+    expect(GEOLOCATE_CONTROL_OPTIONS).toEqual({
+      trackUserLocation: true,
+      showUserLocation: false,
+      showAccuracyCircle: false,
+    })
+    expect(GEOLOCATION_OUTSIDE_MESSAGE)
+      .toBe('現在地はこのマップのエリアから離れているようです')
   })
 })

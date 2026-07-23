@@ -33,7 +33,7 @@ const floor = toRef(props, 'floor')
 const spots = toRef(props, 'spots')
 const position = toRef(props, 'modelValue')
 const selectedSpotId = toRef(props, 'selectedSpotId')
-const { floorError, geolocationAvailable, mapError } = useMapViewer(container, {
+const { floorError, geolocationAreaMessage, geolocationAvailable, mapError } = useMapViewer(container, {
   floor,
   spots,
   position,
@@ -74,6 +74,13 @@ const { floorError, geolocationAvailable, mapError } = useMapViewer(container, {
         class="pointer-events-none absolute bottom-3 left-3 max-w-xs rounded-lg bg-white/90 px-3 py-2 text-xs leading-5 text-stone-600 shadow"
       >
         現在地はイラスト上のおおよその目安です。
+      </p>
+      <p
+        v-if="geolocationAreaMessage"
+        role="status"
+        class="pointer-events-none absolute inset-x-4 top-4 mx-auto max-w-md rounded-lg bg-amber-50/95 px-4 py-3 text-center text-sm font-semibold text-amber-900 shadow"
+      >
+        {{ geolocationAreaMessage }}
       </p>
     </div>
     <p v-if="mapError" role="alert" class="mt-3 text-sm text-red-600">
@@ -119,5 +126,14 @@ const { floorError, geolocationAvailable, mapError } = useMapViewer(container, {
 .map-viewer-marker:focus-visible .map-viewer-marker__shape {
   box-shadow: 0 0 0 4px rgb(255 255 255 / 80%), 0 3px 12px rgb(0 0 0 / 45%);
   scale: 1.12;
+}
+
+.map-viewer-current-location-marker {
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 3px solid white;
+  border-radius: 9999px;
+  background: #2563eb;
+  box-shadow: 0 0 0 0.3rem rgb(37 99 235 / 25%), 0 2px 8px rgb(0 0 0 / 35%);
 }
 </style>
