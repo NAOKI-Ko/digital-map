@@ -97,7 +97,6 @@ async function main() {
         imageWidth: verificationMap.floor.imageWidth,
         imageHeight: verificationMap.floor.imageHeight,
         order: 0,
-        isOutdoor: true,
       },
       create: {
         id: verificationMap.floor.id,
@@ -107,7 +106,6 @@ async function main() {
         imageWidth: verificationMap.floor.imageWidth,
         imageHeight: verificationMap.floor.imageHeight,
         order: 0,
-        isOutdoor: true,
       },
     })
 

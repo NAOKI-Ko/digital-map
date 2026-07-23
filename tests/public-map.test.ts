@@ -53,7 +53,6 @@ function mapRecord(overrides: {
       refBPixelY: null,
       refBLat: null,
       refBLng: null,
-      isOutdoor: true,
       spots: overrides.spots ?? [publishedSpot],
     }],
   }

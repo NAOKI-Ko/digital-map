@@ -10,12 +10,10 @@ export const floorCreateSchema = z.object({
   illustrationUrl: localUploadUrlSchema,
   imageWidth: z.number().int().positive('画像の幅を読み取れませんでした。'),
   imageHeight: z.number().int().positive('画像の高さを読み取れませんでした。'),
-  isOutdoor: z.boolean().default(true),
 })
 
 export const floorUpdateSchema = z.object({
   name: z.string().trim().min(1, 'フロア名を入力してください。').max(50, 'フロア名は50文字以内で入力してください。'),
-  isOutdoor: z.boolean(),
 })
 
 export const floorReorderSchema = z.object({

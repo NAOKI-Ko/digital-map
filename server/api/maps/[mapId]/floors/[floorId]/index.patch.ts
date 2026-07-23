@@ -14,10 +14,7 @@ export default defineEventHandler(async (event): Promise<MapFloorResponse> => {
 
   const updatedFloor = await prisma.mapFloor.update({
     where: { id: floor.id },
-    data: {
-      name: result.data.name,
-      isOutdoor: result.data.isOutdoor,
-    },
+    data: { name: result.data.name },
     include: { _count: { select: { spots: true } } },
   })
 

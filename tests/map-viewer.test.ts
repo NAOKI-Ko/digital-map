@@ -24,11 +24,10 @@ const baseSpot: MapViewerSpot = {
   pinColor: '#C7401F',
 }
 
-const outdoorFloor: MapViewerFloor = {
+const geoReferencedFloor: MapViewerFloor = {
   id: 'floor-1',
-  name: '屋外',
+  name: 'ジオリファレンス設定済み',
   illustrationUrl: '/uploads/floor.png',
-  isOutdoor: true,
   imageWidth: 1000,
   imageHeight: 500,
   refAPixelX: 0,
@@ -140,14 +139,14 @@ describe('フロアimageソースの識別子', () => {
 
 describe('GeolocateControlの追加判定', () => {
   it('ジオリファレンス済みの閲覧モードで有効にする', () => {
-    expect(shouldEnableGeolocate(outdoorFloor)).toBe(true)
+    expect(shouldEnableGeolocate(geoReferencedFloor)).toBe(true)
   })
 
   it('基準点が未設定なら追加しない', () => {
-    expect(shouldEnableGeolocate({ ...outdoorFloor, refALat: null })).toBe(false)
+    expect(shouldEnableGeolocate({ ...geoReferencedFloor, refALat: null })).toBe(false)
   })
 
   it('ジオリファレンス済みならピン配置エディタでも有効にする', () => {
-    expect(shouldEnableGeolocate(outdoorFloor)).toBe(true)
+    expect(shouldEnableGeolocate(geoReferencedFloor)).toBe(true)
   })
 })

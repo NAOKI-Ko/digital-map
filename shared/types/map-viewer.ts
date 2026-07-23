@@ -4,7 +4,6 @@ export interface MapViewerFloor extends FloorGeoReferenceFields {
   id: string
   name: string
   illustrationUrl: string
-  isOutdoor: boolean
 }
 
 export interface MapViewerSpot {

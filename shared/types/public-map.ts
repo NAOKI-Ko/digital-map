@@ -31,7 +31,6 @@ export interface PublicFloor {
   refBPixelY: number | null
   refBLat: number | null
   refBLng: number | null
-  isOutdoor: boolean
   spots: PublicSpot[]
 }
 

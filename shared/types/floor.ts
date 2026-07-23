@@ -14,7 +14,6 @@ export interface MapFloorItem {
   refBPixelY: number | null
   refBLat: number | null
   refBLng: number | null
-  isOutdoor: boolean
   spotCount: number
   createdAt: string
   updatedAt: string

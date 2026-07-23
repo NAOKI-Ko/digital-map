@@ -21,7 +21,6 @@ export function toMapFloorItem(floor: FloorWithCount) {
     refBPixelY: floor.refBPixelY,
     refBLat: floor.refBLat,
     refBLng: floor.refBLng,
-    isOutdoor: floor.isOutdoor,
     spotCount: floor._count.spots,
     createdAt: floor.createdAt.toISOString(),
     updatedAt: floor.updatedAt.toISOString(),

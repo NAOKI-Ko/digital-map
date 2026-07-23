@@ -21,7 +21,6 @@ const createInput = reactive<FloorCreateInput>({
   illustrationUrl: '',
   imageWidth: 0,
   imageHeight: 0,
-  isOutdoor: true,
 })
 const createError = ref('')
 const isCreating = ref(false)
@@ -64,7 +63,6 @@ async function createFloor() {
       illustrationUrl: '',
       imageWidth: 0,
       imageHeight: 0,
-      isOutdoor: true,
     })
   }
   catch {
@@ -76,7 +74,7 @@ async function createFloor() {
 }
 
 async function updateFloor(floor: MapFloorItem) {
-  const input: FloorUpdateInput = { name: floor.name, isOutdoor: floor.isOutdoor }
+  const input: FloorUpdateInput = { name: floor.name }
   const result = floorUpdateSchema.safeParse(input)
   if (!result.success) {
     window.alert(result.error.issues[0]?.message ?? '入力内容を確認してください。')

@@ -24,7 +24,6 @@ export default defineEventHandler(async (event): Promise<MapFloorResponse> => {
       illustrationUrl: result.data.illustrationUrl,
       imageWidth: result.data.imageWidth,
       imageHeight: result.data.imageHeight,
-      isOutdoor: result.data.isOutdoor,
       order: (lastFloor?.order ?? -1) + 1,
     },
     include: { _count: { select: { spots: true } } },

@@ -30,7 +30,6 @@ export function buildPublicMapQuery(slug: string) {
           refBPixelY: true,
           refBLat: true,
           refBLng: true,
-          isOutdoor: true,
           spots: {
             where: {
               isPublished: true,
@@ -89,7 +88,6 @@ export function serializePublicMap(record: PublicMapRecord | null): PublicMap | 
       refBPixelY: floor.refBPixelY,
       refBLat: floor.refBLat,
       refBLng: floor.refBLng,
-      isOutdoor: floor.isOutdoor,
       spots: floor.spots.flatMap((spot) => {
         if (!spot.isPublished || spot.lat === null || spot.lng === null) return []
         const photos = Array.isArray(spot.photosJson)

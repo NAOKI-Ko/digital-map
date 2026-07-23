@@ -61,7 +61,6 @@ model MapFloor {
   refBPixelY      Float?
   refBLat         Float?
   refBLng         Float?
-  isOutdoor       Boolean  @default(true)
   spots           Spot[]
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
