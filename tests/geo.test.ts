@@ -1,15 +1,18 @@
 import { describe, expect, it } from 'vitest'
 import {
+  AREA_MARGIN_METERS,
   computeFloorCorners,
   computeFallbackCorners,
   getFloorCorners,
   getGeoReferenceBounds,
   getGeoReferenceValidationError,
   isGeoReferenced,
+  isWithinFloorArea,
   REFERENCE_DISTANCE_ERROR,
   toImageCoordinates,
   type CompleteFloorGeoReference,
   type FloorGeoReferenceFields,
+  type FloorCorners,
 } from '../lib/geo'
 
 const baseFloor: CompleteFloorGeoReference = {
@@ -159,6 +162,33 @@ describe('isGeoReferenced', () => {
 
   it('画像寸法は現在地機能の設定有無判定に含めない', () => {
     expect(isGeoReferenced({ ...baseFloor, imageWidth: null, imageHeight: null })).toBe(true)
+  })
+})
+
+describe('isWithinFloorArea', () => {
+  const corners: FloorCorners = {
+    topLeft: { lat: 35.001, lng: 138.999 },
+    topRight: { lat: 35.001, lng: 139.001 },
+    bottomRight: { lat: 34.999, lng: 139.001 },
+    bottomLeft: { lat: 34.999, lng: 138.999 },
+  }
+
+  it('フロア範囲の内側をtrueにする', () => {
+    expect(isWithinFloorArea(35, 139, corners)).toBe(true)
+  })
+
+  it('フロア外でも既定の300mマージン内ならtrueにする', () => {
+    expect(AREA_MARGIN_METERS).toBe(300)
+    expect(isWithinFloorArea(35.003, 139, corners)).toBe(true)
+  })
+
+  it('フロア範囲とマージンから離れた位置をfalseにする', () => {
+    expect(isWithinFloorArea(35.006, 139, corners)).toBe(false)
+  })
+
+  it('指定したマージン値を判定へ反映する', () => {
+    expect(isWithinFloorArea(35.0015, 139, corners, 0)).toBe(false)
+    expect(isWithinFloorArea(35.0015, 139, corners, 100)).toBe(true)
   })
 })
 
