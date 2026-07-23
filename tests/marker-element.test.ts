@@ -94,6 +94,40 @@ describe('Marker DOM生成', () => {
     })
   })
 
+  it('kanji接頭辞は文字アイコンとして表示する', () => {
+    const marker = createElement({ pinIconId: 'kanji:観' })
+    const content = marker.children[1]?.children[0]
+
+    expect(content).toMatchObject({
+      tagName: 'SPAN',
+      className: 'map-viewer-marker__content',
+      textContent: '観',
+    })
+    expect(content?.classList.contains('material-symbols-outlined')).toBe(false)
+  })
+
+  it('material接頭辞はMaterial Symbolsのグリフとして表示する', () => {
+    const marker = createElement({ pinIconId: 'material:restaurant' })
+    const content = marker.children[1]?.children[0]
+
+    expect(content).toMatchObject({
+      tagName: 'SPAN',
+      className: 'map-viewer-marker__content map-viewer-marker__content--material material-symbols-outlined',
+      textContent: 'restaurant',
+    })
+    expect(content?.classList.contains('material-symbols-outlined')).toBe(true)
+  })
+
+  it('接頭辞なしの既存IDは文字アイコンへフォールバックする', () => {
+    const marker = createElement({ pinIconId: 'sightseeing' })
+    const content = marker.children[1]?.children[0]
+
+    expect(content).toMatchObject({
+      className: 'map-viewer-marker__content',
+      textContent: '観',
+    })
+  })
+
   it('customは雫型の中に登録画像を返す', () => {
     const marker = createElement({
       pinIconType: 'custom',

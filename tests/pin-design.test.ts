@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { normalizePinIconType } from '../shared/constants/spot'
+import {
+  defaultPinIconId,
+  getPinIconPreset,
+  normalizePinIconId,
+  normalizePinIconType,
+} from '../shared/constants/spot'
 import { pinDesignSchema } from '../shared/schemas/pin-design'
 
 const baseDesign = {
@@ -33,5 +38,44 @@ describe('ピン表示方式の保存値', () => {
     expect(normalizePinIconType('custom')).toBe('custom')
     expect(normalizePinIconType('illustration')).toBe('illustration')
     expect(normalizePinIconType('unknown')).toBe('preset')
+  })
+
+  it.each([
+    ['kanji:食', 'kanji', '食'],
+    ['material:restaurant', 'material', 'restaurant'],
+    ['food', 'kanji', '食'],
+    ['食', 'kanji', '食'],
+  ] as const)('%sのファミリーと表示値を解決する', (id, family, symbol) => {
+    expect(getPinIconPreset(id)).toMatchObject({ family, symbol })
+  })
+
+  it('接頭辞なしの既存IDをcanonicalなkanji IDへ正規化する', () => {
+    expect(normalizePinIconId('hot-spring')).toBe('kanji:♨')
+    expect(normalizePinIconId('♨')).toBe('kanji:♨')
+  })
+
+  it('カテゴリ既定値は引き続き文字アイコンを使う', () => {
+    expect(defaultPinIconId('飲食')).toBe('kanji:食')
+    expect(defaultPinIconId('その他')).toBe('kanji:●')
+  })
+
+  it.each(['kanji:食', 'material:restaurant', 'food'])('%sを保存値として受け付ける', (pinIconId) => {
+    const result = pinDesignSchema.safeParse({
+      ...baseDesign,
+      pinIconType: 'preset',
+      pinIconId,
+    })
+
+    expect(result.success).toBe(true)
+  })
+
+  it('一覧にないMaterial Symbols名は保存できない', () => {
+    const result = pinDesignSchema.safeParse({
+      ...baseDesign,
+      pinIconType: 'preset',
+      pinIconId: 'material:not_in_the_subset',
+    })
+
+    expect(result.success).toBe(false)
   })
 })

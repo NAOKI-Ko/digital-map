@@ -102,7 +102,19 @@ describe('Markerの表示内容', () => {
       lightColor: '#DD8C79',
       darkColor: '#772613',
       imageUrl: null,
+      iconFamily: 'kanji',
       symbol: '♨',
+    })
+  })
+
+  it('Material Symbolsの保存値をグリフ名とfamilyへ分解する', () => {
+    expect(getSpotMarkerPresentation({
+      ...baseSpot,
+      pinIconId: 'material:hot_tub',
+    })).toMatchObject({
+      type: 'preset',
+      iconFamily: 'material',
+      symbol: 'hot_tub',
     })
   })
 
@@ -117,6 +129,7 @@ describe('Markerの表示内容', () => {
       lightColor: '#DD8C79',
       darkColor: '#772613',
       imageUrl: '/uploads/custom.png',
+      iconFamily: null,
       symbol: null,
     })
   })
@@ -132,6 +145,7 @@ describe('Markerの表示内容', () => {
       lightColor: '#DD8C79',
       darkColor: '#772613',
       imageUrl: '/uploads/illustration.png',
+      iconFamily: null,
       symbol: null,
     })
   })
