@@ -139,19 +139,15 @@ describe('フロアimageソースの識別子', () => {
 })
 
 describe('GeolocateControlの追加判定', () => {
-  it('屋外・ジオリファレンス済みの閲覧モードだけ有効にする', () => {
-    expect(shouldEnableGeolocate('view', outdoorFloor)).toBe(true)
+  it('ジオリファレンス済みの閲覧モードで有効にする', () => {
+    expect(shouldEnableGeolocate(outdoorFloor)).toBe(true)
   })
 
-  it('isOutdoor=falseのフロアでは追加しない', () => {
-    expect(shouldEnableGeolocate('view', { ...outdoorFloor, isOutdoor: false })).toBe(false)
+  it('基準点が未設定なら追加しない', () => {
+    expect(shouldEnableGeolocate({ ...outdoorFloor, refALat: null })).toBe(false)
   })
 
-  it('基準点が未設定なら屋外でも追加しない', () => {
-    expect(shouldEnableGeolocate('view', { ...outdoorFloor, refALat: null })).toBe(false)
-  })
-
-  it('ピン配置エディタでは追加しない', () => {
-    expect(shouldEnableGeolocate('edit', outdoorFloor)).toBe(false)
+  it('ジオリファレンス済みならピン配置エディタでも有効にする', () => {
+    expect(shouldEnableGeolocate(outdoorFloor)).toBe(true)
   })
 })

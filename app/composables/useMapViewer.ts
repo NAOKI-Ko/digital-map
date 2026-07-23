@@ -63,10 +63,8 @@ export function getFloorLayerIds(floorId: string) {
   }
 }
 
-export function shouldEnableGeolocate(mode: MapViewerMode, floor: MapViewerFloor) {
-  return mode === 'view'
-    && floor.isOutdoor
-    && isGeoReferenced(floor)
+export function shouldEnableGeolocate(floor: MapViewerFloor) {
+  return isGeoReferenced(floor)
 }
 
 export function createMapViewerStyle(mode: MapViewerMode): StyleSpecification {
@@ -222,7 +220,7 @@ export function useMapViewer(
     removeGeolocateControl()
     const instance = map.value
     const currentMaplibre = maplibre.value
-    if (!instance || !currentMaplibre || !shouldEnableGeolocate(options.mode, floor)) return
+    if (!instance || !currentMaplibre || !shouldEnableGeolocate(floor)) return
 
     geolocateControl = new currentMaplibre.GeolocateControl({
       trackUserLocation: true,

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { defineAsyncComponent } from 'vue'
-import { getFloorCorners, type LatLng } from '~~/lib/geo'
+import { isGeoReferenced, type LatLng } from '~~/lib/geo'
 import type { MapFloorListResponse } from '~~/shared/types/floor'
 import type { AdminSpotListResponse, AdminSpotSummary, PositionedAdminSpotSummary, SpotPositionResponse } from '~~/shared/types/spot'
 
@@ -21,12 +21,11 @@ const positionedFloorSpots = computed(() => selectedFloorSpots.value.filter(hasP
 const moveStatus = ref('')
 const mapRevision = ref(0)
 const geoReferenceEditorPath = computed(() => selectedFloor.value
-  && selectedFloor.value.isOutdoor
   ? `/admin/maps/${mapId}/floors/${selectedFloor.value.id}/georeference?from=editor`
   : '')
 const shouldShowGeoReferenceWarning = computed(() => {
   const floor = selectedFloor.value
-  return Boolean(floor?.isOutdoor && getFloorCorners(floor) === null)
+  return Boolean(floor && !isGeoReferenced(floor))
 })
 
 watch(() => data.value?.floors, (floors) => {
@@ -98,7 +97,7 @@ async function saveMovedSpot(value: { spotId: string, lat: number, lng: number }
       </div>
 
       <div v-if="shouldShowGeoReferenceWarning" class="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-800">
-        <span>このフロアはジオリファレンス未設定です。通常地図上にはピンを置けますが、先にイラストの表示範囲を設定することをおすすめします。</span>
+        <span>ジオリファレンスを設定すると現在地機能が使えます。</span>
         <NuxtLink :to="geoReferenceEditorPath" class="shrink-0 rounded-lg bg-amber-800 px-4 py-2 font-semibold text-white hover:bg-amber-900">ジオリファレンスを設定</NuxtLink>
       </div>
 
