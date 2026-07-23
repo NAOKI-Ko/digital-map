@@ -21,6 +21,13 @@ export const pinIconPresets = [
 ] as const
 
 export type PinIconPresetId = typeof pinIconPresets[number]['id']
+export const pinIconTypes = ['preset', 'custom', 'illustration'] as const
+export type PinIconType = typeof pinIconTypes[number]
+
+export function normalizePinIconType(value: string | null | undefined): PinIconType {
+  if (value === 'custom' || value === 'illustration') return value
+  return 'preset'
+}
 
 export function getPinIconPreset(id: string | null | undefined) {
   return pinIconPresets.find(preset => preset.id === id) ?? pinIconPresets.at(-1)!

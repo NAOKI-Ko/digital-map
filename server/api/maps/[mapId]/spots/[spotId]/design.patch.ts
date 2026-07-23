@@ -1,4 +1,5 @@
 import { pinDesignSchema } from '~~/shared/schemas/pin-design'
+import { normalizePinIconType } from '~~/shared/constants/spot'
 import type { SpotPinDesignResponse } from '~~/shared/types/spot'
 
 export default defineEventHandler(async (event): Promise<SpotPinDesignResponse> => {
@@ -17,7 +18,7 @@ export default defineEventHandler(async (event): Promise<SpotPinDesignResponse> 
     data: {
       pinIconType: result.data.pinIconType,
       pinIconId: result.data.pinIconType === 'preset' ? result.data.pinIconId : null,
-      pinIconImageUrl: result.data.pinIconType === 'custom' ? result.data.pinIconImageUrl : null,
+      pinIconImageUrl: result.data.pinIconType === 'preset' ? null : result.data.pinIconImageUrl,
       pinColor: result.data.pinColor.toUpperCase(),
     },
     select: {
@@ -31,7 +32,7 @@ export default defineEventHandler(async (event): Promise<SpotPinDesignResponse> 
   return {
     design: {
       ...updatedSpot,
-      pinIconType: updatedSpot.pinIconType === 'custom' ? 'custom' : 'preset',
+      pinIconType: normalizePinIconType(updatedSpot.pinIconType),
     },
   }
 })

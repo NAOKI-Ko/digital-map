@@ -1,3 +1,5 @@
+import type { PinIconType } from '../constants/spot'
+
 export interface PublicSpot {
   id: string
   floorId: string
@@ -10,7 +12,7 @@ export interface PublicSpot {
   hoursText: string | null
   holidayText: string | null
   phone: string | null
-  pinIconType: 'preset' | 'custom'
+  pinIconType: PinIconType
   pinIconId: string | null
   pinIconImageUrl: string | null
   pinColor: string

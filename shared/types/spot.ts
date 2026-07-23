@@ -1,3 +1,5 @@
+import type { PinIconType } from '../constants/spot'
+
 export interface AdminSpotSummary {
   id: string
   floorId: string
@@ -7,7 +9,7 @@ export interface AdminSpotSummary {
   lat: number | null
   lng: number | null
   isPublished: boolean
-  pinIconType: 'preset' | 'custom'
+  pinIconType: PinIconType
   pinIconId: string | null
   pinIconImageUrl: string | null
   pinColor: string
@@ -59,7 +61,7 @@ export interface SpotPositionResponse {
 
 export interface SpotPinDesignResponse {
   design: {
-    pinIconType: 'preset' | 'custom'
+    pinIconType: PinIconType
     pinIconId: string | null
     pinIconImageUrl: string | null
     pinColor: string

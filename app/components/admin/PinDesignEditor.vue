@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import ImageUploader from '~/components/admin/ImageUploader.vue'
 import { defaultPinIconId, getPinIconPreset, pinIconPresets } from '~~/shared/constants/spot'
+import type { PinIconType } from '~~/shared/constants/spot'
 import { pinDesignSchema, type PinDesignInput } from '~~/shared/schemas/pin-design'
 import type { SpotPinDesignResponse } from '~~/shared/types/spot'
 
@@ -9,7 +10,7 @@ const props = defineProps<{
   spotId: string
   category: string
   initialValue: {
-    pinIconType: 'preset' | 'custom'
+    pinIconType: PinIconType
     pinIconId: string | null
     pinIconImageUrl: string | null
     pinColor: string

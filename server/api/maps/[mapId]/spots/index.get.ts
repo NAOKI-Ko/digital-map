@@ -1,4 +1,5 @@
 import type { Prisma } from '~~/prisma/generated/client'
+import { normalizePinIconType } from '~~/shared/constants/spot'
 import type { AdminSpotListResponse } from '~~/shared/types/spot'
 
 export default defineEventHandler(async (event): Promise<AdminSpotListResponse> => {
@@ -67,7 +68,7 @@ export default defineEventHandler(async (event): Promise<AdminSpotListResponse> 
       lat: spot.lat,
       lng: spot.lng,
       isPublished: spot.isPublished,
-      pinIconType: spot.pinIconType === 'custom' ? 'custom' : 'preset',
+      pinIconType: normalizePinIconType(spot.pinIconType),
       pinIconId: spot.pinIconId,
       pinIconImageUrl: spot.pinIconImageUrl,
       pinColor: spot.pinColor,

@@ -1,5 +1,6 @@
 import type { Prisma } from '../../prisma/generated/client'
 import type { PublicMap } from '../../shared/types/public-map'
+import { normalizePinIconType } from '../../shared/constants/spot'
 import { prisma } from './prisma'
 
 export function buildPublicMapQuery(slug: string) {
@@ -106,7 +107,7 @@ export function serializePublicMap(record: PublicMapRecord | null): PublicMap | 
           hoursText: spot.hoursText,
           holidayText: spot.holidayText,
           phone: spot.phone,
-          pinIconType: spot.pinIconType === 'custom' ? 'custom' as const : 'preset' as const,
+          pinIconType: normalizePinIconType(spot.pinIconType),
           pinIconId: spot.pinIconId,
           pinIconImageUrl: spot.pinIconImageUrl,
           pinColor: spot.pinColor,
