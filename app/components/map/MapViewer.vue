@@ -152,10 +152,23 @@ const { floorError, geolocationAreaMessage, geolocationAvailable, mapError } = u
 }
 
 .map-viewer-marker__content {
+  display: grid;
   width: 1.55rem;
   height: 1.55rem;
+  place-items: center;
+  border-radius: 9999px;
+  background: white;
+  color: #292524;
+  line-height: 1;
   object-fit: cover;
   transform: rotate(45deg);
+}
+
+.map-viewer-marker__content--material {
+  font-size: 1.125rem;
+  font-style: normal;
+  font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 20;
+  font-weight: 400;
 }
 
 .map-viewer-marker__illustration {

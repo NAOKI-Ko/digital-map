@@ -209,7 +209,11 @@ async function save() {
             <span class="pin-design-preview-shadow" aria-hidden="true" />
             <div class="pin-design-preview" :style="previewStyle">
             <img v-if="design.pinIconType === 'custom' && design.pinIconImageUrl" :src="design.pinIconImageUrl" alt="カスタムピンのプレビュー" class="h-8 w-8 rounded-full bg-white object-cover">
-            <span v-else>{{ selectedPreset.symbol }}</span>
+            <span
+              v-else
+              class="pin-design-preview__content"
+              :class="selectedPreset.family === 'material' ? 'material-symbols-outlined pin-design-preview__content--material' : 'pin-design-preview__content--kanji'"
+            >{{ selectedPreset.symbol }}</span>
             </div>
           </div>
         </div>
@@ -274,6 +278,29 @@ async function save() {
 
 .pin-design-preview > * {
   transform: rotate(45deg);
+}
+
+.pin-design-preview__content {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border-radius: 9999px;
+  background: white;
+  color: #292524;
+  line-height: 1;
+}
+
+.pin-design-preview__content--kanji {
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.pin-design-preview__content--material {
+  font-size: 1.125rem;
+  font-style: normal;
+  font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 20;
+  font-weight: 400;
 }
 
 .pin-design-illustration-preview {

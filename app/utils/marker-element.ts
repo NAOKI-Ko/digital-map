@@ -10,6 +10,9 @@ export function getSpotMarkerPresentation(spot: MapViewerSpot) {
     : spot.pinIconType === 'custom' && hasImage
       ? 'custom'
       : 'preset'
+  const preset = type === 'preset'
+    ? getPinIconPreset(spot.pinIconId, spot.category)
+    : null
 
   return {
     type,
@@ -17,9 +20,8 @@ export function getSpotMarkerPresentation(spot: MapViewerSpot) {
     lightColor: colors.light,
     darkColor: colors.dark,
     imageUrl: type === 'preset' ? null : spot.pinIconImageUrl,
-    symbol: type === 'preset'
-      ? getPinIconPreset(spot.pinIconId, spot.category).symbol
-      : null,
+    iconFamily: preset?.family ?? null,
+    symbol: preset?.symbol ?? null,
   }
 }
 
@@ -77,7 +79,9 @@ export function createSpotMarkerElement(
     }
     else {
       const content = ownerDocument.createElement('span')
-      content.className = 'map-viewer-marker__content'
+      content.className = presentation.iconFamily === 'material'
+        ? 'map-viewer-marker__content map-viewer-marker__content--material material-symbols-outlined'
+        : 'map-viewer-marker__content'
       content.textContent = presentation.symbol
       shape.append(content)
     }
