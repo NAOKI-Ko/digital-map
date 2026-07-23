@@ -29,14 +29,22 @@ const isSaving = ref(false)
 const errorMessage = ref('')
 const successMessage = ref('')
 const colorPresets = ['#C7401F', '#2563EB', '#047857', '#7C3AED', '#D97706', '#292524']
+const pinTypeOptions: Array<{ value: PinIconType, label: string, description: string }> = [
+  { value: 'preset', label: 'プリセット', description: '用意された記号をピンの中に表示' },
+  { value: 'custom', label: 'カスタムアイコン', description: 'ロゴや写真をピンの中に表示' },
+  { value: 'illustration', label: 'イラスト直置き', description: '画像を台座なしで地図へ配置' },
+]
 const selectedPreset = computed(() => getPinIconPreset(design.pinIconId))
+const usesUploadedImage = computed(() => design.pinIconType === 'custom' || design.pinIconType === 'illustration')
+const uploadHeading = computed(() => design.pinIconType === 'illustration' ? '直置きイラスト' : 'カスタム画像')
+const uploadLabel = computed(() => design.pinIconType === 'illustration' ? '直置きイラスト画像' : 'カスタムピン画像')
 
 watch(() => props.initialValue, (value) => {
   Object.assign(design, value, { pinIconId: value.pinIconId ?? defaultPinIconId(props.category) })
 }, { deep: true })
 
 function useCustomImage(url: string) {
-  design.pinIconType = 'custom'
+  if (!usesUploadedImage.value) design.pinIconType = 'custom'
   design.pinIconImageUrl = url
   errorMessage.value = ''
 }
@@ -74,19 +82,35 @@ async function save() {
     <div class="grid gap-8 lg:grid-cols-[1fr_15rem]">
       <div>
         <h2 class="text-lg font-bold text-stone-900">ピンデザイン</h2>
-        <p class="mt-1 text-sm text-stone-600">プリセットまたは独自画像を選び、ピンの地色を設定します。</p>
+        <p class="mt-1 text-sm text-stone-600">地図上でスポットをどのように見せるか選びます。</p>
 
         <fieldset class="mt-6">
+          <legend class="text-sm font-semibold text-stone-800">表示方式</legend>
+          <div class="mt-3 grid gap-3 sm:grid-cols-3">
+            <label
+              v-for="option in pinTypeOptions"
+              :key="option.value"
+              class="cursor-pointer rounded-xl border p-4 transition"
+              :class="design.pinIconType === option.value ? 'border-terracotta-500 bg-terracotta-50 ring-2 ring-terracotta-100' : 'border-stone-200 hover:border-stone-400'"
+            >
+              <input v-model="design.pinIconType" type="radio" name="pin-icon-type" :value="option.value" class="sr-only">
+              <span class="block text-sm font-bold text-stone-900">{{ option.label }}</span>
+              <span class="mt-1 block text-xs leading-5 text-stone-500">{{ option.description }}</span>
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset v-if="design.pinIconType === 'preset'" class="mt-7">
           <legend class="text-sm font-semibold text-stone-800">プリセットアイコン</legend>
           <div class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <button v-for="preset in pinIconPresets" :key="preset.id" type="button" class="rounded-xl border p-3 text-center transition" :class="design.pinIconType === 'preset' && design.pinIconId === preset.id ? 'border-terracotta-500 bg-terracotta-50 ring-2 ring-terracotta-100' : 'border-stone-200 hover:border-stone-400'" @click="design.pinIconType = 'preset'; design.pinIconId = preset.id">
+            <button v-for="preset in pinIconPresets" :key="preset.id" type="button" class="rounded-xl border p-3 text-center transition" :class="design.pinIconId === preset.id ? 'border-terracotta-500 bg-terracotta-50 ring-2 ring-terracotta-100' : 'border-stone-200 hover:border-stone-400'" @click="design.pinIconId = preset.id">
               <span class="mx-auto grid h-10 w-10 place-items-center rounded-full text-sm font-bold text-white" :style="{ backgroundColor: design.pinColor }">{{ preset.symbol }}</span>
               <span class="mt-2 block text-xs font-semibold text-stone-700">{{ preset.label }}</span>
             </button>
           </div>
         </fieldset>
 
-        <fieldset class="mt-7">
+        <fieldset v-if="design.pinIconType !== 'illustration'" class="mt-7">
           <legend class="text-sm font-semibold text-stone-800">ピンカラー</legend>
           <div class="mt-3 flex flex-wrap items-center gap-3">
             <button v-for="color in colorPresets" :key="color" type="button" :aria-label="`ピン色 ${color}`" class="h-9 w-9 rounded-full border-2 border-white shadow ring-1" :class="design.pinColor.toUpperCase() === color ? 'ring-stone-900' : 'ring-stone-300'" :style="{ backgroundColor: color }" @click="design.pinColor = color" />
@@ -94,10 +118,11 @@ async function save() {
           </div>
         </fieldset>
 
-        <div class="mt-7 border-t border-stone-200 pt-7">
-          <h3 class="text-sm font-semibold text-stone-800">カスタム画像</h3>
-          <p class="mt-1 text-xs leading-5 text-stone-500">ロゴなど、背景が透明で正方形に近いPNG/JPEGを推奨します。</p>
-          <div class="mt-3 max-w-lg"><ImageUploader label="カスタムピン画像" @uploaded="useCustomImage($event.url)" /></div>
+        <div v-if="usesUploadedImage" class="mt-7 border-t border-stone-200 pt-7">
+          <h3 class="text-sm font-semibold text-stone-800">{{ uploadHeading }}</h3>
+          <p v-if="design.pinIconType === 'custom'" class="mt-1 text-xs leading-5 text-stone-500">ロゴなど、背景が透明で正方形に近いPNG/JPEGを推奨します。</p>
+          <p v-else class="mt-1 text-xs leading-5 text-stone-500">透過PNGを推奨します。画像の縦横比は保ったまま、台座を付けずに表示します。</p>
+          <div class="mt-3 max-w-lg"><ImageUploader :label="uploadLabel" @uploaded="useCustomImage($event.url)" /></div>
         </div>
       </div>
 
