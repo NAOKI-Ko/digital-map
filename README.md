@@ -81,6 +81,29 @@ docker compose down
 
 `docker compose down -v`はPostgreSQLとアップロード画像のボリュームも削除します。開発データを意図的に初期化する場合以外は実行しないでください。
 
+## 有松チーム内デモデータ
+
+通常のseedコマンドには、下書きの「有松（チーム内デモ）」と10件のデモスポットが含まれます。
+
+Docker Compose環境：
+
+```bash
+docker compose exec \
+  -e SEED_ADMIN_EMAIL=admin@example.com \
+  -e SEED_ADMIN_PASSWORD='replace-with-a-strong-password' \
+  app pnpm db:seed
+```
+
+Dockerを使わない開発環境：
+
+```bash
+pnpm db:seed
+```
+
+`prisma/seed-assets/arimatsu-demo/`のフロアイラスト・ピン画像は、seed実行時に`NUXT_UPLOAD_DIR`へコピーされます。`NUXT_UPLOAD_DIR`が未指定の場合は`public/uploads/`へ配置されます。
+
+有松デモのマップと全スポットは常に下書きとしてupsertされます。固定IDを使うため、同じコマンドを繰り返しても重複登録されません。チーム確認後に手動編集した同デモデータは、次回seedで定義済みの内容へ戻る点に注意してください。
+
 ## Dockerを使わずに開発する
 
 1. PostgreSQLを起動し、`.env.example`を`.env`へコピーして`DATABASE_URL`を接続先に合わせます。
@@ -132,7 +155,7 @@ pnpm exec prisma migrate deploy
 pnpm db:seed             # 管理者・開発用fixtureの作成
 ```
 
-`prisma/seed.ts`は冪等ですが、開発確認用の「湯かおり温泉郷」「里山リゾート」を下書き状態へ戻します。本番運用DBでは、用途を確認してから実行してください。
+`prisma/seed.ts`は冪等ですが、開発確認用の「湯かおり温泉郷」「里山リゾート」「有松（チーム内デモ）」を下書き状態へ戻します。本番運用DBでは、用途を確認してから実行してください。
 
 ## ディレクトリ概要
 
@@ -146,7 +169,7 @@ server/
   utils/            Prisma、認可、アップロード等
 shared/             クライアント/サーバー共通の型・schema
 lib/geo.ts          2点合わせと座標計算
-prisma/             schema、migration、seed
+prisma/             schema、migration、seed、seed-assets
 public/uploads/     ローカル開発時のアップロード先
 docs/                要件・設計・画面仕様・タスク
 ```
