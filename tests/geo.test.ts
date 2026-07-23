@@ -5,9 +5,11 @@ import {
   getFloorCorners,
   getGeoReferenceBounds,
   getGeoReferenceValidationError,
+  isGeoReferenced,
   REFERENCE_DISTANCE_ERROR,
   toImageCoordinates,
   type CompleteFloorGeoReference,
+  type FloorGeoReferenceFields,
 } from '../lib/geo'
 
 const baseFloor: CompleteFloorGeoReference = {
@@ -130,6 +132,33 @@ describe('computeFallbackCorners', () => {
   ])('不正な画像寸法(%s × %s)を拒否する', (width, height) => {
     expect(() => computeFallbackCorners(width, height))
       .toThrow('画像の幅と高さを確認してください。')
+  })
+})
+
+describe('isGeoReferenced', () => {
+  it('基準点A・Bの8項目がすべて有限数ならtrueを返す', () => {
+    expect(isGeoReferenced(baseFloor)).toBe(true)
+  })
+
+  it.each([
+    'refAPixelX',
+    'refAPixelY',
+    'refALat',
+    'refALng',
+    'refBPixelX',
+    'refBPixelY',
+    'refBLat',
+    'refBLng',
+  ] satisfies Array<keyof FloorGeoReferenceFields>)('%sだけ未設定でもfalseを返す', (field) => {
+    expect(isGeoReferenced({ ...baseFloor, [field]: null })).toBe(false)
+  })
+
+  it('基準点に非有限値があればfalseを返す', () => {
+    expect(isGeoReferenced({ ...baseFloor, refBLng: Number.NaN })).toBe(false)
+  })
+
+  it('画像寸法は現在地機能の設定有無判定に含めない', () => {
+    expect(isGeoReferenced({ ...baseFloor, imageWidth: null, imageHeight: null })).toBe(true)
   })
 })
 
