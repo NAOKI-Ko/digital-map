@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import ImageUploader from '~/components/admin/ImageUploader.vue'
-import { getFloorCorners } from '~~/lib/geo'
+import { isGeoReferenced } from '~~/lib/geo'
 import type { FloorCreateInput, FloorUpdateInput } from '~~/shared/schemas/floor'
 import { floorCreateSchema, floorUpdateSchema } from '~~/shared/schemas/floor'
 import type { MapFloorItem, MapFloorListResponse, MapFloorResponse } from '~~/shared/types/floor'
@@ -28,7 +28,7 @@ const isCreating = ref(false)
 const busyFloorId = ref('')
 
 function isFloorGeoreferenced(floor: MapFloorItem) {
-  return getFloorCorners(floor) !== null
+  return isGeoReferenced(floor)
 }
 
 useHead(() => ({
@@ -166,7 +166,7 @@ async function deleteFloor(floor: MapFloorItem) {
     <header class="mt-5">
       <p class="text-sm font-medium text-terracotta-700">マップ設定</p>
       <h1 class="mt-1 text-2xl font-bold tracking-tight text-stone-900 sm:text-3xl">フロア管理</h1>
-      <p class="mt-2 text-sm text-stone-600">フロアごとのイラスト、名称、現在地表示の可否を管理します。</p>
+      <p class="mt-2 text-sm text-stone-600">フロアごとのイラスト、名称、ジオリファレンス設定状況を管理します。</p>
     </header>
 
     <section class="mt-8 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
@@ -178,10 +178,7 @@ async function deleteFloor(floor: MapFloorItem) {
             <label for="new-floor-name" class="text-sm font-semibold text-stone-800">フロア名</label>
             <input id="new-floor-name" v-model="createInput.name" maxlength="50" class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5" placeholder="例：1F / B1 / 屋外エリア">
           </div>
-          <label class="flex items-start gap-3 rounded-lg bg-stone-50 p-4 text-sm text-stone-700">
-            <input v-model="createInput.isOutdoor" type="checkbox" class="mt-0.5 h-4 w-4 rounded border-stone-300 text-terracotta-600">
-            <span><strong class="block text-stone-900">屋外フロア</strong>現在地表示と2点合わせを利用するフロアとして登録します。チェックを外すと、屋内用の範囲を自動設定します。</span>
-          </label>
+          <p class="rounded-lg bg-stone-50 p-4 text-sm leading-6 text-stone-700">フロア追加後、必要に応じて2点合わせを設定できます。未設定でもイラスト表示とピン配置は利用できますが、現在地機能は利用できません。</p>
           <p v-if="createInput.illustrationUrl" class="break-all text-xs text-emerald-700">画像を選択済み: {{ createInput.illustrationUrl }}</p>
           <p v-if="createError" role="alert" class="text-sm text-red-600">{{ createError }}</p>
           <button type="submit" :disabled="isCreating" class="rounded-lg bg-terracotta-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60">
@@ -214,9 +211,9 @@ async function deleteFloor(floor: MapFloorItem) {
                     <label :for="`floor-name-${floor.id}`" class="text-xs font-semibold text-stone-500">フロア名</label>
                     <span
                       class="rounded-full px-2.5 py-1 text-xs font-semibold"
-                      :class="!floor.isOutdoor ? 'bg-sky-100 text-sky-800' : isFloorGeoreferenced(floor) ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'"
+                      :class="isFloorGeoreferenced(floor) ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'"
                     >
-                      {{ !floor.isOutdoor ? '屋内・自動表示' : isFloorGeoreferenced(floor) ? 'ジオリファレンス設定済み' : 'ジオリファレンス未設定' }}
+                      {{ isFloorGeoreferenced(floor) ? 'ジオリファレンス設定済み' : 'ジオリファレンス未設定' }}
                     </span>
                   </div>
                   <input :id="`floor-name-${floor.id}`" v-model="floor.name" maxlength="50" class="mt-1 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm">
@@ -226,14 +223,10 @@ async function deleteFloor(floor: MapFloorItem) {
                   <button type="button" :disabled="index === (data?.floors.length ?? 0) - 1" :aria-label="`${floor.name}を下へ移動`" class="rounded-lg border border-stone-300 px-3 py-2 text-sm disabled:opacity-40" @click="moveFloor(index, 1)">↓</button>
                 </div>
               </div>
-              <label class="mt-4 flex items-center gap-2 text-sm text-stone-700">
-                <input v-model="floor.isOutdoor" type="checkbox" class="h-4 w-4 rounded border-stone-300 text-terracotta-600">
-                屋外（現在地表示・2点合わせあり）
-              </label>
-              <p v-if="!floor.isOutdoor" class="mt-2 text-xs leading-5 text-sky-700">屋内では画像の縦横比から表示範囲を自動設定します。保存済みの基準点は削除されません。</p>
+              <p v-if="!isFloorGeoreferenced(floor)" class="mt-3 text-xs leading-5 text-amber-700">このフロアでは現在地機能が使えません。必要な場合は2点合わせを設定してください。</p>
               <p class="mt-2 text-xs text-stone-500">登録スポット: {{ floor.spotCount }}件</p>
               <div class="mt-4 flex flex-wrap gap-3">
-                <NuxtLink v-if="floor.isOutdoor" :to="`/admin/maps/${mapId}/floors/${floor.id}/georeference`" class="rounded-lg border border-terracotta-300 bg-terracotta-50 px-4 py-2 text-sm font-semibold text-terracotta-800 hover:bg-terracotta-100">{{ isFloorGeoreferenced(floor) ? 'ジオリファレンスを調整' : 'ジオリファレンスを設定' }}</NuxtLink>
+                <NuxtLink :to="`/admin/maps/${mapId}/floors/${floor.id}/georeference`" class="rounded-lg border border-terracotta-300 bg-terracotta-50 px-4 py-2 text-sm font-semibold text-terracotta-800 hover:bg-terracotta-100">{{ isFloorGeoreferenced(floor) ? 'ジオリファレンスを調整' : 'ジオリファレンスを設定' }}</NuxtLink>
                 <button type="button" :disabled="busyFloorId === floor.id" class="rounded-lg bg-stone-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60" @click="updateFloor(floor)">変更を保存</button>
                 <button type="button" :disabled="busyFloorId === floor.id" class="rounded-lg px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-50 disabled:opacity-60" @click="deleteFloor(floor)">削除</button>
               </div>
