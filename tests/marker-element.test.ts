@@ -85,6 +85,7 @@ describe('Marker DOM生成', () => {
     const [shadow, shape] = marker.children
 
     expect(marker.classList.contains('map-viewer-marker--illustration')).toBe(false)
+    expect(marker.attributes.get('data-marker-contact')).toBe('bottom-center')
     expect(shadow?.className).toBe('map-viewer-marker__ground-shadow')
     expect(shape?.className).toBe('map-viewer-marker__shape')
     expect(shape?.children[0]).toMatchObject({
@@ -152,6 +153,7 @@ describe('Marker DOM生成', () => {
     const [shadow, illustration] = marker.children
 
     expect(marker.classList.contains('map-viewer-marker--illustration')).toBe(true)
+    expect(marker.attributes.get('data-marker-contact')).toBe('bottom-center')
     expect(shadow?.className).toBe('map-viewer-marker__ground-shadow')
     expect(illustration?.className).toBe('map-viewer-marker__illustration')
     expect(illustration?.children[0]).toMatchObject({

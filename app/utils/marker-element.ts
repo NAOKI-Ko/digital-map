@@ -44,6 +44,7 @@ export function createSpotMarkerElement(
   element.className = 'map-viewer-marker'
   element.classList.toggle('map-viewer-marker--illustration', presentation.type === 'illustration')
   element.classList.toggle('map-viewer-marker--selected', options.selected)
+  element.setAttribute('data-marker-contact', 'bottom-center')
   element.style.setProperty('--pin-color', presentation.color)
   element.style.setProperty('--pin-color-light', presentation.lightColor)
   element.style.setProperty('--pin-color-dark', presentation.darkColor)

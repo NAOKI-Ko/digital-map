@@ -1,7 +1,7 @@
 import { onBeforeUnmount, onMounted, readonly, ref, shallowRef, watch, type Ref } from 'vue'
-import type { GeolocateControl, Map as MapLibreMap, MapOptions, Marker, StyleSpecification } from 'maplibre-gl'
+import type { GeolocateControl, Map as MapLibreMap, MapOptions, Marker, MarkerOptions, StyleSpecification } from 'maplibre-gl'
 import { getFloorCorners, getGeoReferenceBounds, isGeoReferenced, isWithinFloorArea, toImageCoordinates, type FloorCorners, type LatLng } from '~~/lib/geo'
-import type { MapViewerFloor, MapViewerSpot } from '~~/shared/types/map-viewer'
+import type { MapViewerCameraState, MapViewerFloor, MapViewerSpot } from '~~/shared/types/map-viewer'
 import { createSpotMarkerElement } from '~/utils/marker-element'
 
 export type MapViewerMode = 'view' | 'edit'
@@ -46,7 +46,9 @@ export interface UseMapViewerOptions {
   spots: Readonly<Ref<readonly MapViewerSpot[]>>
   position: Readonly<Ref<LatLng | null>>
   selectedSpotId: Readonly<Ref<string | null>>
+  initialCamera?: MapViewerCameraState | null
   onReady?: (map: MapLibreMap) => void
+  onCameraChanged?: (camera: MapViewerCameraState) => void
   onPositionChanged?: (position: LatLng) => void
   onSpotMoved?: (value: { spotId: string, lat: number, lng: number }) => void
   onSpotSelected?: (spot: MapViewerSpot) => void
@@ -131,6 +133,29 @@ export function addMarkerAtPosition<T extends PositionableMarker>(
   return marker
 }
 
+export function createSpotMarkerOptions(element: HTMLElement, mode: MapViewerMode): MarkerOptions {
+  return {
+    element,
+    anchor: 'bottom',
+    draggable: mode === 'edit',
+  }
+}
+
+export function getMapViewerCameraState(instance: MapLibreMap): MapViewerCameraState {
+  const center = instance.getCenter()
+  return {
+    center: { lat: center.lat, lng: center.lng },
+    zoom: instance.getZoom(),
+  }
+}
+
+export function restoreMapViewerCamera(instance: MapLibreMap, camera: MapViewerCameraState) {
+  instance.jumpTo({
+    center: [camera.center.lng, camera.center.lat],
+    zoom: camera.zoom,
+  })
+}
+
 export function useMapViewer(
   container: Readonly<Ref<HTMLElement | null>>,
   options: UseMapViewerOptions,
@@ -171,9 +196,14 @@ export function useMapViewer(
         if (map.value !== instance) return
         isReady.value = true
         showFloor(options.floor.value, false)
+        if (options.initialCamera) restoreMapViewerCamera(instance, options.initialCamera)
         syncSpotMarkers()
         syncDraftMarker(options.position.value)
         syncGeolocateControl(options.floor.value)
+        options.onCameraChanged?.(getMapViewerCameraState(instance))
+        instance.on('moveend', () => {
+          options.onCameraChanged?.(getMapViewerCameraState(instance))
+        })
         options.onReady?.(instance)
       })
 
@@ -280,10 +310,7 @@ export function useMapViewer(
         onSelected: () => options.onSpotSelected?.(spot),
       })
 
-      const marker = new currentMaplibre.Marker({
-        element,
-        draggable: options.mode === 'edit',
-      })
+      const marker = new currentMaplibre.Marker(createSpotMarkerOptions(element, options.mode))
         .setLngLat([spot.lng, spot.lat])
         .addTo(instance)
 

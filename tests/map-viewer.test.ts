@@ -1,12 +1,15 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import {
   ABSOLUTE_ZOOM_LIMITS,
   addMarkerAtPosition,
   createFloorZoomConstraints,
   createMapViewerOptions,
+  createSpotMarkerOptions,
   GEOLOCATE_CONTROL_OPTIONS,
   GEOLOCATION_OUTSIDE_MESSAGE,
   getFloorLayerIds,
+  getMapViewerCameraState,
+  restoreMapViewerCamera,
   shouldEnableGeolocate,
   VIEWER_CAMERA_CONSTRAINTS,
   ZOOM_IN_ALLOWANCE,
@@ -193,6 +196,39 @@ describe('Markerの表示内容', () => {
       { lat: 35.7, lng: 139.7 },
     )).toBe(marker)
     expect(calls).toEqual(['setLngLat:139.7,35.7', 'addTo'])
+  })
+
+  it.each(['view', 'edit'] as const)('保存済みMarkerは%sモードでbottom-centerを接地点にする', (mode) => {
+    const element = {} as HTMLElement
+    expect(createSpotMarkerOptions(element, mode)).toEqual({
+      element,
+      anchor: 'bottom',
+      draggable: mode === 'edit',
+    })
+  })
+})
+
+describe('editor camera context', () => {
+  it('現在cameraを緯度経度とzoomだけに正規化する', () => {
+    const instance = {
+      getCenter: () => ({ lat: 35.1, lng: 139.2 }),
+      getZoom: () => 16.5,
+    } as MapLibreMap
+
+    expect(getMapViewerCameraState(instance)).toEqual({
+      center: { lat: 35.1, lng: 139.2 },
+      zoom: 16.5,
+    })
+  })
+
+  it('復帰cameraへcenterとzoomだけを適用する', () => {
+    const jumpTo = vi.fn()
+    restoreMapViewerCamera({ jumpTo } as unknown as MapLibreMap, {
+      center: { lat: 35.1, lng: 139.2 },
+      zoom: 16.5,
+    })
+
+    expect(jumpTo).toHaveBeenCalledWith({ center: [139.2, 35.1], zoom: 16.5 })
   })
 })
 

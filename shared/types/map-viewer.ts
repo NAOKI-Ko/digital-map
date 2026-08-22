@@ -18,3 +18,11 @@ export interface MapViewerSpot {
   pinIconImageUrl: string | null
   pinColor: string
 }
+
+export interface MapViewerCameraState {
+  center: {
+    lat: number
+    lng: number
+  }
+  zoom: number
+}

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useMapViewer, type MapViewerMode } from '~/composables/useMapViewer'
 import type { LatLng } from '~~/lib/geo'
-import type { MapViewerFloor, MapViewerSpot } from '~~/shared/types/map-viewer'
+import type { MapViewerCameraState, MapViewerFloor, MapViewerSpot } from '~~/shared/types/map-viewer'
 
 const props = withDefaults(defineProps<{
   floor: MapViewerFloor
@@ -12,6 +12,7 @@ const props = withDefaults(defineProps<{
   height?: string
   label?: string
   floorErrorActionTo?: string | null
+  initialCamera?: MapViewerCameraState | null
 }>(), {
   spots: () => [],
   mode: 'view',
@@ -20,12 +21,14 @@ const props = withDefaults(defineProps<{
   height: '38rem',
   label: 'デジタルマップ',
   floorErrorActionTo: null,
+  initialCamera: null,
 })
 
 const emit = defineEmits<{
   'update:modelValue': [position: LatLng]
   'spotMoved': [value: { spotId: string, lat: number, lng: number }]
   'spotSelected': [spot: MapViewerSpot]
+  'cameraChanged': [camera: MapViewerCameraState]
 }>()
 
 const container = useTemplateRef<HTMLDivElement>('container')
@@ -39,6 +42,8 @@ const { floorError, geolocationAreaMessage, geolocationAvailable, mapError } = u
   position,
   selectedSpotId,
   mode: props.mode,
+  initialCamera: props.initialCamera,
+  onCameraChanged: camera => emit('cameraChanged', camera),
   onPositionChanged: value => emit('update:modelValue', value),
   onSpotMoved: value => emit('spotMoved', value),
   onSpotSelected: spot => emit('spotSelected', spot),
@@ -92,8 +97,11 @@ const { floorError, geolocationAreaMessage, geolocationAvailable, mapError } = u
 <style>
 .map-viewer-marker {
   position: relative;
-  width: 2.75rem;
-  height: 3.25rem;
+  display: flex;
+  width: 3.75rem;
+  height: 3.75rem;
+  align-items: flex-end;
+  justify-content: center;
   border: 0;
   background: transparent;
   cursor: pointer;
@@ -103,12 +111,12 @@ const { floorError, geolocationAreaMessage, geolocationAvailable, mapError } = u
 .map-viewer-marker--illustration {
   width: max-content;
   min-width: 2rem;
-  height: 3.5rem;
+  height: 3rem;
 }
 
 .map-viewer-marker__ground-shadow {
   position: absolute;
-  bottom: 0.1rem;
+  bottom: -0.25rem;
   left: 50%;
   width: 1.625rem;
   height: 0.5rem;
@@ -120,12 +128,13 @@ const { floorError, geolocationAreaMessage, geolocationAvailable, mapError } = u
 }
 
 .map-viewer-marker--illustration .map-viewer-marker__ground-shadow {
-  bottom: 0.05rem;
   width: min(70%, 4rem);
 }
 
 .map-viewer-marker__shape {
-  position: relative;
+  position: absolute;
+  bottom: 0;
+  left: 50%;
   z-index: 1;
   display: grid;
   width: 2.5rem;
@@ -147,6 +156,7 @@ const { floorError, geolocationAreaMessage, geolocationAvailable, mapError } = u
   color: white;
   font-size: 0.75rem;
   font-weight: 800;
+  transform-origin: bottom left;
   transform: rotate(-45deg);
   transition: scale 150ms ease, box-shadow 150ms ease;
 }
@@ -176,6 +186,7 @@ const { floorError, geolocationAreaMessage, geolocationAvailable, mapError } = u
   z-index: 1;
   display: block;
   width: max-content;
+  transform-origin: bottom center;
   filter: drop-shadow(0 5px 5px rgb(37 48 58 / 32%));
   transition: scale 150ms ease, filter 150ms ease;
 }

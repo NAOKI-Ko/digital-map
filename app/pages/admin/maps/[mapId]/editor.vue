@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { defineAsyncComponent } from 'vue'
+import { createMapEditorReturnQuery, resolveMapEditorReturnContext } from '~/utils/map-editor-camera'
 import { isGeoReferenced, type LatLng } from '~~/lib/geo'
 import type { MapFloorListResponse } from '~~/shared/types/floor'
+import type { MapViewerCameraState } from '~~/shared/types/map-viewer'
 import type { AdminSpotListResponse, AdminSpotSummary, PositionedAdminSpotSummary, SpotPositionResponse } from '~~/shared/types/spot'
 
 definePageMeta({ layout: 'admin', middleware: 'auth' })
@@ -13,8 +15,14 @@ const mapId = route.params.mapId as string
 const { data, error, status } = await useFetch<MapFloorListResponse>(`/api/maps/${mapId}/floors`)
 const { data: spotData, refresh: refreshSpots } = await useFetch<AdminSpotListResponse>(`/api/maps/${mapId}/spots`)
 const requestedFloorId = typeof route.query.floorId === 'string' ? route.query.floorId : ''
+const returnContext = resolveMapEditorReturnContext(
+  route.query,
+  data.value?.floors.map(floor => floor.id) ?? [],
+)
 const selectedFloorId = ref(requestedFloorId)
 const position = ref<LatLng | null>(null)
+const camera = ref<MapViewerCameraState | null>(returnContext)
+const initialCamera = ref<MapViewerCameraState | null>(returnContext)
 const selectedFloor = computed(() => data.value?.floors.find(floor => floor.id === selectedFloorId.value))
 const selectedFloorSpots = computed(() => spotData.value?.spots.filter(spot => spot.floorId === selectedFloorId.value) ?? [])
 const positionedFloorSpots = computed(() => selectedFloorSpots.value.filter(hasPosition))
@@ -43,15 +51,30 @@ function hasPosition(spot: AdminSpotSummary): spot is PositionedAdminSpotSummary
 }
 
 function startRegistration() {
-  if (!selectedFloor.value || !position.value) return
+  if (!selectedFloor.value || !position.value || !camera.value) return
+  const returnQuery = createMapEditorReturnQuery({
+    floorId: selectedFloor.value.id,
+    ...camera.value,
+  })
   return navigateTo({
     path: `/admin/maps/${mapId}/spots/new`,
     query: {
-      floorId: selectedFloor.value.id,
       lat: position.value.lat.toString(),
       lng: position.value.lng.toString(),
+      ...returnQuery,
     },
   })
+}
+
+function handleCameraChanged(value: MapViewerCameraState) {
+  camera.value = value
+  if (!initialCamera.value) return
+
+  initialCamera.value = null
+  void navigateTo({
+    path: route.path,
+    query: { floorId: selectedFloorId.value },
+  }, { replace: true })
 }
 
 async function saveMovedSpot(value: { spotId: string, lat: number, lng: number }) {
@@ -111,6 +134,8 @@ async function saveMovedSpot(value: { spotId: string, lat: number, lng: number }
             mode="edit"
             label="ピン配置地図"
             :floor-error-action-to="geoReferenceEditorPath || null"
+            :initial-camera="initialCamera"
+            @camera-changed="handleCameraChanged"
             @spot-moved="saveMovedSpot"
           />
           <template #fallback><div class="h-[38rem] animate-pulse rounded-xl bg-stone-100" /></template>

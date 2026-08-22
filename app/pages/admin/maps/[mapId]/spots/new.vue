@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import SpotForm from '~/components/admin/SpotForm.vue'
+import { createMapEditorReturnQuery, resolveMapEditorReturnContext } from '~/utils/map-editor-camera'
 import type { SpotFormInput } from '~~/shared/schemas/spot'
 import type { MapFloorListResponse } from '~~/shared/types/floor'
 import type { AdminSpotResponse } from '~~/shared/types/spot'
@@ -10,6 +11,16 @@ const route = useRoute()
 const mapId = route.params.mapId as string
 const { data } = await useFetch<MapFloorListResponse>(`/api/maps/${mapId}/floors`)
 const floors = computed(() => data.value?.floors.map(floor => ({ id: floor.id, name: floor.name })) ?? [])
+const returnContext = computed(() => resolveMapEditorReturnContext(
+  route.query,
+  floors.value.map(floor => floor.id),
+))
+const editorReturnLocation = computed(() => returnContext.value
+  ? {
+      path: `/admin/maps/${mapId}/editor`,
+      query: createMapEditorReturnQuery(returnContext.value),
+    }
+  : null)
 
 function parseCoordinate(value: unknown, minimum: number, maximum: number) {
   if (typeof value !== 'string' || value.trim() === '') return null
@@ -43,7 +54,7 @@ async function createSpot(input: SpotFormInput) {
   submitError.value = ''
   try {
     const response = await $fetch<AdminSpotResponse>(`/api/maps/${mapId}/spots`, { method: 'POST', body: input })
-    await navigateTo(`/admin/maps/${mapId}/spots/${response.spot.id}`)
+    await navigateTo(editorReturnLocation.value ?? `/admin/maps/${mapId}/spots/${response.spot.id}`)
   }
   catch {
     submitError.value = 'スポットを登録できませんでした。入力内容を確認してください。'
@@ -56,7 +67,7 @@ async function createSpot(input: SpotFormInput) {
 
 <template>
   <div class="max-w-4xl">
-    <NuxtLink :to="`/admin/maps/${mapId}/spots`" class="text-sm font-medium text-stone-600 hover:text-stone-900">← スポット一覧に戻る</NuxtLink>
+    <NuxtLink :to="editorReturnLocation ?? `/admin/maps/${mapId}/spots`" class="text-sm font-medium text-stone-600 hover:text-stone-900">{{ editorReturnLocation ? '← ピン配置エディタに戻る' : '← スポット一覧に戻る' }}</NuxtLink>
     <header class="mt-5">
       <p class="text-sm font-medium text-terracotta-700">スポット管理</p>
       <h1 class="mt-1 text-2xl font-bold tracking-tight text-stone-900 sm:text-3xl">新しいスポット</h1>
