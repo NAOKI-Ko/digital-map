@@ -20,7 +20,7 @@ function toggleCategory(categoryId: string, selected: string[]) {
 <template>
   <div
     v-if="categories.length"
-    class="flex max-w-full overscroll-x-contain gap-2 overflow-x-auto px-1 pb-1"
+    class="flex max-w-full touch-pan-x overscroll-x-contain gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none]"
     role="group"
     aria-label="カテゴリで絞り込み"
   >

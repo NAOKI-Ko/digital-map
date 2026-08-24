@@ -33,7 +33,7 @@ onBeforeUnmount(() => {
   <Transition name="map-hint">
     <div
       v-if="visible"
-      class="pointer-events-none absolute inset-x-4 bottom-[max(1.5rem,env(safe-area-inset-bottom))] z-30 mx-auto max-w-lg rounded-2xl bg-stone-950/85 px-5 py-4 text-center text-sm font-medium leading-6 text-white shadow-xl backdrop-blur sm:bottom-8"
+      class="pointer-events-none absolute inset-x-4 bottom-[max(5.5rem,calc(env(safe-area-inset-bottom)+5.5rem))] z-30 mx-auto max-w-lg rounded-2xl bg-stone-950/85 px-5 py-4 text-center text-sm font-medium leading-6 text-white shadow-xl backdrop-blur sm:bottom-8"
       role="status"
     >
       <p class="font-bold">マップを自由に動かせます</p>

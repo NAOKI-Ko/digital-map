@@ -91,11 +91,19 @@ function selectSpot(spot: MapViewerSpot) {
 
       <section class="relative min-h-0">
         <div class="pointer-events-none absolute left-3 right-[3.75rem] top-3 z-20 sm:left-5 sm:right-20">
-          <div class="pointer-events-auto space-y-2">
+          <div class="pointer-events-auto">
             <FloorTabs
               v-model="selectedFloorId"
               :floors="data.map.floors"
             />
+          </div>
+        </div>
+
+        <div
+          class="pointer-events-none absolute inset-x-3 z-20 transition-[bottom] sm:bottom-auto sm:left-5 sm:right-20 sm:top-[4.25rem]"
+          :class="selectedSpot ? 'bottom-[calc(8.75rem+env(safe-area-inset-bottom))]' : 'bottom-[max(1rem,env(safe-area-inset-bottom))]'"
+        >
+          <div class="pointer-events-auto">
             <CategoryFilter v-model="selectedCategoryIds" :categories="categories" />
           </div>
         </div>
