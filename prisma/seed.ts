@@ -243,6 +243,35 @@ const arimatsuDemoSpots = [
 const adapter = new PrismaPg({ connectionString })
 const prisma = new PrismaClient({ adapter })
 
+async function syncLegacySpotCategories(mapId: string) {
+  const spots = await prisma.spot.findMany({
+    where: { floor: { mapId } },
+    select: { id: true, category: true },
+  })
+  const categoryNames = [...new Set(spots.map(spot => spot.category.trim()))]
+    .sort((left, right) => left.localeCompare(right, 'ja'))
+  const categories = await Promise.all(categoryNames.map((name, order) => (
+    prisma.category.upsert({
+      where: { mapId_name: { mapId, name } },
+      update: { order },
+      create: { mapId, name, order },
+      select: { id: true, name: true },
+    })
+  )))
+  const categoryIdByName = new Map(categories.map(category => [category.name, category.id]))
+
+  await prisma.$transaction(spots.map((spot) => {
+    const categoryId = categoryIdByName.get(spot.category.trim())
+    if (!categoryId) throw new Error(`Spot ${spot.id} のCategoryを同期できません。`)
+
+    return prisma.spotCategory.upsert({
+      where: { spotId_categoryId: { spotId: spot.id, categoryId } },
+      update: {},
+      create: { spotId: spot.id, categoryId },
+    })
+  }))
+}
+
 async function copyArimatsuDemoAssets() {
   await mkdir(uploadDirectory, { recursive: true })
   await Promise.all(arimatsuDemoAssets.map(asset => copyFile(
@@ -324,6 +353,8 @@ async function seedArimatsuDemo(tenantId: string) {
     })
   }))
 
+  await syncLegacySpotCategories(map.id)
+
   console.info(`有松チーム内デモを作成しました: ${arimatsuDemoSpots.length}スポット（すべて下書き）`)
 }
 
@@ -395,6 +426,8 @@ async function main() {
         order: 0,
       },
     })
+
+    await syncLegacySpotCategories(map.id)
 
     console.info(`実地確認用マップを作成しました: ${verificationMap.name}`)
   }

@@ -38,10 +38,25 @@ model Map {
   slug        String     @unique
   isPublished Boolean    @default(false)
   floors      MapFloor[]
+  categories  Category[]
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 
   @@index([tenantId])
+}
+
+model Category {
+  id             String         @id @default(cuid())
+  mapId          String
+  map            Map            @relation(fields: [mapId], references: [id], onDelete: Cascade)
+  name           String
+  order          Int            @default(0)
+  spotCategories SpotCategory[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@unique([mapId, name])
+  @@index([mapId, order])
 }
 
 model MapFloor {
@@ -74,6 +89,7 @@ model Spot {
   floor           MapFloor @relation(fields: [floorId], references: [id], onDelete: Cascade)
   name            String
   category        String
+  spotCategories  SpotCategory[]
   description     String?
   lat             Float?
   lng             Float?
@@ -92,4 +108,14 @@ model Spot {
   @@index([floorId])
   @@index([floorId, isPublished])
   @@index([category])
+}
+
+model SpotCategory {
+  spotId     String
+  spot       Spot     @relation(fields: [spotId], references: [id], onDelete: Cascade)
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([spotId, categoryId])
+  @@index([categoryId])
 }
