@@ -1,5 +1,5 @@
 # Design: デジタルマップ作成プラットフォーム(MVP)
-Ver.5 ― 2点合わせジオリファレンス方式(緯度経度ベース・現在地機能を維持)
+Ver.5 ― 2点合わせジオリファレンス方式(現行実装同期版)
 
 ## 0. Ver.5での変更点(重要・経緯)
 
@@ -13,9 +13,13 @@ Ver.5 ― 2点合わせジオリファレンス方式(緯度経度ベース・�
   位置・回転・縮尺を数学的に一意に計算する(相似変換/ヘルマート変換)。パラメータが
   2点(自由度4)しかないため、4隅個別ドラッグ(自由度8)のような歪んだ形は原理的に
   作れない
-- 緯度経度ベースの設計・`GeolocateControl`による現在地表示(屋外フロアのみ)は
-  Ver.3から維持する。変更が必要なのは、ジオリファレンス設定UIと、その裏側の
-  座標計算ロジックのみ
+- Ver.5策定時は`MapFloor.isOutdoor`で現在地表示を切り替える設計だった。その後、屋内外を
+  システム上で分類せず、**基準点A・Bが揃ってジオリファレンス済みか**で切り替える方式へ変更した。
+  `isOutdoor`カラムは廃止済みであり、現行のPrisma schema・公開API・画面型には存在しない
+- 現行実装では、基準点A・Bが未設定でも画像寸法から`computeFallbackCorners()`で表示用の
+  fallback coordinatesを算出し、イラスト表示とピン配置を利用できる。この座標は実世界の位置を
+  表さず、現在地機能の有効判定には使わない。これはVer.4で破棄した「システム全体を疑似座標へ
+  置き換える案」とは異なる
 
 ## 1. アーキテクチャ概要
 
@@ -45,48 +49,77 @@ Nuxt 4
 | 認証 | nuxt-auth-utils (セッションベース) | MVPは管理者ロールのみ |
 | フォーム | VeeValidate + zod | |
 | スタイリング | Tailwind CSS (`@nuxtjs/tailwindcss`) | |
-| 画像ストレージ | 開発時はローカル、本番はS3互換(MinIO等) | |
+| 画像ストレージ | ローカルファイルシステム | 開発時は`public/uploads/`、本番は`NUXT_UPLOAD_DIR`で永続化先を指定 |
 | デプロイ(セルフホスト) | Docker Compose (app + postgres) | |
 
 ## 3. データモデル
 
 ```prisma
 model Tenant {
-  id          String   @id @default(cuid())
-  name        String
-  slug        String   @unique
-  users       User[]
-  maps        Map[]
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  users     User[]
+  maps      Map[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model User {
   id           String   @id @default(cuid())
   tenantId     String
-  tenant       Tenant   @relation(fields: [tenantId], references: [id])
+  tenant       Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   email        String   @unique
   passwordHash String
   role         String   @default("admin")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([tenantId])
 }
 
 model Map {
-  id          String     @id @default(cuid())
-  tenantId    String
-  tenant      Tenant     @relation(fields: [tenantId], references: [id])
-  name        String
-  slug        String     @unique
-  isPublished Boolean    @default(false)
-  floors      MapFloor[]
+  id               String     @id @default(cuid())
+  tenantId         String
+  tenant           Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  name             String
+  slug             String     @unique
+  organizationName String?
+  logoUrl          String?
+  websiteUrl       String?
+  snsUrl           String?
+  isPublished      Boolean    @default(false)
+  floors           MapFloor[]
+  categories       Category[]
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  @@index([tenantId])
+}
+
+model Category {
+  id             String         @id @default(cuid())
+  mapId          String
+  map            Map            @relation(fields: [mapId], references: [id], onDelete: Cascade)
+  name           String
+  order          Int            @default(0)
+  spotCategories SpotCategory[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@unique([mapId, name])
+  @@index([mapId, order])
 }
 
 model MapFloor {
-  id               String  @id @default(cuid())
+  id               String   @id @default(cuid())
   mapId            String
-  map              Map     @relation(fields: [mapId], references: [id])
+  map              Map      @relation(fields: [mapId], references: [id], onDelete: Cascade)
   name             String
   illustrationUrl  String
-  imageWidth       Int     // アップロード時に読み取ったピクセル幅
-  imageHeight      Int     // アップロード時に読み取ったピクセル高さ
-  isOutdoor        Boolean @default(true) // false の場合、現在地機能を無効化(地下街等)
+  imageWidth       Int      // アップロード時に読み取ったピクセル幅
+  imageHeight      Int      // アップロード時に読み取ったピクセル高さ
+  order            Int      @default(0)
 
   // 基準点A: イラスト上のピクセル座標 + 対応する実世界の緯度経度
   refAPixelX       Float?
@@ -100,17 +133,21 @@ model MapFloor {
   refBLng          Float?
 
   spots            Spot[]
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([mapId, order])
 }
 
 model Spot {
   id               String   @id @default(cuid())
   floorId          String
-  floor            MapFloor @relation(fields: [floorId], references: [id])
+  floor            MapFloor @relation(fields: [floorId], references: [id], onDelete: Cascade)
   name             String
-  category         String
+  spotCategories   SpotCategory[]
   description      String?
-  lat              Float
-  lng              Float
+  lat              Float?
+  lng              Float?
   photosJson       Json     @default("[]")
   hoursText        String?
   holidayText      String?
@@ -119,7 +156,23 @@ model Spot {
   pinIconId        String?
   pinIconImageUrl  String?
   pinColor         String   @default("#C7401F")
+  importance       String   @default("normal")
   isPublished      Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([floorId])
+  @@index([floorId, isPublished])
+}
+
+model SpotCategory {
+  spotId     String
+  spot       Spot     @relation(fields: [spotId], references: [id], onDelete: Cascade)
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([spotId, categoryId])
+  @@index([categoryId])
 }
 ```
 
@@ -127,7 +180,12 @@ model Spot {
 - `MapFloor`の四隅8カラム(`topLeft/topRight/bottomRight/bottomLeft`の緯度経度)を削除
 - 代わりに、管理者が実際に指定する「基準点A・基準点B」(各点につきピクセル座標+緯度経度の4値、合計8カラム)を保持する。四隅の座標はこの2点から都度計算する(保存しない)
 - `imageWidth`, `imageHeight`を追加(ピクセル⇔実距離の変換に必要)
-- `Spot.lat, lng`はVer.3から変更なし
+- `isOutdoor`は後続の実装変更で廃止。現在地機能は基準点A・Bの設定有無で判定する
+- `Spot.lat, lng`の命名はVer.3から維持し、位置未設定の下書きを扱えるようnullableとする
+- `Spot.pinIconType`は`preset`、`custom`、`illustration`を使用する。プリセットIDは`kanji:`/`material:`接頭辞でアイコンファミリーを識別し、旧IDは読み込み時に正規化する
+- 旧`Spot.category`文字列は廃止し、Map単位の`Category`と中間テーブル`SpotCategory`によるmany-to-manyを使用する。Category 0件を許可し、別MapのCategoryとの関連づけを拒否する
+- `Spot.importance`は`normal`/`featured`の2段階とし、PINデザインとは独立した公開表示優先度として扱う
+- `Map`の団体情報は公開ヘッダー用の4項目に限定し、任意HTML・CSS・自由レイアウトは保存しない
 
 ## 4. ジオリファレンスの設計(2点合わせ・相似変換)
 
@@ -230,57 +288,54 @@ map.addSource(`floor-${floor.id}`, {
 
 ### 4.5 傾き・回転・ズーム、ピン表示、フロア切替、現在地表示
 
-Ver.3から変更なし。
+MapLibreによる表示方式はVer.3から維持し、現在地の有効判定は現行実装へ同期する。
 
 - `pitch`/`bearing`/`zoom`はMapLibre標準オプション(`maxPitch`等)で制約する
-- ピンは`maplibregl.Marker`(DOM要素ベース)、クリック判定も標準のDOMイベント
+- ピンは`maplibregl.Marker`(DOM要素ベース)。プリセット、カスタム画像入りピン、イラスト直置きをDOMの見た目で切り替え、クリック判定も標準のDOMイベントを使う
 - フロア切り替え時は`image`ソースを差し替え、計算済みの4隅範囲へ`fitBounds`する
-- 現在地表示は`GeolocateControl`を`isOutdoor === true`のフロアのみに追加する。地下街等、GPSの入らない`isOutdoor === false`のフロアには追加しない
+- 現在地表示は`isGeoReferenced(floor)`が`true`のフロアだけに`GeolocateControl`を追加する。判定対象は基準点A・Bの8項目で、屋内外という分類は使わない
+- GPSで得た位置が、フロア4隅を含む円と許容マージン300mの外側なら現在地マーカーを表示せず、エリアから離れている旨を表示してフロア範囲へ視点を戻す
 
-### 4.6 屋内フロア(is_outdoor = false)は2点合わせを省略する
+### 4.6 ジオリファレンス未設定フロアのfallback表示
 
-**背景**:ジオリファレンス(2点合わせ)の目的は、現在地(GPS)とイラストを対応づけることにある。しかし`is_outdoor === false`のフロアは、そもそも4.5節の通り`GeolocateControl`自体を表示しないため、**GPSと突き合わせる場面が存在しない**。この場合、管理者に実地図上での2点合わせを求めるのは無駄な手間でしかない。
-
-**対応方針**:`is_outdoor === false`のフロアでは、⑤-2のジオリファレンス設定ウィザードを表示せず、画像の縦横比から機械的に算出した「実世界とは無関係な仮の座標範囲」を自動的に割り当てる。管理者は一切操作しない。
-
-```ts
-// lib/geo.ts
-const INDOOR_PSEUDO_ORIGIN = { lat: 0, lng: 0 }; // 実世界のどこにも対応しない固定点
-const INDOOR_PSEUDO_EXTENT_DEG = 0.01; // 見た目のズーム感が揃う程度の固定値
-
-export function computeIndoorPseudoCorners(imageWidth: number, imageHeight: number) {
-  const aspect = imageWidth / imageHeight;
-  const halfLng = aspect >= 1 ? INDOOR_PSEUDO_EXTENT_DEG / 2 : (INDOOR_PSEUDO_EXTENT_DEG * aspect) / 2;
-  const halfLat = aspect >= 1 ? (INDOOR_PSEUDO_EXTENT_DEG / aspect) / 2 : INDOOR_PSEUDO_EXTENT_DEG / 2;
-  const { lat, lng } = INDOOR_PSEUDO_ORIGIN;
-  return {
-    topLeft:     { lat: lat + halfLat, lng: lng - halfLng },
-    topRight:    { lat: lat + halfLat, lng: lng + halfLng },
-    bottomRight: { lat: lat - halfLat, lng: lng - halfLat },
-    bottomLeft:  { lat: lat - halfLat, lng: lng + halfLng },
-  };
-}
-```
-
-**呼び出し側の分岐**
+`getFloorCorners()`は、`isGeoReferenced(floor)`が`false`の場合に`computeFallbackCorners()`を使う。
+画像の縦横比を保ち、緯度0・経度0を中心とした固定範囲へ4隅を割り当てるため、基準点A・Bが
+未設定でもイラスト表示・`fitBounds`・ピン配置を利用できる。
 
 ```ts
-const corners = floor.isOutdoor
-  ? computeFloorCorners(floor)          // 屋外: 実世界の基準点2つから算出(4.2節)
-  : computeIndoorPseudoCorners(floor.imageWidth, floor.imageHeight); // 屋内: 自動算出、管理者操作なし
+const corners = isGeoReferenced(floor)
+  ? computeFloorCorners(floor)
+  : computeFallbackCorners(floor.imageWidth, floor.imageHeight)
 ```
 
-**UI・運用上の扱い**
+fallback coordinatesは実世界の位置を表さない。したがって、次の扱いを必須とする。
 
-- ⑤マップ設定画面で「屋内」トグルをONにしたフロアには、「ジオリファレンスを設定する」ボタン自体を表示しない(不要なため)
-- ⑥ピン配置エディタも、屋内フロアを開いた際は即座にイラスト全体が収まる表示になる(ジオリファレンス未設定の警告は出さない)
-- フロアの屋外/屋内を後から切り替えた場合の扱い:
-  - 屋外→屋内に変更:既存の基準点(refA/refB)は保持するが、表示計算では使用しない(いつでも屋外に戻せるようにするため、破棄はしない)
-  - 屋内→屋外に変更:基準点が未設定であれば、通常通り⑤-2のウィザードへの案内を表示する
+- fallback表示に成功しても「ジオリファレンス設定済み」とは判定しない
+- `GeolocateControl`は追加しない
+- フロア管理とピン配置エディタには、現在地機能を使うには2点合わせが必要である旨と設定導線を表示する
+- すべてのフロアで2点合わせを設定・調整できる。屋内外トグルによる導線の出し分けは行わない
 
-**この方式のトレードオフ(明示しておくべき点)**
+### 4.7 旧仕様: `isOutdoor`による屋内外分岐(廃止済み)
 
-- 屋内フロアの座標は完全に実世界と無関係なので、**将来「屋内フロアでも現在地相当の機能を使いたい」となった場合(屋内測位ビーコン等の導入)、この仮座標は使えず、あらためて座標体系を設計し直す必要がある**。ただし現時点でそのニーズはなく、対応外(3章のスコープ外項目を参照)としているため、実務上の影響はない
+一時期、`MapFloor.isOutdoor`を持ち、屋外フロアは`computeFloorCorners()`、屋内フロアは
+`computeIndoorPseudoCorners()`へ分岐する設計・実装を採用していた。屋内フロアでは2点合わせの
+導線を隠し、屋外/屋内の切り替え時には保存済み基準点を保持する想定だった。
+
+この方式はその後廃止され、`isOutdoor`カラムと屋内外トグル、`computeIndoorPseudoCorners()`は削除済み。
+疑似座標計算は「屋内用」ではなく「ジオリファレンス未設定時のfallback」として
+`computeFallbackCorners()`へ改名・一般化された。現在仕様として屋内外分岐を再導入しない。
+
+### 4.8 Spot lifecycle・意味的PIN密度・モバイル公開UI
+
+- Spotは情報を先に作成し、`lat`/`lng`を後からエディタで設定できる。公開APIは位置未設定Spotを返さず、公開操作も拒否する。PINを独立entityにはしない
+- CategoryはMap単位で管理し、Spotとのmany-to-many relationを`categoryIds`で更新する。公開絞り込みは複数選択ORとし、未使用Categoryだけを削除できる。表示順は`Category.order`を使う
+- Floor画像のupload前にはfilenameと画像previewを表示し、cancelまたは差し替えができる。既存Floorの画像差し替えではSpotの`lat`/`lng`と基準点A・Bを自動変更せず、再確認が必要な旨を警告する
+- cameraはFloor切り替え・初期表示でFloor全体へfitする。通常のMap clickやPIN配置ではfitせず、Spot登録画面との往復ではcenter/zoomを復元する
+- `importance === featured`は縮小時も不透明度と優先サイズを維持する。`normal`はフロア相対の最小zoomから2段階の範囲で、不透明度35%→100%、サイズ78%→100%へ連続変化する。raw zoom値は管理UIへ公開しない
+- Markerの位置基準は3方式ともbottom-center接地点とし、意味的なscale・opacity変更や選択状態で接地点をずらさない。MapLibreがMarker本体へ設定する`opacity`とは競合させず、内部DOMのCSS変数で密度表示を適用する
+- custom PIN画像のcrop範囲editorは実装せず、PdM判断によりMVP対象外とする。画像の見え方に関する不具合修正と、新しいcrop編集機能の追加は区別する
+- mobile公開画面はMap操作を主とし、Categoryチップをsafe area対応の下部操作列、Spot詳細をcollapsed/expandedのBottom Sheetとして表示する。背景レイヤーはpan gestureを奪わない。desktopは右側dialogを維持する
+- 公開ヘッダーは団体名・ローカルuploadロゴ・http/httpsの公式Webサイト/SNSリンクだけを任意表示し、未設定時は従来表示を維持する
 
 ## 5. 画面一覧(参照)
 
@@ -289,7 +344,8 @@ const corners = floor.isOutdoor
 ## 6. セキュリティ・認可
 
 - 管理画面配下は全てNuxtのルートミドルウェア(`middleware/auth.ts`)でセッションチェックを通す
-- 公開マップ画面・APIは認証不要だが、`isPublished === true`のマップ・スポットのみを返す
+- 公開マップ画面・APIは認証不要だが、`Map.isPublished === true`のマップだけを返し、その中でも`Spot.isPublished === true`かつ`lat`/`lng`設定済みのスポットだけを返す
+- Category CRUD、Spot relation更新・一括操作、Map branding更新はすべてセッションの`tenantId`とMap ownershipを検証する。Category relationはSpotと同じMapに属するものだけを許可する
 
 ## 7. ディレクトリ構造
 
@@ -298,27 +354,14 @@ const corners = floor.isOutdoor
 ├── app/
 │   ├── assets/css/tailwind.css
 │   ├── components/
-│   │   ├── admin/
-│   │   │   ├── SpotForm.vue
-│   │   │   ├── SpotList.vue
-│   │   │   ├── PinDesignPicker.vue
-│   │   │   ├── FloorManager.vue
-│   │   │   └── GeoReferenceWizard.vue     … 2点合わせウィザード(⑤-2)
-│   │   ├── map/
-│   │   │   ├── MapViewer.vue
-│   │   │   ├── SpotDetailCard.vue
-│   │   │   ├── CategoryFilter.vue
-│   │   │   └── FloorTabs.vue
-│   │   └── ui/
+│   │   ├── admin/                          … 管理フォーム・2点合わせ・公開共有UI
+│   │   └── map/                            … MapViewer・詳細カード・絞り込み・フロアタブ
 │   ├── composables/
 │   │   ├── useMapViewer.ts
 │   │   ├── useGeoReference.ts             … 2点合わせの状態管理
 │   │   └── useAuth.ts
-│   ├── layouts/
-│   │   ├── default.vue
-│   │   └── admin.vue
-│   ├── middleware/
-│   │   └── auth.ts
+│   ├── layouts/admin.vue
+│   ├── middleware/auth.ts
 │   ├── pages/
 │   │   ├── [mapSlug]/index.vue            … ①
 │   │   └── admin/
@@ -327,61 +370,32 @@ const corners = floor.isOutdoor
 │   │       └── maps/[mapId]/
 │   │           ├── settings.vue           … ⑤
 │   │           ├── floors.vue             … ⑤
-│   │           ├── georeference.vue       … ⑤-2
+│   │           ├── floors/[floorId]/georeference.vue … ⑤-2
 │   │           ├── editor.vue             … ⑥
 │   │           ├── spots/
 │   │           │   ├── index.vue          … ⑦
 │   │           │   ├── new.vue
 │   │           │   └── [spotId].vue
 │   │           └── publish.vue            … ⑧
-│   ├── app.vue
-│   └── error.vue
+│   ├── utils/marker-element.ts
+│   └── app.vue
 ├── server/
-│   ├── api/
-│   │   ├── auth/login.post.ts
-│   │   ├── maps/
-│   │   │   ├── index.get.ts
-│   │   │   ├── index.post.ts
-│   │   │   └── [mapId]/
-│   │   │       ├── index.get.ts
-│   │   │       ├── index.patch.ts
-│   │   │       ├── publish.post.ts
-│   │   │       └── floors/
-│   │   │           ├── index.get.ts
-│   │   │           ├── index.post.ts
-│   │   │           └── [floorId]/
-│   │   │               ├── index.patch.ts
-│   │   │               ├── georeference.patch.ts  … 基準点A/Bの保存
-│   │   │               ├── index.delete.ts
-│   │   │               └── spots/
-│   │   │                   ├── index.get.ts
-│   │   │                   ├── index.post.ts
-│   │   │                   └── [spotId].patch.ts
-│   │   ├── public/[mapSlug]/index.get.ts
-│   │   ├── geocode.get.ts                 … Nominatimラッパー(基準点検索補助)
-│   │   └── uploads/image.post.ts          … アップロード時にimageWidth/imageHeightを計測
-│   ├── utils/
-│   │   ├── prisma.ts
-│   │   └── session.ts
-│   └── middleware/00.auth-check.ts
-├── lib/
-│   └── geo.ts                             … computeFloorCorners()等
-├── prisma/
-│   ├── schema.prisma
-│   ├── seed.ts
-│   └── migrations/
-├── public/uploads/
-├── docker/postgres/
+│   ├── api/auth/                           … ログイン・ログアウト
+│   ├── api/maps/                           … マップ・フロア・スポット管理API
+│   ├── api/public/[mapSlug]/index.get.ts   … 公開マップAPI
+│   ├── api/geocode/index.get.ts            … Nominatimラッパー
+│   ├── api/uploads/image.post.ts           … 画像寸法を計測して保存
+│   ├── middleware/00.auth-check.ts
+│   ├── routes/uploads/[filename].get.ts
+│   └── utils/                              … Prisma・認可・公開条件・アップロード等
+├── shared/                                 … 共通schema・型・定数・utility
+├── lib/geo.ts                              … 2点合わせ・fallback・現在地エリア判定
+├── prisma/                                 … schema・migration・seed・seed-assets
+├── tests/
 ├── docker-compose.yml
 ├── Dockerfile
 ├── nuxt.config.ts
 ├── AGENTS.md
-├── docs/
-│   ├── requirements.md
-│   ├── design.md
-│   ├── tasks.md
-│   ├── wireframe-spec.md
-│   ├── feature-list.xlsx
-│   └── platform-map-spec.xlsx
+├── docs/                                   … requirements・design・tasks・wireframe-spec
 └── package.json
 ```

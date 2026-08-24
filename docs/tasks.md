@@ -20,7 +20,7 @@
 - [x] T-08: マップ設定画面:マップ名の登録、マップの新規作成API
 - [x] T-09: イラスト画像アップロード機能(API Route経由、ローカル保存でまず動かす)
 - [x] T-10: フロア(MapFloor)のCRUD:追加・並び替え・削除
-- [x] T-11: フロアのジオリファレンス設定UI ※Ver.5でPhase 8(T-39)により4隅個別ドラッグ→2点合わせ方式に作り直し予定
+- [x] T-11: フロアのジオリファレンス設定UI ※旧4隅方式として実装後、Phase 8(T-39)で2点合わせ方式へ移行済み
 
 ## Phase 3: スポット管理(管理側)
 
@@ -36,26 +36,26 @@
 ## Phase 4: 地図ビューア(MapLibre GL JS, コアコンポーネント)
 
 - [x] T-20: `MapViewer.vue`コンポーネントの実装(MapLibre GL JSの初期化。ロジックは`app/composables/useMapViewer.ts`に切り出す)
-- [x] T-21: フロアのイラストを`image`ソースとして追加し、緯度経度に対応づけて表示(Phase 8で四隅の算出方法を2点合わせ方式に変更)
+- [x] T-21: フロアのイラストを`image`ソースとして追加し、緯度経度に対応づけて表示(Phase 8で四隅の算出方法を2点合わせ方式へ変更済み)
 - [x] T-22: `pitch`/`bearing`/`zoom`の制約設定(`maxPitch`等。design.md 4.3節を参照)
-- [x] T-23: ピンの表示(`maplibregl.Marker`)、カテゴリ別カラー・アイコン反映、クリックイベントでのスポット選択
+- [x] T-23: ピンの表示(`maplibregl.Marker`)、当時仕様のカテゴリ別カラー・アイコン反映、クリックイベントでのスポット選択(カテゴリからの暗黙推定はPhase 14で汎用defaultへ変更済み)
 - [x] T-24: フロア切り替え時の`image`ソース差し替え(`removeLayer`/`removeSource`→再追加)と`fitBounds`による視点移動
-- [x] T-25: 現在地表示(`GeolocateControl`を`isOutdoor`フロアのみ追加) ※Ver.5でも維持
+- [x] T-25: 現在地表示(`GeolocateControl`) ※初期実装の屋内外判定は廃止し、現行はジオリファレンス設定有無で切り替え
 
 ## Phase 5: 公開側画面
 
-- [ ] T-26: 公開マップ閲覧画面(`MapViewer`の組み込み)
-- [ ] T-27: スポット詳細カード(オーバーレイ表示)
-- [ ] T-28: カテゴリ絞り込みチップ
-- [ ] T-29: フロア切り替えタブ(複数フロアがある場合のみ表示)
-- [ ] T-30: 初回操作ヒントの表示・フェードアウト
+- [x] T-26: 公開マップ閲覧画面(`MapViewer`の組み込み)
+- [x] T-27: スポット詳細カード(オーバーレイ表示)
+- [x] T-28: カテゴリ絞り込みチップ
+- [x] T-29: フロア切り替えタブ(複数フロアがある場合のみ表示)
+- [x] T-30: 初回操作ヒントの表示・フェードアウト
 
 ## Phase 6: 公開設定・仕上げ
 
-- [ ] T-31: マップの公開/非公開切り替え画面
-- [ ] T-32: 公開URL・QRコード発行
-- [ ] T-33: レスポンシブ対応の最終調整(モバイル優先)
-- [ ] T-34: README整備(セルフホスト手順、Docker Composeの使い方)
+- [x] T-31: マップの公開/非公開切り替え画面
+- [x] T-32: 公開URL・QRコード発行
+- [x] T-33: レスポンシブ対応の最終調整(モバイル優先)
+- [x] T-34: README整備(セルフホスト手順、Docker Composeの使い方)
 
 ## Phase 7: 保守系(次フェーズ)
 
@@ -66,33 +66,126 @@
 Ver.3で採用した「イラストの四隅を個別にドラッグして緯度経度に対応づける」方式は、
 対角のねじれや日付変更線をまたぐ座標破損など、運用検証でバグが繰り返し発生した。
 design.md Ver.5 / wireframe-spec.md Ver.5を正として、ジオリファレンスの"やり方"を
-「2点合わせ(相似変換)」に置き換える。**現在地表示(`GeolocateControl`)・緯度経度
-ベースの設計自体はVer.3のまま維持し、変更しない。**
+「2点合わせ(相似変換)」に置き換える。このPhaseでは現在地表示(`GeolocateControl`)・
+緯度経度ベースの設計をVer.3から維持した。現在地の有効判定は、その後Phase 10で
+屋内外ではなくジオリファレンス設定有無へ変更済み。
 
-- [ ] T-36: Prismaスキーマ移行:`MapFloor`の四隅8カラム(`topLeft/topRight/bottomRight/bottomLeft`)を削除し、基準点A・B用の8カラム(`refAPixelX/Y, refALat/Lng, refBPixelX/Y, refBLat/Lng`)と`imageWidth`, `imageHeight`を追加
-- [ ] T-37: 画像アップロードAPI(`server/api/uploads/image.post.ts`)で、アップロード時に画像のピクセル幅・高さを計測し`MapFloor.imageWidth/imageHeight`に保存する処理を追加
-- [ ] T-38: `lib/geo.ts`に`computeFloorCorners()`(2点合わせによる相似変換で4隅を算出)を実装し、design.md 4.2節のロジックに沿って実装する。四隅個別ドラッグ・経度正規化のための旧ロジックは削除する
-- [ ] T-39: ジオリファレンス設定UI(`⑤-2`相当)を、4隅個別ドラッグのUIから「2点合わせウィザード」(`GeoReferenceWizard.vue`)に作り直す。イラスト側クリック→実地図側クリック(住所検索可)を、基準点A・Bそれぞれについて行う
-- [ ] T-40: 保存前プレビュー:`computeFloorCorners()`の計算結果を実地図上にイラストを半透明重ねで表示し、確認できるようにする
-- [ ] T-41: バリデーション:基準点A・Bのピクセル距離・実距離がdesign.md 4.3節の閾値未満の場合、保存時にエラーとし「もっと離れた目印を選んでください」と案内する
-- [ ] T-42: `MapViewer.vue` / `useMapViewer.ts`が受け取る4隅座標の算出元を、`computeFloorCorners()`の結果に差し替える(pitch/bearing/zoom制約、Marker表示、`GeolocateControl`まわりのロジックは変更不要のはず。変更が必要な場合は理由を報告すること)
-- [ ] T-43: ピン配置エディタ(`editor.vue`)を開いた際、ジオリファレンス済みであれば自動的に計算済みの4隅範囲へ`fitBounds`する処理を確認・調整する
-- [ ] T-44: 自動テストの移行:四隅個別ドラッグ・経度正規化のために書いた既存テストを削除し、`computeFloorCorners()`のユニットテストに置き換える(様々な回転角、南北反転、極端な縮尺、基準点が近すぎるエラーケースを含む)
-- [ ] T-45: 既存データのクリーンアップ確認:これまでの検証で作成された旧方式の座標データ(四隅の緯度経度が入っているテスト用フロア)を洗い出して報告する(削除は指示を待つ)
+- [x] T-36: Prismaスキーマ移行:`MapFloor`の四隅8カラム(`topLeft/topRight/bottomRight/bottomLeft`)を削除し、基準点A・B用の8カラム(`refAPixelX/Y, refALat/Lng, refBPixelX/Y, refBLat/Lng`)と`imageWidth`, `imageHeight`を追加
+- [x] T-37: 画像アップロードAPI(`server/api/uploads/image.post.ts`)で、アップロード時に画像のピクセル幅・高さを計測し`MapFloor.imageWidth/imageHeight`に保存する処理を追加
+- [x] T-38: `lib/geo.ts`に`computeFloorCorners()`(2点合わせによる相似変換で4隅を算出)を実装し、design.md 4.2節のロジックに沿って実装する。四隅個別ドラッグ・経度正規化のための旧ロジックは削除する
+- [x] T-39: ジオリファレンス設定UI(`⑤-2`相当)を、4隅個別ドラッグのUIから「2点合わせウィザード」(`GeoReferenceWizard.vue`)に作り直す。イラスト側クリック→実地図側クリック(住所検索可)を、基準点A・Bそれぞれについて行う
+- [x] T-40: 保存前プレビュー:`computeFloorCorners()`の計算結果を実地図上にイラストを半透明重ねで表示し、確認できるようにする
+- [x] T-41: バリデーション:基準点A・Bのピクセル距離・実距離がdesign.md 4.3節の閾値未満の場合、保存時にエラーとし「もっと離れた目印を選んでください」と案内する
+- [x] T-42: `MapViewer.vue` / `useMapViewer.ts`が受け取る4隅座標の算出元を、`computeFloorCorners()`の結果に差し替える
+- [x] T-43: ピン配置エディタ(`editor.vue`)を開いた際、ジオリファレンス済みであれば自動的に計算済みの4隅範囲へ`fitBounds`する処理を確認・調整する
+- [x] T-44: 自動テストの移行:四隅個別ドラッグ・経度正規化のために書いた既存テストを削除し、`computeFloorCorners()`のユニットテストに置き換える
+- [x] T-45: 既存データのクリーンアップ確認:旧方式の座標データを洗い出して報告する(削除は別指示)
 
-## Phase 9: 屋内フロアのジオリファレンス省略(自動疑似座標)
+## Phase 9: 屋内フロアのジオリファレンス省略(旧仕様・廃止済み)
 
-屋内フロア(`is_outdoor === false`)は、そもそも現在地表示(`GeolocateControl`)を出さないため、
-実世界の緯度経度と対応づける意味がない。design.md 4.6節の方針に沿って、屋内フロアでは
-2点合わせを省略し、画像の縦横比から自動算出した仮の座標範囲を割り当てる。
+`isOutdoor`で屋内外を分類し、屋内だけ疑似座標へ分岐する方式として一度実装した。その後、
+Phase 10で「全フロアをジオリファレンス設定有無で扱う」方式へ置き換えたため、以下は完了済みの
+過去経緯であり、現在仕様ではない。
 
-- [ ] T-46: `lib/geo.ts`に`computeIndoorPseudoCorners()`を実装する(design.md 4.6節のコードを参照)
-- [ ] T-47: フロアの4隅算出ロジックを、`is_outdoor`の値によって`computeFloorCorners()`(屋外・2点合わせ)と`computeIndoorPseudoCorners()`(屋内・自動)に振り分ける
-- [ ] T-48: マップ設定画面(⑤)で、屋内フロアには「ジオリファレンスを設定する」ボタンを表示しないようにする
-- [ ] T-49: ピン配置エディタ(⑥)で、屋内フロアを開いた際にジオリファレンス未設定の警告を表示しないようにし、常に自動算出済みの範囲へ`fitBounds`する
-- [ ] T-50: フロアの屋外/屋内切り替え時の挙動を実装する。屋外→屋内:既存の基準点(refA/refB)は保持したまま表示計算では使用しない。屋内→屋外:基準点が未設定であれば通常通り⑤-2への案内を表示する
-- [ ] T-51: 自動テスト:`computeIndoorPseudoCorners()`が様々な縦横比で正しい範囲を返すこと、`is_outdoor`の値によって正しい関数が呼び分けられることを検証する
-- [ ] T-52: 実際に屋内フロアを1つ作成し、ジオリファレンス設定なしでピン配置・公開閲覧まで一連の動作を確認する。あわせて既存の屋外フロア(有松・里山リゾート等)が引き続き2点合わせ方式で正常に動作することも確認する
+- [x] T-46: `computeIndoorPseudoCorners()`を実装(後に`computeFallbackCorners()`へ改名・一般化)
+- [x] T-47: `isOutdoor`による屋外/屋内の4隅算出分岐を実装(廃止済み)
+- [x] T-48: 屋内フロアでジオリファレンス設定導線を非表示化(廃止済み)
+- [x] T-49: 屋内エディタを疑似座標範囲へ自動表示(全未設定フロアのfallback表示へ一般化)
+- [x] T-50: 屋外/屋内切り替え時の基準点保持を実装(`isOutdoor`廃止に伴い不要化)
+- [x] T-51: 屋内疑似座標と屋内外分岐をテスト(現行のfallback・設定有無テストへ置換)
+- [x] T-52: 屋内外フロアの実地動作を確認(現行の設定有無別確認へ置換)
+
+## Phase 10: ジオリファレンス設定有無への統一
+
+Phase 9のT-46〜T-52を置き換える際、実装履歴では同じタスク番号を再利用した。
+現行実装は以下を正とする。
+
+- [x] T-46: 屋内専用だった疑似座標を、未設定フロア用の`computeFallbackCorners()`へ改名・一般化
+- [x] T-47: `isGeoReferenced()`へ設定有無判定を一元化し、`getFloorCorners()`で2点合わせ/fallbackを切り替え
+- [x] T-48: すべてのフロアにジオリファレンス設定・調整導線を表示し、未設定でも表示・ピン配置可能である旨を案内
+- [x] T-49: `GeolocateControl`とエディタ警告をジオリファレンス設定有無で切り替え
+- [x] T-50: fallback coordinatesと設定有無判定の自動テストを追加
+- [x] T-51: Prisma schema・API・共有型・画面から`isOutdoor`を削除し、カラム削除migrationを追加
+- [x] T-52: ジオリファレンス設定済み/未設定フロアの実地動作を確認
+
+## Phase 11: ビューア制約・現在地エリア判定
+
+- [x] T-53: フロアの初期表示を基準に、ズームアウト/ズームインの相対制約を設定
+- [x] T-54: ジオリファレンス済みフロアの4隅から現在地の表示対象エリアを判定
+- [x] T-55: エリア外の現在地マーカーを抑制し、案内メッセージとフロア範囲への視点復帰を追加
+- [x] T-56: 現在地エリア判定と表示制御の自動テストを追加
+- [x] T-57: フロア相対ズーム制約をブラウザで確認
+
+## Phase 12: ピン表示方式の拡張
+
+- [x] T-58: 雫型ピンを立体グラデーション表示へ更新
+- [x] T-59: ピンの接地影を独立したDOM要素として追加
+- [x] T-60: 画像を台座なしで表示する`illustration`方式を共有型・schemaへ追加
+- [x] T-61: 管理画面へ3種類のピン表示方式の選択UIを追加
+- [x] T-62: イラスト直置き型のMarker表示を実装
+- [x] T-63: 3種類のピンデザインに対応するミニプレビューを追加
+- [x] T-64: 3種類のMarker生成を自動テスト
+- [x] T-65: 3種類のピン表示を実地確認
+
+## Phase 13: Material Symbols対応
+
+- [x] T-66: 利用するMaterial Symbolsのプリセット一覧を確定
+- [x] T-67: Material Symbolsフォントを使用グリフに限定して読み込み
+- [x] T-68: 旧プリセットIDを接頭辞付きIDへ正規化する後方互換を追加
+- [x] T-69: 文字アイコン/Material Symbolsのファミリー切り替えUIを追加
+- [x] T-70: Markerのアイコン表示をアイコンファミリーで分岐
+- [x] T-71: アイコンID接頭辞と後方互換の自動テストを追加
+- [x] T-72: Material Symbols表示を実地確認
+
+## Phase 14: Category domain完成・複数カテゴリー
+
+- [x] T-73: Map単位のCategory CRUD、表示順、使用件数、重複・使用中削除のvalidationを追加
+- [x] T-74: SpotCategoryによる0/1/複数CategoryとMap境界validationをAPI・管理UIへ追加
+- [x] T-75: 公開側の複数Category選択をOR semanticsで実装し、Category 0件Spotの扱いを統一
+- [x] T-76: 既存データ移行後、旧`Spot.category`カラムを削除し恒久sourceから撤去
+
+## Phase 15: 柔軟なSpot作成・後配置
+
+- [x] T-77: `lat`/`lng`未設定でSpot情報を先に作成できるフォーム・APIを実装
+- [x] T-78: Spot一覧・詳細で未配置を明示し、エディタから既存Spotを後配置できる導線を追加
+- [x] T-79: editor起点の位置付き新規Spotフローを維持し、camera contextを往復で保持
+- [x] T-80: 位置未設定Spotの公開拒否と公開API非漏洩をテスト
+
+## Phase 16: Floor画像・camera操作改善
+
+- [x] T-81: upload確定前のfilename・画像preview・差し替え・cancelを追加
+- [x] T-82: Floor画像差し替え時の影響警告を追加し、Spot座標と基準点を自動変更しない
+- [x] T-83: Floor切替・初期表示ではfitし、通常click・PIN配置ではcameraを変更しないよう調整
+
+## Phase 17: Map基本情報・Spot一括操作
+
+- [x] T-84: Map名編集と、slugを公開URL保護のためread-onlyとする案内を同期
+- [x] T-85: Spot一覧へ複数選択・検索結果全選択・公開/非公開・Category全置換を追加
+- [x] T-86: 最大100件のtransaction一括削除と件数確認、Map ownership validationを追加
+
+## Phase 18: 意味的PIN密度
+
+- [x] T-87: Spot重要度`normal`/`featured`をschema・API・管理フォームへ追加
+- [x] T-88: フロア相対zoomに応じて通常PINを連続的に縮小・減光し、注目PINを優先表示
+- [x] T-89: MapLibreが管理するmarker本体opacityとの競合を避け、内部DOMのCSS変数で減光
+- [x] T-90: PIN方式・接地点・選択状態と独立した密度表示を自動/実画面確認
+
+## Phase 19: モバイル公開Map UX
+
+- [x] T-91: Categoryチップをsafe area対応の下部操作列へ移動し、Map controlsとの競合を回避
+- [x] T-92: Spot詳細をcollapsed/expandedのBottom Sheet化し、Sheet外のpan gestureを維持
+- [x] T-93: desktopの右側dialog表示を維持し、レスポンシブ回帰を追加
+
+## Phase 20: 限定的な団体branding
+
+- [x] T-94: Mapへ団体名・ロゴ・公式WebサイトURL・SNS URLのnullable項目を追加
+- [x] T-95: ownership検証済み管理API・設定UIと、ローカルupload/http(s) URL validationを追加
+- [x] T-96: 公開headerへ設定済み項目だけを表示し、未設定時の従来表示を維持
+- [x] T-97: 任意HTML/CSS・配色・自由レイアウトを対象外のまま維持
+
+## 対象外としたFB
+
+- custom PIN画像のcrop範囲editor: PdM判断により未実装・MVP対象外。画像表示の既存BUG修正とは別の新機能として扱う
 
 ## 各タスクの依頼テンプレート(Codex用)
 
