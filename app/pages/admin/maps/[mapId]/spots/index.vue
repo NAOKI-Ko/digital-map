@@ -150,6 +150,7 @@ function formatDate(value: string) {
                 <div>
                 <div class="flex flex-wrap items-center gap-2">
                   <h3 class="font-bold text-stone-900">{{ spot.name }}</h3>
+                  <span v-if="spot.importance === 'featured'" class="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-800">注目</span>
                   <span v-for="category in spot.categories" :key="category.id" class="rounded-full bg-stone-100 px-2.5 py-1 text-xs text-stone-700">{{ category.name }}</span>
                   <span class="rounded-full px-2.5 py-1 text-xs font-semibold" :class="spot.isPublished ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'">{{ spot.isPublished ? '公開' : '下書き' }}</span>
                 </div>

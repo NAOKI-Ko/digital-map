@@ -1,4 +1,4 @@
-import type { PinIconType } from '../constants/spot'
+import type { PinIconType, SpotImportance } from '../constants/spot'
 import type { SpotCategorySummary } from './category'
 
 export interface AdminSpotSummary {
@@ -7,6 +7,7 @@ export interface AdminSpotSummary {
   floorName: string
   name: string
   categories: SpotCategorySummary[]
+  importance: SpotImportance
   lat: number | null
   lng: number | null
   isPublished: boolean

@@ -3,6 +3,7 @@ import type { GeolocateControl, Map as MapLibreMap, MapOptions, Marker, MarkerOp
 import { getFloorCorners, getGeoReferenceBounds, isGeoReferenced, isWithinFloorArea, toImageCoordinates, type FloorCorners, type LatLng } from '~~/lib/geo'
 import type { MapViewerCameraState, MapViewerFloor, MapViewerSpot } from '~~/shared/types/map-viewer'
 import { createSpotMarkerElement } from '~/utils/marker-element'
+import { applyMarkerDensityPresentation, getMarkerDensityPresentation } from '~/utils/marker-density'
 
 export type MapViewerMode = 'view' | 'edit'
 
@@ -169,6 +170,7 @@ export function useMapViewer(
   const geolocationAreaMessage = ref('')
   let draftMarker: Marker | null = null
   let spotMarkers: Marker[] = []
+  let spotMarkerElements: Array<{ element: HTMLElement, spot: MapViewerSpot }> = []
   let geolocateControl: GeolocateControl | null = null
   let geolocateHandler: ((position: GeolocationPosition) => void) | null = null
   let currentLocationMarker: Marker | null = null
@@ -198,6 +200,7 @@ export function useMapViewer(
         showFloor(options.floor.value, false)
         if (options.initialCamera) restoreMapViewerCamera(instance, options.initialCamera)
         syncSpotMarkers()
+        instance.on('zoom', syncMarkerDensity)
         syncDraftMarker(options.position.value)
         syncGeolocateControl(options.floor.value)
         options.onCameraChanged?.(getMapViewerCameraState(instance))
@@ -229,6 +232,7 @@ export function useMapViewer(
     draftMarker = null
     spotMarkers.forEach(marker => marker.remove())
     spotMarkers = []
+    spotMarkerElements = []
     removeGeolocateControl()
     removeFloorImage()
     map.value?.remove()
@@ -298,6 +302,7 @@ export function useMapViewer(
   function syncSpotMarkers() {
     spotMarkers.forEach(marker => marker.remove())
     spotMarkers = []
+    spotMarkerElements = []
 
     const instance = map.value
     const currentMaplibre = maplibre.value
@@ -309,6 +314,7 @@ export function useMapViewer(
         selected: spot.id === options.selectedSpotId.value,
         onSelected: () => options.onSpotSelected?.(spot),
       })
+      spotMarkerElements.push({ element, spot })
 
       const marker = new currentMaplibre.Marker(createSpotMarkerOptions(element, options.mode))
         .setLngLat([spot.lng, spot.lat])
@@ -322,6 +328,22 @@ export function useMapViewer(
       }
 
       return marker
+    })
+    syncMarkerDensity()
+  }
+
+  function syncMarkerDensity() {
+    const instance = map.value
+    if (!instance) return
+    const zoom = instance.getZoom()
+    const minimumZoom = instance.getMinZoom()
+    spotMarkerElements.forEach(({ element, spot }) => {
+      applyMarkerDensityPresentation(element, getMarkerDensityPresentation(
+        spot.importance,
+        zoom,
+        minimumZoom,
+        options.mode === 'edit' || spot.id === options.selectedSpotId.value,
+      ))
     })
   }
 
@@ -449,6 +471,7 @@ export function useMapViewer(
     removeFloorImage,
     syncGeolocateControl,
     syncSpotMarkers,
+    syncMarkerDensity,
     syncDraftMarker,
   }
 }

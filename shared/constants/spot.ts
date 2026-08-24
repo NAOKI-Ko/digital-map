@@ -45,6 +45,12 @@ export type PinIconId = PinIconPresetId | MaterialSymbolPresetId
 export type PinIconFamily = 'kanji' | 'material'
 export const pinIconTypes = ['preset', 'custom', 'illustration'] as const
 export type PinIconType = typeof pinIconTypes[number]
+export const spotImportances = ['normal', 'featured'] as const
+export type SpotImportance = typeof spotImportances[number]
+
+export function normalizeSpotImportance(value: string | null | undefined): SpotImportance {
+  return value === 'featured' ? 'featured' : 'normal'
+}
 
 export function normalizePinIconType(value: string | null | undefined): PinIconType {
   if (value === 'custom' || value === 'illustration') return value

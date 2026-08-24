@@ -1,5 +1,5 @@
 import type { Prisma } from '~~/prisma/generated/client'
-import { normalizePinIconType } from '~~/shared/constants/spot'
+import { normalizePinIconType, normalizeSpotImportance } from '~~/shared/constants/spot'
 import { sortSpotCategories, spotCategorySelect } from './category'
 
 export const adminSpotInclude = {
@@ -20,6 +20,7 @@ export function toAdminSpotDetail(spot: SpotWithFloor) {
     floorName: spot.floor.name,
     name: spot.name,
     categories: sortSpotCategories(spot.spotCategories.map(relation => relation.category)),
+    importance: normalizeSpotImportance(spot.importance),
     description: spot.description,
     lat: spot.lat,
     lng: spot.lng,

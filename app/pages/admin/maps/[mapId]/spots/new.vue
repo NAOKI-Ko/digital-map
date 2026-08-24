@@ -38,6 +38,7 @@ const initialValue = computed<SpotFormInput>(() => {
     floorId: floors.value.some(floor => floor.id === requestedFloorId) ? requestedFloorId : '',
     name: '',
     categoryIds: [],
+    importance: 'normal',
     description: '',
     hoursText: '',
     holidayText: '',

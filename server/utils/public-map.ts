@@ -1,6 +1,6 @@
 import type { Prisma } from '../../prisma/generated/client'
 import type { PublicMap } from '../../shared/types/public-map'
-import { normalizePinIconType } from '../../shared/constants/spot'
+import { normalizePinIconType, normalizeSpotImportance } from '../../shared/constants/spot'
 import { prisma } from './prisma'
 import { categoryOrderBy, sortSpotCategories, spotCategorySelect } from './category'
 
@@ -43,6 +43,7 @@ export function buildPublicMapQuery(slug: string) {
               id: true,
               floorId: true,
               name: true,
+              importance: true,
               description: true,
               lat: true,
               lng: true,
@@ -101,6 +102,7 @@ export function serializePublicMap(record: PublicMapRecord | null): PublicMap | 
           floorId: spot.floorId,
           name: spot.name,
           categories: sortSpotCategories(spot.spotCategories.map(relation => relation.category)),
+          importance: normalizeSpotImportance(spot.importance),
           description: spot.description,
           lat: spot.lat,
           lng: spot.lng,

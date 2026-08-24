@@ -24,6 +24,7 @@ const baseSpot: MapViewerSpot = {
   id: 'spot-1',
   name: 'テストスポット',
   categories: [{ id: 'category-1', name: '温泉', order: 0 }],
+  importance: 'normal',
   lat: 35.7,
   lng: 139.7,
   pinIconType: 'preset',

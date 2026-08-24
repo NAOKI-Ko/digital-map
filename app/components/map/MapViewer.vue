@@ -106,6 +106,7 @@ const { floorError, geolocationAreaMessage, geolocationAvailable, mapError } = u
   background: transparent;
   cursor: pointer;
   padding: 0;
+  transition: opacity 120ms linear;
 }
 
 .map-viewer-marker--illustration {
@@ -159,6 +160,7 @@ const { floorError, geolocationAreaMessage, geolocationAvailable, mapError } = u
   transform-origin: bottom left;
   transform: rotate(-45deg);
   transition: scale 150ms ease, box-shadow 150ms ease;
+  scale: var(--marker-density-scale, 1);
 }
 
 .map-viewer-marker__content {
@@ -189,6 +191,7 @@ const { floorError, geolocationAreaMessage, geolocationAvailable, mapError } = u
   transform-origin: bottom center;
   filter: drop-shadow(0 5px 5px rgb(37 48 58 / 32%));
   transition: scale 150ms ease, filter 150ms ease;
+  scale: var(--marker-density-scale, 1);
 }
 
 .map-viewer-marker__illustration-image {
@@ -206,7 +209,7 @@ const { floorError, geolocationAreaMessage, geolocationAvailable, mapError } = u
     0 7px 12px rgb(37 48 58 / 45%),
     inset -3px -3px 6px rgb(0 0 0 / 25%),
     inset 2px 2px 4px rgb(255 255 255 / 35%);
-  scale: 1.12;
+  scale: calc(var(--marker-density-scale, 1) * 1.12);
 }
 
 .map-viewer-marker--selected .map-viewer-marker__illustration,
@@ -214,7 +217,7 @@ const { floorError, geolocationAreaMessage, geolocationAvailable, mapError } = u
   filter:
     drop-shadow(0 0 3px rgb(255 255 255 / 95%))
     drop-shadow(0 6px 6px rgb(37 48 58 / 42%));
-  scale: 1.12;
+  scale: calc(var(--marker-density-scale, 1) * 1.12);
 }
 
 .map-viewer-current-location-marker {

@@ -63,6 +63,7 @@ const baseSpot: MapViewerSpot = {
   id: 'spot-1',
   name: 'テストスポット',
   categories: [{ id: 'category-1', name: '観光', order: 0 }],
+  importance: 'normal',
   lat: 35,
   lng: 139,
   pinIconType: 'preset',
@@ -80,6 +81,13 @@ function createElement(overrides: Partial<MapViewerSpot> = {}) {
 }
 
 describe('Marker DOM生成', () => {
+  it('重要度をデザイン方式と独立した属性として付与する', () => {
+    const marker = createElement({ importance: 'featured', pinIconType: 'illustration', pinIconImageUrl: '/pin.png' })
+
+    expect(marker.classList.contains('map-viewer-marker--featured')).toBe(true)
+    expect(marker.attributes.get('data-spot-importance')).toBe('featured')
+  })
+
   it('presetは独立した接地影と雫型の文字アイコンを返す', () => {
     const marker = createElement()
     const [shadow, shape] = marker.children

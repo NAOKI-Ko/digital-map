@@ -21,6 +21,7 @@ const initialValue = computed<SpotFormInput | undefined>(() => data.value
       floorId: data.value.spot.floorId,
       name: data.value.spot.name,
       categoryIds: data.value.spot.categories.map(category => category.id),
+      importance: data.value.spot.importance,
       description: data.value.spot.description ?? '',
       hoursText: data.value.spot.hoursText ?? '',
       holidayText: data.value.spot.holidayText ?? '',

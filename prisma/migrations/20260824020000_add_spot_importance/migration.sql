@@ -1,0 +1,2 @@
+ALTER TABLE "Spot"
+ADD COLUMN "importance" TEXT NOT NULL DEFAULT 'normal';
