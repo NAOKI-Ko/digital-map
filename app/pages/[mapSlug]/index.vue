@@ -82,11 +82,18 @@ function selectSpot(spot: MapViewerSpot) {
       </section>
     </div>
     <template v-else-if="selectedFloor">
-      <header class="flex h-16 items-center border-b border-stone-200 bg-white px-4 sm:px-6">
-        <div class="min-w-0">
-          <p class="text-xs font-semibold tracking-widest text-terracotta-700">DIGITAL MAP</p>
-          <h1 class="mt-0.5 truncate text-lg font-bold tracking-tight sm:text-xl">{{ data.map.name }}</h1>
+      <header class="flex h-16 items-center justify-between gap-3 border-b border-stone-200 bg-white px-4 sm:px-6">
+        <div class="flex min-w-0 items-center gap-3">
+          <img v-if="data.map.logoUrl" :src="data.map.logoUrl" :alt="`${data.map.organizationName ?? data.map.name}のロゴ`" class="size-10 shrink-0 rounded-lg object-contain">
+          <div class="min-w-0">
+            <p class="truncate text-xs font-semibold tracking-widest text-terracotta-700">{{ data.map.organizationName ?? 'DIGITAL MAP' }}</p>
+            <h1 class="mt-0.5 truncate text-lg font-bold tracking-tight sm:text-xl">{{ data.map.name }}</h1>
+          </div>
         </div>
+        <nav v-if="data.map.websiteUrl || data.map.snsUrl" aria-label="団体リンク" class="flex shrink-0 items-center gap-1 sm:gap-2">
+          <a v-if="data.map.websiteUrl" :href="data.map.websiteUrl" target="_blank" rel="noopener noreferrer" class="rounded-full border border-stone-200 px-2.5 py-1.5 text-xs font-semibold text-stone-700 hover:bg-stone-50 sm:px-3">公式</a>
+          <a v-if="data.map.snsUrl" :href="data.map.snsUrl" target="_blank" rel="noopener noreferrer" class="rounded-full border border-stone-200 px-2.5 py-1.5 text-xs font-semibold text-stone-700 hover:bg-stone-50 sm:px-3">SNS</a>
+        </nav>
       </header>
 
       <section class="relative min-h-0">

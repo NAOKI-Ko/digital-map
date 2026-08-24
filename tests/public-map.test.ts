@@ -14,6 +14,7 @@ const publishedSpot = {
   id: 'spot-published',
   floorId: 'floor-1',
   name: '公開スポット',
+  importance: 'normal',
   spotCategories: [{ category: { id: 'category-1', name: '観光', order: 0 } }],
   description: null,
   lat: 35,
@@ -37,6 +38,10 @@ function mapRecord(overrides: {
     id: 'map-1',
     name: 'テストマップ',
     slug: 'test-map',
+    organizationName: null,
+    logoUrl: null,
+    websiteUrl: null,
+    snsUrl: null,
     isPublished: overrides.isPublished ?? true,
     floors: [{
       id: 'floor-1',

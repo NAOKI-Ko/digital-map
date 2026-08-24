@@ -12,9 +12,17 @@ export interface AdminMapListResponse {
 }
 
 export interface AdminMapDetail extends AdminMapSummary {
+  organizationName: string | null
+  logoUrl: string | null
+  websiteUrl: string | null
+  snsUrl: string | null
   createdAt: string
 }
 
 export interface AdminMapResponse {
   map: AdminMapDetail
+}
+
+export interface MapBrandingResponse {
+  branding: Pick<AdminMapDetail, 'organizationName' | 'logoUrl' | 'websiteUrl' | 'snsUrl'>
 }

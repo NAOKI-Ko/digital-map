@@ -14,6 +14,10 @@ export function buildPublicMapQuery(slug: string) {
       id: true,
       name: true,
       slug: true,
+      organizationName: true,
+      logoUrl: true,
+      websiteUrl: true,
+      snsUrl: true,
       isPublished: true,
       floors: {
         orderBy: [{ order: 'asc' as const }, { createdAt: 'asc' as const }],
@@ -76,6 +80,10 @@ export function serializePublicMap(record: PublicMapRecord | null): PublicMap | 
     id: record.id,
     name: record.name,
     slug: record.slug,
+    organizationName: record.organizationName,
+    logoUrl: record.logoUrl,
+    websiteUrl: record.websiteUrl,
+    snsUrl: record.snsUrl,
     floors: record.floors.map(floor => ({
       id: floor.id,
       name: floor.name,

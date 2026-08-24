@@ -42,6 +42,10 @@ export interface PublicMap {
   id: string
   name: string
   slug: string
+  organizationName: string | null
+  logoUrl: string | null
+  websiteUrl: string | null
+  snsUrl: string | null
   floors: PublicFloor[]
 }
 

@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import MapNameForm from '~/components/admin/MapNameForm.vue'
+import ImageUploader from '~/components/admin/ImageUploader.vue'
 import type { MapNameInput } from '~~/shared/schemas/map'
-import type { AdminMapResponse } from '~~/shared/types/map'
+import type { AdminMapResponse, MapBrandingResponse } from '~~/shared/types/map'
+import type { UploadedImage } from '~~/shared/types/upload'
 
 definePageMeta({
   layout: 'admin',
@@ -14,6 +16,15 @@ const { data, error, status } = await useFetch<AdminMapResponse>(`/api/maps/${ma
 const isSubmitting = ref(false)
 const submitError = ref('')
 const successMessage = ref('')
+const brandingError = ref('')
+const brandingMessage = ref('')
+const isBrandingSaving = ref(false)
+const branding = reactive({
+  organizationName: data.value?.map.organizationName ?? '',
+  logoUrl: data.value?.map.logoUrl ?? '',
+  websiteUrl: data.value?.map.websiteUrl ?? '',
+  snsUrl: data.value?.map.snsUrl ?? '',
+})
 
 useHead(() => ({
   title: `${data.value?.map.name ?? 'マップ設定'} | デジタルマップ`,
@@ -37,6 +48,33 @@ async function saveMap(input: MapNameInput) {
   }
   finally {
     isSubmitting.value = false
+  }
+}
+
+function useUploadedLogo(image: UploadedImage) {
+  branding.logoUrl = image.url
+}
+
+async function saveBranding() {
+  isBrandingSaving.value = true
+  brandingError.value = ''
+  brandingMessage.value = ''
+  try {
+    const response = await $fetch<MapBrandingResponse>(`/api/maps/${mapId}/branding`, {
+      method: 'PATCH',
+      body: branding,
+    })
+    Object.assign(branding, Object.fromEntries(
+      Object.entries(response.branding).map(([key, value]) => [key, value ?? '']),
+    ))
+    Object.assign(data.value!.map, response.branding)
+    brandingMessage.value = '公開ヘッダーの団体情報を保存しました。'
+  }
+  catch (error: any) {
+    brandingError.value = error?.data?.statusMessage ?? '団体情報を保存できませんでした。入力内容を確認してください。'
+  }
+  finally {
+    isBrandingSaving.value = false
   }
 }
 </script>
@@ -97,11 +135,49 @@ async function saveMap(input: MapNameInput) {
       </section>
 
       <section class="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+        <div>
+          <h2 class="text-lg font-bold text-stone-900">公開ヘッダーの団体情報</h2>
+          <p class="mt-1 text-sm leading-6 text-stone-600">必要な項目だけ設定できます。未設定の項目は公開画面に表示されません。</p>
+        </div>
+        <form class="mt-6 space-y-5" @submit.prevent="saveBranding">
+          <div>
+            <label for="organization-name" class="text-sm font-semibold text-stone-800">団体・運営者名</label>
+            <input id="organization-name" v-model="branding.organizationName" maxlength="100" class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5" placeholder="例：○○観光協会">
+          </div>
+          <div>
+            <p class="text-sm font-semibold text-stone-800">ロゴ</p>
+            <div v-if="branding.logoUrl" class="mt-2 flex items-center gap-4 rounded-xl border border-stone-200 p-4">
+              <img :src="branding.logoUrl" alt="現在の団体ロゴ" class="size-16 rounded-lg object-contain">
+              <button type="button" class="text-sm font-semibold text-red-700" @click="branding.logoUrl = ''">ロゴを外す</button>
+            </div>
+            <div class="mt-3">
+              <ImageUploader label="団体ロゴ" @uploaded="useUploadedLogo" />
+            </div>
+          </div>
+          <div class="grid gap-5 sm:grid-cols-2">
+            <div>
+              <label for="website-url" class="text-sm font-semibold text-stone-800">公式WebサイトURL</label>
+              <input id="website-url" v-model="branding.websiteUrl" type="url" class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5" placeholder="https://example.jp">
+            </div>
+            <div>
+              <label for="sns-url" class="text-sm font-semibold text-stone-800">SNS URL</label>
+              <input id="sns-url" v-model="branding.snsUrl" type="url" class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5" placeholder="https://www.instagram.com/…">
+            </div>
+          </div>
+          <p v-if="brandingError" role="alert" class="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{{ brandingError }}</p>
+          <p v-if="brandingMessage" role="status" class="rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{{ brandingMessage }}</p>
+          <div class="flex justify-end">
+            <button type="submit" :disabled="isBrandingSaving" class="rounded-lg bg-stone-900 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60">{{ isBrandingSaving ? '保存中…' : '団体情報を保存' }}</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
         <h2 class="text-lg font-bold text-stone-900">
           イラスト画像とフロア
         </h2>
         <p class="mt-2 text-sm leading-6 text-stone-600">
-          フロアごとにイラスト画像を登録し、表示順や屋外・屋内を設定します。
+          フロアごとにイラスト画像を登録し、表示順やジオリファレンスを設定します。
         </p>
         <NuxtLink :to="`/admin/maps/${mapId}/floors`" class="mt-5 inline-flex rounded-lg bg-stone-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-stone-700">
           フロアを管理する
