@@ -41,6 +41,19 @@ function useUploadedImage(image: UploadedImage) {
   createError.value = ''
 }
 
+async function replaceFloorImage(floor: MapFloorItem, image: UploadedImage) {
+  busyFloorId.value = floor.id
+  try {
+    const response = await $fetch<MapFloorResponse>(`/api/maps/${mapId}/floors/${floor.id}`, {
+      method: 'PATCH',
+      body: { name: floor.name, illustrationUrl: image.url, imageWidth: image.width, imageHeight: image.height },
+    })
+    if (data.value) data.value = { floors: data.value.floors.map(item => item.id === floor.id ? response.floor : item) }
+  }
+  catch { window.alert('フロア画像を差し替えできませんでした。') }
+  finally { busyFloorId.value = '' }
+}
+
 async function createFloor() {
   const result = floorCreateSchema.safeParse(createInput)
   if (!result.success) {
@@ -223,6 +236,11 @@ async function deleteFloor(floor: MapFloorItem) {
               </div>
               <p v-if="!isFloorGeoreferenced(floor)" class="mt-3 text-xs leading-5 text-amber-700">このフロアでは現在地機能が使えません。必要な場合は2点合わせを設定してください。</p>
               <p class="mt-2 text-xs text-stone-500">登録スポット: {{ floor.spotCount }}件</p>
+              <details class="mt-4 rounded-lg border border-stone-200 p-3">
+                <summary class="cursor-pointer text-sm font-semibold text-stone-800">フロア画像を差し替える</summary>
+                <p class="mt-2 text-xs leading-5 text-amber-700">既存PINの緯度経度と2点合わせ設定は維持されます。地図内容や画像比率が変わる場合は、差し替え後にジオリファレンスを確認・再設定してください。</p>
+                <div class="mt-3"><ImageUploader label="差し替え画像" confirm-message="既存PINの位置は維持されます。画像内容が変わる場合は2点合わせの再確認が必要です。この画像をアップロードしますか？" @uploaded="replaceFloorImage(floor, $event)" /></div>
+              </details>
               <div class="mt-4 flex flex-wrap gap-3">
                 <NuxtLink :to="`/admin/maps/${mapId}/floors/${floor.id}/georeference`" class="rounded-lg border border-terracotta-300 bg-terracotta-50 px-4 py-2 text-sm font-semibold text-terracotta-800 hover:bg-terracotta-100">{{ isFloorGeoreferenced(floor) ? 'ジオリファレンスを調整' : 'ジオリファレンスを設定' }}</NuxtLink>
                 <button type="button" :disabled="busyFloorId === floor.id" class="rounded-lg bg-stone-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60" @click="updateFloor(floor)">変更を保存</button>

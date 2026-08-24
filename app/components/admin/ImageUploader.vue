@@ -3,8 +3,10 @@ import type { ImageUploadResponse, UploadedImage } from '~~/shared/types/upload'
 
 const props = withDefaults(defineProps<{
   label?: string
+  confirmMessage?: string
 }>(), {
   label: 'イラスト画像',
+  confirmMessage: '',
 })
 
 const emit = defineEmits<{
@@ -15,12 +17,23 @@ const input = useTemplateRef<HTMLInputElement>('input')
 const isUploading = ref(false)
 const errorMessage = ref('')
 const uploadedImage = ref<UploadedImage>()
+const selectedFile = ref<File>()
+const previewUrl = ref('')
+
+function clearSelection() {
+  if (previewUrl.value) URL.revokeObjectURL(previewUrl.value)
+  previewUrl.value = ''
+  selectedFile.value = undefined
+  if (input.value) input.value.value = ''
+}
+
+onBeforeUnmount(clearSelection)
 
 function chooseFile() {
   input.value?.click()
 }
 
-async function upload(event: Event) {
+function selectFile(event: Event) {
   const target = event.target as HTMLInputElement
   const file = target.files?.[0]
 
@@ -40,9 +53,17 @@ async function upload(event: Event) {
     return
   }
 
-  isUploading.value = true
   errorMessage.value = ''
+  clearSelection()
+  selectedFile.value = file
+  previewUrl.value = URL.createObjectURL(file)
+}
 
+async function confirmUpload() {
+  const file = selectedFile.value
+  if (!file) return
+  if (props.confirmMessage && !window.confirm(props.confirmMessage)) return
+  isUploading.value = true
   try {
     const body = new FormData()
     body.append('file', file)
@@ -52,13 +73,13 @@ async function upload(event: Event) {
     })
     uploadedImage.value = response.image
     emit('uploaded', response.image)
+    clearSelection()
   }
   catch (error) {
     errorMessage.value = getErrorMessage(error)
   }
   finally {
     isUploading.value = false
-    target.value = ''
   }
 }
 
@@ -81,7 +102,7 @@ function getErrorMessage(error: unknown) {
       type="file"
       accept="image/png,image/jpeg,.png,.jpg,.jpeg"
       class="sr-only"
-      @change="upload"
+      @change="selectFile"
     >
     <div
       class="rounded-xl border-2 border-dashed border-stone-300 bg-stone-50 p-6 text-center"
@@ -99,8 +120,17 @@ function getErrorMessage(error: unknown) {
         class="mt-4 rounded-lg border border-stone-300 bg-white px-4 py-2 text-sm font-semibold text-stone-800 shadow-sm hover:bg-stone-100 disabled:cursor-not-allowed disabled:opacity-60"
         @click="chooseFile"
       >
-        {{ isUploading ? 'アップロード中…' : 'ファイルを選ぶ' }}
+        {{ selectedFile ? '別のファイルを選ぶ' : 'ファイルを選ぶ' }}
       </button>
+    </div>
+
+    <div v-if="selectedFile" class="mt-4 rounded-xl border border-stone-200 bg-white p-4">
+      <p class="break-all text-sm font-semibold text-stone-800">{{ selectedFile.name }}</p>
+      <img :src="previewUrl" :alt="`${props.label}の選択プレビュー`" class="mt-3 max-h-72 w-full rounded-lg bg-stone-50 object-contain">
+      <div class="mt-3 flex gap-2">
+        <button type="button" :disabled="isUploading" class="rounded-lg bg-terracotta-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50" @click="confirmUpload">{{ isUploading ? 'アップロード中…' : 'この画像を使用' }}</button>
+        <button type="button" :disabled="isUploading" class="rounded-lg border border-stone-300 px-4 py-2 text-sm" @click="clearSelection">キャンセル</button>
+      </div>
     </div>
 
     <p v-if="errorMessage" role="alert" class="mt-3 text-sm text-red-600">

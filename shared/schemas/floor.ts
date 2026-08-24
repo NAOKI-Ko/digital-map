@@ -14,6 +14,14 @@ export const floorCreateSchema = z.object({
 
 export const floorUpdateSchema = z.object({
   name: z.string().trim().min(1, 'フロア名を入力してください。').max(50, 'フロア名は50文字以内で入力してください。'),
+  illustrationUrl: localUploadUrlSchema.optional(),
+  imageWidth: z.number().int().positive().optional(),
+  imageHeight: z.number().int().positive().optional(),
+}).superRefine((value, context) => {
+  const imageValues = [value.illustrationUrl, value.imageWidth, value.imageHeight]
+  if (imageValues.some(item => item !== undefined) && imageValues.some(item => item === undefined)) {
+    context.addIssue({ code: 'custom', message: '画像URLと画像サイズをすべて指定してください。' })
+  }
 })
 
 export const floorReorderSchema = z.object({

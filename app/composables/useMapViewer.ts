@@ -427,13 +427,14 @@ export function useMapViewer(
   watch(() => options.spots.value, syncSpotMarkers, { deep: true })
   watch(() => options.position.value, syncDraftMarker, { deep: true })
   watch(() => options.selectedSpotId.value, syncSpotMarkers)
-  watch(() => options.floor.value, (floor) => {
+  watch(() => options.floor.value.id, () => {
     if (!isReady.value) return
+    const floor = options.floor.value
     showFloor(floor, true)
     syncSpotMarkers()
     syncDraftMarker(options.position.value)
     syncGeolocateControl(floor)
-  }, { deep: true })
+  })
 
   return {
     map: readonly(map),
