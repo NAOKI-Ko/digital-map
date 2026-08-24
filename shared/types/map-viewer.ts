@@ -1,5 +1,6 @@
 import type { FloorGeoReferenceFields } from '../../lib/geo'
 import type { PinIconType } from '../constants/spot'
+import type { SpotCategorySummary } from './category'
 
 export interface MapViewerFloor extends FloorGeoReferenceFields {
   id: string
@@ -10,7 +11,7 @@ export interface MapViewerFloor extends FloorGeoReferenceFields {
 export interface MapViewerSpot {
   id: string
   name: string
-  category: string
+  categories: SpotCategorySummary[]
   lat: number
   lng: number
   pinIconType: PinIconType

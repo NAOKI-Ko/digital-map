@@ -9,7 +9,7 @@ const optionalCoordinate = (minimum: number, maximum: number, message: string) =
 export const spotFormSchema = z.object({
   floorId: z.string().min(1, 'フロアを選択してください。'),
   name: z.string().trim().min(1, '店名・スポット名を入力してください。').max(100, '名称は100文字以内で入力してください。'),
-  category: z.string().trim().min(1, 'カテゴリを入力してください。').max(50, 'カテゴリは50文字以内で入力してください。'),
+  categoryIds: z.array(z.string().min(1, 'カテゴリーIDが不正です。')).optional(),
   description: optionalText(2000, '説明文は2000文字以内で入力してください。'),
   hoursText: optionalText(500, '営業時間は500文字以内で入力してください。'),
   holidayText: optionalText(500, '定休日は500文字以内で入力してください。'),

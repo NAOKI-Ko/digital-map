@@ -88,7 +88,6 @@ model Spot {
   floorId         String
   floor           MapFloor @relation(fields: [floorId], references: [id], onDelete: Cascade)
   name            String
-  category        String
   spotCategories  SpotCategory[]
   description     String?
   lat             Float?
@@ -107,7 +106,6 @@ model Spot {
 
   @@index([floorId])
   @@index([floorId, isPublished])
-  @@index([category])
 }
 
 model SpotCategory {

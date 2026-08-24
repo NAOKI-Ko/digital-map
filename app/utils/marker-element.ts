@@ -11,7 +11,7 @@ export function getSpotMarkerPresentation(spot: MapViewerSpot) {
       ? 'custom'
       : 'preset'
   const preset = type === 'preset'
-    ? getPinIconPreset(spot.pinIconId, spot.category)
+    ? getPinIconPreset(spot.pinIconId)
     : null
 
   return {

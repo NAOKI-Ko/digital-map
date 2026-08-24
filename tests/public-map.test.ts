@@ -14,7 +14,7 @@ const publishedSpot = {
   id: 'spot-published',
   floorId: 'floor-1',
   name: '公開スポット',
-  category: '観光',
+  spotCategories: [{ category: { id: 'category-1', name: '観光', order: 0 } }],
   description: null,
   lat: 35,
   lng: 139,

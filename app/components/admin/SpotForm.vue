@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import AddressGeocoder from '~/components/admin/AddressGeocoder.vue'
 import { useForm } from 'vee-validate'
-import { spotCategorySuggestions } from '~~/shared/constants/spot'
 import { spotFormSchema, type SpotFormInput } from '~~/shared/schemas/spot'
+import type { SpotCategorySummary } from '~~/shared/types/category'
 import type { SpotListFilterFloor } from '~~/shared/types/spot'
 
 const props = withDefaults(defineProps<{
   floors: SpotListFilterFloor[]
+  categories: SpotCategorySummary[]
   initialValue?: SpotFormInput
   isSubmitting?: boolean
   submitLabel?: string
@@ -14,7 +15,7 @@ const props = withDefaults(defineProps<{
   initialValue: () => ({
     floorId: '',
     name: '',
-    category: '',
+    categoryIds: [],
     description: '',
     hoursText: '',
     holidayText: '',
@@ -36,7 +37,7 @@ const { defineField, errors, handleSubmit, resetForm, setErrors, setFieldValue }
 
 const [floorId, floorIdAttrs] = defineField('floorId')
 const [name, nameAttrs] = defineField('name')
-const [category, categoryAttrs] = defineField('category')
+const [categoryIds] = defineField('categoryIds')
 const [description, descriptionAttrs] = defineField('description')
 const [hoursText, hoursTextAttrs] = defineField('hoursText')
 const [holidayText, holidayTextAttrs] = defineField('holidayText')
@@ -79,10 +80,14 @@ function useGeocodeResult(result: { lat: number, lng: number }) {
           <p v-if="errors.floorId" class="mt-1 text-sm text-red-600">{{ errors.floorId }}</p>
         </div>
         <div>
-          <label for="spot-category" class="text-sm font-semibold text-stone-800">カテゴリ <span class="text-red-600">必須</span></label>
-          <input id="spot-category" v-model="category" v-bind="categoryAttrs" list="spot-category-suggestions" maxlength="50" class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5" placeholder="例：飲食">
-          <datalist id="spot-category-suggestions"><option v-for="suggestion in spotCategorySuggestions" :key="suggestion" :value="suggestion" /></datalist>
-          <p v-if="errors.category" class="mt-1 text-sm text-red-600">{{ errors.category }}</p>
+          <span class="text-sm font-semibold text-stone-800">カテゴリー</span>
+          <div v-if="categories.length" class="mt-2 flex flex-wrap gap-2">
+            <label v-for="category in categories" :key="category.id" class="flex cursor-pointer items-center gap-2 rounded-lg border border-stone-300 px-3 py-2 text-sm">
+              <input v-model="categoryIds" type="checkbox" :value="category.id" class="size-4 rounded border-stone-300 text-terracotta-600">
+              {{ category.name }}
+            </label>
+          </div>
+          <p v-else class="mt-2 text-sm text-amber-700">カテゴリーはまだありません。マップ設定のカテゴリー管理から追加できます。</p>
         </div>
         <div class="sm:col-span-2">
           <label for="spot-name" class="text-sm font-semibold text-stone-800">店名・スポット名 <span class="text-red-600">必須</span></label>

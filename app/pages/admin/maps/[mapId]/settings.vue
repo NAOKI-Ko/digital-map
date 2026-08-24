@@ -108,6 +108,12 @@ async function saveMap(input: MapNameInput) {
       </section>
 
       <section class="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+        <h2 class="text-lg font-bold text-stone-900">カテゴリー</h2>
+        <p class="mt-2 text-sm leading-6 text-stone-600">スポットで使用するカテゴリーの名称と表示順を管理します。</p>
+        <NuxtLink :to="`/admin/maps/${mapId}/categories`" class="mt-5 inline-flex rounded-lg bg-stone-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-stone-700">カテゴリーを管理する</NuxtLink>
+      </section>
+
+      <section class="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
         <h2 class="text-lg font-bold text-stone-900">スポット</h2>
         <p class="mt-2 text-sm leading-6 text-stone-600">登録済みスポットを検索し、情報や公開状態を管理します。</p>
         <div class="mt-5 flex flex-wrap gap-3">

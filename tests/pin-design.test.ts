@@ -54,9 +54,8 @@ describe('ピン表示方式の保存値', () => {
     expect(normalizePinIconId('♨')).toBe('kanji:♨')
   })
 
-  it('カテゴリ既定値は引き続き文字アイコンを使う', () => {
-    expect(defaultPinIconId('飲食')).toBe('kanji:食')
-    expect(defaultPinIconId('その他')).toBe('kanji:●')
+  it('カテゴリー名に依存しない汎用文字アイコンを既定値にする', () => {
+    expect(defaultPinIconId()).toBe('kanji:●')
   })
 
   it.each(['kanji:食', 'material:restaurant', 'food'])('%sを保存値として受け付ける', (pinIconId) => {

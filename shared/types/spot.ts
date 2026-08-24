@@ -1,11 +1,12 @@
 import type { PinIconType } from '../constants/spot'
+import type { SpotCategorySummary } from './category'
 
 export interface AdminSpotSummary {
   id: string
   floorId: string
   floorName: string
   name: string
-  category: string
+  categories: SpotCategorySummary[]
   lat: number | null
   lng: number | null
   isPublished: boolean
@@ -29,7 +30,7 @@ export interface SpotListFilterFloor {
 export interface AdminSpotListResponse {
   spots: AdminSpotSummary[]
   filters: {
-    categories: string[]
+    categories: SpotCategorySummary[]
     floors: SpotListFilterFloor[]
   }
 }
@@ -46,6 +47,7 @@ export interface AdminSpotDetail extends AdminSpotSummary {
 export interface AdminSpotResponse {
   spot: AdminSpotDetail
   floors: SpotListFilterFloor[]
+  categories: SpotCategorySummary[]
 }
 
 export interface SpotPhotosResponse {

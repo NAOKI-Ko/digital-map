@@ -20,7 +20,7 @@ const initialValue = computed<SpotFormInput | undefined>(() => data.value
   ? {
       floorId: data.value.spot.floorId,
       name: data.value.spot.name,
-      category: data.value.spot.category,
+      categoryIds: data.value.spot.categories.map(category => category.id),
       description: data.value.spot.description ?? '',
       hoursText: data.value.spot.hoursText ?? '',
       holidayText: data.value.spot.holidayText ?? '',
@@ -63,7 +63,7 @@ async function updateSpot(input: SpotFormInput) {
       <div v-if="submitError" role="alert" class="mt-6 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{{ submitError }}</div>
       <div v-if="successMessage" role="status" class="mt-6 rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{{ successMessage }}</div>
       <section class="mt-8 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
-        <SpotForm :floors="data.floors" :initial-value="initialValue" :is-submitting="isSubmitting" @submit="updateSpot" />
+        <SpotForm :floors="data.floors" :categories="data.categories" :initial-value="initialValue" :is-submitting="isSubmitting" @submit="updateSpot" />
       </section>
       <section class="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
         <SpotPhotoManager
@@ -77,7 +77,6 @@ async function updateSpot(input: SpotFormInput) {
         <PinDesignEditor
           :map-id="mapId"
           :spot-id="spotId"
-          :category="data.spot.category"
           :initial-value="data.spot"
           @updated="Object.assign(data.spot, $event)"
         />

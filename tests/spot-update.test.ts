@@ -10,7 +10,7 @@ const mocks = vi.hoisted(() => ({
 const baseBody = {
   floorId: 'floor-1',
   name: '公開スポット',
-  category: '観光',
+  categoryIds: [],
   description: '',
   hoursText: '',
   holidayText: '',

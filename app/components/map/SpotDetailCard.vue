@@ -38,7 +38,9 @@ defineEmits<{
           ×
         </button>
 
-        <p class="pr-12 text-xs font-semibold text-terracotta-700">{{ spot.category }}</p>
+        <div v-if="spot.categories.length" class="flex flex-wrap gap-1.5 pr-12">
+          <span v-for="category in spot.categories" :key="category.id" class="rounded-full bg-terracotta-50 px-2 py-1 text-xs font-semibold text-terracotta-700">{{ category.name }}</span>
+        </div>
         <h2 :id="`spot-detail-title-${spot.id}`" class="mt-1 pr-12 text-2xl font-bold tracking-tight text-stone-900">
           {{ spot.name }}
         </h2>

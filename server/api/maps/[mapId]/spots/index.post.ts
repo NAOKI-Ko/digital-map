@@ -20,20 +20,26 @@ export default defineEventHandler(async (event): Promise<AdminSpotResponse> => {
     throw createError({ statusCode: 422, statusMessage: '選択したフロアが見つかりません。' })
   }
 
-  const spot = await prisma.spot.create({
-    data: {
-      ...result.data,
-      description: result.data.description || null,
-      hoursText: result.data.hoursText || null,
-      holidayText: result.data.holidayText || null,
-      phone: result.data.phone || null,
-    },
-    include: adminSpotInclude,
+  const spot = await prisma.$transaction(async (transaction) => {
+    const categories = await validateSpotCategories(transaction, map.id, result.data.categoryIds ?? [])
+    const { categoryIds: _categoryIds, ...spotData } = result.data
+    return transaction.spot.create({
+      data: {
+        ...spotData,
+        description: spotData.description || null,
+        hoursText: spotData.hoursText || null,
+        holidayText: spotData.holidayText || null,
+        phone: spotData.phone || null,
+        spotCategories: { create: categories.map(category => ({ categoryId: category.id })) },
+      },
+      include: adminSpotInclude,
+    })
   })
 
   setResponseStatus(event, 201)
   return {
     spot: toAdminSpotDetail(spot),
     floors: await getMapFloorOptions(map.id),
+    categories: await getMapCategoryOptions(map.id),
   }
 })

@@ -62,7 +62,7 @@ const fakeDocument = {
 const baseSpot: MapViewerSpot = {
   id: 'spot-1',
   name: 'テストスポット',
-  category: '観光',
+  categories: [{ id: 'category-1', name: '観光', order: 0 }],
   lat: 35,
   lng: 139,
   pinIconType: 'preset',

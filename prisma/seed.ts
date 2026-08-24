@@ -243,11 +243,7 @@ const arimatsuDemoSpots = [
 const adapter = new PrismaPg({ connectionString })
 const prisma = new PrismaClient({ adapter })
 
-async function syncLegacySpotCategories(mapId: string) {
-  const spots = await prisma.spot.findMany({
-    where: { floor: { mapId } },
-    select: { id: true, category: true },
-  })
+async function syncSeedSpotCategories(mapId: string, spots: readonly { id: string, category: string }[]) {
   const categoryNames = [...new Set(spots.map(spot => spot.category.trim()))]
     .sort((left, right) => left.localeCompare(right, 'ja'))
   const categories = await Promise.all(categoryNames.map((name, order) => (
@@ -339,7 +335,7 @@ async function seedArimatsuDemo(tenantId: string) {
   })
 
   await prisma.$transaction(arimatsuDemoSpots.map((spot) => {
-    const { id, ...spotData } = spot
+    const { id, category: _category, ...spotData } = spot
     const data = {
       floorId: floor.id,
       ...spotData,
@@ -353,7 +349,7 @@ async function seedArimatsuDemo(tenantId: string) {
     })
   }))
 
-  await syncLegacySpotCategories(map.id)
+  await syncSeedSpotCategories(map.id, arimatsuDemoSpots)
 
   console.info(`有松チーム内デモを作成しました: ${arimatsuDemoSpots.length}スポット（すべて下書き）`)
 }
@@ -426,8 +422,6 @@ async function main() {
         order: 0,
       },
     })
-
-    await syncLegacySpotCategories(map.id)
 
     console.info(`実地確認用マップを作成しました: ${verificationMap.name}`)
   }

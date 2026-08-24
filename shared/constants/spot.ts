@@ -1,14 +1,3 @@
-export const spotCategorySuggestions = [
-  '飲食',
-  '買い物',
-  '観光',
-  '温泉',
-  '宿泊',
-  '駐車場',
-  '公共施設',
-  'その他',
-] as const
-
 export const kanjiIconPresets = [
   { id: 'kanji:食', legacyId: 'food', label: '飲食', symbol: '食' },
   { id: 'kanji:買', legacyId: 'shopping', label: '買い物', symbol: '買' },
@@ -62,30 +51,12 @@ export function normalizePinIconType(value: string | null | undefined): PinIconT
   return 'preset'
 }
 
-export function defaultPinIconId(category: string): PinIconPresetId {
-  const mapping: Record<string, PinIconPresetId> = {
-    '飲食': 'kanji:食',
-    '買い物': 'kanji:買',
-    '観光': 'kanji:観',
-    '温泉': 'kanji:♨',
-    '宿泊': 'kanji:宿',
-    '駐車場': 'kanji:P',
-    '公共施設': 'kanji:i',
-  }
-  return mapping[category] ?? 'kanji:●'
+export function defaultPinIconId(): PinIconPresetId {
+  return 'kanji:●'
 }
 
-export function defaultMaterialSymbolId(category: string): MaterialSymbolPresetId {
-  const mapping: Record<string, MaterialSymbolPresetId> = {
-    '飲食': 'material:restaurant',
-    '買い物': 'material:storefront',
-    '観光': 'material:museum',
-    '温泉': 'material:hot_tub',
-    '宿泊': 'material:hotel',
-    '駐車場': 'material:local_parking',
-    '公共施設': 'material:wc',
-  }
-  return mapping[category] ?? 'material:directions_walk'
+export function defaultMaterialSymbolId(): MaterialSymbolPresetId {
+  return 'material:directions_walk'
 }
 
 export function isSupportedPinIconId(id: string) {
@@ -97,8 +68,8 @@ export function isSupportedPinIconId(id: string) {
   )
 }
 
-export function getPinIconPreset(id: string | null | undefined, category = '') {
-  const fallbackId = defaultPinIconId(category)
+export function getPinIconPreset(id: string | null | undefined) {
+  const fallbackId = defaultPinIconId()
   const fallback = kanjiIconPresets.find(preset => preset.id === fallbackId)!
 
   if (id?.startsWith('material:')) {
@@ -130,7 +101,6 @@ export function getPinIconPreset(id: string | null | undefined, category = '') {
 
 export function normalizePinIconId(
   id: string | null | undefined,
-  category = '',
 ): PinIconId {
-  return getPinIconPreset(id, category).id
+  return getPinIconPreset(id).id
 }

@@ -15,8 +15,8 @@ describe('Category domain schema', () => {
     expect(schema).toContain('@@index([categoryId])')
   })
 
-  it('移行期間中はlegacy Spot.categoryを維持する', () => {
-    expect(schema).toMatch(/model Spot \{[\s\S]*?category\s+String/)
+  it('legacy Spot.categoryを恒久sourceとして残さない', () => {
+    expect(schema).not.toMatch(/model Spot \{[\s\S]*?\n\s+category\s+String/)
   })
 })
 

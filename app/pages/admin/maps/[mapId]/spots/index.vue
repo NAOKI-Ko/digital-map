@@ -8,7 +8,7 @@ definePageMeta({
 
 const route = useRoute()
 const mapId = route.params.mapId as string
-const form = reactive({ q: '', category: '', floorId: '', status: '' })
+const form = reactive({ q: '', categoryId: '', floorId: '', status: '' })
 const appliedFilters = ref({ ...form })
 const query = computed(() => Object.fromEntries(
   Object.entries(appliedFilters.value).filter(([, value]) => value),
@@ -24,7 +24,7 @@ function search() {
 }
 
 function reset() {
-  Object.assign(form, { q: '', category: '', floorId: '', status: '' })
+  Object.assign(form, { q: '', categoryId: '', floorId: '', status: '' })
   appliedFilters.value = { ...form }
 }
 
@@ -54,9 +54,9 @@ function formatDate(value: string) {
         </div>
         <div>
           <label for="spot-category" class="text-xs font-semibold text-stone-600">カテゴリ</label>
-          <select id="spot-category" v-model="form.category" class="mt-1.5 w-full rounded-lg border border-stone-300 px-3 py-2.5 text-sm">
+          <select id="spot-category" v-model="form.categoryId" class="mt-1.5 w-full rounded-lg border border-stone-300 px-3 py-2.5 text-sm">
             <option value="">すべて</option>
-            <option v-for="category in data?.filters.categories" :key="category" :value="category">{{ category }}</option>
+            <option v-for="category in data?.filters.categories" :key="category.id" :value="category.id">{{ category.name }}</option>
           </select>
         </div>
         <div>
@@ -103,7 +103,7 @@ function formatDate(value: string) {
               <div>
                 <div class="flex flex-wrap items-center gap-2">
                   <h3 class="font-bold text-stone-900">{{ spot.name }}</h3>
-                  <span class="rounded-full bg-stone-100 px-2.5 py-1 text-xs text-stone-700">{{ spot.category }}</span>
+                  <span v-for="category in spot.categories" :key="category.id" class="rounded-full bg-stone-100 px-2.5 py-1 text-xs text-stone-700">{{ category.name }}</span>
                   <span class="rounded-full px-2.5 py-1 text-xs font-semibold" :class="spot.isPublished ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'">{{ spot.isPublished ? '公開' : '下書き' }}</span>
                 </div>
                 <p v-if="spot.lat !== null && spot.lng !== null" class="mt-2 text-sm text-stone-600">{{ spot.floorName }} · lat {{ spot.lat.toFixed(6) }}, lng {{ spot.lng.toFixed(6) }}</p>

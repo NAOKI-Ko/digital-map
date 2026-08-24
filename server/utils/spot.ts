@@ -1,8 +1,10 @@
 import type { Prisma } from '~~/prisma/generated/client'
 import { normalizePinIconType } from '~~/shared/constants/spot'
+import { sortSpotCategories, spotCategorySelect } from './category'
 
 export const adminSpotInclude = {
   floor: { select: { name: true } },
+  spotCategories: { select: spotCategorySelect },
 } satisfies Prisma.SpotInclude
 
 type SpotWithFloor = Prisma.SpotGetPayload<{ include: typeof adminSpotInclude }>
@@ -17,7 +19,7 @@ export function toAdminSpotDetail(spot: SpotWithFloor) {
     floorId: spot.floorId,
     floorName: spot.floor.name,
     name: spot.name,
-    category: spot.category,
+    categories: sortSpotCategories(spot.spotCategories.map(relation => relation.category)),
     description: spot.description,
     lat: spot.lat,
     lng: spot.lng,
@@ -40,5 +42,13 @@ export async function getMapFloorOptions(mapId: string) {
     where: { mapId },
     select: { id: true, name: true },
     orderBy: [{ order: 'asc' }, { createdAt: 'asc' }],
+  })
+}
+
+export async function getMapCategoryOptions(mapId: string) {
+  return prisma.category.findMany({
+    where: { mapId },
+    select: { id: true, name: true, order: true },
+    orderBy: [{ order: 'asc' }, { name: 'asc' }],
   })
 }

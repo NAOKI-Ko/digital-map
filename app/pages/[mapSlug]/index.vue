@@ -4,6 +4,7 @@ import CategoryFilter from '~/components/map/CategoryFilter.vue'
 import FloorTabs from '~/components/map/FloorTabs.vue'
 import MapOperationHint from '~/components/map/MapOperationHint.vue'
 import SpotDetailCard from '~/components/map/SpotDetailCard.vue'
+import { collectSpotCategories, filterSpotsByCategoryIds } from '~/utils/category-filter'
 import type { MapViewerSpot } from '~~/shared/types/map-viewer'
 import type { PublicMapResponse } from '~~/shared/types/public-map'
 
@@ -16,7 +17,7 @@ const { data, error, status } = await useFetch<PublicMapResponse>(
 )
 const selectedFloorId = ref('')
 const selectedSpotId = ref<string | null>(null)
-const selectedCategory = ref('')
+const selectedCategoryIds = ref<string[]>([])
 
 const selectedFloor = computed(() => (
   data.value?.map.floors.find(floor => floor.id === selectedFloorId.value)
@@ -27,12 +28,9 @@ const selectedSpot = computed(() => (
   ?? null
 ))
 const categories = computed(() => (
-  [...new Set(selectedFloor.value?.spots.map(spot => spot.category) ?? [])]
-    .sort((left, right) => left.localeCompare(right, 'ja'))
+  collectSpotCategories(selectedFloor.value?.spots ?? [])
 ))
-const visibleSpots = computed(() => selectedFloor.value?.spots.filter(spot => (
-  selectedCategory.value === '' || spot.category === selectedCategory.value
-)) ?? [])
+const visibleSpots = computed(() => filterSpotsByCategoryIds(selectedFloor.value?.spots ?? [], selectedCategoryIds.value))
 
 watch(() => data.value?.map.floors, (floors) => {
   if (!floors?.length) {
@@ -46,10 +44,10 @@ watch(() => data.value?.map.floors, (floors) => {
 
 watch(selectedFloorId, () => {
   selectedSpotId.value = null
-  selectedCategory.value = ''
+  selectedCategoryIds.value = []
 })
 
-watch(selectedCategory, () => {
+watch(selectedCategoryIds, () => {
   if (!visibleSpots.value.some(spot => spot.id === selectedSpotId.value)) {
     selectedSpotId.value = null
   }
@@ -98,7 +96,7 @@ function selectSpot(spot: MapViewerSpot) {
               v-model="selectedFloorId"
               :floors="data.map.floors"
             />
-            <CategoryFilter v-model="selectedCategory" :categories="categories" />
+            <CategoryFilter v-model="selectedCategoryIds" :categories="categories" />
           </div>
         </div>
 

@@ -1,12 +1,13 @@
 import type { Prisma } from '~~/prisma/generated/client'
 import { normalizePinIconType } from '~~/shared/constants/spot'
+import { categoryOrderBy, sortSpotCategories, spotCategorySelect } from '~~/server/utils/category'
 import type { AdminSpotListResponse } from '~~/shared/types/spot'
 
 export default defineEventHandler(async (event): Promise<AdminSpotListResponse> => {
   const { map } = await requireOwnedMap(event)
   const query = getQuery(event)
   const keyword = typeof query.q === 'string' ? query.q.trim().slice(0, 100) : ''
-  const category = typeof query.category === 'string' ? query.category.trim().slice(0, 100) : ''
+  const categoryId = typeof query.categoryId === 'string' ? query.categoryId : ''
   const floorId = typeof query.floorId === 'string' ? query.floorId : ''
   const status = query.status === 'published' || query.status === 'draft' ? query.status : ''
   const where: Prisma.SpotWhereInput = {
@@ -15,24 +16,23 @@ export default defineEventHandler(async (event): Promise<AdminSpotListResponse> 
       ? {
           OR: [
             { name: { contains: keyword, mode: 'insensitive' } },
-            { category: { contains: keyword, mode: 'insensitive' } },
+            { spotCategories: { some: { category: { name: { contains: keyword, mode: 'insensitive' } } } } },
             { description: { contains: keyword, mode: 'insensitive' } },
           ],
         }
       : {}),
-    ...(category ? { category } : {}),
+    ...(categoryId ? { spotCategories: { some: { categoryId, category: { mapId: map.id } } } } : {}),
     ...(floorId ? { floorId } : {}),
     ...(status ? { isPublished: status === 'published' } : {}),
   }
 
-  const [spots, floors, categoryRows] = await Promise.all([
+  const [spots, floors, categories] = await Promise.all([
     prisma.spot.findMany({
       where,
       select: {
         id: true,
         floorId: true,
         name: true,
-        category: true,
         lat: true,
         lng: true,
         isPublished: true,
@@ -42,6 +42,7 @@ export default defineEventHandler(async (event): Promise<AdminSpotListResponse> 
         pinColor: true,
         updatedAt: true,
         floor: { select: { name: true } },
+        spotCategories: { select: spotCategorySelect },
       },
       orderBy: { updatedAt: 'desc' },
     }),
@@ -50,11 +51,10 @@ export default defineEventHandler(async (event): Promise<AdminSpotListResponse> 
       select: { id: true, name: true },
       orderBy: [{ order: 'asc' }, { createdAt: 'asc' }],
     }),
-    prisma.spot.findMany({
-      where: { floor: { mapId: map.id } },
-      select: { category: true },
-      distinct: ['category'],
-      orderBy: { category: 'asc' },
+    prisma.category.findMany({
+      where: { mapId: map.id },
+      select: { id: true, name: true, order: true },
+      orderBy: categoryOrderBy,
     }),
   ])
 
@@ -64,7 +64,7 @@ export default defineEventHandler(async (event): Promise<AdminSpotListResponse> 
       floorId: spot.floorId,
       floorName: spot.floor.name,
       name: spot.name,
-      category: spot.category,
+      categories: sortSpotCategories(spot.spotCategories.map(relation => relation.category)),
       lat: spot.lat,
       lng: spot.lng,
       isPublished: spot.isPublished,
@@ -75,7 +75,7 @@ export default defineEventHandler(async (event): Promise<AdminSpotListResponse> 
       updatedAt: spot.updatedAt.toISOString(),
     })),
     filters: {
-      categories: categoryRows.map(row => row.category),
+      categories,
       floors,
     },
   }

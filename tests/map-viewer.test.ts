@@ -23,7 +23,7 @@ import { getPinColorVariants, mixHexColor } from '../shared/utils/pin-style'
 const baseSpot: MapViewerSpot = {
   id: 'spot-1',
   name: 'テストスポット',
-  category: '温泉',
+  categories: [{ id: 'category-1', name: '温泉', order: 0 }],
   lat: 35.7,
   lng: 139.7,
   pinIconType: 'preset',
@@ -98,7 +98,7 @@ describe('フロアごとのズーム制約', () => {
 })
 
 describe('Markerの表示内容', () => {
-  it('カテゴリの既定プリセットと保存色を反映する', () => {
+  it('汎用の既定プリセットと保存色を反映する', () => {
     expect(getSpotMarkerPresentation(baseSpot)).toEqual({
       type: 'preset',
       color: '#C7401F',
@@ -106,7 +106,7 @@ describe('Markerの表示内容', () => {
       darkColor: '#772613',
       imageUrl: null,
       iconFamily: 'kanji',
-      symbol: '♨',
+      symbol: '●',
     })
   })
 

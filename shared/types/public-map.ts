@@ -1,10 +1,11 @@
 import type { PinIconType } from '../constants/spot'
+import type { SpotCategorySummary } from './category'
 
 export interface PublicSpot {
   id: string
   floorId: string
   name: string
-  category: string
+  categories: SpotCategorySummary[]
   description: string | null
   lat: number
   lng: number

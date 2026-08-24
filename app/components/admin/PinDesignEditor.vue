@@ -19,7 +19,6 @@ import { getPinColorVariants } from '~~/shared/utils/pin-style'
 const props = defineProps<{
   mapId: string
   spotId: string
-  category: string
   initialValue: {
     pinIconType: PinIconType
     pinIconId: string | null
@@ -34,7 +33,7 @@ const emit = defineEmits<{
 
 const design = reactive<PinDesignInput>({
   ...props.initialValue,
-  pinIconId: normalizePinIconId(props.initialValue.pinIconId, props.category),
+  pinIconId: normalizePinIconId(props.initialValue.pinIconId),
 })
 const isSaving = ref(false)
 const errorMessage = ref('')
@@ -50,12 +49,12 @@ const selectedIconFamily = computed(() => selectedPreset.value.family)
 const lastKanjiIconId = ref<PinIconPresetId>(
   selectedPreset.value.family === 'kanji'
     ? selectedPreset.value.id
-    : defaultPinIconId(props.category),
+    : defaultPinIconId(),
 )
 const lastMaterialIconId = ref<MaterialSymbolPresetId>(
   selectedPreset.value.family === 'material'
     ? selectedPreset.value.id
-    : defaultMaterialSymbolId(props.category),
+    : defaultMaterialSymbolId(),
 )
 const usesUploadedImage = computed(() => design.pinIconType === 'custom' || design.pinIconType === 'illustration')
 const uploadHeading = computed(() => design.pinIconType === 'illustration' ? '直置きイラスト' : 'カスタム画像')
@@ -70,11 +69,11 @@ const previewStyle = computed(() => {
 })
 
 watch(() => props.initialValue, (value) => {
-  Object.assign(design, value, { pinIconId: normalizePinIconId(value.pinIconId, props.category) })
+  Object.assign(design, value, { pinIconId: normalizePinIconId(value.pinIconId) })
 }, { deep: true })
 
 watch(() => design.pinIconId, (pinIconId) => {
-  const preset = getPinIconPreset(pinIconId, props.category)
+  const preset = getPinIconPreset(pinIconId)
   if (preset.family === 'material') lastMaterialIconId.value = preset.id
   else lastKanjiIconId.value = preset.id
 })

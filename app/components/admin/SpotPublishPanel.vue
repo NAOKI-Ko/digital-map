@@ -17,7 +17,7 @@ const isSaving = ref(false)
 const isPreviewOpen = ref(false)
 const errorMessage = ref('')
 const successMessage = ref('')
-const pinPreset = computed(() => getPinIconPreset(props.spot.pinIconId, props.spot.category))
+const pinPreset = computed(() => getPinIconPreset(props.spot.pinIconId))
 const hasCoordinates = computed(() => props.spot.lat !== null && props.spot.lng !== null)
 const pinStyle = computed(() => {
   const colors = getPinColorVariants(props.spot.pinColor)
@@ -113,7 +113,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleKeydown))
 
           <div class="px-6 pb-6 pt-10">
             <div class="flex flex-wrap items-center gap-2">
-              <span class="rounded-full bg-terracotta-50 px-2.5 py-1 text-xs font-semibold text-terracotta-800">{{ spot.category }}</span>
+              <span v-for="category in spot.categories" :key="category.id" class="rounded-full bg-terracotta-50 px-2.5 py-1 text-xs font-semibold text-terracotta-800">{{ category.name }}</span>
               <span class="text-xs text-stone-500">{{ spot.floorName }}</span>
             </div>
             <h3 id="spot-preview-title" class="mt-3 text-2xl font-bold tracking-tight text-stone-900">{{ spot.name }}</h3>
