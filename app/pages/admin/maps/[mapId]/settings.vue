@@ -81,6 +81,7 @@ async function saveMap(input: MapNameInput) {
           <p class="mt-1 text-sm text-stone-600">
             管理画面と公開画面に表示する名称です。
           </p>
+          <p class="mt-2 text-xs text-stone-500">公開URL: /{{ data.map.slug }}（既存リンクを保護するため、この画面では変更できません）</p>
         </div>
         <div v-if="submitError" role="alert" class="mb-6 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
           {{ submitError }}

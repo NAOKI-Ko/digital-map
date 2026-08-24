@@ -76,3 +76,7 @@ export interface SpotPublishResponse {
     updatedAt: string
   }
 }
+
+export interface SpotBulkResponse {
+  updatedCount: number
+}
