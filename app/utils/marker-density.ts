@@ -38,7 +38,7 @@ export function applyMarkerDensityPresentation(
   element: HTMLElement,
   presentation: ReturnType<typeof getMarkerDensityPresentation>,
 ) {
-  element.style.opacity = presentation.opacity.toFixed(3)
   element.style.zIndex = String(presentation.priority)
+  element.style.setProperty('--marker-density-opacity', presentation.opacity.toFixed(3))
   element.style.setProperty('--marker-density-scale', presentation.scale.toFixed(3))
 }
