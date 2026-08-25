@@ -79,7 +79,12 @@ async function createSpot(input: SpotFormInput) {
     <div v-if="floors.length === 0" class="mt-8 rounded-xl bg-amber-50 p-6 text-sm text-amber-800">先にフロアを1件以上登録してください。</div>
     <div v-if="submitError" role="alert" class="mt-6 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{{ submitError }}</div>
     <section class="mt-8 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
-      <SpotForm :floors="floors" :categories="categoryData?.categories ?? []" :initial-value="initialValue" :is-submitting="isSubmitting" submit-label="スポットを登録する" @submit="createSpot" />
+      <ClientOnly>
+        <SpotForm :floors="floors" :categories="categoryData?.categories ?? []" :initial-value="initialValue" :is-submitting="isSubmitting" submit-label="スポットを登録する" @submit="createSpot" />
+        <template #fallback>
+          <p class="text-sm text-stone-600">フォームを読み込んでいます…</p>
+        </template>
+      </ClientOnly>
     </section>
   </div>
 </template>

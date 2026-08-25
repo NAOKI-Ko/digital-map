@@ -65,7 +65,12 @@ async function updateSpot(input: SpotFormInput) {
       <div v-if="submitError" role="alert" class="mt-6 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{{ submitError }}</div>
       <div v-if="successMessage" role="status" class="mt-6 rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{{ successMessage }}</div>
       <section class="mt-8 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
-        <SpotForm :floors="data.floors" :categories="data.categories" :initial-value="initialValue" :is-submitting="isSubmitting" @submit="updateSpot" />
+        <ClientOnly>
+          <SpotForm :floors="data.floors" :categories="data.categories" :initial-value="initialValue" :is-submitting="isSubmitting" @submit="updateSpot" />
+          <template #fallback>
+            <p class="text-sm text-stone-600">フォームを読み込んでいます…</p>
+          </template>
+        </ClientOnly>
       </section>
       <section class="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
         <SpotPhotoManager
