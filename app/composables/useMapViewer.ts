@@ -139,6 +139,14 @@ export function createSpotMarkerOptions(element: HTMLElement, mode: MapViewerMod
     element,
     anchor: 'bottom',
     draggable: mode === 'edit',
+    subpixelPositioning: true,
+  }
+}
+
+export function createDraftMarkerOptions(): MarkerOptions {
+  return {
+    color: '#C7401F',
+    subpixelPositioning: true,
   }
 }
 
@@ -361,7 +369,7 @@ export function useMapViewer(
 
     if (!draftMarker) {
       draftMarker = addMarkerAtPosition(
-        new currentMaplibre.Marker({ color: '#C7401F' }),
+        new currentMaplibre.Marker(createDraftMarkerOptions()),
         instance,
         position,
       )

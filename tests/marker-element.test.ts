@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 import { describe, expect, it, vi } from 'vitest'
 import { createSpotMarkerElement } from '../app/utils/marker-element'
 import type { MapViewerSpot } from '../shared/types/map-viewer'
@@ -59,6 +60,11 @@ const fakeDocument = {
   },
 }
 
+const mapViewerSource = readFileSync(
+  new URL('../app/components/map/MapViewer.vue', import.meta.url),
+  'utf8',
+)
+
 const baseSpot: MapViewerSpot = {
   id: 'spot-1',
   name: 'テストスポット',
@@ -81,6 +87,26 @@ function createElement(overrides: Partial<MapViewerSpot> = {}) {
 }
 
 describe('Marker DOM生成', () => {
+  it.each([
+    ['normal', 'preset', null, 'map-viewer-marker__shape'],
+    ['normal', 'custom', '/uploads/custom.png', 'map-viewer-marker__shape'],
+    ['normal', 'illustration', '/uploads/illustration.png', 'map-viewer-marker__illustration'],
+    ['featured', 'preset', null, 'map-viewer-marker__shape'],
+    ['featured', 'custom', '/uploads/custom.png', 'map-viewer-marker__shape'],
+    ['featured', 'illustration', '/uploads/illustration.png', 'map-viewer-marker__illustration'],
+  ] as const)('%s / %sはMapLibre rootとscale対象visualを分離する', (importance, pinIconType, pinIconImageUrl, visualClass) => {
+    const marker = createElement({ importance, pinIconType, pinIconImageUrl })
+
+    expect(marker.attributes.get('data-marker-contact')).toBe('bottom-center')
+    expect(marker.style.properties.has('transform')).toBe(false)
+    expect(marker.children[1]?.className).toBe(visualClass)
+  })
+
+  it('scale対象visualはbottom接点をtransform-originにする', () => {
+    expect(mapViewerSource).toMatch(/\.map-viewer-marker__shape\s*\{[\s\S]*?transform-origin:\s*bottom left;/)
+    expect(mapViewerSource).toMatch(/\.map-viewer-marker__illustration\s*\{[\s\S]*?transform-origin:\s*bottom center;/)
+  })
+
   it('重要度をデザイン方式と独立した属性として付与する', () => {
     const marker = createElement({ importance: 'featured', pinIconType: 'illustration', pinIconImageUrl: '/pin.png' })
 

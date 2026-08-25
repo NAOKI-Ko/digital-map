@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import {
   ABSOLUTE_ZOOM_LIMITS,
   addMarkerAtPosition,
+  createDraftMarkerOptions,
   createFloorZoomConstraints,
   createMapViewerOptions,
   createSpotMarkerOptions,
@@ -205,6 +206,14 @@ describe('Markerの表示内容', () => {
       element,
       anchor: 'bottom',
       draggable: mode === 'edit',
+      subpixelPositioning: true,
+    })
+  })
+
+  it('仮Markerもzoom時に投影座標を整数pixelへ丸めない', () => {
+    expect(createDraftMarkerOptions()).toEqual({
+      color: '#C7401F',
+      subpixelPositioning: true,
     })
   })
 })
