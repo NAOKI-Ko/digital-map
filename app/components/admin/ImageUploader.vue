@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { ImageUploadResponse, UploadedImage } from '~~/shared/types/upload'
+import ConfirmDialog from '~/components/ui/ConfirmDialog.vue'
 
 const props = withDefaults(defineProps<{
   label?: string
@@ -21,6 +22,7 @@ const errorMessage = ref('')
 const uploadedImage = ref<UploadedImage>()
 const selectedFile = ref<File>()
 const previewUrl = ref('')
+const uploadConfirmOpen = ref(false)
 
 function clearSelection() {
   if (previewUrl.value) URL.revokeObjectURL(previewUrl.value)
@@ -61,10 +63,16 @@ function selectFile(event: Event) {
   previewUrl.value = URL.createObjectURL(file)
 }
 
-async function confirmUpload() {
+function requestUpload() {
+  if (!selectedFile.value) return
+  if (props.confirmMessage) uploadConfirmOpen.value = true
+  else performUpload()
+}
+
+async function performUpload() {
   const file = selectedFile.value
   if (!file) return
-  if (props.confirmMessage && !window.confirm(props.confirmMessage)) return
+  uploadConfirmOpen.value = false
   isUploading.value = true
   try {
     const body = new FormData()
@@ -130,7 +138,7 @@ function getErrorMessage(error: unknown) {
       <p class="break-all text-sm font-semibold text-stone-800">{{ selectedFile.name }}</p>
       <img :src="previewUrl" :alt="`${props.label}の選択プレビュー`" class="mt-3 max-h-72 w-full rounded-lg bg-stone-50 object-contain">
       <div class="mt-3 flex gap-2">
-        <button type="button" :disabled="isUploading" class="rounded-lg bg-terracotta-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50" @click="confirmUpload">{{ isUploading ? 'アップロード中…' : 'この画像を使用' }}</button>
+        <button type="button" :disabled="isUploading" class="rounded-lg bg-terracotta-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50" @click="requestUpload">{{ isUploading ? 'アップロード中…' : 'この画像を使用' }}</button>
         <button type="button" :disabled="isUploading" class="rounded-lg border border-stone-300 px-4 py-2 text-sm" @click="clearSelection">キャンセル</button>
       </div>
     </div>
@@ -149,5 +157,6 @@ function getErrorMessage(error: unknown) {
         class="mt-3 max-h-72 w-full rounded-lg bg-white object-contain"
       >
     </div>
+    <ConfirmDialog :open="uploadConfirmOpen" title="画像を差し替え" :message="confirmMessage" confirm-label="アップロードする" :busy="isUploading" @cancel="uploadConfirmOpen = false" @confirm="performUpload" />
   </div>
 </template>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import ImageUploader from '~/components/admin/ImageUploader.vue'
+import ConfirmDialog from '~/components/ui/ConfirmDialog.vue'
 import { isGeoReferenced } from '~~/lib/geo'
 import type { FloorCreateInput, FloorUpdateInput } from '~~/shared/schemas/floor'
 import { floorCreateSchema, floorUpdateSchema } from '~~/shared/schemas/floor'
@@ -25,6 +26,15 @@ const createInput = reactive<FloorCreateInput>({
 const createError = ref('')
 const isCreating = ref(false)
 const busyFloorId = ref('')
+const operationError = ref('')
+const deleteTarget = ref<MapFloorItem | null>(null)
+const deleteMessage = computed(() => {
+  const floor = deleteTarget.value
+  if (!floor) return ''
+  return floor.spotCount > 0
+    ? `「${floor.name}」と登録済みスポット${floor.spotCount}件を削除します。関連する写真やカテゴリー設定も登録から外れ、元に戻せません。`
+    : `「${floor.name}」を削除します。元に戻せません。`
+})
 
 function isFloorGeoreferenced(floor: MapFloorItem) {
   return isGeoReferenced(floor)
@@ -43,6 +53,7 @@ function useUploadedImage(image: UploadedImage) {
 
 async function replaceFloorImage(floor: MapFloorItem, image: UploadedImage) {
   busyFloorId.value = floor.id
+  operationError.value = ''
   try {
     const response = await $fetch<MapFloorResponse>(`/api/maps/${mapId}/floors/${floor.id}`, {
       method: 'PATCH',
@@ -50,7 +61,7 @@ async function replaceFloorImage(floor: MapFloorItem, image: UploadedImage) {
     })
     if (data.value) data.value = { floors: data.value.floors.map(item => item.id === floor.id ? response.floor : item) }
   }
-  catch { window.alert('フロア画像を差し替えできませんでした。') }
+  catch { operationError.value = 'フロア画像を差し替えできませんでした。もう一度お試しください。' }
   finally { busyFloorId.value = '' }
 }
 
@@ -90,11 +101,12 @@ async function updateFloor(floor: MapFloorItem) {
   const input: FloorUpdateInput = { name: floor.name }
   const result = floorUpdateSchema.safeParse(input)
   if (!result.success) {
-    window.alert(result.error.issues[0]?.message ?? '入力内容を確認してください。')
+    operationError.value = result.error.issues[0]?.message ?? '入力内容を確認してください。'
     return
   }
 
   busyFloorId.value = floor.id
+  operationError.value = ''
   try {
     const response = await $fetch<MapFloorResponse>(`/api/maps/${mapId}/floors/${floor.id}`, {
       method: 'PATCH',
@@ -107,7 +119,7 @@ async function updateFloor(floor: MapFloorItem) {
     }
   }
   catch {
-    window.alert('フロアを保存できませんでした。')
+    operationError.value = 'フロアを保存できませんでした。もう一度お試しください。'
   }
   finally {
     busyFloorId.value = ''
@@ -129,6 +141,7 @@ async function moveFloor(index: number, direction: -1 | 1) {
   }
 
   try {
+    operationError.value = ''
     await $fetch(`/api/maps/${mapId}/floors/reorder`, {
       method: 'PATCH',
       body: { floorIds: reordered.map(floor => floor.id) },
@@ -136,17 +149,19 @@ async function moveFloor(index: number, direction: -1 | 1) {
   }
   catch {
     data.value = { floors: previousFloors }
-    window.alert('並び順を保存できませんでした。')
+    operationError.value = '並び順を保存できませんでした。もう一度お試しください。'
   }
 }
 
-async function deleteFloor(floor: MapFloorItem) {
-  const message = floor.spotCount > 0
-    ? `「${floor.name}」と登録済みスポット${floor.spotCount}件を削除します。元に戻せません。よろしいですか？`
-    : `「${floor.name}」を削除します。元に戻せません。よろしいですか？`
-  if (!window.confirm(message)) return
+function requestDeleteFloor(floor: MapFloorItem) {
+  deleteTarget.value = floor
+}
 
+async function confirmDeleteFloor() {
+  const floor = deleteTarget.value
+  if (!floor) return
   busyFloorId.value = floor.id
+  operationError.value = ''
   try {
     const response = await fetch(`/api/maps/${mapId}/floors/${floor.id}`, { method: 'DELETE' })
     if (!response.ok) throw new Error('Failed to delete floor')
@@ -157,9 +172,10 @@ async function deleteFloor(floor: MapFloorItem) {
           .map((item, order) => ({ ...item, order })),
       }
     }
+    deleteTarget.value = null
   }
   catch {
-    window.alert('フロアを削除できませんでした。')
+    operationError.value = 'フロアを削除できませんでした。もう一度お試しください。'
   }
   finally {
     busyFloorId.value = ''
@@ -179,6 +195,7 @@ async function deleteFloor(floor: MapFloorItem) {
       <h1 class="mt-1 text-2xl font-bold tracking-tight text-stone-900 sm:text-3xl">フロア管理</h1>
       <p class="mt-2 text-sm text-stone-600">フロアごとのイラスト、名称、ジオリファレンス設定状況を管理します。</p>
     </header>
+    <p v-if="operationError" role="alert" class="mt-6 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{{ operationError }}</p>
 
     <section class="mt-8 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
       <h2 class="text-lg font-bold text-stone-900">フロアを追加</h2>
@@ -244,12 +261,13 @@ async function deleteFloor(floor: MapFloorItem) {
               <div class="mt-4 flex flex-wrap gap-3">
                 <NuxtLink :to="`/admin/maps/${mapId}/floors/${floor.id}/georeference`" class="rounded-lg border border-terracotta-300 bg-terracotta-50 px-4 py-2 text-sm font-semibold text-terracotta-800 hover:bg-terracotta-100">{{ isFloorGeoreferenced(floor) ? 'ジオリファレンスを調整' : 'ジオリファレンスを設定' }}</NuxtLink>
                 <button type="button" :disabled="busyFloorId === floor.id" class="rounded-lg bg-stone-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60" @click="updateFloor(floor)">変更を保存</button>
-                <button type="button" :disabled="busyFloorId === floor.id" class="rounded-lg px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-50 disabled:opacity-60" @click="deleteFloor(floor)">削除</button>
+                <button type="button" :disabled="busyFloorId === floor.id" class="rounded-lg px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-50 disabled:opacity-60" @click="requestDeleteFloor(floor)">削除</button>
               </div>
             </div>
           </div>
         </li>
       </ol>
     </section>
+    <ConfirmDialog :open="deleteTarget !== null" title="フロアを削除" :message="deleteMessage" confirm-label="削除する" destructive :busy="Boolean(busyFloorId)" @cancel="deleteTarget = null" @confirm="confirmDeleteFloor" />
   </div>
 </template>

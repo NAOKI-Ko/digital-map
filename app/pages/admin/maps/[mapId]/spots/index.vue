@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { AdminSpotListResponse } from '~~/shared/types/spot'
+import ConfirmDialog from '~/components/ui/ConfirmDialog.vue'
 
 definePageMeta({
   layout: 'admin',
@@ -20,6 +21,7 @@ const selectedSpotIds = ref<string[]>([])
 const bulkCategoryIds = ref<string[]>([])
 const bulkMessage = ref('')
 const isBulkSaving = ref(false)
+const bulkDeleteOpen = ref(false)
 const allCurrentSelected = computed(() => Boolean(data.value?.spots.length) && data.value!.spots.every(spot => selectedSpotIds.value.includes(spot.id)))
 
 useHead({ title: 'スポット一覧 | デジタルマップ' })
@@ -39,7 +41,14 @@ function toggleAllCurrent() {
 
 async function runBulk(action: 'delete' | 'publish' | 'unpublish' | 'setCategories') {
   if (!selectedSpotIds.value.length) return
-  if (action === 'delete' && !window.confirm(`選択した${selectedSpotIds.value.length}件を削除します。元に戻せません。`)) return
+  if (action === 'delete') {
+    bulkDeleteOpen.value = true
+    return
+  }
+  await executeBulk(action)
+}
+
+async function executeBulk(action: 'delete' | 'publish' | 'unpublish' | 'setCategories') {
   isBulkSaving.value = true
   bulkMessage.value = ''
   try {
@@ -49,6 +58,7 @@ async function runBulk(action: 'delete' | 'publish' | 'unpublish' | 'setCategori
     })
     bulkMessage.value = `${selectedSpotIds.value.length}件を更新しました。`
     selectedSpotIds.value = []
+    bulkDeleteOpen.value = false
     await refresh()
   }
   catch (error: any) { bulkMessage.value = error?.data?.statusMessage ?? '一括操作を完了できませんでした。' }
@@ -165,5 +175,6 @@ function formatDate(value: string) {
         </ul>
       </div>
     </section>
+    <ConfirmDialog :open="bulkDeleteOpen" title="スポットを一括削除" :message="`選択した${selectedSpotIds.length}件のスポットを削除します。関連する写真やカテゴリー設定も登録から外れ、元に戻せません。`" confirm-label="削除する" destructive :busy="isBulkSaving" @cancel="bulkDeleteOpen = false" @confirm="executeBulk('delete')" />
   </div>
 </template>

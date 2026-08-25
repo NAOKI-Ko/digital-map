@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import CategoryIconEditor from '~/components/admin/CategoryIconEditor.vue'
+import AppDialog from '~/components/ui/AppDialog.vue'
+import ConfirmDialog from '~/components/ui/ConfirmDialog.vue'
 import type { CategoryIconType } from '~~/shared/constants/category'
+import { categoryUpdateSchema } from '~~/shared/schemas/category'
 import type { CategoryListResponse, CategoryResponse, CategorySummary } from '~~/shared/types/category'
 
 interface CategoryIconDraft {
@@ -19,6 +22,8 @@ const newIcon = ref<CategoryIconDraft>({ iconType: null, iconPresetId: null, ico
 const editingId = ref<string | null>(null)
 const editName = ref('')
 const editIcon = ref<CategoryIconDraft>({ iconType: null, iconPresetId: null, iconImageUrl: null })
+const editError = ref('')
+const deleteTarget = ref<CategorySummary | null>(null)
 const message = ref('')
 const isSaving = ref(false)
 
@@ -46,17 +51,37 @@ function startEditing(category: CategorySummary) {
     iconImageUrl: category.iconImageUrl,
   }
   message.value = ''
+  editError.value = ''
 }
 
-async function saveCategory(category: CategorySummary) {
+function closeEditor() {
+  if (isSaving.value) return
+  editingId.value = null
+  editError.value = ''
+}
+
+function handleEditEnter(event: KeyboardEvent) {
+  event.preventDefault()
+  if (event.isComposing) return
+  void saveCategory()
+}
+
+async function saveCategory() {
+  const category = data.value?.categories.find(item => item.id === editingId.value)
+  if (!category) return
+  const result = categoryUpdateSchema.safeParse({ name: editName.value, ...editIcon.value })
+  if (!result.success) {
+    editError.value = result.error.issues[0]?.message ?? '入力内容を確認してください。'
+    return
+  }
   isSaving.value = true
-  message.value = ''
+  editError.value = ''
   try {
-    await $fetch(`/api/maps/${mapId}/categories/${category.id}`, { method: 'PATCH', body: { name: editName.value, ...editIcon.value } })
+    await $fetch(`/api/maps/${mapId}/categories/${category.id}`, { method: 'PATCH', body: result.data })
     editingId.value = null
     await refresh()
   }
-  catch (error: any) { message.value = error?.data?.statusMessage ?? 'カテゴリーを変更できませんでした。' }
+  catch (error: any) { editError.value = error?.data?.statusMessage ?? 'カテゴリーを変更できませんでした。' }
   finally { isSaving.value = false }
 }
 
@@ -73,13 +98,17 @@ async function moveCategory(index: number, direction: -1 | 1) {
   await refresh()
 }
 
-async function deleteCategory(category: CategorySummary) {
-  if (!window.confirm(`「${category.name}」を削除しますか？`)) return
+async function deleteCategory() {
+  const category = deleteTarget.value
+  if (!category) return
+  isSaving.value = true
   try {
     await $fetch(`/api/maps/${mapId}/categories/${category.id}`, { method: 'DELETE' })
+    deleteTarget.value = null
     await refresh()
   }
   catch (error: any) { message.value = error?.data?.statusMessage ?? 'カテゴリーを削除できませんでした。' }
+  finally { isSaving.value = false }
 }
 </script>
 
@@ -104,16 +133,22 @@ async function deleteCategory(category: CategorySummary) {
           <div class="flex gap-2">
             <button type="button" :disabled="index === 0" class="rounded border px-3 py-1.5 disabled:opacity-30" aria-label="上へ移動" @click="moveCategory(index, -1)">↑</button>
             <button type="button" :disabled="index === (data?.categories.length ?? 0) - 1" class="rounded border px-3 py-1.5 disabled:opacity-30" aria-label="下へ移動" @click="moveCategory(index, 1)">↓</button>
-            <button type="button" class="rounded border px-3 py-1.5" @click="editingId === category.id ? editingId = null : startEditing(category)">{{ editingId === category.id ? '閉じる' : '編集' }}</button>
-            <button type="button" :disabled="category.spotCount > 0" class="rounded border border-red-200 px-3 py-1.5 text-red-700 disabled:opacity-40" @click="deleteCategory(category)">削除</button>
+            <button type="button" class="rounded border px-3 py-1.5" @click="startEditing(category)">編集</button>
+            <button type="button" :disabled="category.spotCount > 0" class="rounded border border-red-200 px-3 py-1.5 text-red-700 disabled:opacity-40" @click="deleteTarget = category">削除</button>
           </div>
         </div>
-        <form v-if="editingId === category.id" class="mt-5 space-y-5 border-t border-stone-200 pt-5" @submit.prevent="saveCategory(category)">
-          <div><label :for="`category-name-${category.id}`" class="text-sm font-semibold text-stone-800">カテゴリー名</label><input :id="`category-name-${category.id}`" v-model="editName" maxlength="50" required class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5"></div>
-          <CategoryIconEditor v-model="editIcon" :upload-url="uploadUrl" />
-          <div class="flex justify-end gap-2"><button type="button" class="rounded-lg border border-stone-300 px-4 py-2 text-sm" @click="editingId = null">キャンセル</button><button :disabled="isSaving" class="rounded-lg bg-terracotta-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">変更を保存</button></div>
-        </form>
       </li>
     </ul>
+
+    <AppDialog :open="editingId !== null" title="カテゴリー名を編集" description="カテゴリー名とアイコンを変更できます。" max-width="lg" @close="closeEditor">
+      <form class="space-y-5" @submit.prevent="saveCategory" @keydown.enter="handleEditEnter">
+        <div><label for="edit-category-name" class="text-sm font-semibold text-stone-800">カテゴリー名</label><input id="edit-category-name" v-model="editName" autofocus maxlength="50" class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-terracotta-600"></div>
+        <CategoryIconEditor v-model="editIcon" :upload-url="uploadUrl" />
+        <p v-if="editError" role="alert" class="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{{ editError }}</p>
+        <div class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end"><button type="button" :disabled="isSaving" class="rounded-lg border border-stone-300 px-4 py-2.5 text-sm font-semibold" @click="closeEditor">キャンセル</button><button :disabled="isSaving" class="rounded-lg bg-terracotta-600 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50">{{ isSaving ? '保存中…' : '保存' }}</button></div>
+      </form>
+    </AppDialog>
+
+    <ConfirmDialog :open="deleteTarget !== null" title="カテゴリーを削除" :message="deleteTarget ? `「${deleteTarget.name}」を削除します。元に戻せません。` : ''" confirm-label="削除する" destructive :busy="isSaving" @cancel="deleteTarget = null" @confirm="deleteCategory" />
   </div>
 </template>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ImageUploadResponse } from '~~/shared/types/upload'
 import type { SpotPhotosResponse } from '~~/shared/types/spot'
+import ConfirmDialog from '~/components/ui/ConfirmDialog.vue'
 
 const props = defineProps<{
   mapId: string
@@ -17,6 +18,7 @@ const photos = ref([...props.initialPhotos])
 const isSaving = ref(false)
 const errorMessage = ref('')
 const successMessage = ref('')
+const removeTargetIndex = ref<number | null>(null)
 
 watch(() => props.initialPhotos, value => photos.value = [...value], { deep: true })
 
@@ -65,7 +67,13 @@ async function addPhotos(event: Event) {
 }
 
 async function removePhoto(index: number) {
-  if (!window.confirm('この写真を登録から外しますか？')) return
+  removeTargetIndex.value = index
+}
+
+async function confirmRemovePhoto() {
+  const index = removeTargetIndex.value
+  if (index === null) return
+  removeTargetIndex.value = null
   await saveChange(photos.value.filter((_, photoIndex) => photoIndex !== index), '写真を削除しました。')
 }
 
@@ -139,5 +147,6 @@ async function persist(nextPhotos: string[]) {
         </div>
       </li>
     </ol>
+    <ConfirmDialog :open="removeTargetIndex !== null" title="写真を削除" message="この写真をスポットの登録から外します。元の画像ファイル自体は削除されません。" confirm-label="登録から外す" destructive :busy="isSaving" @cancel="removeTargetIndex = null" @confirm="confirmRemovePhoto" />
   </div>
 </template>
