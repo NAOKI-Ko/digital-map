@@ -54,7 +54,7 @@ export default defineEventHandler(async (event): Promise<AdminSpotListResponse> 
     }),
     prisma.category.findMany({
       where: { mapId: map.id },
-      select: { id: true, name: true, order: true },
+      select: { id: true, name: true, order: true, iconType: true, iconPresetId: true, iconImageUrl: true },
       orderBy: categoryOrderBy,
     }),
   ])

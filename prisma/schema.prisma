@@ -55,6 +55,9 @@ model Category {
   map            Map            @relation(fields: [mapId], references: [id], onDelete: Cascade)
   name           String
   order          Int            @default(0)
+  iconType       String?
+  iconPresetId   String?
+  iconImageUrl   String?
   spotCategories SpotCategory[]
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt

@@ -3,6 +3,9 @@ export interface CategorySummary {
   mapId: string
   name: string
   order: number
+  iconType: string | null
+  iconPresetId: string | null
+  iconImageUrl: string | null
   spotCount: number
 }
 
@@ -10,6 +13,9 @@ export interface SpotCategorySummary {
   id: string
   name: string
   order: number
+  iconType: string | null
+  iconPresetId: string | null
+  iconImageUrl: string | null
 }
 
 export interface CategoryListResponse {

@@ -1,5 +1,6 @@
 import { categoryUpdateSchema } from '~~/shared/schemas/category'
 import type { CategoryResponse } from '~~/shared/types/category'
+import { toCategoryIconData } from '~~/server/utils/category-icon'
 
 export default defineEventHandler(async (event): Promise<CategoryResponse> => {
   const { map } = await requireOwnedMap(event)
@@ -10,7 +11,11 @@ export default defineEventHandler(async (event): Promise<CategoryResponse> => {
   try {
     const category = await prisma.category.update({
       where: { id: ownedCategory.id },
-      data: result.data,
+      data: {
+        ...(result.data.name === undefined ? {} : { name: result.data.name }),
+        ...(result.data.order === undefined ? {} : { order: result.data.order }),
+        ...toCategoryIconData(result.data, map.id),
+      },
       include: { _count: { select: { spotCategories: true } } },
     })
     return { category: toCategorySummary(category) }

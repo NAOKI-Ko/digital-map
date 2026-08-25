@@ -104,7 +104,10 @@ watch(() => props.categories, measureCategories, { deep: true })
       :aria-pressed="modelValue.includes(category.id)"
       @click="$emit('update:modelValue', toggleCategory(category.id, modelValue))"
     >
-      {{ category.name }}
+      <span class="flex items-center gap-1.5">
+        <CategoryIcon :icon-type="category.iconType" :icon-preset-id="category.iconPresetId" :icon-image-url="category.iconImageUrl" size="sm" />
+        <span>{{ category.name }}</span>
+      </span>
     </button>
 
     <div v-if="overflowCategories.length" class="relative shrink-0">
@@ -136,7 +139,10 @@ watch(() => props.categories, measureCategories, { deep: true })
           :aria-pressed="modelValue.includes(category.id)"
           @click="emit('update:modelValue', toggleCategory(category.id, modelValue))"
         >
-          <span>{{ category.name }}</span>
+          <span class="flex items-center gap-2">
+            <CategoryIcon :icon-type="category.iconType" :icon-preset-id="category.iconPresetId" :icon-image-url="category.iconImageUrl" />
+            <span>{{ category.name }}</span>
+          </span>
           <span v-if="modelValue.includes(category.id)" aria-hidden="true" class="text-terracotta-600">✓</span>
         </button>
       </div>
@@ -148,7 +154,10 @@ watch(() => props.categories, measureCategories, { deep: true })
       class="pointer-events-none fixed left-0 top-0 -z-50 flex invisible gap-2 whitespace-nowrap"
     >
       <button type="button" tabindex="-1" class="min-h-11 rounded-full px-4 py-2 text-sm font-semibold">すべて</button>
-      <button v-for="category in categories" :key="category.id" type="button" tabindex="-1" class="min-h-11 rounded-full px-4 py-2 text-sm font-semibold">{{ category.name }}</button>
+      <button v-for="category in categories" :key="category.id" type="button" tabindex="-1" class="flex min-h-11 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold">
+        <CategoryIcon :icon-type="category.iconType" :icon-preset-id="category.iconPresetId" :icon-image-url="category.iconImageUrl" size="sm" />
+        <span>{{ category.name }}</span>
+      </button>
       <button type="button" tabindex="-1" class="size-11 rounded-full text-lg font-bold">…</button>
     </div>
   </div>

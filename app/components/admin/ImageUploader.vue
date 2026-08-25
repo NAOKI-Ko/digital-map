@@ -4,9 +4,11 @@ import type { ImageUploadResponse, UploadedImage } from '~~/shared/types/upload'
 const props = withDefaults(defineProps<{
   label?: string
   confirmMessage?: string
+  uploadUrl?: string
 }>(), {
   label: 'イラスト画像',
   confirmMessage: '',
+  uploadUrl: '/api/uploads/image',
 })
 
 const emit = defineEmits<{
@@ -67,7 +69,7 @@ async function confirmUpload() {
   try {
     const body = new FormData()
     body.append('file', file)
-    const response = await $fetch<ImageUploadResponse>('/api/uploads/image', {
+    const response = await $fetch<ImageUploadResponse>(props.uploadUrl, {
       method: 'POST',
       body,
     })

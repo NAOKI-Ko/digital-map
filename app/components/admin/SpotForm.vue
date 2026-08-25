@@ -86,7 +86,8 @@ function useGeocodeResult(result: { lat: number, lng: number }) {
           <div v-if="categories.length" class="mt-2 flex flex-wrap gap-2">
             <label v-for="category in categories" :key="category.id" class="flex cursor-pointer items-center gap-2 rounded-lg border border-stone-300 px-3 py-2 text-sm">
               <input v-model="categoryIds" type="checkbox" :value="category.id" class="size-4 rounded border-stone-300 text-terracotta-600">
-              {{ category.name }}
+              <CategoryIcon :icon-type="category.iconType" :icon-preset-id="category.iconPresetId" :icon-image-url="category.iconImageUrl" size="sm" />
+              <span>{{ category.name }}</span>
             </label>
           </div>
           <p v-else class="mt-2 text-sm text-amber-700">カテゴリーはまだありません。マップ設定のカテゴリー管理から追加できます。</p>

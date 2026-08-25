@@ -49,7 +49,7 @@ export async function getMapFloorOptions(mapId: string) {
 export async function getMapCategoryOptions(mapId: string) {
   return prisma.category.findMany({
     where: { mapId },
-    select: { id: true, name: true, order: true },
+    select: { id: true, name: true, order: true, iconType: true, iconPresetId: true, iconImageUrl: true },
     orderBy: [{ order: 'asc' }, { name: 'asc' }],
   })
 }
