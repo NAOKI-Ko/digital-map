@@ -18,6 +18,11 @@ describe('Category validation', () => {
     expect(categoryCreateSchema.safeParse({ name: '観光', order: -1 }).success).toBe(false)
   })
 
+  it('50文字を許可し、51文字以上を拒否する', () => {
+    expect(categoryCreateSchema.safeParse({ name: 'あ'.repeat(50) }).success).toBe(true)
+    expect(categoryCreateSchema.safeParse({ name: 'あ'.repeat(51) }).success).toBe(false)
+  })
+
   it('PATCHはname/orderのどちらかを必須にする', () => {
     expect(categoryUpdateSchema.safeParse({}).success).toBe(false)
     expect(categoryUpdateSchema.safeParse({ order: 0 }).success).toBe(true)
@@ -52,6 +57,19 @@ describe('公開Category OR filter', () => {
   it('未選択では0 Category Spotも表示し、複数選択ではOR一致だけを返す', () => {
     expect(filterSpotsByCategoryIds(spots, []).map(spot => spot.id)).toEqual(['spot-1', 'spot-2', 'spot-3'])
     expect(filterSpotsByCategoryIds(spots, ['c1', 'c3']).map(spot => spot.id)).toEqual(['spot-1', 'spot-2'])
+  })
+
+  it('カフェ／土産の単独・複数選択をOR semanticsで処理する', () => {
+    const matrix = [
+      { id: 'a', categories: [{ id: 'cafe', name: 'カフェ', order: 0 }] },
+      { id: 'b', categories: [{ id: 'gift', name: '土産', order: 1 }] },
+      { id: 'c', categories: [{ id: 'cafe', name: 'カフェ', order: 0 }, { id: 'gift', name: '土産', order: 1 }] },
+      { id: 'd', categories: [] },
+    ] as MapViewerSpot[]
+    expect(filterSpotsByCategoryIds(matrix, []).map(spot => spot.id)).toEqual(['a', 'b', 'c', 'd'])
+    expect(filterSpotsByCategoryIds(matrix, ['cafe']).map(spot => spot.id)).toEqual(['a', 'c'])
+    expect(filterSpotsByCategoryIds(matrix, ['gift']).map(spot => spot.id)).toEqual(['b', 'c'])
+    expect(filterSpotsByCategoryIds(matrix, ['cafe', 'gift']).map(spot => spot.id)).toEqual(['a', 'b', 'c'])
   })
 })
 

@@ -118,4 +118,20 @@ describe('GET /api/public/:mapSlug', () => {
     const result = await getPublicMapBySlug('test-map')
     expect(result?.floors[0]?.spots).toEqual([])
   })
+
+  it('公開responseはCategory・importance・brandingを返し、admin用公開フラグを混ぜない', async () => {
+    mocks.findFirst.mockResolvedValue(mapRecord())
+
+    const result = await getPublicMapBySlug('test-map')
+    expect(result).toMatchObject({
+      organizationName: null,
+      logoUrl: null,
+      websiteUrl: null,
+      snsUrl: null,
+      floors: [{ spots: [{ importance: 'normal', categories: [{ id: 'category-1', name: '観光', order: 0 }] }] }],
+    })
+    expect(result).not.toHaveProperty('isPublished')
+    expect(result?.floors[0]?.spots[0]).not.toHaveProperty('isPublished')
+    expect(result?.floors[0]?.spots[0]).not.toHaveProperty('spotCategories')
+  })
 })

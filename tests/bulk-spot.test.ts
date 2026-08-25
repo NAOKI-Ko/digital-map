@@ -13,4 +13,9 @@ describe('Spot一括操作validation', () => {
   it('対象Spotなしを拒否する', () => {
     expect(spotBulkSchema.safeParse({ action: 'delete', spotIds: [] }).success).toBe(false)
   })
+
+  it('一括操作は100件まで許可し、101件を拒否する', () => {
+    expect(spotBulkSchema.safeParse({ action: 'delete', spotIds: Array.from({ length: 100 }, (_, index) => `spot-${index}`) }).success).toBe(true)
+    expect(spotBulkSchema.safeParse({ action: 'delete', spotIds: Array.from({ length: 101 }, (_, index) => `spot-${index}`) }).success).toBe(false)
+  })
 })
