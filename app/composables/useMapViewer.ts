@@ -1,5 +1,5 @@
 import { onBeforeUnmount, onMounted, readonly, ref, shallowRef, watch, type Ref } from 'vue'
-import type { GeolocateControl, Map as MapLibreMap, MapOptions, Marker, MarkerOptions, StyleSpecification } from 'maplibre-gl'
+import type { GeolocateControl, IControl, Map as MapLibreMap, MapOptions, Marker, MarkerOptions, StyleSpecification } from 'maplibre-gl'
 import { getFloorCorners, getGeoReferenceBounds, isGeoReferenced, isWithinFloorArea, toImageCoordinates, type FloorCorners, type LatLng } from '~~/lib/geo'
 import type { MapViewerCameraState, MapViewerFloor, MapViewerSpot } from '~~/shared/types/map-viewer'
 import { createSpotMarkerElement } from '~/utils/marker-element'
@@ -165,6 +165,60 @@ export function restoreMapViewerCamera(instance: MapLibreMap, camera: MapViewerC
   })
 }
 
+function createControlButton(label: string, text: string, action: () => void) {
+  const button = document.createElement('button')
+  button.type = 'button'
+  button.title = label
+  button.setAttribute('aria-label', label)
+  button.textContent = text
+  button.addEventListener('click', action)
+  return button
+}
+
+export class MapNavigationControl implements IControl {
+  private map: MapLibreMap | null = null
+  private container: HTMLElement | null = null
+
+  onAdd(map: MapLibreMap) {
+    this.map = map
+    const container = document.createElement('div')
+    container.className = 'map-viewer-navigation-control'
+    container.append(
+      createControlButton('拡大', '+', () => this.map?.zoomIn()),
+      createControlButton('縮小', '−', () => this.map?.zoomOut()),
+      createControlButton('方位をリセット', 'N', () => this.map?.easeTo({ bearing: 0, pitch: 0 })),
+    )
+    this.container = container
+    return container
+  }
+
+  onRemove(_map: MapLibreMap) {
+    this.container?.remove()
+    this.container = null
+    this.map = null
+  }
+}
+
+export class HorizontalMapControlGroup implements IControl {
+  private container: HTMLElement | null = null
+
+  constructor(private readonly controls: IControl[]) {}
+
+  onAdd(map: MapLibreMap) {
+    const container = document.createElement('div')
+    container.className = 'maplibregl-ctrl map-viewer-control-group'
+    this.controls.forEach(control => container.appendChild(control.onAdd(map)))
+    this.container = container
+    return container
+  }
+
+  onRemove(map: MapLibreMap) {
+    this.controls.toReversed().forEach(control => control.onRemove(map))
+    this.container?.remove()
+    this.container = null
+  }
+}
+
 export function useMapViewer(
   container: Readonly<Ref<HTMLElement | null>>,
   options: UseMapViewerOptions,
@@ -180,6 +234,7 @@ export function useMapViewer(
   let spotMarkers: Marker[] = []
   let spotMarkerElements: Array<{ element: HTMLElement, spot: MapViewerSpot }> = []
   let geolocateControl: GeolocateControl | null = null
+  let mapControlGroup: HorizontalMapControlGroup | null = null
   let geolocateHandler: ((position: GeolocationPosition) => void) | null = null
   let currentLocationMarker: Marker | null = null
   let activeSourceId: string | null = null
@@ -196,12 +251,6 @@ export function useMapViewer(
       maplibre.value = maplibregl
       const instance = new maplibregl.Map(createMapViewerOptions(container.value, options.mode))
       map.value = instance
-      instance.addControl(new maplibregl.NavigationControl({
-        showCompass: options.mode === 'view',
-        showZoom: true,
-        visualizePitch: options.mode === 'view',
-      }), 'top-right')
-
       instance.once('load', () => {
         if (map.value !== instance) return
         isReady.value = true
@@ -254,12 +303,13 @@ export function useMapViewer(
     if (geolocateControl && geolocateHandler) {
       geolocateControl.off('geolocate', geolocateHandler)
     }
-    if (instance && geolocateControl && instance.hasControl(geolocateControl)) {
-      instance.removeControl(geolocateControl)
+    if (instance && mapControlGroup && instance.hasControl(mapControlGroup)) {
+      instance.removeControl(mapControlGroup)
     }
     currentLocationMarker?.remove()
     currentLocationMarker = null
     geolocateControl = null
+    mapControlGroup = null
     geolocateHandler = null
     geolocationAvailable.value = false
     geolocationAreaMessage.value = ''
@@ -269,7 +319,14 @@ export function useMapViewer(
     removeGeolocateControl()
     const instance = map.value
     const currentMaplibre = maplibre.value
-    if (!instance || !currentMaplibre || !shouldEnableGeolocate(floor)) return
+    if (!instance || !currentMaplibre) return
+
+    const controls: IControl[] = [new MapNavigationControl()]
+    if (!shouldEnableGeolocate(floor)) {
+      mapControlGroup = new HorizontalMapControlGroup(controls)
+      instance.addControl(mapControlGroup, 'top-right')
+      return
+    }
 
     // 標準マーカーは判定より先に表示されるため無効化し、範囲内だけ独自表示する。
     geolocateControl = new currentMaplibre.GeolocateControl(GEOLOCATE_CONTROL_OPTIONS)
@@ -303,7 +360,9 @@ export function useMapViewer(
       currentLocationMarker.setLngLat([lng, lat])
     }
     geolocateControl.on('geolocate', geolocateHandler)
-    instance.addControl(geolocateControl, 'top-right')
+    controls.push(geolocateControl)
+    mapControlGroup = new HorizontalMapControlGroup(controls)
+    instance.addControl(mapControlGroup, 'top-right')
     geolocationAvailable.value = true
   }
 

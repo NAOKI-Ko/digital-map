@@ -107,8 +107,8 @@ function selectSpot(spot: MapViewerSpot) {
         </div>
 
         <div
-          class="pointer-events-none absolute inset-x-3 z-20 transition-[bottom] sm:bottom-auto sm:left-5 sm:right-20 sm:top-[4.25rem]"
-          :class="selectedSpot ? 'bottom-[calc(8.75rem+env(safe-area-inset-bottom))]' : 'bottom-[max(1rem,env(safe-area-inset-bottom))]'"
+          class="pointer-events-none absolute left-1/2 z-20 w-[min(50vw,44rem)] -translate-x-1/2 transition-[bottom] max-sm:w-[calc(100vw-1.5rem)]"
+          :class="selectedSpot ? 'bottom-[calc(8.75rem+env(safe-area-inset-bottom))] sm:bottom-[max(1rem,env(safe-area-inset-bottom))]' : 'bottom-[max(1rem,env(safe-area-inset-bottom))]'"
         >
           <div class="pointer-events-auto">
             <CategoryFilter v-model="selectedCategoryIds" :categories="categories" />

@@ -36,7 +36,7 @@ const floor = toRef(props, 'floor')
 const spots = toRef(props, 'spots')
 const position = toRef(props, 'modelValue')
 const selectedSpotId = toRef(props, 'selectedSpotId')
-const { floorError, geolocationAreaMessage, geolocationAvailable, mapError } = useMapViewer(container, {
+const { floorError, geolocationAreaMessage, mapError } = useMapViewer(container, {
   floor,
   spots,
   position,
@@ -74,12 +74,6 @@ const { floorError, geolocationAreaMessage, geolocationAvailable, mapError } = u
         <p>{{ floorError }}</p>
         <NuxtLink v-if="floorErrorActionTo" :to="floorErrorActionTo" class="mt-4 inline-flex rounded-lg bg-terracotta-600 px-4 py-2 text-sm font-semibold text-white hover:bg-terracotta-700">ジオリファレンスを設定</NuxtLink>
       </div>
-      <p
-        v-if="geolocationAvailable"
-        class="pointer-events-none absolute bottom-3 left-3 max-w-xs rounded-lg bg-white/90 px-3 py-2 text-xs leading-5 text-stone-600 shadow"
-      >
-        現在地はイラスト上のおおよその目安です。
-      </p>
       <p
         v-if="geolocationAreaMessage"
         role="status"
@@ -233,5 +227,43 @@ const { floorError, geolocationAreaMessage, geolocationAvailable, mapError } = u
   border-radius: 9999px;
   background: #2563eb;
   box-shadow: 0 0 0 0.3rem rgb(37 99 235 / 25%), 0 2px 8px rgb(0 0 0 / 35%);
+}
+
+.map-viewer-control-group {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0.75rem 0.75rem 0 0;
+}
+
+.maplibregl-ctrl-top-right .map-viewer-control-group > .maplibregl-ctrl {
+  margin: 0;
+}
+
+.map-viewer-navigation-control {
+  display: flex;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  background: white;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 30%);
+}
+
+.map-viewer-navigation-control button,
+.map-viewer-control-group .maplibregl-ctrl-geolocate {
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
+}
+
+.map-viewer-navigation-control button + button {
+  border-left: 1px solid #e7e5e4;
+}
+
+.map-viewer-navigation-control button:focus-visible,
+.map-viewer-control-group .maplibregl-ctrl-geolocate:focus-visible {
+  position: relative;
+  z-index: 1;
+  outline: 2px solid #1c1917;
+  outline-offset: -2px;
 }
 </style>
