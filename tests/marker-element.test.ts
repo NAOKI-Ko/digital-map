@@ -64,6 +64,23 @@ const mapViewerSource = readFileSync(
   new URL('../app/components/map/MapViewer.vue', import.meta.url),
   'utf8',
 )
+const pinDesignEditorSource = readFileSync(
+  new URL('../app/components/admin/PinDesignEditor.vue', import.meta.url),
+  'utf8',
+)
+const spotPublishPanelSource = readFileSync(
+  new URL('../app/components/admin/SpotPublishPanel.vue', import.meta.url),
+  'utf8',
+)
+
+function cssRule(source: string, selector: string) {
+  const escapedSelector = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  return source.match(new RegExp(`${escapedSelector}\\s*\\{([\\s\\S]*?)\\}`))?.[1] ?? ''
+}
+
+function remValue(rule: string, property: string) {
+  return Number(rule.match(new RegExp(`${property}:\\s*([\\d.]+)rem;`))?.[1])
+}
 
 const baseSpot: MapViewerSpot = {
   id: 'spot-1',
@@ -105,6 +122,32 @@ describe('Marker DOM生成', () => {
   it('scale対象visualはbottom接点をtransform-originにする', () => {
     expect(mapViewerSource).toMatch(/\.map-viewer-marker__shape\s*\{[\s\S]*?transform-origin:\s*bottom left;/)
     expect(mapViewerSource).toMatch(/\.map-viewer-marker__illustration\s*\{[\s\S]*?transform-origin:\s*bottom center;/)
+  })
+
+  it('presetとcustomは外形を広げず内部contentが本体幅の75%以上を使う', () => {
+    const shapeRule = cssRule(mapViewerSource, '.map-viewer-marker__shape')
+    const contentRule = cssRule(mapViewerSource, '.map-viewer-marker__content')
+    const shapeWidth = remValue(shapeRule, 'width')
+    const contentWidth = remValue(contentRule, 'width')
+
+    expect(contentWidth / shapeWidth).toBeGreaterThanOrEqual(0.75)
+    expect(remValue(contentRule, 'height')).toBe(contentWidth)
+    expect(contentRule).toMatch(/object-fit:\s*cover;/)
+    expect(contentRule).toMatch(/object-position:\s*center;/)
+  })
+
+  it('管理画面のcustom previewも共通content classで内部領域を広げる', () => {
+    const pinDesignShapeWidth = remValue(cssRule(pinDesignEditorSource, '.pin-design-preview'), 'width')
+    const pinDesignContentWidth = remValue(cssRule(pinDesignEditorSource, '.pin-design-preview__content'), 'width')
+    const publishShapeWidth = remValue(cssRule(spotPublishPanelSource, '.spot-preview-pin'), 'width')
+    const publishContentWidth = remValue(cssRule(spotPublishPanelSource, '.spot-preview-pin__content'), 'width')
+
+    expect(pinDesignEditorSource).toContain('class="pin-design-preview__content pin-design-preview__content--custom"')
+    expect(spotPublishPanelSource).toContain('class="spot-preview-pin__content spot-preview-pin__content--custom"')
+    expect(pinDesignContentWidth / pinDesignShapeWidth).toBeGreaterThanOrEqual(0.75)
+    expect(publishContentWidth / publishShapeWidth).toBeGreaterThanOrEqual(0.75)
+    expect(cssRule(pinDesignEditorSource, '.pin-design-preview__content--custom')).toMatch(/object-fit:\s*cover;/)
+    expect(cssRule(spotPublishPanelSource, '.spot-preview-pin__content--custom')).toMatch(/object-fit:\s*cover;/)
   })
 
   it('重要度をデザイン方式と独立した属性として付与する', () => {

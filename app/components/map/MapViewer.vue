@@ -168,19 +168,21 @@ const { floorError, geolocationAreaMessage, geolocationAvailable, mapError } = u
 
 .map-viewer-marker__content {
   display: grid;
-  width: 1.55rem;
-  height: 1.55rem;
+  width: 1.875rem;
+  height: 1.875rem;
   place-items: center;
   border-radius: 9999px;
   background: white;
   color: #292524;
+  font-size: 1rem;
   line-height: 1;
   object-fit: cover;
+  object-position: center;
   transform: rotate(45deg);
 }
 
 .map-viewer-marker__content--material {
-  font-size: 1.125rem;
+  font-size: 1.375rem;
   font-style: normal;
   font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 20;
   font-weight: 400;

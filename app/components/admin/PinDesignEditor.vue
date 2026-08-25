@@ -207,12 +207,12 @@ async function save() {
           <div v-else class="pin-design-marker">
             <span class="pin-design-preview-shadow" aria-hidden="true" />
             <div class="pin-design-preview" :style="previewStyle">
-            <img v-if="design.pinIconType === 'custom' && design.pinIconImageUrl" :src="design.pinIconImageUrl" alt="カスタムピンのプレビュー" class="h-8 w-8 rounded-full bg-white object-cover">
-            <span
-              v-else
-              class="pin-design-preview__content"
-              :class="selectedPreset.family === 'material' ? 'material-symbols-outlined pin-design-preview__content--material' : 'pin-design-preview__content--kanji'"
-            >{{ selectedPreset.symbol }}</span>
+              <img v-if="design.pinIconType === 'custom' && design.pinIconImageUrl" :src="design.pinIconImageUrl" alt="カスタムピンのプレビュー" class="pin-design-preview__content pin-design-preview__content--custom">
+              <span
+                v-else
+                class="pin-design-preview__content"
+                :class="selectedPreset.family === 'material' ? 'material-symbols-outlined pin-design-preview__content--material' : 'pin-design-preview__content--kanji'"
+              >{{ selectedPreset.symbol }}</span>
             </div>
           </div>
         </div>
@@ -281,8 +281,8 @@ async function save() {
 
 .pin-design-preview__content {
   display: grid;
-  width: 2rem;
-  height: 2rem;
+  width: 3rem;
+  height: 3rem;
   place-items: center;
   border-radius: 9999px;
   background: white;
@@ -291,15 +291,20 @@ async function save() {
 }
 
 .pin-design-preview__content--kanji {
-  font-size: 1rem;
+  font-size: 1.5rem;
   font-weight: 800;
 }
 
 .pin-design-preview__content--material {
-  font-size: 1.125rem;
+  font-size: 1.75rem;
   font-style: normal;
   font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 20;
   font-weight: 400;
+}
+
+.pin-design-preview__content--custom {
+  object-fit: cover;
+  object-position: center;
 }
 
 .pin-design-illustration-preview {

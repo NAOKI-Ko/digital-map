@@ -99,7 +99,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleKeydown))
                 <span class="spot-preview-shadow" aria-hidden="true" />
                 <img v-if="spot.pinIconType === 'illustration' && spot.pinIconImageUrl" :src="spot.pinIconImageUrl" alt="" class="spot-preview-illustration">
                 <div v-else class="spot-preview-pin" :style="pinStyle">
-                  <img v-if="spot.pinIconType === 'custom' && spot.pinIconImageUrl" :src="spot.pinIconImageUrl" alt="" class="h-7 w-7 rounded-full bg-white object-cover">
+                  <img v-if="spot.pinIconType === 'custom' && spot.pinIconImageUrl" :src="spot.pinIconImageUrl" alt="" class="spot-preview-pin__content spot-preview-pin__content--custom">
                   <span
                     v-else
                     class="spot-preview-pin__content"
@@ -186,8 +186,8 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleKeydown))
 
 .spot-preview-pin__content {
   display: grid;
-  width: 2rem;
-  height: 2rem;
+  width: 2.625rem;
+  height: 2.625rem;
   place-items: center;
   border-radius: 9999px;
   background: white;
@@ -196,15 +196,20 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleKeydown))
 }
 
 .spot-preview-pin__content--kanji {
-  font-size: 0.875rem;
+  font-size: 1.125rem;
   font-weight: 800;
 }
 
 .spot-preview-pin__content--material {
-  font-size: 1.125rem;
+  font-size: 1.375rem;
   font-style: normal;
   font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 20;
   font-weight: 400;
+}
+
+.spot-preview-pin__content--custom {
+  object-fit: cover;
+  object-position: center;
 }
 
 .spot-preview-illustration {
