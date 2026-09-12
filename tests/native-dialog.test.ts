@@ -1,5 +1,6 @@
 import { readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import { categoryUpdateSchema } from '~~/shared/schemas/category'
 
@@ -20,8 +21,8 @@ function sourceFiles(directory: string): string[] {
 describe('native browser dialog regression', () => {
   it('production source does not call alert, confirm, or prompt', () => {
     const files = [
-      ...sourceFiles(new URL('../app', import.meta.url).pathname),
-      ...sourceFiles(new URL('../server', import.meta.url).pathname),
+      ...sourceFiles(fileURLToPath(new URL('../app', import.meta.url))),
+      ...sourceFiles(fileURLToPath(new URL('../server', import.meta.url))),
     ]
 
     for (const file of files) {
