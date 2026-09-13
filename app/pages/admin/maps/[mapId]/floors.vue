@@ -28,6 +28,8 @@ const createPickerRevision = ref(0)
 const isCreating = ref(false)
 const busyFloorId = ref('')
 const operationError = ref('')
+const saveMessage = ref('')
+const saveState = ref<'idle' | 'saving' | 'success' | 'error'>('idle')
 const deleteTarget = ref<MapFloorItem | null>(null)
 const deleteMessage = computed(() => {
   const floor = deleteTarget.value
@@ -56,14 +58,22 @@ function useUploadedImage(image: UploadedImage) {
 async function replaceFloorImage(floor: MapFloorItem, image: UploadedImage) {
   busyFloorId.value = floor.id
   operationError.value = ''
+  saveMessage.value = ''
+  saveState.value = 'saving'
   try {
     const response = await $fetch<MapFloorResponse>(`/api/maps/${mapId}/floors/${floor.id}`, {
       method: 'PATCH',
       body: { name: floor.name, illustrationUrl: image.url, illustrationAssetId: image.assetId, imageWidth: image.width, imageHeight: image.height },
     })
     if (data.value) data.value = { floors: data.value.floors.map(item => item.id === floor.id ? response.floor : item) }
+    saveMessage.value = 'フロア画像を差し替えました。'
+    saveState.value = 'success'
   }
-  catch { operationError.value = 'フロア画像を差し替えできませんでした。もう一度お試しください。' }
+  catch {
+    operationError.value = 'フロア画像を差し替えできませんでした。もう一度お試しください。'
+    saveMessage.value = operationError.value
+    saveState.value = 'error'
+  }
   finally { busyFloorId.value = '' }
 }
 
@@ -76,6 +86,8 @@ async function createFloor() {
 
   isCreating.value = true
   createError.value = ''
+  saveMessage.value = ''
+  saveState.value = 'saving'
   try {
     const response = await $fetch<MapFloorResponse>(`/api/maps/${mapId}/floors`, {
       method: 'POST',
@@ -91,9 +103,13 @@ async function createFloor() {
       imageHeight: 0,
     })
     createPickerRevision.value += 1
+    saveMessage.value = 'フロアを追加しました。'
+    saveState.value = 'success'
   }
   catch {
     createError.value = 'フロアを追加できませんでした。もう一度お試しください。'
+    saveMessage.value = createError.value
+    saveState.value = 'error'
   }
   finally {
     isCreating.value = false
@@ -110,6 +126,8 @@ async function updateFloor(floor: MapFloorItem) {
 
   busyFloorId.value = floor.id
   operationError.value = ''
+  saveMessage.value = ''
+  saveState.value = 'saving'
   try {
     const response = await $fetch<MapFloorResponse>(`/api/maps/${mapId}/floors/${floor.id}`, {
       method: 'PATCH',
@@ -120,9 +138,13 @@ async function updateFloor(floor: MapFloorItem) {
         floors: data.value.floors.map(item => item.id === floor.id ? response.floor : item),
       }
     }
+    saveMessage.value = 'フロア名を保存しました。'
+    saveState.value = 'success'
   }
   catch {
     operationError.value = 'フロアを保存できませんでした。もう一度お試しください。'
+    saveMessage.value = operationError.value
+    saveState.value = 'error'
   }
   finally {
     busyFloorId.value = ''
@@ -145,14 +167,20 @@ async function moveFloor(index: number, direction: -1 | 1) {
 
   try {
     operationError.value = ''
+    saveMessage.value = ''
+    saveState.value = 'saving'
     await $fetch(`/api/maps/${mapId}/floors/reorder`, {
       method: 'PATCH',
       body: { floorIds: reordered.map(floor => floor.id) },
     })
+    saveMessage.value = 'フロアの並び順を保存しました。'
+    saveState.value = 'success'
   }
   catch {
     data.value = { floors: previousFloors }
     operationError.value = '並び順を保存できませんでした。もう一度お試しください。'
+    saveMessage.value = operationError.value
+    saveState.value = 'error'
   }
 }
 
@@ -165,6 +193,8 @@ async function confirmDeleteFloor() {
   if (!floor) return
   busyFloorId.value = floor.id
   operationError.value = ''
+  saveMessage.value = ''
+  saveState.value = 'saving'
   try {
     const response = await fetch(`/api/maps/${mapId}/floors/${floor.id}`, { method: 'DELETE' })
     if (!response.ok) throw new Error('Failed to delete floor')
@@ -176,9 +206,13 @@ async function confirmDeleteFloor() {
       }
     }
     deleteTarget.value = null
+    saveMessage.value = 'フロアを削除しました。'
+    saveState.value = 'success'
   }
   catch {
     operationError.value = 'フロアを削除できませんでした。もう一度お試しください。'
+    saveMessage.value = operationError.value
+    saveState.value = 'error'
   }
   finally {
     busyFloorId.value = ''
@@ -198,7 +232,7 @@ async function confirmDeleteFloor() {
       <h1 class="mt-1 text-2xl font-bold tracking-tight text-stone-900 sm:text-3xl">フロア管理</h1>
       <p class="mt-2 text-sm text-stone-600">フロアごとのイラスト、名称、ジオリファレンス設定状況を管理します。</p>
     </header>
-    <p v-if="operationError" role="alert" class="mt-6 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{{ operationError }}</p>
+    <SaveFeedback class="mt-6" :state="saveState" :message="saveMessage" />
 
     <section class="mt-8 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
       <h2 class="text-lg font-bold text-stone-900">フロアを追加</h2>

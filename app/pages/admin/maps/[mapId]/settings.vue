@@ -123,12 +123,7 @@ async function saveBranding() {
           </p>
           <p class="mt-2 text-xs text-stone-500">公開URL: /{{ data.map.slug }}（既存リンクを保護するため、この画面では変更できません）</p>
         </div>
-        <div v-if="submitError" role="alert" class="mb-6 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
-          {{ submitError }}
-        </div>
-        <div v-if="successMessage" role="status" class="mb-6 rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-          {{ successMessage }}
-        </div>
+        <SaveFeedback class="mb-6" :state="isSubmitting ? 'saving' : submitError ? 'error' : successMessage ? 'success' : 'idle'" :message="submitError || successMessage" />
         <MapNameForm
           :initial-name="data.map.name"
           :is-submitting="isSubmitting"
@@ -166,8 +161,7 @@ async function saveBranding() {
               <input id="sns-url" v-model="branding.snsUrl" type="url" class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5" placeholder="https://www.instagram.com/…">
             </div>
           </div>
-          <p v-if="brandingError" role="alert" class="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{{ brandingError }}</p>
-          <p v-if="brandingMessage" role="status" class="rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{{ brandingMessage }}</p>
+          <SaveFeedback :state="isBrandingSaving ? 'saving' : brandingError ? 'error' : brandingMessage ? 'success' : 'idle'" :message="brandingError || brandingMessage" />
           <div class="flex justify-end">
             <button type="submit" :disabled="isBrandingSaving" class="rounded-lg bg-stone-900 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60">{{ isBrandingSaving ? '保存中…' : '団体情報を保存' }}</button>
           </div>

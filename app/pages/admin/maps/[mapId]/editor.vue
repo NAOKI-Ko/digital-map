@@ -230,6 +230,7 @@ function updateCandidateFromDrag(value: { spotId: string, x: number, y: number }
         </ClientOnly>
         <aside class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
           <label for="placement-spot" class="text-sm font-bold text-stone-900">位置を設定するスポット</label>
+          <SaveFeedback v-if="route.query.saved === 'spot-created'" class="mt-3" state="success" message="スポットを登録しました。" />
           <select id="placement-spot" v-model="placementSpotId" class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5 text-sm">
             <option value="">新しいスポットを登録</option>
             <option v-for="spot in selectedFloorSpots" :key="spot.id" :value="spot.id">{{ spot.name }}（{{ hasPosition(spot) ? '配置済み' : '未配置' }}）</option>

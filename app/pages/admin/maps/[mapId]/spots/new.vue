@@ -88,7 +88,9 @@ async function persistSpot(input: SpotFormInput) {
   submitError.value = ''
   try {
     const response = await $fetch<AdminSpotResponse>(`/api/maps/${mapId}/spots`, { method: 'POST', body: input })
-    await navigateTo(editorReturnLocation.value ?? `/admin/maps/${mapId}/spots/${response.spot.id}`)
+    await navigateTo(editorReturnLocation.value
+      ? { ...editorReturnLocation.value, query: { ...editorReturnLocation.value.query, saved: 'spot-created' } }
+      : { path: `/admin/maps/${mapId}/spots/${response.spot.id}`, query: { saved: 'spot-created' } })
   }
   catch {
     submitError.value = 'スポットを登録できませんでした。入力内容を確認してください。'
@@ -119,7 +121,7 @@ function continueWithDuplicate() {
       <p class="mt-2 text-sm text-stone-600">店名や営業情報、所属フロアを登録します。</p>
     </header>
     <div v-if="floors.length === 0" class="mt-8 rounded-xl bg-amber-50 p-6 text-sm text-amber-800">先にフロアを1件以上登録してください。</div>
-    <div v-if="submitError" role="alert" class="mt-6 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{{ submitError }}</div>
+    <SaveFeedback class="mt-6" :state="isSubmitting ? 'saving' : submitError ? 'error' : 'idle'" :message="submitError" />
     <section class="mt-8 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
       <ClientOnly>
         <SpotForm :floors="floors" :categories="categoryData?.categories ?? []" :fields="fieldData?.fields ?? []" :initial-value="initialValue" :is-submitting="isSubmitting" submit-label="スポットを登録する" @submit="createSpot" />

@@ -27,7 +27,7 @@ async function createMap() {
   try {
     const body: MapCreateInput = result.data
     const response = await $fetch<AdminMapResponse>('/api/maps', { method: 'POST', body })
-    await navigateTo(`/admin/maps/${response.map.id}/setup`)
+    await navigateTo({ path: `/admin/maps/${response.map.id}/setup`, query: { saved: 'map-created' } })
   }
   catch (error: any) {
     errorMessage.value = error?.data?.statusMessage ?? 'マップを作成できませんでした。公開パスが既に使われていないか確認してください。'
@@ -70,7 +70,7 @@ async function createMap() {
           <span class="mt-2 flex items-center rounded-lg border border-stone-300 bg-white"><span class="pl-3 text-stone-500">/</span><input v-model="form.slug" maxlength="80" class="min-w-0 flex-1 px-2 py-2.5" placeholder="arimatsu-guide"></span>
           <span class="mt-1 block text-xs font-normal text-stone-500">公開URLに使います。作成後は既存リンク保護のため変更できません。</span>
         </label>
-        <p v-if="errorMessage" role="alert" class="rounded-lg bg-red-50 p-3 text-sm text-red-700">{{ errorMessage }}</p>
+        <SaveFeedback :state="isSubmitting ? 'saving' : errorMessage ? 'error' : 'idle'" :message="errorMessage" />
         <button type="submit" :disabled="isSubmitting" class="rounded-lg bg-terracotta-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">{{ isSubmitting ? '作成中…' : 'マップを作成してセットアップへ' }}</button>
       </form>
     </section>

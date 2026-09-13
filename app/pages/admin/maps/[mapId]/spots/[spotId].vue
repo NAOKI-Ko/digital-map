@@ -17,7 +17,7 @@ const returnTo = computed(() => typeof route.query.returnTo === 'string' && rout
 const { data, error, status } = await useFetch<AdminSpotResponse>(`/api/maps/${mapId}/spots/${spotId}`)
 const isSubmitting = ref(false)
 const submitError = ref('')
-const successMessage = ref('')
+const successMessage = ref(route.query.saved === 'spot-created' ? 'スポットを登録しました。' : '')
 const duplicateMatches = ref<SpotDuplicateMatch[]>([])
 const pendingInput = ref<SpotFormInput | null>(null)
 
@@ -104,8 +104,7 @@ function continueWithDuplicate() {
         <p class="mt-2 text-sm text-stone-600">基本情報や営業情報を編集します。</p>
       </header>
       <NuxtLink :to="{ path: `/admin/maps/${mapId}/editor`, query: { floorId: data.spot.floorId, placeSpotId: data.spot.id } }" class="mt-5 inline-flex rounded-lg bg-terracotta-600 px-4 py-2.5 text-sm font-semibold text-white">{{ data.spot.x === null || data.spot.y === null ? '位置を設定' : '位置を再設定' }}</NuxtLink>
-      <div v-if="submitError" role="alert" class="mt-6 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{{ submitError }}</div>
-      <div v-if="successMessage" role="status" class="mt-6 rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{{ successMessage }}</div>
+      <SaveFeedback class="mt-6" :state="isSubmitting ? 'saving' : submitError ? 'error' : successMessage ? 'success' : 'idle'" :message="submitError || successMessage" />
       <section class="mt-8 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
         <ClientOnly>
           <SpotForm :floors="data.floors" :categories="data.categories" :fields="data.fields" :initial-value="initialValue" :is-submitting="isSubmitting" @submit="updateSpot" />

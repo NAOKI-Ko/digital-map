@@ -94,7 +94,8 @@ describe('native dialog replacements', () => {
 
   it('shows floor operation failures inline', () => {
     const floors = source('/app/pages/admin/maps/[mapId]/floors.vue')
-    expect(floors).toContain('v-if="operationError" role="alert"')
+    expect(floors).toContain('<SaveFeedback class="mt-6" :state="saveState" :message="saveMessage"')
+    expect(floors).toContain("saveState.value = 'error'")
     expect(floors).toContain("operationError.value = 'フロアを保存できませんでした。もう一度お試しください。'")
     expect(floors).toContain("operationError.value = 'フロアを削除できませんでした。もう一度お試しください。'")
   })

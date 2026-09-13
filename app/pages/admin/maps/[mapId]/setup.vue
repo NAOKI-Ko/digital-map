@@ -15,11 +15,13 @@ const tourismTemplates = ['観光', '飲食', '買い物', '宿泊', '交通', '
 const selectedTemplates = ref<string[]>([])
 const customCategory = ref('')
 const message = ref('')
+const categorySaveState = ref<'idle' | 'saving' | 'success' | 'error'>('idle')
 
 async function addCategories() {
   const names = [...new Set([...selectedTemplates.value, customCategory.value.trim()].filter(Boolean))]
     .filter(name => !categories.value?.categories.some(category => category.name === name))
   try {
+    categorySaveState.value = 'saving'
     for (const [index, name] of names.entries()) {
       await $fetch(`/api/maps/${mapId}/categories`, {
         method: 'POST',
@@ -30,9 +32,11 @@ async function addCategories() {
     selectedTemplates.value = []
     customCategory.value = ''
     message.value = `${names.length}件のカテゴリーを追加しました。`
+    categorySaveState.value = 'success'
   }
   catch {
     message.value = 'カテゴリーを追加できませんでした。'
+    categorySaveState.value = 'error'
   }
 }
 </script>
@@ -42,6 +46,7 @@ async function addCategories() {
     <p class="text-sm font-medium text-terracotta-700">イラストマップ セットアップ</p>
     <h1 class="mt-1 text-3xl font-bold">{{ mapData?.map.name ?? 'マップ' }}を準備する</h1>
     <p class="mt-2 text-sm text-stone-600">ジオリファレンスは任意です。イラスト、項を登録すれば、設定とSpot登録を進められます。</p>
+    <SaveFeedback v-if="route.query.saved === 'map-created'" class="mt-5" state="success" message="マップを作成しました。セットアップを続けてください。" />
 
     <ol class="mt-8 grid gap-4 sm:grid-cols-2">
       <li class="rounded-2xl border bg-white p-5"><b>1. イラストを登録</b><p class="mt-2 text-sm text-stone-600">{{ floors?.floors.length ? `${floors.floors.length}フロア登録済み` : '未登録' }}</p><NuxtLink :to="`/admin/maps/${mapId}/floors`" class="mt-4 inline-flex text-sm font-semibold text-terracotta-700">フロアとイラストを設定 →</NuxtLink></li>
@@ -56,7 +61,7 @@ async function addCategories() {
       <div class="mt-4 flex flex-wrap gap-3"><label v-for="name in tourismTemplates" :key="name" class="flex items-center gap-2 rounded-lg border px-3 py-2 text-sm"><input v-model="selectedTemplates" type="checkbox" :value="name">{{ name }}</label></div>
       <label class="mt-5 block text-sm font-semibold">独自Category<input v-model="customCategory" maxlength="50" class="mt-2 w-full max-w-sm rounded-lg border border-stone-300 px-3 py-2"></label>
       <button type="button" :disabled="!selectedTemplates.length && !customCategory.trim()" class="mt-4 rounded-lg bg-stone-900 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-40" @click="addCategories">選択したCategoryを追加</button>
-      <p v-if="message" role="status" class="mt-3 text-sm text-stone-600">{{ message }}</p>
+      <SaveFeedback class="mt-3" :state="categorySaveState" :message="message" />
     </section>
 
     <section class="mt-6 rounded-2xl border bg-white p-6">
