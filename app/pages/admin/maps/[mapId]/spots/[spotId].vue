@@ -3,8 +3,10 @@ import PinDesignEditor from '~/components/admin/PinDesignEditor.vue'
 import SpotPhotoManager from '~/components/admin/SpotPhotoManager.vue'
 import SpotPublishPanel from '~/components/admin/SpotPublishPanel.vue'
 import SpotForm from '~/components/admin/SpotForm.vue'
+import DuplicateSpotDialog from '~/components/admin/DuplicateSpotDialog.vue'
 import type { SpotFormInput } from '~~/shared/schemas/spot'
 import type { AdminSpotResponse } from '~~/shared/types/spot'
+import type { SpotDuplicateMatch, SpotDuplicateResponse } from '~~/shared/types/spot-duplicate'
 
 definePageMeta({ layout: 'admin', middleware: 'auth' })
 
@@ -16,6 +18,8 @@ const { data, error, status } = await useFetch<AdminSpotResponse>(`/api/maps/${m
 const isSubmitting = ref(false)
 const submitError = ref('')
 const successMessage = ref('')
+const duplicateMatches = ref<SpotDuplicateMatch[]>([])
+const pendingInput = ref<SpotFormInput | null>(null)
 
 const initialValue = computed<SpotFormInput | undefined>(() => data.value
   ? {
@@ -42,6 +46,29 @@ async function updateSpot(input: SpotFormInput) {
   submitError.value = ''
   successMessage.value = ''
   try {
+    const duplicateResponse = await $fetch<SpotDuplicateResponse>(`/api/maps/${mapId}/spots/duplicates`, {
+      query: { name: input.name, excludeId: spotId },
+    })
+    if (duplicateResponse.matches.length) {
+      pendingInput.value = input
+      duplicateMatches.value = duplicateResponse.matches
+      return
+    }
+    await persistSpot(input)
+  }
+  catch {
+    submitError.value = 'スポット情報を保存できませんでした。入力内容を確認してください。'
+  }
+  finally {
+    isSubmitting.value = false
+  }
+}
+
+async function persistSpot(input: SpotFormInput) {
+  isSubmitting.value = true
+  submitError.value = ''
+  successMessage.value = ''
+  try {
     data.value = await $fetch<AdminSpotResponse>(`/api/maps/${mapId}/spots/${spotId}`, { method: 'PATCH', body: input })
     successMessage.value = 'スポット情報を保存しました。'
   }
@@ -51,6 +78,17 @@ async function updateSpot(input: SpotFormInput) {
   finally {
     isSubmitting.value = false
   }
+}
+
+function cancelDuplicateWarning() {
+  duplicateMatches.value = []
+  pendingInput.value = null
+}
+
+function continueWithDuplicate() {
+  const input = pendingInput.value
+  cancelDuplicateWarning()
+  if (input) void persistSpot(input)
 }
 </script>
 
@@ -101,6 +139,7 @@ async function updateSpot(input: SpotFormInput) {
           @updated="Object.assign(data.spot, $event)"
         />
       </section>
+      <DuplicateSpotDialog :open="duplicateMatches.length > 0" :matches="duplicateMatches" @cancel="cancelDuplicateWarning" @continue="continueWithDuplicate" />
     </template>
   </div>
 </template>

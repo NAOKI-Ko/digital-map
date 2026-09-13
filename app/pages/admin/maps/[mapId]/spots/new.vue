@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import SpotForm from '~/components/admin/SpotForm.vue'
+import DuplicateSpotDialog from '~/components/admin/DuplicateSpotDialog.vue'
 import { createMapEditorReturnQuery, resolveMapEditorReturnContext } from '~/utils/map-editor-camera'
 import type { SpotFormInput } from '~~/shared/schemas/spot'
 import type { MapFloorListResponse } from '~~/shared/types/floor'
 import type { CategoryListResponse } from '~~/shared/types/category'
 import type { AdminSpotResponse } from '~~/shared/types/spot'
 import type { SpotFieldDefinitionListResponse } from '~~/shared/types/spot-field'
+import type { SpotDuplicateMatch, SpotDuplicateResponse } from '~~/shared/types/spot-duplicate'
 
 definePageMeta({ layout: 'admin', middleware: 'auth' })
 
@@ -54,10 +56,34 @@ const initialValue = computed<SpotFormInput>(() => {
 })
 const isSubmitting = ref(false)
 const submitError = ref('')
+const duplicateMatches = ref<SpotDuplicateMatch[]>([])
+const pendingInput = ref<SpotFormInput | null>(null)
 
 useHead({ title: '新しいスポット | デジタルマップ' })
 
 async function createSpot(input: SpotFormInput) {
+  isSubmitting.value = true
+  submitError.value = ''
+  try {
+    const duplicateResponse = await $fetch<SpotDuplicateResponse>(`/api/maps/${mapId}/spots/duplicates`, {
+      query: { name: input.name },
+    })
+    if (duplicateResponse.matches.length) {
+      pendingInput.value = input
+      duplicateMatches.value = duplicateResponse.matches
+      return
+    }
+    await persistSpot(input)
+  }
+  catch {
+    submitError.value = 'スポットを登録できませんでした。入力内容を確認してください。'
+  }
+  finally {
+    isSubmitting.value = false
+  }
+}
+
+async function persistSpot(input: SpotFormInput) {
   isSubmitting.value = true
   submitError.value = ''
   try {
@@ -70,6 +96,17 @@ async function createSpot(input: SpotFormInput) {
   finally {
     isSubmitting.value = false
   }
+}
+
+function cancelDuplicateWarning() {
+  duplicateMatches.value = []
+  pendingInput.value = null
+}
+
+function continueWithDuplicate() {
+  const input = pendingInput.value
+  cancelDuplicateWarning()
+  if (input) void persistSpot(input)
 }
 </script>
 
@@ -91,5 +128,6 @@ async function createSpot(input: SpotFormInput) {
         </template>
       </ClientOnly>
     </section>
+    <DuplicateSpotDialog :open="duplicateMatches.length > 0" :matches="duplicateMatches" @cancel="cancelDuplicateWarning" @continue="continueWithDuplicate" />
   </div>
 </template>
