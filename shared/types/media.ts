@@ -5,6 +5,7 @@ export interface MediaAssetUsage {
   spotPins: number
   spotPhotos: number
   decorations: number
+  tenantLogos: number
   total: number
 }
 

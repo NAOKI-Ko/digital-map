@@ -3,7 +3,7 @@ import { mkdir, unlink, writeFile } from 'node:fs/promises'
 import type { ImageUploadResponse } from '~~/shared/types/upload'
 
 export default defineEventHandler(async (event): Promise<ImageUploadResponse> => {
-  const session = await requireAdminSession(event)
+  const { session } = await requireTenantMediaAccess(event)
   const parts = await readMultipartFormData(event)
   const file = parts?.find(part => part.name === 'file' && part.filename)
 

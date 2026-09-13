@@ -8,13 +8,14 @@ export interface MediaUsageCounts {
   spotPins: number
   spotPhotos: number
   decorations: number
+  tenantLogos: number
 }
 
 export function summarizeMediaUsage(counts: MediaUsageCounts): MediaAssetUsage {
   return {
     ...counts,
     total: counts.mapLogos + counts.floorIllustrations + counts.categoryIcons
-      + counts.spotPins + counts.spotPhotos + counts.decorations,
+      + counts.spotPins + counts.spotPhotos + counts.decorations + counts.tenantLogos,
   }
 }
 
@@ -26,7 +27,7 @@ export async function resolveTenantMediaAsset(tenantId: string, assetId: string 
 }
 
 export async function requireOwnedMediaAsset(event: H3Event) {
-  const session = await requireAdminSession(event)
+  const { session } = await requireTenantOwner(event)
   const assetId = getRouterParam(event, 'assetId')
   if (!assetId) throw createError({ statusCode: 400, statusMessage: '画像IDが必要です。' })
 
@@ -41,6 +42,7 @@ export async function requireOwnedMediaAsset(event: H3Event) {
           spotPins: true,
           spotPhotos: true,
           decorations: true,
+          tenantLogos: true,
         },
       },
     },

@@ -3,7 +3,7 @@ import type { AdminMapResponse } from '~~/shared/types/map'
 import { defaultSpotFieldDefinitions } from '~~/shared/constants/spot-fields'
 
 export default defineEventHandler(async (event): Promise<AdminMapResponse> => {
-  const session = await requireAdminSession(event)
+  const { session } = await requireTenantOwner(event)
   const input = await readValidatedBody(event, mapCreateSchema.parse)
   const map = await prisma.map.create({
     data: {

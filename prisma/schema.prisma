@@ -8,27 +8,68 @@ datasource db {
 }
 
 model Tenant {
-  id          String       @id @default(cuid())
+  id          String         @id @default(cuid())
   name        String
-  slug        String       @unique
-  users       User[]
+  slug        String         @unique
+  logoUrl     String?
+  logoAssetId String?
+  logoAsset   MediaAsset?    @relation("TenantLogoAsset", fields: [logoAssetId], references: [id], onDelete: SetNull)
+  websiteUrl  String?
+  snsUrl      String?
+  members     TenantMember[]
   maps        Map[]
-  mediaAssets MediaAsset[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  mediaAssets MediaAsset[]   @relation("TenantMediaAssets")
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
 }
 
 model User {
-  id           String   @id @default(cuid())
-  tenantId     String
-  tenant       Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  email        String   @unique
-  passwordHash String
-  role         String   @default("admin")
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id            String         @id @default(cuid())
+  email         String         @unique
+  displayName   String?
+  passwordHash  String
+  tenantMembers TenantMember[]
+  mapMembers    MapMember[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
 
-  @@index([tenantId])
+enum TenantRole {
+  OWNER
+  MEMBER
+}
+
+model TenantMember {
+  id        String     @id @default(cuid())
+  tenantId  String
+  tenant    Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      TenantRole @default(MEMBER)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@unique([tenantId, userId])
+  @@index([userId])
+  @@index([tenantId, role])
+}
+
+enum MapRole {
+  EDITOR
+}
+
+model MapMember {
+  id        String   @id @default(cuid())
+  mapId     String
+  map       Map      @relation(fields: [mapId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      MapRole  @default(EDITOR)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([mapId, userId])
+  @@index([userId])
 }
 
 model Map {
@@ -47,6 +88,7 @@ model Map {
   floors               MapFloor[]
   categories           Category[]
   spotFieldDefinitions SpotFieldDefinition[]
+  members              MapMember[]
   createdAt            DateTime              @default(now())
   updatedAt            DateTime              @updatedAt
 
@@ -187,7 +229,7 @@ model SpotFieldValue {
 model MediaAsset {
   id                 String            @id @default(cuid())
   tenantId           String
-  tenant             Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenant             Tenant            @relation("TenantMediaAssets", fields: [tenantId], references: [id], onDelete: Cascade)
   storageKey         String            @unique
   originalFilename   String
   mimeType           String
@@ -201,6 +243,7 @@ model MediaAsset {
   spotPins           Spot[]            @relation("SpotPinAsset")
   spotPhotos         SpotPhoto[]
   decorations        FloorDecoration[]
+  tenantLogos        Tenant[]          @relation("TenantLogoAsset")
   createdAt          DateTime          @default(now())
   updatedAt          DateTime          @updatedAt
 

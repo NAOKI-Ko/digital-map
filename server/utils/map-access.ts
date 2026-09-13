@@ -1,27 +1,41 @@
 import type { H3Event } from 'h3'
 
-export async function requireOwnedMap(event: H3Event) {
-  const session = await requireAdminSession(event)
+export async function requireMapAccess(event: H3Event) {
+  const session = await requireUser(event)
   const mapId = getRouterParam(event, 'mapId')
 
   if (!mapId) {
     throw createError({ statusCode: 400, statusMessage: 'マップIDが必要です。' })
   }
 
-  const map = await prisma.map.findFirst({
-    where: {
-      id: mapId,
-      tenantId: session.user.tenantId,
-    },
-    select: { id: true, name: true },
+  const map = await prisma.map.findUnique({
+    where: { id: mapId },
+    select: { id: true, name: true, tenantId: true },
   })
 
   if (!map) {
     throw createError({ statusCode: 404, statusMessage: 'マップが見つかりません。' })
   }
 
-  return { session, map }
+  const membership = await prisma.tenantMember.findUnique({
+    where: { tenantId_userId: { tenantId: map.tenantId, userId: session.user.id } },
+  })
+  if (!membership || map.tenantId !== session.user.tenantId) {
+    throw createError({ statusCode: 404, statusMessage: 'マップが見つかりません。' })
+  }
+  if (membership.role !== 'OWNER') {
+    const assignment = await prisma.mapMember.findUnique({
+      where: { mapId_userId: { mapId: map.id, userId: session.user.id } },
+    })
+    if (!assignment || assignment.role !== 'EDITOR') {
+      throw createError({ statusCode: 404, statusMessage: 'マップが見つかりません。' })
+    }
+  }
+  return { session, map, membership, isOwner: membership.role === 'OWNER' }
 }
+
+export const requireMapEditorOrOwner = requireMapAccess
+export const requireOwnedMap = requireMapAccess
 
 export async function requireOwnedFloor(event: H3Event) {
   const { session, map } = await requireOwnedMap(event)

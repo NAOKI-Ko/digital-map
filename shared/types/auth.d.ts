@@ -3,7 +3,14 @@ declare module '#auth-utils' {
     id: string
     tenantId: string
     email: string
-    role: 'admin'
+    displayName: string | null
+    tenantRole: 'OWNER' | 'MEMBER'
+    tenantName: string
+    organizations: Array<{
+      id: string
+      name: string
+      role: 'OWNER' | 'MEMBER'
+    }>
   }
 
   interface UserSession {

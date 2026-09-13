@@ -371,16 +371,18 @@ async function main() {
   const admin = await prisma.user.upsert({
     where: { email: adminEmail },
     update: {
-      tenantId: tenant.id,
       passwordHash,
-      role: 'admin',
     },
     create: {
-      tenantId: tenant.id,
       email: adminEmail,
       passwordHash,
-      role: 'admin',
     },
+  })
+
+  await prisma.tenantMember.upsert({
+    where: { tenantId_userId: { tenantId: tenant.id, userId: admin.id } },
+    update: { role: 'OWNER' },
+    create: { tenantId: tenant.id, userId: admin.id, role: 'OWNER' },
   })
 
   console.info(`管理者を作成しました: ${admin.email} (${tenant.name})`)

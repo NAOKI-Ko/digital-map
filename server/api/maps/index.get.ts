@@ -1,9 +1,12 @@
 import type { AdminMapListResponse } from '~~/shared/types/map'
 
 export default defineEventHandler(async (event): Promise<AdminMapListResponse> => {
-  const session = await requireAdminSession(event)
+  const { session, membership } = await requireTenantMember(event)
   const maps = await prisma.map.findMany({
-    where: { tenantId: session.user.tenantId },
+    where: {
+      tenantId: session.user.tenantId,
+      ...(membership.role === 'OWNER' ? {} : { members: { some: { userId: session.user.id, role: 'EDITOR' } } }),
+    },
     orderBy: { updatedAt: 'desc' },
     select: {
       id: true,
@@ -18,6 +21,7 @@ export default defineEventHandler(async (event): Promise<AdminMapListResponse> =
   })
 
   return {
+    permissions: { canCreateMap: membership.role === 'OWNER', isOwner: membership.role === 'OWNER' },
     maps: maps.map(map => ({
       id: map.id,
       name: map.name,

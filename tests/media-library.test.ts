@@ -3,7 +3,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vites
 import { summarizeMediaUsage } from '../server/utils/media'
 
 const mocks = vi.hoisted(() => ({
-  requireAdminSession: vi.fn(),
+  requireTenantOwner: vi.fn(),
   getRouterParam: vi.fn(),
   findFirst: vi.fn(),
   delete: vi.fn(),
@@ -21,7 +21,7 @@ describe('Tenant Media Library', () => {
 
   beforeAll(async () => {
     vi.stubGlobal('defineEventHandler', (handler: unknown) => handler)
-    vi.stubGlobal('requireAdminSession', mocks.requireAdminSession)
+    vi.stubGlobal('requireTenantOwner', mocks.requireTenantOwner)
     vi.stubGlobal('getRouterParam', mocks.getRouterParam)
     vi.stubGlobal('createError', testError)
     vi.stubGlobal('getUploadDirectory', () => '/tmp/digital-map-media-test')
@@ -38,7 +38,7 @@ describe('Tenant Media Library', () => {
   })
 
   beforeEach(() => {
-    mocks.requireAdminSession.mockReset().mockResolvedValue({ user: { tenantId: 'tenant-a' } })
+    mocks.requireTenantOwner.mockReset().mockResolvedValue({ session: { user: { tenantId: 'tenant-a' } } })
     mocks.getRouterParam.mockReset().mockReturnValue('asset-a')
     mocks.findFirst.mockReset()
     mocks.delete.mockReset().mockResolvedValue({})
@@ -93,5 +93,6 @@ function emptyCounts() {
     spotPins: 0,
     spotPhotos: 0,
     decorations: 0,
+    tenantLogos: 0,
   }
 }

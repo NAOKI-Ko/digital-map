@@ -1,9 +1,11 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mocks = vi.hoisted(() => ({
-  requireAdminSession: vi.fn(),
+  requireUser: vi.fn(),
   getRouterParam: vi.fn(),
-  mapFindFirst: vi.fn(),
+  mapFindUnique: vi.fn(),
+  tenantMemberFindUnique: vi.fn(),
+  mapMemberFindUnique: vi.fn(),
   floorFindFirst: vi.fn(),
   spotFindFirst: vi.fn(),
   categoryFindFirst: vi.fn(),
@@ -20,11 +22,13 @@ describe('release security: tenant / Map ownership boundary', () => {
   let requireOwnedCategory: typeof import('../server/utils/category').requireOwnedCategory
 
   beforeAll(async () => {
-    vi.stubGlobal('requireAdminSession', mocks.requireAdminSession)
+    vi.stubGlobal('requireUser', mocks.requireUser)
     vi.stubGlobal('getRouterParam', mocks.getRouterParam)
     vi.stubGlobal('createError', testError)
     vi.stubGlobal('prisma', {
-      map: { findFirst: mocks.mapFindFirst },
+      map: { findUnique: mocks.mapFindUnique },
+      tenantMember: { findUnique: mocks.tenantMemberFindUnique },
+      mapMember: { findUnique: mocks.mapMemberFindUnique },
       mapFloor: { findFirst: mocks.floorFindFirst },
       spot: { findFirst: mocks.spotFindFirst },
       category: { findFirst: mocks.categoryFindFirst },
@@ -34,9 +38,11 @@ describe('release security: tenant / Map ownership boundary', () => {
   })
 
   beforeEach(() => {
-    mocks.requireAdminSession.mockReset().mockResolvedValue({ user: { tenantId: 'tenant-a' } })
+    mocks.requireUser.mockReset().mockResolvedValue({ user: { id: 'owner-a', tenantId: 'tenant-a' } })
     mocks.getRouterParam.mockReset().mockImplementation((_event, key) => ({ mapId: 'map-a', floorId: 'floor-a', spotId: 'spot-a' })[key])
-    mocks.mapFindFirst.mockReset().mockResolvedValue({ id: 'map-a', name: 'Map A' })
+    mocks.mapFindUnique.mockReset().mockResolvedValue({ id: 'map-a', name: 'Map A', tenantId: 'tenant-a' })
+    mocks.tenantMemberFindUnique.mockReset().mockResolvedValue({ role: 'OWNER' })
+    mocks.mapMemberFindUnique.mockReset().mockResolvedValue(null)
     mocks.floorFindFirst.mockReset().mockResolvedValue({ id: 'floor-a', mapId: 'map-a', order: 0, imageWidth: 1000, imageHeight: 500 })
     mocks.spotFindFirst.mockReset().mockResolvedValue({ id: 'spot-a', floorId: 'floor-a', x: 0.5, y: 0.5, isPublished: false })
     mocks.categoryFindFirst.mockReset().mockResolvedValue({ id: 'category-a', mapId: 'map-a', _count: { spotCategories: 0 } })
@@ -44,15 +50,23 @@ describe('release security: tenant / Map ownership boundary', () => {
 
   afterAll(() => vi.unstubAllGlobals())
 
-  it('Map取得をsession tenantIdで制約する', async () => {
+  it('OwnerはMapMemberなしでMapへアクセスできる', async () => {
     await requireOwnedMap({} as never)
-    expect(mocks.mapFindFirst).toHaveBeenCalledWith(expect.objectContaining({
-      where: { id: 'map-a', tenantId: 'tenant-a' },
-    }))
+    expect(mocks.tenantMemberFindUnique).toHaveBeenCalledWith(expect.objectContaining({ where: { tenantId_userId: { tenantId: 'tenant-a', userId: 'owner-a' } } }))
+    expect(mocks.mapMemberFindUnique).not.toHaveBeenCalled()
   })
 
   it('他tenant Mapは404として拒否する', async () => {
-    mocks.mapFindFirst.mockResolvedValue(null)
+    mocks.mapFindUnique.mockResolvedValue({ id: 'map-b', name: 'Map B', tenantId: 'tenant-b' })
+    await expect(requireOwnedMap({} as never)).rejects.toMatchObject({ statusCode: 404 })
+  })
+
+  it('割り当て済みEditorは許可し、未割り当てMemberは拒否する', async () => {
+    mocks.requireUser.mockResolvedValue({ user: { id: 'member-a', tenantId: 'tenant-a' } })
+    mocks.tenantMemberFindUnique.mockResolvedValue({ role: 'MEMBER' })
+    mocks.mapMemberFindUnique.mockResolvedValue({ role: 'EDITOR' })
+    await expect(requireOwnedMap({} as never)).resolves.toMatchObject({ isOwner: false })
+    mocks.mapMemberFindUnique.mockResolvedValue(null)
     await expect(requireOwnedMap({} as never)).rejects.toMatchObject({ statusCode: 404 })
   })
 

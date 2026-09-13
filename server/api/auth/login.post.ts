@@ -11,18 +11,16 @@ export default defineEventHandler(async (event) => {
     ? await compare(credentials.password, user.passwordHash)
     : false
 
-  if (!user || !isValidPassword || user.role !== 'admin') {
+  if (!user || !isValidPassword) {
     throw createError({
       statusCode: 401,
       statusMessage: 'メールアドレスまたはパスワードが正しくありません。',
     })
   }
 
-  const sessionUser = {
-    id: user.id,
-    tenantId: user.tenantId,
-    email: user.email,
-    role: 'admin' as const,
+  const sessionUser = await buildSessionUser(user.id)
+  if (!sessionUser) {
+    throw createError({ statusCode: 403, statusMessage: '所属する組織がありません。' })
   }
 
   await setUserSession(event, {

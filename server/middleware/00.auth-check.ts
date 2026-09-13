@@ -7,6 +7,6 @@ export default defineEventHandler(async (event) => {
   )
 
   if (requiresAuthentication) {
-    await requireAdminSession(event)
+    await requireUser(event)
   }
 })

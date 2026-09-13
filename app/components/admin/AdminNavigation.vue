@@ -6,13 +6,27 @@ defineEmits<{
 const route = useRoute()
 const { logout, user } = useAuth()
 const isLoggingOut = ref(false)
+const { data: organizationData } = await useFetch('/api/organizations')
+const organizations = computed(() => organizationData.value?.organizations ?? [])
+const activeOrganization = computed(() => organizations.value.find(item => item.id === organizationData.value?.activeOrganizationId))
 
-const navigation = [
-  {
-    label: 'ダッシュボード',
-    to: '/admin/dashboard',
-  },
-]
+const navigation = computed(() => [
+  { label: 'ダッシュボード', to: '/admin/dashboard' },
+  ...(activeOrganization.value?.role === 'OWNER' ? [{ label: '組織設定・メンバー', to: '/admin/organization' }] : []),
+])
+
+async function switchOrganization(event: Event) {
+  const tenantId = (event.target as HTMLSelectElement).value
+  await $fetch('/api/organizations/active', { method: 'POST', body: { tenantId } })
+  await reloadNuxtApp({ path: '/admin/dashboard', force: true })
+}
+
+onMounted(async () => {
+  if (organizations.value.length && !activeOrganization.value) {
+    await $fetch('/api/organizations/active', { method: 'POST', body: { tenantId: organizations.value[0]!.id } })
+    await reloadNuxtApp({ path: '/admin/dashboard', force: true })
+  }
+})
 
 function isActive(to: string) {
   return route.path === to || route.path.startsWith(`${to}/`)
@@ -70,6 +84,19 @@ async function handleLogout() {
     </nav>
 
     <div class="border-t border-white/10 p-4">
+      <div v-if="organizations.length" class="mb-4">
+        <label for="organization-switcher" class="px-2 text-xs text-stone-400">組織</label>
+        <select
+          v-if="organizations.length > 1"
+          id="organization-switcher"
+          :value="organizationData?.activeOrganizationId"
+          class="mt-1 w-full rounded-lg border border-white/15 bg-stone-800 px-2 py-2 text-sm text-white"
+          @change="switchOrganization"
+        >
+          <option v-for="organization in organizations" :key="organization.id" :value="organization.id">{{ organization.name }}</option>
+        </select>
+        <p v-else class="mt-1 truncate px-2 text-sm font-semibold text-stone-100">{{ activeOrganization?.name }}</p>
+      </div>
       <p class="truncate px-2 text-xs text-stone-400">
         ログイン中
       </p>

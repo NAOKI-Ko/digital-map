@@ -1,17 +1,11 @@
 import type { AdminMapResponse } from '~~/shared/types/map'
 
 export default defineEventHandler(async (event): Promise<AdminMapResponse> => {
-  const session = await requireAdminSession(event)
-  const mapId = getRouterParam(event, 'mapId')
-
-  if (!mapId) {
-    throw createError({ statusCode: 400, statusMessage: 'マップIDが必要です。' })
-  }
+  const { map: accessibleMap, isOwner } = await requireMapAccess(event)
 
   const map = await prisma.map.findFirst({
     where: {
-      id: mapId,
-      tenantId: session.user.tenantId,
+      id: accessibleMap.id,
     },
     select: {
       id: true,
@@ -49,6 +43,7 @@ export default defineEventHandler(async (event): Promise<AdminMapResponse> => {
       floorCount: map._count.floors,
       createdAt: map.createdAt.toISOString(),
       updatedAt: map.updatedAt.toISOString(),
+      permissions: { isOwner, canDelete: isOwner, canManageEditors: isOwner },
     },
   }
 })

@@ -19,6 +19,8 @@ const successMessage = ref('')
 const brandingError = ref('')
 const brandingMessage = ref('')
 const isBrandingSaving = ref(false)
+const deleteError = ref('')
+const deleteDialogOpen = ref(false)
 const branding = reactive({
   organizationName: data.value?.map.organizationName ?? '',
   logoUrl: data.value?.map.logoUrl ?? '',
@@ -78,6 +80,16 @@ async function saveBranding() {
   finally {
     isBrandingSaving.value = false
   }
+}
+
+async function deleteMap() {
+  deleteDialogOpen.value = false
+  deleteError.value = ''
+  try {
+    await $fetch(`/api/maps/${mapId}`, { method: 'DELETE' })
+    await navigateTo('/admin/dashboard')
+  }
+  catch (error: any) { deleteError.value = error?.data?.statusMessage ?? 'マップを削除できませんでした。' }
 }
 </script>
 
@@ -167,6 +179,20 @@ async function saveBranding() {
           </div>
         </form>
       </section>
+
+      <section v-if="data.map.permissions?.canManageEditors" class="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+        <h2 class="text-lg font-bold text-stone-900">このマップの編集者</h2>
+        <p class="mt-2 text-sm text-stone-600">組織メンバーへ、このマップだけの編集権限を割り当てます。組織オーナーはすべてのマップを編集できます。</p>
+        <NuxtLink :to="`/admin/maps/${mapId}/editors`" class="mt-5 inline-flex rounded-lg bg-stone-900 px-4 py-2.5 text-sm font-semibold text-white">編集者を管理する</NuxtLink>
+      </section>
+
+      <section v-if="data.map.permissions?.canDelete" class="mt-6 rounded-2xl border border-red-200 bg-white p-6 shadow-sm sm:p-8">
+        <h2 class="text-lg font-bold text-red-900">マップの削除</h2>
+        <p class="mt-2 text-sm text-stone-600">マップと配下のデータを削除します。編集者はこの操作を実行できません。</p>
+        <p v-if="deleteError" class="mt-3 text-sm text-red-700">{{ deleteError }}</p>
+        <button class="mt-5 rounded-lg border border-red-300 px-4 py-2.5 text-sm font-semibold text-red-700" @click="deleteDialogOpen = true">マップを削除</button>
+      </section>
+      <ConfirmDialog :open="deleteDialogOpen" title="マップを削除" message="このマップと配下のデータを削除します。この操作は取り消せません。" confirm-label="削除する" destructive @cancel="deleteDialogOpen = false" @confirm="deleteMap" />
 
       <section class="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
         <h2 class="text-lg font-bold text-stone-900">

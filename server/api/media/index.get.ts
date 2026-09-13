@@ -2,7 +2,7 @@ import type { MediaAssetListResponse } from '~~/shared/types/media'
 import { summarizeMediaUsage } from '~~/server/utils/media'
 
 export default defineEventHandler(async (event): Promise<MediaAssetListResponse> => {
-  const session = await requireAdminSession(event)
+  const { session } = await requireTenantMediaAccess(event)
   const assets = await prisma.mediaAsset.findMany({
     where: { tenantId: session.user.tenantId },
     orderBy: { createdAt: 'desc' },
@@ -21,6 +21,7 @@ export default defineEventHandler(async (event): Promise<MediaAssetListResponse>
           spotPins: true,
           spotPhotos: true,
           decorations: true,
+          tenantLogos: true,
         },
       },
     },

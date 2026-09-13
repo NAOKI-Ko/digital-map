@@ -9,6 +9,7 @@ export interface AdminMapSummary {
 
 export interface AdminMapListResponse {
   maps: AdminMapSummary[]
+  permissions: { canCreateMap: boolean, isOwner: boolean }
 }
 
 export interface AdminMapDetail extends AdminMapSummary {
@@ -18,6 +19,7 @@ export interface AdminMapDetail extends AdminMapSummary {
   websiteUrl: string | null
   snsUrl: string | null
   createdAt: string
+  permissions?: { isOwner: boolean, canDelete: boolean, canManageEditors: boolean }
 }
 
 export interface AdminMapResponse {

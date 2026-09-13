@@ -11,6 +11,7 @@ useHead({ title: 'ダッシュボード | デジタルマップ' })
 const { user } = useUserSession()
 const { data, error, refresh, status } = await useFetch<AdminMapListResponse>('/api/maps')
 const maps = computed(() => data.value?.maps ?? [])
+const canCreateMap = computed(() => data.value?.permissions.canCreateMap ?? false)
 
 const dateFormatter = new Intl.DateTimeFormat('ja-JP', {
   dateStyle: 'medium',
@@ -37,6 +38,7 @@ function formatDate(value: string) {
         </p>
       </div>
       <NuxtLink
+        v-if="canCreateMap"
         to="/admin/maps/new"
         class="inline-flex items-center justify-center gap-2 rounded-lg bg-terracotta-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-terracotta-700 focus:outline-none focus:ring-2 focus:ring-terracotta-400 focus:ring-offset-2"
       >
@@ -87,12 +89,13 @@ function formatDate(value: string) {
         </svg>
       </div>
       <h2 class="mt-5 text-lg font-bold text-stone-900">
-        最初のマップを作りましょう
+        {{ canCreateMap ? '最初のマップを作りましょう' : '編集できるマップはありません' }}
       </h2>
       <p class="mx-auto mt-2 max-w-lg text-sm leading-6 text-stone-600">
-        マップ名を決めたら、イラスト画像やスポットを順番に登録できます。
+        {{ canCreateMap ? 'マップ名を決めたら、イラスト画像やスポットを順番に登録できます。' : '組織オーナーからマップの編集者に割り当てられると、ここに表示されます。' }}
       </p>
       <NuxtLink
+        v-if="canCreateMap"
         to="/admin/maps/new"
         class="mt-6 inline-flex rounded-lg bg-terracotta-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-terracotta-700"
       >
