@@ -3,6 +3,8 @@ import { defineAsyncComponent } from 'vue'
 import ConfirmDialog from '~/components/ui/ConfirmDialog.vue'
 import { createMapEditorReturnQuery, resolveMapEditorReturnContext } from '~/utils/map-editor-camera'
 import { isGeoReferenced, type ImagePosition } from '~~/lib/geo'
+import { getAddressPlacementCandidate } from '~~/lib/address-placement'
+import type { GeocodeResponse, GeocodeResult } from '~~/shared/types/geocode'
 import type { MapFloorListResponse } from '~~/shared/types/floor'
 import type { MapViewerCameraState } from '~~/shared/types/map-viewer'
 import type { AdminSpotListResponse, AdminSpotSummary, PositionedAdminSpotSummary, SpotPositionResponse } from '~~/shared/types/spot'
@@ -34,6 +36,9 @@ const placementSpotIsPositioned = computed(() => Boolean(placementSpot.value && 
 const moveStatus = ref('')
 const mapRevision = ref(0)
 const unplaceConfirmOpen = ref(false)
+const addressCandidates = ref<GeocodeResult[]>([])
+const addressSearchStatus = ref('')
+const isSearchingAddress = ref(false)
 const geoReferenceEditorPath = computed(() => selectedFloor.value
   ? `/admin/maps/${mapId}/floors/${selectedFloor.value.id}/georeference?from=editor`
   : '')
@@ -58,6 +63,8 @@ watch(placementSpot, (spot) => {
     ? { x: spot.x, y: spot.y }
     : null
   mapRevision.value += 1
+  addressCandidates.value = []
+  addressSearchStatus.value = ''
 }, { immediate: true })
 
 useHead({ title: 'ピン配置エディタ | デジタルマップ' })
@@ -140,6 +147,40 @@ function handleCameraChanged(value: MapViewerCameraState) {
   }, { replace: true })
 }
 
+async function searchPlacementAddress() {
+  const spot = placementSpot.value
+  if (!spot?.address || !selectedFloor.value || !isGeoReferenced(selectedFloor.value)) return
+  isSearchingAddress.value = true
+  addressCandidates.value = []
+  addressSearchStatus.value = '住所を検索しています…'
+  try {
+    const response = await $fetch<GeocodeResponse>('/api/geocode', { query: { q: spot.address } })
+    addressCandidates.value = response.results
+    addressSearchStatus.value = response.results.length
+      ? '候補を選んで地図上の仮位置を確認してください。'
+      : '候補が見つかりませんでした。地図上で手動配置できます。'
+  }
+  catch {
+    addressSearchStatus.value = '住所を検索できませんでした。地図上で手動配置できます。'
+  }
+  finally {
+    isSearchingAddress.value = false
+  }
+}
+
+function chooseAddressCandidate(candidate: GeocodeResult) {
+  const floor = selectedFloor.value
+  if (!floor) return
+  const imageCandidate = getAddressPlacementCandidate(floor, candidate)
+  if (!imageCandidate) {
+    addressSearchStatus.value = 'この住所候補はイラストの範囲外です。別の候補か手動配置を選んでください。'
+    return
+  }
+  position.value = imageCandidate
+  mapRevision.value += 1
+  addressSearchStatus.value = '住所から仮配置しました。地図上で調整し、「この位置を保存」で確定してください。'
+}
+
 function updateCandidateFromDrag(value: { spotId: string, x: number, y: number }) {
   if (value.spotId !== placementSpotId.value) return
   position.value = { x: value.x, y: value.y }
@@ -193,6 +234,16 @@ function updateCandidateFromDrag(value: { spotId: string, x: number, y: number }
             <option value="">新しいスポットを登録</option>
             <option v-for="spot in selectedFloorSpots" :key="spot.id" :value="spot.id">{{ spot.name }}（{{ hasPosition(spot) ? '配置済み' : '未配置' }}）</option>
           </select>
+          <div v-if="placementSpot?.address && isGeoReferenced(selectedFloor)" class="mt-4 rounded-lg border border-stone-200 p-3">
+            <p class="text-xs font-semibold text-stone-700">登録住所: {{ placementSpot.address }}</p>
+            <button type="button" :disabled="isSearchingAddress" class="mt-2 w-full rounded-lg border border-terracotta-300 px-3 py-2 text-sm font-semibold text-terracotta-700 disabled:opacity-50" @click="searchPlacementAddress">{{ isSearchingAddress ? '検索中…' : '住所から位置候補を探す' }}</button>
+            <ul v-if="addressCandidates.length" class="mt-3 space-y-2">
+              <li v-for="candidate in addressCandidates" :key="candidate.id">
+                <button type="button" class="w-full rounded-lg bg-stone-100 p-2 text-left text-xs leading-5 text-stone-700 hover:bg-stone-200" @click="chooseAddressCandidate(candidate)">{{ candidate.displayName }}</button>
+              </li>
+            </ul>
+            <p v-if="addressSearchStatus" role="status" class="mt-2 text-xs leading-5 text-stone-600">{{ addressSearchStatus }}</p>
+          </div>
           <h2 class="font-bold text-stone-900">仮配置した位置</h2>
           <div v-if="position" class="mt-4 rounded-lg bg-stone-100 p-4 font-mono text-sm text-stone-700">
             <p>x {{ position.x.toFixed(7) }}</p>

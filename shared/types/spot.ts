@@ -7,6 +7,7 @@ export interface AdminSpotSummary {
   floorId: string
   floorName: string
   name: string
+  address: string | null
   categories: SpotCategorySummary[]
   importance: SpotImportance
   x: number | null
