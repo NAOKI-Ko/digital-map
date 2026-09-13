@@ -24,6 +24,7 @@ const createInput = reactive<FloorCreateInput>({
   imageHeight: 0,
 })
 const createError = ref('')
+const createUploader = useTemplateRef<{ reset: () => void }>('createUploader')
 const isCreating = ref(false)
 const busyFloorId = ref('')
 const operationError = ref('')
@@ -88,6 +89,7 @@ async function createFloor() {
       imageWidth: 0,
       imageHeight: 0,
     })
+    createUploader.value?.reset()
   }
   catch {
     createError.value = 'フロアを追加できませんでした。もう一度お試しください。'
@@ -200,7 +202,7 @@ async function confirmDeleteFloor() {
     <section class="mt-8 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
       <h2 class="text-lg font-bold text-stone-900">フロアを追加</h2>
       <div class="mt-6 grid gap-6 lg:grid-cols-2">
-        <ImageUploader label="フロアイラスト" @uploaded="useUploadedImage" />
+        <ImageUploader ref="createUploader" label="フロアイラスト" @uploaded="useUploadedImage" />
         <form class="space-y-5" @submit.prevent="createFloor">
           <div>
             <label for="new-floor-name" class="text-sm font-semibold text-stone-800">フロア名</label>
@@ -255,7 +257,7 @@ async function confirmDeleteFloor() {
               <p class="mt-2 text-xs text-stone-500">登録スポット: {{ floor.spotCount }}件</p>
               <details class="mt-4 rounded-lg border border-stone-200 p-3">
                 <summary class="cursor-pointer text-sm font-semibold text-stone-800">フロア画像を差し替える</summary>
-                <p class="mt-2 text-xs leading-5 text-amber-700">既存PINの緯度経度と2点合わせ設定は維持されます。地図内容や画像比率が変わる場合は、差し替え後にジオリファレンスを確認・再設定してください。</p>
+                <p class="mt-2 text-xs leading-5 text-amber-700">既存PINのイラスト上の相対位置と2点合わせ設定は維持されます。画像内容や比率が変わっても自動補正されません。差し替え後にジオリファレンスの対応を確認してください。</p>
                 <div class="mt-3"><ImageUploader label="差し替え画像" confirm-message="既存PINの位置は維持されます。画像内容が変わる場合は2点合わせの再確認が必要です。この画像をアップロードしますか？" @uploaded="replaceFloorImage(floor, $event)" /></div>
               </details>
               <div class="mt-4 flex flex-wrap gap-3">
