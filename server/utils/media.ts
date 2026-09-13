@@ -17,6 +17,13 @@ export function summarizeMediaUsage(counts: MediaUsageCounts): MediaAssetUsage {
   }
 }
 
+export async function resolveTenantMediaAsset(tenantId: string, assetId: string | null | undefined) {
+  if (!assetId) return null
+  const asset = await prisma.mediaAsset.findFirst({ where: { id: assetId, tenantId } })
+  if (!asset) throw createError({ statusCode: 422, statusMessage: '選択した登録画像が見つかりません。' })
+  return { id: asset.id, url: `/uploads/${asset.storageKey}`, width: asset.width, height: asset.height }
+}
+
 export async function requireOwnedMediaAsset(event: H3Event) {
   const session = await requireAdminSession(event)
   const assetId = getRouterParam(event, 'assetId')

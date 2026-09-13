@@ -40,6 +40,7 @@ export default defineEventHandler(async (event): Promise<AdminSpotListResponse> 
         pinIconType: true,
         pinIconId: true,
         pinIconImageUrl: true,
+        pinIconAssetId: true,
         pinColor: true,
         updatedAt: true,
         floor: { select: { name: true } },
@@ -54,7 +55,7 @@ export default defineEventHandler(async (event): Promise<AdminSpotListResponse> 
     }),
     prisma.category.findMany({
       where: { mapId: map.id },
-      select: { id: true, name: true, order: true, iconType: true, iconPresetId: true, iconImageUrl: true },
+      select: { id: true, name: true, order: true, iconType: true, iconPresetId: true, iconImageUrl: true, iconAssetId: true },
       orderBy: categoryOrderBy,
     }),
   ])
@@ -73,6 +74,7 @@ export default defineEventHandler(async (event): Promise<AdminSpotListResponse> 
       pinIconType: normalizePinIconType(spot.pinIconType),
       pinIconId: spot.pinIconId,
       pinIconImageUrl: spot.pinIconImageUrl,
+      pinIconAssetId: spot.pinIconAssetId,
       pinColor: spot.pinColor,
       updatedAt: spot.updatedAt.toISOString(),
     })),

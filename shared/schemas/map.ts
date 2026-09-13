@@ -29,6 +29,7 @@ export const mapBrandingSchema = z.object({
     value => typeof value === 'string' && value.trim() === '' ? null : value,
     z.string().trim().startsWith('/uploads/', 'アップロードしたロゴ画像を指定してください。').nullable(),
   ),
+  logoAssetId: z.string().min(1).nullable().optional(),
   websiteUrl: nullableHttpUrl,
   snsUrl: nullableHttpUrl,
 })

@@ -34,7 +34,7 @@ describe('Category icon API ownership', () => {
   })
 
   beforeEach(() => {
-    mocks.requireOwnedMap.mockReset().mockResolvedValue({ map: { id: 'map-a' } })
+    mocks.requireOwnedMap.mockReset().mockResolvedValue({ map: { id: 'map-a' }, session: { user: { tenantId: 'tenant-a' } } })
     mocks.requireOwnedCategory.mockReset().mockResolvedValue({ id: 'category-a' })
     mocks.readBody.mockReset()
     mocks.aggregate.mockReset().mockResolvedValue({ _max: { order: 0 } })

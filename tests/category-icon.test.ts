@@ -37,7 +37,7 @@ describe('Category icon validation', () => {
   it('他Mapの画像関連付けを拒否する', async () => {
     const { toCategoryIconData } = await import('../server/utils/category-icon')
     expect(() => toCategoryIconData({ iconType: 'custom', iconPresetId: null, iconImageUrl: customUrl }, 'map-b')).toThrow()
-    expect(toCategoryIconData({ iconType: 'custom', iconPresetId: null, iconImageUrl: customUrl }, 'map-a')).toEqual({ iconType: 'custom', iconPresetId: null, iconImageUrl: customUrl })
+    expect(toCategoryIconData({ iconType: 'custom', iconPresetId: null, iconImageUrl: customUrl }, 'map-a')).toEqual({ iconType: 'custom', iconPresetId: null, iconImageUrl: customUrl, iconAssetId: null })
   })
 })
 
@@ -45,7 +45,7 @@ describe('Category icon domain and public UI', () => {
   it('icon更新dataはSpot relation・PIN・座標を含まない', async () => {
     const { toCategoryIconData } = await import('../server/utils/category-icon')
     const data = toCategoryIconData({ iconType: 'preset', iconPresetId: 'material:park', iconImageUrl: null }, 'map-a')
-    expect(data).toEqual({ iconType: 'preset', iconPresetId: 'material:park', iconImageUrl: null })
+    expect(data).toEqual({ iconType: 'preset', iconPresetId: 'material:park', iconImageUrl: null, iconAssetId: null })
     expect(data).not.toHaveProperty('spotCategories')
     expect(data).not.toHaveProperty('pinIconType')
     expect(data).not.toHaveProperty('lat')

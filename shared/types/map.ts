@@ -14,6 +14,7 @@ export interface AdminMapListResponse {
 export interface AdminMapDetail extends AdminMapSummary {
   organizationName: string | null
   logoUrl: string | null
+  logoAssetId?: string | null
   websiteUrl: string | null
   snsUrl: string | null
   createdAt: string
@@ -24,5 +25,5 @@ export interface AdminMapResponse {
 }
 
 export interface MapBrandingResponse {
-  branding: Pick<AdminMapDetail, 'organizationName' | 'logoUrl' | 'websiteUrl' | 'snsUrl'>
+  branding: Pick<AdminMapDetail, 'organizationName' | 'logoUrl' | 'logoAssetId' | 'websiteUrl' | 'snsUrl'>
 }

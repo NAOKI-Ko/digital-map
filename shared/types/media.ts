@@ -18,6 +18,7 @@ export interface MediaAssetItem {
   sha256: string | null
   createdAt: string
   usage: MediaAssetUsage
+  usedInMapIds: string[]
 }
 
 export interface MediaAssetListResponse {

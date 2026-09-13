@@ -7,7 +7,7 @@ export const categoryOrderBy = [
 
 export const spotCategorySelect = {
   category: {
-    select: { id: true, name: true, order: true, iconType: true, iconPresetId: true, iconImageUrl: true },
+    select: { id: true, name: true, order: true, iconType: true, iconPresetId: true, iconImageUrl: true, iconAssetId: true },
   },
 } satisfies Prisma.SpotCategorySelect
 
@@ -25,7 +25,7 @@ export async function validateSpotCategories(
 
   const categories = await client.category.findMany({
     where: { id: { in: uniqueIds }, mapId },
-    select: { id: true, name: true, order: true, iconType: true, iconPresetId: true, iconImageUrl: true },
+    select: { id: true, name: true, order: true, iconType: true, iconPresetId: true, iconImageUrl: true, iconAssetId: true },
     orderBy: categoryOrderBy,
   })
   if (categories.length !== uniqueIds.length) {
@@ -52,6 +52,7 @@ export function toCategorySummary(category: {
   iconType: string | null
   iconPresetId: string | null
   iconImageUrl: string | null
+  iconAssetId: string | null
   _count: { spotCategories: number }
 }) {
   return {
@@ -62,6 +63,7 @@ export function toCategorySummary(category: {
     iconType: category.iconType === 'preset' || category.iconType === 'custom' ? category.iconType : null,
     iconPresetId: category.iconPresetId,
     iconImageUrl: category.iconImageUrl,
+    iconAssetId: category.iconAssetId,
     spotCount: category._count.spotCategories,
   }
 }

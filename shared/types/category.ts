@@ -6,6 +6,7 @@ export interface CategorySummary {
   iconType: string | null
   iconPresetId: string | null
   iconImageUrl: string | null
+  iconAssetId?: string | null
   spotCount: number
 }
 
@@ -16,6 +17,7 @@ export interface SpotCategorySummary {
   iconType: string | null
   iconPresetId: string | null
   iconImageUrl: string | null
+  iconAssetId?: string | null
 }
 
 export interface CategoryListResponse {

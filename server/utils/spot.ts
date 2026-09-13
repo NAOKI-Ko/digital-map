@@ -5,6 +5,7 @@ import { sortSpotCategories, spotCategorySelect } from './category'
 export const adminSpotInclude = {
   floor: { select: { name: true } },
   spotCategories: { select: spotCategorySelect },
+  photos: { include: { asset: true }, orderBy: { order: 'asc' as const } },
 } satisfies Prisma.SpotInclude
 
 type SpotWithFloor = Prisma.SpotGetPayload<{ include: typeof adminSpotInclude }>
@@ -13,6 +14,7 @@ export function toAdminSpotDetail(spot: SpotWithFloor) {
   const photos = Array.isArray(spot.photosJson)
     ? spot.photosJson.filter((value): value is string => typeof value === 'string')
     : []
+  const assetIdByUrl = new Map(spot.photos.map(photo => [`/uploads/${photo.asset.storageKey}`, photo.assetId]))
 
   return {
     id: spot.id,
@@ -25,12 +27,14 @@ export function toAdminSpotDetail(spot: SpotWithFloor) {
     x: spot.x,
     y: spot.y,
     photos,
+    photoAssetIds: photos.map(photo => assetIdByUrl.get(photo) ?? null),
     hoursText: spot.hoursText,
     holidayText: spot.holidayText,
     phone: spot.phone,
     pinIconType: normalizePinIconType(spot.pinIconType),
     pinIconId: spot.pinIconId,
     pinIconImageUrl: spot.pinIconImageUrl,
+    pinIconAssetId: spot.pinIconAssetId,
     pinColor: spot.pinColor,
     isPublished: spot.isPublished,
     createdAt: spot.createdAt.toISOString(),
@@ -49,7 +53,7 @@ export async function getMapFloorOptions(mapId: string) {
 export async function getMapCategoryOptions(mapId: string) {
   return prisma.category.findMany({
     where: { mapId },
-    select: { id: true, name: true, order: true, iconType: true, iconPresetId: true, iconImageUrl: true },
+    select: { id: true, name: true, order: true, iconType: true, iconPresetId: true, iconImageUrl: true, iconAssetId: true },
     orderBy: [{ order: 'asc' }, { name: 'asc' }],
   })
 }

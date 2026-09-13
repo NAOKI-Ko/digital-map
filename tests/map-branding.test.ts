@@ -20,7 +20,7 @@ describe('限定的な団体branding', () => {
   })
 
   beforeEach(() => {
-    mocks.requireOwnedMap.mockReset().mockResolvedValue({ map: { id: 'owned-map' } })
+    mocks.requireOwnedMap.mockReset().mockResolvedValue({ map: { id: 'owned-map' }, session: { user: { tenantId: 'tenant-a' } } })
     mocks.readValidatedBody.mockReset().mockImplementation(async (_event, parse) => parse({
       organizationName: 'まちづくり協会',
       logoUrl: '/uploads/logo.png',

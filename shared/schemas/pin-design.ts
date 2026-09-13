@@ -8,6 +8,7 @@ export const pinDesignSchema = z.object({
     .refine(isSupportedPinIconId, 'プリセットアイコンを選択してください。')
     .nullable(),
   pinIconImageUrl: uploadedImageUrlSchema.nullable(),
+  pinIconAssetId: z.string().min(1).nullable().optional(),
   pinColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'ピン色を選択してください。'),
 }).superRefine((value, context) => {
   if (value.pinIconType === 'preset' && !value.pinIconId) {

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import MapNameForm from '~/components/admin/MapNameForm.vue'
-import ImageUploader from '~/components/admin/ImageUploader.vue'
+import MediaPicker from '~/components/admin/MediaPicker.vue'
 import type { MapNameInput } from '~~/shared/schemas/map'
 import type { AdminMapResponse, MapBrandingResponse } from '~~/shared/types/map'
 import type { UploadedImage } from '~~/shared/types/upload'
@@ -22,6 +22,7 @@ const isBrandingSaving = ref(false)
 const branding = reactive({
   organizationName: data.value?.map.organizationName ?? '',
   logoUrl: data.value?.map.logoUrl ?? '',
+  logoAssetId: data.value?.map.logoAssetId ?? null,
   websiteUrl: data.value?.map.websiteUrl ?? '',
   snsUrl: data.value?.map.snsUrl ?? '',
 })
@@ -53,6 +54,7 @@ async function saveMap(input: MapNameInput) {
 
 function useUploadedLogo(image: UploadedImage) {
   branding.logoUrl = image.url
+  branding.logoAssetId = image.assetId
 }
 
 async function saveBranding() {
@@ -148,10 +150,10 @@ async function saveBranding() {
             <p class="text-sm font-semibold text-stone-800">ロゴ</p>
             <div v-if="branding.logoUrl" class="mt-2 flex items-center gap-4 rounded-xl border border-stone-200 p-4">
               <img :src="branding.logoUrl" alt="現在の団体ロゴ" class="size-16 rounded-lg object-contain">
-              <button type="button" class="text-sm font-semibold text-red-700" @click="branding.logoUrl = ''">ロゴを外す</button>
+              <button type="button" class="text-sm font-semibold text-red-700" @click="branding.logoUrl = ''; branding.logoAssetId = null">ロゴを外す</button>
             </div>
             <div class="mt-3">
-              <ImageUploader label="団体ロゴ" @uploaded="useUploadedLogo" />
+              <MediaPicker :map-id="mapId" label="団体ロゴ" usage="logo" @selected="useUploadedLogo" />
             </div>
           </div>
           <div class="grid gap-5 sm:grid-cols-2">

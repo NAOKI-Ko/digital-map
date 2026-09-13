@@ -10,18 +10,18 @@ interface CategoryIconDraft {
   iconType: CategoryIconType | null
   iconPresetId: string | null
   iconImageUrl: string | null
+  iconAssetId: string | null
 }
 
 definePageMeta({ layout: 'admin', middleware: 'auth' })
 const route = useRoute()
 const mapId = route.params.mapId as string
-const uploadUrl = `/api/maps/${mapId}/category-icons`
 const { data, error, refresh } = await useFetch<CategoryListResponse>(`/api/maps/${mapId}/categories`)
 const newName = ref('')
-const newIcon = ref<CategoryIconDraft>({ iconType: null, iconPresetId: null, iconImageUrl: null })
+const newIcon = ref<CategoryIconDraft>({ iconType: null, iconPresetId: null, iconImageUrl: null, iconAssetId: null })
 const editingId = ref<string | null>(null)
 const editName = ref('')
-const editIcon = ref<CategoryIconDraft>({ iconType: null, iconPresetId: null, iconImageUrl: null })
+const editIcon = ref<CategoryIconDraft>({ iconType: null, iconPresetId: null, iconImageUrl: null, iconAssetId: null })
 const editError = ref('')
 const deleteTarget = ref<CategorySummary | null>(null)
 const message = ref('')
@@ -35,7 +35,7 @@ async function createCategory() {
   try {
     await $fetch<CategoryResponse>(`/api/maps/${mapId}/categories`, { method: 'POST', body: { name: newName.value, ...newIcon.value } })
     newName.value = ''
-    newIcon.value = { iconType: null, iconPresetId: null, iconImageUrl: null }
+    newIcon.value = { iconType: null, iconPresetId: null, iconImageUrl: null, iconAssetId: null }
     await refresh()
   }
   catch (error: any) { message.value = error?.data?.statusMessage ?? 'カテゴリーを追加できませんでした。' }
@@ -49,6 +49,7 @@ function startEditing(category: CategorySummary) {
     iconType: category.iconType === 'preset' || category.iconType === 'custom' ? category.iconType : null,
     iconPresetId: category.iconPresetId,
     iconImageUrl: category.iconImageUrl,
+    iconAssetId: category.iconAssetId ?? null,
   }
   message.value = ''
   editError.value = ''
@@ -119,7 +120,7 @@ async function deleteCategory() {
     <p v-if="message" role="alert" class="mt-6 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{{ message }}</p>
     <form class="mt-8 space-y-5 rounded-2xl border border-stone-200 bg-white p-5" @submit.prevent="createCategory">
       <div><label for="new-category-name" class="text-sm font-semibold text-stone-800">新しいカテゴリー名</label><input id="new-category-name" v-model="newName" maxlength="50" required class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5" placeholder="カテゴリー名"></div>
-      <CategoryIconEditor v-model="newIcon" :upload-url="uploadUrl" />
+      <CategoryIconEditor v-model="newIcon" :map-id="mapId" />
       <div class="flex justify-end"><button :disabled="isSaving" class="rounded-lg bg-terracotta-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">追加</button></div>
     </form>
     <div v-if="error" class="mt-6 rounded-lg bg-red-50 p-5 text-sm text-red-700">カテゴリーを読み込めませんでした。</div>
@@ -143,7 +144,7 @@ async function deleteCategory() {
     <AppDialog :open="editingId !== null" title="カテゴリー名を編集" description="カテゴリー名とアイコンを変更できます。" max-width="lg" @close="closeEditor">
       <form class="space-y-5" @submit.prevent="saveCategory" @keydown.enter="handleEditEnter">
         <div><label for="edit-category-name" class="text-sm font-semibold text-stone-800">カテゴリー名</label><input id="edit-category-name" v-model="editName" autofocus maxlength="50" class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-terracotta-600"></div>
-        <CategoryIconEditor v-model="editIcon" :upload-url="uploadUrl" />
+        <CategoryIconEditor v-model="editIcon" :map-id="mapId" />
         <p v-if="editError" role="alert" class="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{{ editError }}</p>
         <div class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end"><button type="button" :disabled="isSaving" class="rounded-lg border border-stone-300 px-4 py-2.5 text-sm font-semibold" @click="closeEditor">キャンセル</button><button :disabled="isSaving" class="rounded-lg bg-terracotta-600 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50">{{ isSaving ? '保存中…' : '保存' }}</button></div>
       </form>

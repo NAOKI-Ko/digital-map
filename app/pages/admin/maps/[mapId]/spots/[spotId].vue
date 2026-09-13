@@ -77,6 +77,7 @@ async function updateSpot(input: SpotFormInput) {
           :map-id="mapId"
           :spot-id="spotId"
           :initial-photos="data.spot.photos"
+          :initial-photo-asset-ids="data.spot.photoAssetIds"
           @updated="data.spot.photos = $event"
         />
       </section>

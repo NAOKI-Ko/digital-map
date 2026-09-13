@@ -47,7 +47,7 @@ describe('フロア画像差し替え', () => {
 
   it('フロア作成成功後に画像選択とプレビューをリセットする', () => {
     expect(uploaderSource).toContain('defineExpose({ reset })')
-    expect(floorPageSource).toContain('createUploader.value?.reset()')
+    expect(floorPageSource).toContain('createPickerRevision.value += 1')
   })
 
   it('画像比率が変わっても相対位置を自動補正しないと警告する', () => {

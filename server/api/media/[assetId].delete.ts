@@ -1,6 +1,7 @@
 import { unlink } from 'node:fs/promises'
 import { basename, resolve } from 'node:path'
 import type { MediaAssetDeleteResponse } from '~~/shared/types/media'
+import { requireOwnedMediaAsset, summarizeMediaUsage } from '~~/server/utils/media'
 
 export default defineEventHandler(async (event): Promise<MediaAssetDeleteResponse> => {
   const { asset } = await requireOwnedMediaAsset(event)

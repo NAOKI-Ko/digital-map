@@ -1,28 +1,30 @@
 <script setup lang="ts">
-import ImageUploader from './ImageUploader.vue'
+import MediaPicker from './MediaPicker.vue'
+import type { UploadedImage } from '~~/shared/types/upload'
 import { categoryIconPresets, type CategoryIconType } from '~~/shared/constants/category'
 
 export interface CategoryIconDraft {
   iconType: CategoryIconType | null
   iconPresetId: string | null
   iconImageUrl: string | null
+  iconAssetId: string | null
 }
 
-const props = defineProps<{ modelValue: CategoryIconDraft, uploadUrl: string }>()
+const props = defineProps<{ modelValue: CategoryIconDraft, mapId: string }>()
 const emit = defineEmits<{ 'update:modelValue': [value: CategoryIconDraft] }>()
 
 function selectType(type: CategoryIconType | null) {
-  if (type === null) emit('update:modelValue', { iconType: null, iconPresetId: null, iconImageUrl: null })
-  else if (type === 'preset') emit('update:modelValue', { iconType: 'preset', iconPresetId: props.modelValue.iconPresetId ?? categoryIconPresets[0].id, iconImageUrl: null })
-  else emit('update:modelValue', { iconType: 'custom', iconPresetId: null, iconImageUrl: props.modelValue.iconImageUrl })
+  if (type === null) emit('update:modelValue', { iconType: null, iconPresetId: null, iconImageUrl: null, iconAssetId: null })
+  else if (type === 'preset') emit('update:modelValue', { iconType: 'preset', iconPresetId: props.modelValue.iconPresetId ?? categoryIconPresets[0].id, iconImageUrl: null, iconAssetId: null })
+  else emit('update:modelValue', { iconType: 'custom', iconPresetId: null, iconImageUrl: props.modelValue.iconImageUrl, iconAssetId: props.modelValue.iconAssetId })
 }
 
 function selectPreset(iconPresetId: string) {
-  emit('update:modelValue', { iconType: 'preset', iconPresetId, iconImageUrl: null })
+  emit('update:modelValue', { iconType: 'preset', iconPresetId, iconImageUrl: null, iconAssetId: null })
 }
 
-function useImage(iconImageUrl: string) {
-  emit('update:modelValue', { iconType: 'custom', iconPresetId: null, iconImageUrl })
+function useImage(image: UploadedImage) {
+  emit('update:modelValue', { iconType: 'custom', iconPresetId: null, iconImageUrl: image.url, iconAssetId: image.assetId })
 }
 </script>
 
@@ -42,7 +44,7 @@ function useImage(iconImageUrl: string) {
     <div v-if="modelValue.iconType === 'custom'" class="mt-4">
       <div v-if="modelValue.iconImageUrl" class="mb-4 flex items-center gap-3 rounded-lg border border-stone-200 bg-white p-3"><img :src="modelValue.iconImageUrl" alt="" class="size-16 rounded-lg bg-stone-50 object-contain"><p class="text-sm text-stone-600">現在のカスタム画像</p></div>
       <p class="mb-3 text-xs leading-5 text-stone-500">正方形に近い透過PNGを推奨します。縦横比を保ったまま表示します。</p>
-      <ImageUploader label="カテゴリーアイコン画像" :upload-url="uploadUrl" @uploaded="useImage($event.url)" />
+      <MediaPicker :map-id="mapId" label="カテゴリーアイコン画像" usage="category" @selected="useImage" />
     </div>
   </fieldset>
 </template>

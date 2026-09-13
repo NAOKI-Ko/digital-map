@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ImageUploader from '~/components/admin/ImageUploader.vue'
+import MediaPicker from '~/components/admin/MediaPicker.vue'
 import ConfirmDialog from '~/components/ui/ConfirmDialog.vue'
 import { isGeoReferenced } from '~~/lib/geo'
 import type { FloorCreateInput, FloorUpdateInput } from '~~/shared/schemas/floor'
@@ -24,7 +24,7 @@ const createInput = reactive<FloorCreateInput>({
   imageHeight: 0,
 })
 const createError = ref('')
-const createUploader = useTemplateRef<{ reset: () => void }>('createUploader')
+const createPickerRevision = ref(0)
 const isCreating = ref(false)
 const busyFloorId = ref('')
 const operationError = ref('')
@@ -49,6 +49,7 @@ function useUploadedImage(image: UploadedImage) {
   createInput.illustrationUrl = image.url
   createInput.imageWidth = image.width
   createInput.imageHeight = image.height
+  createInput.illustrationAssetId = image.assetId
   createError.value = ''
 }
 
@@ -58,7 +59,7 @@ async function replaceFloorImage(floor: MapFloorItem, image: UploadedImage) {
   try {
     const response = await $fetch<MapFloorResponse>(`/api/maps/${mapId}/floors/${floor.id}`, {
       method: 'PATCH',
-      body: { name: floor.name, illustrationUrl: image.url, imageWidth: image.width, imageHeight: image.height },
+      body: { name: floor.name, illustrationUrl: image.url, illustrationAssetId: image.assetId, imageWidth: image.width, imageHeight: image.height },
     })
     if (data.value) data.value = { floors: data.value.floors.map(item => item.id === floor.id ? response.floor : item) }
   }
@@ -89,7 +90,7 @@ async function createFloor() {
       imageWidth: 0,
       imageHeight: 0,
     })
-    createUploader.value?.reset()
+    createPickerRevision.value += 1
   }
   catch {
     createError.value = 'フロアを追加できませんでした。もう一度お試しください。'
@@ -202,7 +203,7 @@ async function confirmDeleteFloor() {
     <section class="mt-8 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
       <h2 class="text-lg font-bold text-stone-900">フロアを追加</h2>
       <div class="mt-6 grid gap-6 lg:grid-cols-2">
-        <ImageUploader ref="createUploader" label="フロアイラスト" @uploaded="useUploadedImage" />
+        <MediaPicker :key="createPickerRevision" :map-id="mapId" label="フロアイラスト" usage="floor" @selected="useUploadedImage" />
         <form class="space-y-5" @submit.prevent="createFloor">
           <div>
             <label for="new-floor-name" class="text-sm font-semibold text-stone-800">フロア名</label>
@@ -258,7 +259,7 @@ async function confirmDeleteFloor() {
               <details class="mt-4 rounded-lg border border-stone-200 p-3">
                 <summary class="cursor-pointer text-sm font-semibold text-stone-800">フロア画像を差し替える</summary>
                 <p class="mt-2 text-xs leading-5 text-amber-700">既存PINのイラスト上の相対位置と2点合わせ設定は維持されます。画像内容や比率が変わっても自動補正されません。差し替え後にジオリファレンスの対応を確認してください。</p>
-                <div class="mt-3"><ImageUploader label="差し替え画像" confirm-message="既存PINの位置は維持されます。画像内容が変わる場合は2点合わせの再確認が必要です。この画像をアップロードしますか？" @uploaded="replaceFloorImage(floor, $event)" /></div>
+                <div class="mt-3"><MediaPicker :map-id="mapId" label="差し替え画像" usage="floor" @selected="replaceFloorImage(floor, $event)" /></div>
               </details>
               <div class="mt-4 flex flex-wrap gap-3">
                 <NuxtLink :to="`/admin/maps/${mapId}/floors/${floor.id}/georeference`" class="rounded-lg border border-terracotta-300 bg-terracotta-50 px-4 py-2 text-sm font-semibold text-terracotta-800 hover:bg-terracotta-100">{{ isFloorGeoreferenced(floor) ? 'ジオリファレンスを調整' : 'ジオリファレンスを設定' }}</NuxtLink>

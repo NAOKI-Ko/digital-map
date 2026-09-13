@@ -3,6 +3,7 @@ export interface MapFloorItem {
   mapId: string
   name: string
   illustrationUrl: string
+  illustrationAssetId?: string | null
   imageWidth: number
   imageHeight: number
   order: number

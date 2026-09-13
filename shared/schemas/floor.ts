@@ -10,6 +10,7 @@ export const floorCreateSchema = z.object({
   illustrationUrl: localUploadUrlSchema,
   imageWidth: z.number().int().positive('画像の幅を読み取れませんでした。'),
   imageHeight: z.number().int().positive('画像の高さを読み取れませんでした。'),
+  illustrationAssetId: z.string().min(1).optional(),
 })
 
 export const floorUpdateSchema = z.object({
@@ -17,6 +18,7 @@ export const floorUpdateSchema = z.object({
   illustrationUrl: localUploadUrlSchema.optional(),
   imageWidth: z.number().int().positive().optional(),
   imageHeight: z.number().int().positive().optional(),
+  illustrationAssetId: z.string().min(1).nullable().optional(),
 }).superRefine((value, context) => {
   const imageValues = [value.illustrationUrl, value.imageWidth, value.imageHeight]
   if (imageValues.some(item => item !== undefined) && imageValues.some(item => item === undefined)) {

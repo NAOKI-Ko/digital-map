@@ -14,6 +14,7 @@ export interface AdminSpotSummary {
   pinIconType: PinIconType
   pinIconId: string | null
   pinIconImageUrl: string | null
+  pinIconAssetId?: string | null
   pinColor: string
   updatedAt: string
 }
@@ -39,6 +40,7 @@ export interface AdminSpotListResponse {
 export interface AdminSpotDetail extends AdminSpotSummary {
   description: string | null
   photos: string[]
+  photoAssetIds: Array<string | null>
   hoursText: string | null
   holidayText: string | null
   phone: string | null
@@ -53,6 +55,7 @@ export interface AdminSpotResponse {
 
 export interface SpotPhotosResponse {
   photos: string[]
+  assetIds: Array<string | null>
 }
 
 export interface SpotPositionResponse {
@@ -67,6 +70,7 @@ export interface SpotPinDesignResponse {
     pinIconType: PinIconType
     pinIconId: string | null
     pinIconImageUrl: string | null
+    pinIconAssetId?: string | null
     pinColor: string
   }
 }

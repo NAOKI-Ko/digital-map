@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import ImageUploader from '~/components/admin/ImageUploader.vue'
+import MediaPicker from '~/components/admin/MediaPicker.vue'
+import type { UploadedImage } from '~~/shared/types/upload'
 import {
   defaultMaterialSymbolId,
   defaultPinIconId,
@@ -23,6 +24,7 @@ const props = defineProps<{
     pinIconType: PinIconType
     pinIconId: string | null
     pinIconImageUrl: string | null
+    pinIconAssetId?: string | null
     pinColor: string
   }
 }>()
@@ -84,9 +86,10 @@ function selectIconFamily(family: PinIconFamily) {
     : lastKanjiIconId.value
 }
 
-function useCustomImage(url: string) {
+function useCustomImage(image: UploadedImage) {
   if (!usesUploadedImage.value) design.pinIconType = 'custom'
-  design.pinIconImageUrl = url
+  design.pinIconImageUrl = image.url
+  design.pinIconAssetId = image.assetId
   errorMessage.value = ''
 }
 
@@ -190,7 +193,7 @@ async function save() {
           <h3 class="text-sm font-semibold text-stone-800">{{ uploadHeading }}</h3>
           <p v-if="design.pinIconType === 'custom'" class="mt-1 text-xs leading-5 text-stone-500">ロゴなど、背景が透明で正方形に近いPNG/JPEGを推奨します。</p>
           <p v-else class="mt-1 text-xs leading-5 text-stone-500">透過PNGを推奨します。画像の縦横比は保ったまま、台座を付けずに表示します。</p>
-          <div class="mt-3 max-w-lg"><ImageUploader :label="uploadLabel" @uploaded="useCustomImage($event.url)" /></div>
+          <div class="mt-3 max-w-3xl"><MediaPicker :map-id="mapId" :label="uploadLabel" usage="pin" @selected="useCustomImage" /></div>
         </div>
       </div>
 

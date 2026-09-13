@@ -1,9 +1,10 @@
 import { categoryCreateSchema } from '~~/shared/schemas/category'
 import type { CategoryResponse } from '~~/shared/types/category'
 import { toCategoryIconData } from '~~/server/utils/category-icon'
+import { resolveTenantMediaAsset } from '~~/server/utils/media'
 
 export default defineEventHandler(async (event): Promise<CategoryResponse> => {
-  const { map } = await requireOwnedMap(event)
+  const { map, session } = await requireOwnedMap(event)
   const result = categoryCreateSchema.safeParse(await readBody(event))
   if (!result.success) throw createError({ statusCode: 422, statusMessage: result.error.issues[0]?.message ?? '入力内容を確認してください。' })
 
@@ -13,12 +14,13 @@ export default defineEventHandler(async (event): Promise<CategoryResponse> => {
   }))._max.order ?? -1) + 1
 
   try {
+    const asset = await resolveTenantMediaAsset(session.user.tenantId, result.data.iconAssetId)
     const category = await prisma.category.create({
       data: {
         mapId: map.id,
         name: result.data.name,
         order,
-        ...toCategoryIconData(result.data, map.id),
+        ...toCategoryIconData(result.data, map.id, asset),
       },
       include: { _count: { select: { spotCategories: true } } },
     })

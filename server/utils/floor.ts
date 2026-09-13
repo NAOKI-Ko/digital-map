@@ -10,6 +10,7 @@ export function toMapFloorItem(floor: FloorWithCount) {
     mapId: floor.mapId,
     name: floor.name,
     illustrationUrl: floor.illustrationUrl,
+    illustrationAssetId: floor.illustrationAssetId,
     imageWidth: floor.imageWidth,
     imageHeight: floor.imageHeight,
     order: floor.order,

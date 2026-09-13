@@ -1,8 +1,9 @@
 import { floorCreateSchema } from '~~/shared/schemas/floor'
 import type { MapFloorResponse } from '~~/shared/types/floor'
+import { resolveTenantMediaAsset } from '~~/server/utils/media'
 
 export default defineEventHandler(async (event): Promise<MapFloorResponse> => {
-  const { map } = await requireOwnedMap(event)
+  const { map, session } = await requireOwnedMap(event)
   const result = floorCreateSchema.safeParse(await readBody(event))
 
   if (!result.success) {
@@ -17,13 +18,15 @@ export default defineEventHandler(async (event): Promise<MapFloorResponse> => {
     orderBy: { order: 'desc' },
     select: { order: true },
   })
+  const asset = await resolveTenantMediaAsset(session.user.tenantId, result.data.illustrationAssetId)
   const floor = await prisma.mapFloor.create({
     data: {
       mapId: map.id,
       name: result.data.name,
-      illustrationUrl: result.data.illustrationUrl,
-      imageWidth: result.data.imageWidth,
-      imageHeight: result.data.imageHeight,
+      illustrationUrl: asset?.url ?? result.data.illustrationUrl,
+      illustrationAssetId: asset?.id,
+      imageWidth: asset?.width ?? result.data.imageWidth,
+      imageHeight: asset?.height ?? result.data.imageHeight,
       order: (lastFloor?.order ?? -1) + 1,
     },
     include: { _count: { select: { spots: true } } },
