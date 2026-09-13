@@ -212,6 +212,11 @@ describe('Markerの表示内容', () => {
     })
   })
 
+  it('再設定対象以外のMarkerはeditモードでもdrag不可にできる', () => {
+    expect(createSpotMarkerOptions({} as HTMLElement, 'edit', false).draggable).toBe(false)
+    expect(createSpotMarkerOptions({} as HTMLElement, 'edit', true).draggable).toBe(true)
+  })
+
   it('仮Markerもzoom時に投影座標を整数pixelへ丸めない', () => {
     expect(createDraftMarkerOptions()).toEqual({
       color: '#C7401F',

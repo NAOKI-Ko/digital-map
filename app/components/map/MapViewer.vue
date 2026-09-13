@@ -9,6 +9,7 @@ const props = withDefaults(defineProps<{
   mode?: MapViewerMode
   modelValue?: ImagePosition | null
   selectedSpotId?: string | null
+  draggableSpotId?: string | null
   height?: string
   label?: string
   floorErrorActionTo?: string | null
@@ -18,6 +19,7 @@ const props = withDefaults(defineProps<{
   mode: 'view',
   modelValue: null,
   selectedSpotId: null,
+  draggableSpotId: null,
   height: '38rem',
   label: 'デジタルマップ',
   floorErrorActionTo: null,
@@ -36,11 +38,13 @@ const floor = toRef(props, 'floor')
 const spots = toRef(props, 'spots')
 const position = toRef(props, 'modelValue')
 const selectedSpotId = toRef(props, 'selectedSpotId')
+const draggableSpotId = toRef(props, 'draggableSpotId')
 const { floorError, geolocationAreaMessage, mapError } = useMapViewer(container, {
   floor,
   spots,
   position,
   selectedSpotId,
+  draggableSpotId,
   mode: props.mode,
   initialCamera: props.initialCamera,
   onCameraChanged: camera => emit('cameraChanged', camera),

@@ -8,6 +8,7 @@ const mocks = vi.hoisted(() => ({
 
 type Handler = (event: unknown) => Promise<unknown>
 let handler: Handler
+let removeHandler: Handler
 
 function testError(input: { statusCode: number, statusMessage: string }) {
   return Object.assign(new Error(input.statusMessage), input)
@@ -21,6 +22,7 @@ describe('PATCH Spot IMAGE position', () => {
     vi.stubGlobal('createError', testError)
     vi.stubGlobal('prisma', { spot: { update: mocks.update } })
     handler = (await import('../server/api/maps/[mapId]/spots/[spotId]/position.patch')).default as Handler
+    removeHandler = (await import('../server/api/maps/[mapId]/spots/[spotId]/position.delete')).default as Handler
   })
 
   beforeEach(() => {
@@ -50,6 +52,14 @@ describe('PATCH Spot IMAGE position', () => {
     expect(mocks.update).toHaveBeenCalledWith({
       where: { id: 'spot-1' },
       data: { x: 0.25, y: 0.75 },
+    })
+  })
+
+  it('配置解除はSpotを削除せずx/yをnullにし、公開中なら下書きへ戻す', async () => {
+    await expect(removeHandler({})).resolves.toEqual({ position: { x: null, y: null } })
+    expect(mocks.update).toHaveBeenCalledWith({
+      where: { id: 'spot-1' },
+      data: { x: null, y: null, isPublished: false },
     })
   })
 })

@@ -21,8 +21,8 @@ Start SHA: `a58b4353bd108e6586f329080c772f69b8aaffda`
 | WU-00 | KAN-49/50/51 and referenced PdM decisions | PASS | `75e64c4` | Product contracts created; baseline 24 files / 197 tests; runtime unchanged |
 | WU-01 | KAN-49 | PASS | `508b74f` | IMAGE x/y and normalized reference points; migration-only epsilon `1e-12`; focused 83 tests, full 26 files / 219 tests, typecheck, Prisma validate, build PASS. Read-only audit command exits 2 because this worktree has no configured `DATABASE_URL`; migration remains fail-closed for unresolved rows. |
 | WU-02 | KAN-7/40/49 | PASS | `8b2004c` | Replacement updates only image reference/dimensions and preserves normalized placement/georeference; selected-image preview/choose-again/reset UX; focused 7 tests, full 26 files / 223 tests, typecheck PASS. |
-| WU-03 | KAN-33/40 | PASS | PENDING COMMIT | Two-point flow retained; image zoom/pan, overlay opacity, non-destructive editing reset, confirmed saved mapping removal; focused 48 tests, full 27 files / 227 tests, typecheck PASS. |
-| WU-04 | KAN-30 | PENDING | — | |
+| WU-03 | KAN-33/40 | PASS | `f69f097` | Two-point flow retained; image zoom/pan, overlay opacity, non-destructive editing reset, confirmed saved mapping removal; focused 48 tests, full 27 files / 227 tests, typecheck PASS. |
+| WU-04 | KAN-30 | PASS | PENDING COMMIT | Dedicated candidate mode for set/reconfigure; only selected PIN draggable; explicit save/cancel; confirmed unplace preserves Spot and unpublishes; focused 38 tests, full 28 files / 233 tests, typecheck, Prisma validate, build PASS. |
 | WU-05 | KAN-51 | PENDING | — | |
 | WU-06 | KAN-39 | PENDING | — | |
 | WU-07 | KAN-50 | PENDING | — | |

@@ -57,8 +57,8 @@ export interface SpotPhotosResponse {
 
 export interface SpotPositionResponse {
   position: {
-    x: number
-    y: number
+    x: number | null
+    y: number | null
   }
 }
 

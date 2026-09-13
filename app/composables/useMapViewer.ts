@@ -47,6 +47,7 @@ export interface UseMapViewerOptions {
   spots: Readonly<Ref<readonly MapViewerSpot[]>>
   position: Readonly<Ref<ImagePosition | null>>
   selectedSpotId: Readonly<Ref<string | null>>
+  draggableSpotId?: Readonly<Ref<string | null>>
   initialCamera?: MapViewerCameraState | null
   onReady?: (map: MapLibreMap) => void
   onCameraChanged?: (camera: MapViewerCameraState) => void
@@ -148,11 +149,11 @@ export function constrainImagePlacementCandidate(floor: MapViewerFloor, position
   }
 }
 
-export function createSpotMarkerOptions(element: HTMLElement, mode: MapViewerMode): MarkerOptions {
+export function createSpotMarkerOptions(element: HTMLElement, mode: MapViewerMode, draggable = mode === 'edit'): MarkerOptions {
   return {
     element,
     anchor: 'bottom',
-    draggable: mode === 'edit',
+    draggable,
     subpixelPositioning: true,
   }
 }
@@ -400,11 +401,12 @@ export function useMapViewer(
       })
       spotMarkerElements.push({ element, spot })
 
-      const marker = new currentMaplibre.Marker(createSpotMarkerOptions(element, options.mode))
+      const isDraggable = options.mode === 'edit' && options.draggableSpotId?.value === spot.id
+      const marker = new currentMaplibre.Marker(createSpotMarkerOptions(element, options.mode, isDraggable))
         .setLngLat([renderPosition.lng, renderPosition.lat])
         .addTo(instance)
 
-      if (options.mode === 'edit') {
+      if (isDraggable) {
         marker.on('dragend', () => {
           const lngLat = marker.getLngLat()
           const position = constrainImagePlacementCandidate(options.floor.value, lngLat)
@@ -540,6 +542,7 @@ export function useMapViewer(
   watch(() => options.spots.value, syncSpotMarkers, { deep: true })
   watch(() => options.position.value, syncDraftMarker, { deep: true })
   watch(() => options.selectedSpotId.value, syncSpotMarkers)
+  if (options.draggableSpotId) watch(() => options.draggableSpotId?.value, syncSpotMarkers)
   watch(() => options.floor.value.id, () => {
     if (!isReady.value) return
     const floor = options.floor.value

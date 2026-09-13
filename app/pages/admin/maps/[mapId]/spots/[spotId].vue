@@ -61,7 +61,7 @@ async function updateSpot(input: SpotFormInput) {
         <h1 class="mt-1 text-2xl font-bold tracking-tight text-stone-900 sm:text-3xl">{{ data.spot.name }}</h1>
         <p class="mt-2 text-sm text-stone-600">基本情報や営業情報を編集します。</p>
       </header>
-      <NuxtLink v-if="data.spot.x === null || data.spot.y === null" :to="{ path: `/admin/maps/${mapId}/editor`, query: { floorId: data.spot.floorId, placeSpotId: data.spot.id } }" class="mt-5 inline-flex rounded-lg bg-terracotta-600 px-4 py-2.5 text-sm font-semibold text-white">地図上に配置する</NuxtLink>
+      <NuxtLink :to="{ path: `/admin/maps/${mapId}/editor`, query: { floorId: data.spot.floorId, placeSpotId: data.spot.id } }" class="mt-5 inline-flex rounded-lg bg-terracotta-600 px-4 py-2.5 text-sm font-semibold text-white">{{ data.spot.x === null || data.spot.y === null ? '位置を設定' : '位置を再設定' }}</NuxtLink>
       <div v-if="submitError" role="alert" class="mt-6 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{{ submitError }}</div>
       <div v-if="successMessage" role="status" class="mt-6 rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{{ successMessage }}</div>
       <section class="mt-8 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
