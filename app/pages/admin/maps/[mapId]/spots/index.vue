@@ -9,7 +9,14 @@ definePageMeta({
 
 const route = useRoute()
 const mapId = route.params.mapId as string
-const form = reactive({ q: '', categoryId: '', floorId: '', status: '' })
+const form = reactive({
+  q: typeof route.query.q === 'string' ? route.query.q : '',
+  categoryId: typeof route.query.categoryId === 'string' ? route.query.categoryId : '',
+  floorId: typeof route.query.floorId === 'string' ? route.query.floorId : '',
+  status: typeof route.query.status === 'string' ? route.query.status : '',
+  position: typeof route.query.position === 'string' ? route.query.position : '',
+  sort: typeof route.query.sort === 'string' ? route.query.sort : 'updated',
+})
 const appliedFilters = ref({ ...form })
 const query = computed(() => Object.fromEntries(
   Object.entries(appliedFilters.value).filter(([, value]) => value),
@@ -24,16 +31,33 @@ const bulkMessage = ref('')
 const isBulkSaving = ref(false)
 const bulkDeleteOpen = ref(false)
 const allCurrentSelected = computed(() => Boolean(data.value?.spots.length) && data.value!.spots.every(spot => selectedSpotIds.value.includes(spot.id)))
+let searchTimer: ReturnType<typeof setTimeout> | null = null
 
 useHead({ title: 'スポット一覧 | デジタルマップ' })
 
 function search() {
   appliedFilters.value = { ...form, q: form.q.trim() }
+  void navigateTo({ path: route.path, query: query.value }, { replace: true })
 }
 
 function reset() {
-  Object.assign(form, { q: '', categoryId: '', floorId: '', status: '' })
-  appliedFilters.value = { ...form }
+  Object.assign(form, { q: '', categoryId: '', floorId: '', status: '', position: '', sort: 'updated' })
+  search()
+}
+
+watch(form, () => {
+  if (searchTimer) clearTimeout(searchTimer)
+  searchTimer = setTimeout(search, 250)
+}, { deep: true })
+
+onMounted(() => {
+  const saved = sessionStorage.getItem(`spot-list-scroll:${mapId}`)
+  if (saved) requestAnimationFrame(() => window.scrollTo({ top: Number(saved) || 0 }))
+})
+onBeforeRouteLeave(() => sessionStorage.setItem(`spot-list-scroll:${mapId}`, String(window.scrollY)))
+
+function spotDetailLocation(spotId: string) {
+  return { path: `/admin/maps/${mapId}/spots/${spotId}`, query: { returnTo: route.fullPath } }
 }
 
 function toggleAllCurrent() {
@@ -90,7 +114,7 @@ function formatDate(value: string) {
     </header>
 
     <form class="mt-8 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm" @submit.prevent="search">
-      <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         <div class="xl:col-span-2">
           <label for="spot-keyword" class="text-xs font-semibold text-stone-600">キーワード</label>
           <input id="spot-keyword" v-model="form.q" type="search" maxlength="100" class="mt-1.5 w-full rounded-lg border border-stone-300 px-3 py-2.5 text-sm" placeholder="店名・カテゴリ・説明文を検索">
@@ -102,6 +126,8 @@ function formatDate(value: string) {
             <option v-for="category in data?.filters.categories" :key="category.id" :value="category.id">{{ category.name }}</option>
           </select>
         </div>
+        <div><label for="spot-position" class="text-xs font-semibold text-stone-600">配置状態</label><select id="spot-position" v-model="form.position" class="mt-1.5 w-full rounded-lg border border-stone-300 px-3 py-2.5 text-sm"><option value="">すべて</option><option value="positioned">配置済み</option><option value="unpositioned">位置未設定</option></select></div>
+        <div><label for="spot-sort" class="text-xs font-semibold text-stone-600">並び順</label><select id="spot-sort" v-model="form.sort" class="mt-1.5 w-full rounded-lg border border-stone-300 px-3 py-2.5 text-sm"><option value="updated">更新が新しい順</option><option value="name">名前順</option><option value="created">作成が新しい順</option></select></div>
         <div>
           <label for="spot-floor" class="text-xs font-semibold text-stone-600">フロア</label>
           <select id="spot-floor" v-model="form.floorId" class="mt-1.5 w-full rounded-lg border border-stone-300 px-3 py-2.5 text-sm">
@@ -163,13 +189,14 @@ function formatDate(value: string) {
                 <input v-model="selectedSpotIds" type="checkbox" :value="spot.id" :aria-label="`${spot.name}を選択`" class="mt-1 size-4">
                 <div>
                 <div class="flex flex-wrap items-center gap-2">
-                  <h3 class="font-bold text-stone-900">{{ spot.name }}</h3>
+                  <h3 class="font-bold text-stone-900"><NuxtLink :to="spotDetailLocation(spot.id)" class="hover:text-terracotta-700">{{ spot.name }}</NuxtLink></h3>
                   <span v-if="spot.importance === 'featured'" class="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-800">注目</span>
                   <span v-for="category in spot.categories" :key="category.id" class="rounded-full bg-stone-100 px-2.5 py-1 text-xs text-stone-700">{{ category.name }}</span>
                   <span class="rounded-full px-2.5 py-1 text-xs font-semibold" :class="spot.isPublished ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'">{{ spot.isPublished ? '公開' : '下書き' }}</span>
                 </div>
                 <p v-if="spot.x !== null && spot.y !== null" class="mt-2 text-sm text-stone-600">{{ spot.floorName }} · 配置済み</p>
                 <p v-else class="mt-2 text-sm font-medium text-amber-700">{{ spot.floorName }} · 位置未設定</p>
+                <NuxtLink v-if="spot.x !== null && spot.y !== null" :to="{ path: `/admin/maps/${mapId}/editor`, query: { floorId: spot.floorId, placeSpotId: spot.id } }" class="mt-2 inline-flex text-xs font-semibold text-terracotta-700">地図上で識別</NuxtLink>
                 <p class="mt-1 text-xs text-stone-500">最終更新 {{ formatDate(spot.updatedAt) }}</p>
                 </div>
               </div>

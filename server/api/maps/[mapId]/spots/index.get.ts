@@ -10,6 +10,8 @@ export default defineEventHandler(async (event): Promise<AdminSpotListResponse> 
   const categoryId = typeof query.categoryId === 'string' ? query.categoryId : ''
   const floorId = typeof query.floorId === 'string' ? query.floorId : ''
   const status = query.status === 'published' || query.status === 'draft' ? query.status : ''
+  const position = query.position === 'positioned' || query.position === 'unpositioned' ? query.position : ''
+  const sort = query.sort === 'name' || query.sort === 'created' ? query.sort : 'updated'
   const where: Prisma.SpotWhereInput = {
     floor: { mapId: map.id },
     ...(keyword
@@ -24,6 +26,7 @@ export default defineEventHandler(async (event): Promise<AdminSpotListResponse> 
     ...(categoryId ? { spotCategories: { some: { categoryId, category: { mapId: map.id } } } } : {}),
     ...(floorId ? { floorId } : {}),
     ...(status ? { isPublished: status === 'published' } : {}),
+    ...(position === 'positioned' ? { x: { not: null }, y: { not: null } } : position === 'unpositioned' ? { OR: [{ x: null }, { y: null }] } : {}),
   }
 
   const [spots, floors, categories] = await Promise.all([
@@ -48,7 +51,7 @@ export default defineEventHandler(async (event): Promise<AdminSpotListResponse> 
         floor: { select: { name: true } },
         spotCategories: { select: spotCategorySelect },
       },
-      orderBy: { updatedAt: 'desc' },
+      orderBy: sort === 'name' ? [{ name: 'asc' }, { createdAt: 'desc' }] : sort === 'created' ? { createdAt: 'desc' } : { updatedAt: 'desc' },
     }),
     prisma.mapFloor.findMany({
       where: { mapId: map.id },
