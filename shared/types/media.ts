@@ -1,0 +1,29 @@
+export interface MediaAssetUsage {
+  mapLogos: number
+  floorIllustrations: number
+  categoryIcons: number
+  spotPins: number
+  spotPhotos: number
+  total: number
+}
+
+export interface MediaAssetItem {
+  id: string
+  url: string
+  originalFilename: string
+  mimeType: string
+  width: number
+  height: number
+  fileSize: number
+  sha256: string | null
+  createdAt: string
+  usage: MediaAssetUsage
+}
+
+export interface MediaAssetListResponse {
+  assets: MediaAssetItem[]
+}
+
+export interface MediaAssetDeleteResponse {
+  deletedId: string
+}

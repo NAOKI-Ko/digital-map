@@ -1,10 +1,10 @@
-import { randomUUID } from 'node:crypto'
-import { mkdir, writeFile } from 'node:fs/promises'
+import { createHash, randomUUID } from 'node:crypto'
+import { mkdir, unlink, writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import type { ImageUploadResponse } from '~~/shared/types/upload'
 
 export default defineEventHandler(async (event): Promise<ImageUploadResponse> => {
-  const { map } = await requireOwnedMap(event)
+  const { map, session } = await requireOwnedMap(event)
   const parts = await readMultipartFormData(event)
   const file = parts?.find(part => part.name === 'file' && part.filename)
   if (!file) throw createError({ statusCode: 400, statusMessage: '画像ファイルを選択してください。' })
@@ -17,14 +17,33 @@ export default defineEventHandler(async (event): Promise<ImageUploadResponse> =>
   await mkdir(uploadDirectory, { recursive: true })
   await writeFile(resolve(uploadDirectory, filename), file.data, { flag: 'wx' })
 
-  return {
-    image: {
-      url: `/uploads/${filename}`,
-      filename,
-      mimeType: validated.mimeType,
-      size: file.data.length,
-      width: dimensions.width,
-      height: dimensions.height,
-    },
+  try {
+    const asset = await prisma.mediaAsset.create({
+      data: {
+        tenantId: session.user.tenantId,
+        storageKey: filename,
+        originalFilename: file.filename ?? filename,
+        mimeType: validated.mimeType,
+        width: dimensions.width,
+        height: dimensions.height,
+        fileSize: file.data.length,
+        sha256: createHash('sha256').update(file.data).digest('hex'),
+      },
+    })
+    return {
+      image: {
+        assetId: asset.id,
+        url: `/uploads/${filename}`,
+        filename,
+        mimeType: validated.mimeType,
+        size: file.data.length,
+        width: dimensions.width,
+        height: dimensions.height,
+      },
+    }
+  }
+  catch (error) {
+    await unlink(resolve(uploadDirectory, filename)).catch(() => undefined)
+    throw error
   }
 })

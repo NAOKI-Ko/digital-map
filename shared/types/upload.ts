@@ -1,4 +1,5 @@
 export interface UploadedImage {
+  assetId: string
   url: string
   filename: string
   mimeType: 'image/png' | 'image/jpeg'
