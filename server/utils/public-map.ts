@@ -1,6 +1,6 @@
 import type { Prisma } from '../../prisma/generated/client'
 import type { PublicMap } from '../../shared/types/public-map'
-import { normalizePinIconType, normalizeSpotImportance } from '../../shared/constants/spot'
+import { normalizePinIconType, normalizePinSize, normalizeSpotImportance } from '../../shared/constants/spot'
 import { prisma } from './prisma'
 import { categoryOrderBy, sortSpotCategories, spotCategorySelect } from './category'
 
@@ -67,6 +67,7 @@ export function buildPublicMapQuery(slug: string) {
               pinIconId: true,
               pinIconImageUrl: true,
               pinColor: true,
+              pinSize: true,
               isPublished: true,
               spotCategories: { select: spotCategorySelect },
             },
@@ -169,6 +170,7 @@ export function serializePublicMap(record: PublicMapRecord | null): PublicMap | 
           pinIconId: spot.pinIconId,
           pinIconImageUrl: spot.pinIconImageUrl,
           pinColor: spot.pinColor,
+          pinSize: normalizePinSize(spot.pinSize),
         }]
       }),
       decorations: floor.decorations.map(item => ({ id: item.id, imageUrl: `/uploads/${item.asset.storageKey}`, imageWidth: item.asset.width, imageHeight: item.asset.height, x: item.x, y: item.y, width: item.width, rotation: item.rotation, order: item.order })),

@@ -122,6 +122,7 @@ model Spot {
   photos          SpotPhoto[]
   fieldValues     SpotFieldValue[]
   pinColor        String           @default("#C7401F")
+  pinSize         String           @default("medium")
   importance      String           @default("normal")
   isPublished     Boolean          @default(false)
   createdAt       DateTime         @default(now())

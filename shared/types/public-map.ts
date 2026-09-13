@@ -1,4 +1,4 @@
-import type { PinIconType, SpotImportance } from '../constants/spot'
+import type { PinIconType, PinSize, SpotImportance } from '../constants/spot'
 import type { SpotCategorySummary } from './category'
 import type { MapViewerDecoration } from './map-viewer'
 
@@ -26,6 +26,7 @@ export interface PublicSpot {
   pinIconId: string | null
   pinIconImageUrl: string | null
   pinColor: string
+  pinSize: PinSize
 }
 
 export interface PublicFloor {

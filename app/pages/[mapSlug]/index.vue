@@ -122,6 +122,7 @@ function selectSpot(spot: MapViewerSpot) {
             :decorations="selectedFloor.decorations"
             mode="view"
             :selected-spot-id="selectedSpotId"
+            :prioritize-visible-spots="selectedCategoryIds.length > 0"
             height="calc(100svh - 4rem)"
             :label="`${data.map.name} ${selectedFloor.name}`"
             @spot-selected="selectSpot"

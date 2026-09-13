@@ -1,5 +1,5 @@
 import type { Prisma } from '~~/prisma/generated/client'
-import { normalizePinIconType, normalizeSpotImportance } from '~~/shared/constants/spot'
+import { normalizePinIconType, normalizePinSize, normalizeSpotImportance } from '~~/shared/constants/spot'
 import { categoryOrderBy, sortSpotCategories, spotCategorySelect } from '~~/server/utils/category'
 import type { AdminSpotListResponse } from '~~/shared/types/spot'
 
@@ -43,6 +43,7 @@ export default defineEventHandler(async (event): Promise<AdminSpotListResponse> 
         pinIconImageUrl: true,
         pinIconAssetId: true,
         pinColor: true,
+        pinSize: true,
         updatedAt: true,
         floor: { select: { name: true } },
         spotCategories: { select: spotCategorySelect },
@@ -78,6 +79,7 @@ export default defineEventHandler(async (event): Promise<AdminSpotListResponse> 
       pinIconImageUrl: spot.pinIconImageUrl,
       pinIconAssetId: spot.pinIconAssetId,
       pinColor: spot.pinColor,
+      pinSize: normalizePinSize(spot.pinSize),
       updatedAt: spot.updatedAt.toISOString(),
     })),
     filters: {

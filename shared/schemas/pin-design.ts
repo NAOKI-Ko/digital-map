@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { isSupportedPinIconId, pinIconTypes } from '~~/shared/constants/spot'
+import { isSupportedPinIconId, pinIconTypes, pinSizes } from '~~/shared/constants/spot'
 import { uploadedImageUrlSchema } from '~~/shared/schemas/photo'
 
 export const pinDesignSchema = z.object({
@@ -10,6 +10,7 @@ export const pinDesignSchema = z.object({
   pinIconImageUrl: uploadedImageUrlSchema.nullable(),
   pinIconAssetId: z.string().min(1).nullable().optional(),
   pinColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'ピン色を選択してください。'),
+  pinSize: z.enum(pinSizes).default('medium'),
 }).superRefine((value, context) => {
   if (value.pinIconType === 'preset' && !value.pinIconId) {
     context.addIssue({ code: 'custom', path: ['pinIconId'], message: 'プリセットアイコンを選択してください。' })

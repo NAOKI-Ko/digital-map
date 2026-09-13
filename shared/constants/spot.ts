@@ -27,6 +27,11 @@ export const pinIconTypes = ['preset', 'custom', 'illustration'] as const
 export type PinIconType = typeof pinIconTypes[number]
 export const spotImportances = ['normal', 'featured'] as const
 export type SpotImportance = typeof spotImportances[number]
+export const pinSizes = ['small', 'medium', 'large'] as const
+export type PinSize = typeof pinSizes[number]
+export function normalizePinSize(value: string | null | undefined): PinSize {
+  return value === 'small' || value === 'large' ? value : 'medium'
+}
 
 export function normalizeSpotImportance(value: string | null | undefined): SpotImportance {
   return value === 'featured' ? 'featured' : 'normal'

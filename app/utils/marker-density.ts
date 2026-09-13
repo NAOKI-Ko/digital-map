@@ -1,44 +1,17 @@
-import type { SpotImportance } from '~~/shared/constants/spot'
+import type { PinSize, SpotImportance } from '~~/shared/constants/spot'
 
-export const NORMAL_SPOT_FULL_VISIBILITY_OFFSET = 2
-export const NORMAL_SPOT_MIN_OPACITY = 0.35
-export const NORMAL_SPOT_MIN_SCALE = 0.78
-export const FEATURED_SPOT_SCALE = 1.12
+export const NORMAL_SPOT_VISIBILITY_ZOOM_OFFSET = 1.5
+export const PIN_SIZE_SCALES: Record<PinSize, number> = { small: 0.8, medium: 1, large: 1.25 }
 
-function clamp(value: number, minimum: number, maximum: number) {
-  return Math.min(maximum, Math.max(minimum, value))
+export function getMarkerDensityPresentation(importance: SpotImportance, pinSize: PinSize, zoom: number, minimumZoom: number, selected = false, activeCategoryMatch = false) {
+  if (selected) return { visible: true, scale: PIN_SIZE_SCALES[pinSize], priority: 4 }
+  if (activeCategoryMatch) return { visible: true, scale: PIN_SIZE_SCALES[pinSize], priority: 3 }
+  if (importance === 'featured') return { visible: true, scale: PIN_SIZE_SCALES[pinSize], priority: 2 }
+  return { visible: zoom >= minimumZoom + NORMAL_SPOT_VISIBILITY_ZOOM_OFFSET, scale: PIN_SIZE_SCALES[pinSize], priority: 1 }
 }
 
-export function getMarkerDensityPresentation(
-  importance: SpotImportance,
-  zoom: number,
-  minimumZoom: number,
-  selected = false,
-) {
-  if (selected) {
-    return { opacity: 1, scale: 1, priority: 3 }
-  }
-  if (importance === 'featured') {
-    return {
-      opacity: 1,
-      scale: FEATURED_SPOT_SCALE,
-      priority: 2,
-    }
-  }
-
-  const progress = clamp((zoom - minimumZoom) / NORMAL_SPOT_FULL_VISIBILITY_OFFSET, 0, 1)
-  return {
-    opacity: NORMAL_SPOT_MIN_OPACITY + (1 - NORMAL_SPOT_MIN_OPACITY) * progress,
-    scale: NORMAL_SPOT_MIN_SCALE + (1 - NORMAL_SPOT_MIN_SCALE) * progress,
-    priority: 1,
-  }
-}
-
-export function applyMarkerDensityPresentation(
-  element: HTMLElement,
-  presentation: ReturnType<typeof getMarkerDensityPresentation>,
-) {
+export function applyMarkerDensityPresentation(element: HTMLElement, presentation: ReturnType<typeof getMarkerDensityPresentation>) {
+  element.hidden = !presentation.visible
   element.style.zIndex = String(presentation.priority)
-  element.style.setProperty('--marker-density-opacity', presentation.opacity.toFixed(3))
-  element.style.setProperty('--marker-density-scale', presentation.scale.toFixed(3))
+  element.style.setProperty('--marker-size-scale', presentation.scale.toFixed(3))
 }

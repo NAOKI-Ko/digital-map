@@ -1,5 +1,5 @@
 import type { Prisma } from '~~/prisma/generated/client'
-import { normalizePinIconType, normalizeSpotImportance } from '~~/shared/constants/spot'
+import { normalizePinIconType, normalizePinSize, normalizeSpotImportance } from '~~/shared/constants/spot'
 import { sortSpotCategories, spotCategorySelect } from './category'
 
 export const adminSpotInclude = {
@@ -46,6 +46,7 @@ export function toAdminSpotDetail(spot: SpotWithFloor) {
     pinIconImageUrl: spot.pinIconImageUrl,
     pinIconAssetId: spot.pinIconAssetId,
     pinColor: spot.pinColor,
+    pinSize: normalizePinSize(spot.pinSize),
     isPublished: spot.isPublished,
     createdAt: spot.createdAt.toISOString(),
     updatedAt: spot.updatedAt.toISOString(),

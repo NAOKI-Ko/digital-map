@@ -1,0 +1,1 @@
+ALTER TABLE "Spot" ADD COLUMN "pinSize" TEXT NOT NULL DEFAULT 'medium';

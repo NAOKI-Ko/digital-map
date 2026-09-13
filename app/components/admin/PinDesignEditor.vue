@@ -12,6 +12,7 @@ import {
   type PinIconFamily,
   type PinIconPresetId,
   type PinIconType,
+  type PinSize,
 } from '~~/shared/constants/spot'
 import { pinDesignSchema, type PinDesignInput } from '~~/shared/schemas/pin-design'
 import type { SpotPinDesignResponse } from '~~/shared/types/spot'
@@ -26,6 +27,7 @@ const props = defineProps<{
     pinIconImageUrl: string | null
     pinIconAssetId?: string | null
     pinColor: string
+    pinSize: PinSize
   }
 }>()
 
@@ -186,6 +188,16 @@ async function save() {
           <div class="mt-3 flex flex-wrap items-center gap-3">
             <button v-for="color in colorPresets" :key="color" type="button" :aria-label="`ピン色 ${color}`" class="h-9 w-9 rounded-full border-2 border-white shadow ring-1" :class="design.pinColor.toUpperCase() === color ? 'ring-stone-900' : 'ring-stone-300'" :style="{ backgroundColor: color }" @click="design.pinColor = color" />
             <label class="flex items-center gap-2 rounded-lg border border-stone-300 px-3 py-2 text-sm text-stone-700">自由選択 <input v-model="design.pinColor" type="color" aria-label="自由なピン色" class="h-7 w-10 cursor-pointer border-0 bg-transparent p-0"></label>
+          </div>
+        </fieldset>
+
+        <fieldset class="mt-7">
+          <legend class="text-sm font-semibold text-stone-800">表示サイズ</legend>
+          <p class="mt-1 text-xs text-stone-500">重要度とは独立した見た目のサイズです。</p>
+          <div class="mt-3 flex gap-2">
+            <label v-for="item in [{ id: 'small', label: '小' }, { id: 'medium', label: '中' }, { id: 'large', label: '大' }]" :key="item.id" class="rounded-lg border px-4 py-2 text-sm">
+              <input v-model="design.pinSize" type="radio" name="pin-size" :value="item.id" class="mr-2">{{ item.label }}
+            </label>
           </div>
         </fieldset>
 

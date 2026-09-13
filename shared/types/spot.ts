@@ -1,4 +1,4 @@
-import type { PinIconType, SpotImportance } from '../constants/spot'
+import type { PinIconType, PinSize, SpotImportance } from '../constants/spot'
 import type { SpotCategorySummary } from './category'
 import type { SpotFieldDefinitionItem } from './spot-field'
 
@@ -18,6 +18,7 @@ export interface AdminSpotSummary {
   pinIconImageUrl: string | null
   pinIconAssetId?: string | null
   pinColor: string
+  pinSize: PinSize
   updatedAt: string
 }
 
@@ -78,6 +79,7 @@ export interface SpotPinDesignResponse {
     pinIconImageUrl: string | null
     pinIconAssetId?: string | null
     pinColor: string
+    pinSize: PinSize
   }
 }
 

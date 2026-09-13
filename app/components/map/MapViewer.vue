@@ -15,6 +15,7 @@ const props = withDefaults(defineProps<{
   label?: string
   floorErrorActionTo?: string | null
   initialCamera?: MapViewerCameraState | null
+  prioritizeVisibleSpots?: boolean
 }>(), {
   spots: () => [],
   decorations: () => [],
@@ -26,6 +27,7 @@ const props = withDefaults(defineProps<{
   label: 'デジタルマップ',
   floorErrorActionTo: null,
   initialCamera: null,
+  prioritizeVisibleSpots: false,
 })
 
 const emit = defineEmits<{
@@ -42,6 +44,7 @@ const decorations = toRef(props, 'decorations')
 const position = toRef(props, 'modelValue')
 const selectedSpotId = toRef(props, 'selectedSpotId')
 const draggableSpotId = toRef(props, 'draggableSpotId')
+const prioritizeVisibleSpots = toRef(props, 'prioritizeVisibleSpots')
 const { floorError, geolocationAreaMessage, mapError } = useMapViewer(container, {
   floor,
   spots,
@@ -49,6 +52,7 @@ const { floorError, geolocationAreaMessage, mapError } = useMapViewer(container,
   position,
   selectedSpotId,
   draggableSpotId,
+  prioritizeVisibleSpots,
   mode: props.mode,
   initialCamera: props.initialCamera,
   onCameraChanged: camera => emit('cameraChanged', camera),
@@ -126,7 +130,7 @@ const { floorError, geolocationAreaMessage, mapError } = useMapViewer(container,
   border-radius: 50%;
   background: rgb(37 48 58 / 28%);
   filter: blur(2px);
-  opacity: var(--marker-density-opacity, 1);
+  opacity: 1;
   pointer-events: none;
   transform: translateX(-50%);
   transition: opacity 120ms linear;
@@ -161,11 +165,10 @@ const { floorError, geolocationAreaMessage, mapError } = useMapViewer(container,
   color: white;
   font-size: 0.75rem;
   font-weight: 800;
-  opacity: var(--marker-density-opacity, 1);
   transform-origin: bottom left;
   transform: rotate(-45deg);
   transition: scale 150ms ease, box-shadow 150ms ease, opacity 120ms linear;
-  scale: var(--marker-density-scale, 1);
+  scale: var(--marker-size-scale, 1);
 }
 
 .map-viewer-marker__content {
@@ -197,9 +200,8 @@ const { floorError, geolocationAreaMessage, mapError } = useMapViewer(container,
   width: max-content;
   transform-origin: bottom center;
   filter: drop-shadow(0 5px 5px rgb(37 48 58 / 32%));
-  opacity: var(--marker-density-opacity, 1);
   transition: scale 150ms ease, filter 150ms ease, opacity 120ms linear;
-  scale: var(--marker-density-scale, 1);
+  scale: var(--marker-size-scale, 1);
 }
 
 .map-viewer-marker__illustration-image {
@@ -217,7 +219,7 @@ const { floorError, geolocationAreaMessage, mapError } = useMapViewer(container,
     0 7px 12px rgb(37 48 58 / 45%),
     inset -3px -3px 6px rgb(0 0 0 / 25%),
     inset 2px 2px 4px rgb(255 255 255 / 35%);
-  scale: calc(var(--marker-density-scale, 1) * 1.12);
+  scale: calc(var(--marker-size-scale, 1) * 1.12);
 }
 
 .map-viewer-marker--selected .map-viewer-marker__illustration,
@@ -225,7 +227,7 @@ const { floorError, geolocationAreaMessage, mapError } = useMapViewer(container,
   filter:
     drop-shadow(0 0 3px rgb(255 255 255 / 95%))
     drop-shadow(0 6px 6px rgb(37 48 58 / 42%));
-  scale: calc(var(--marker-density-scale, 1) * 1.12);
+  scale: calc(var(--marker-size-scale, 1) * 1.12);
 }
 
 .map-viewer-current-location-marker {

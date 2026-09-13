@@ -50,6 +50,7 @@ export interface UseMapViewerOptions {
   position: Readonly<Ref<ImagePosition | null>>
   selectedSpotId: Readonly<Ref<string | null>>
   draggableSpotId?: Readonly<Ref<string | null>>
+  prioritizeVisibleSpots?: Readonly<Ref<boolean>>
   initialCamera?: MapViewerCameraState | null
   onReady?: (map: MapLibreMap) => void
   onCameraChanged?: (camera: MapViewerCameraState) => void
@@ -433,9 +434,11 @@ export function useMapViewer(
     spotMarkerElements.forEach(({ element, spot }) => {
       applyMarkerDensityPresentation(element, getMarkerDensityPresentation(
         spot.importance,
+        spot.pinSize ?? 'medium',
         zoom,
         minimumZoom,
         options.mode === 'edit' || spot.id === options.selectedSpotId.value,
+        options.prioritizeVisibleSpots?.value ?? false,
       ))
     })
   }
@@ -572,6 +575,7 @@ export function useMapViewer(
   watch(() => options.position.value, syncDraftMarker, { deep: true })
   watch(() => options.selectedSpotId.value, syncSpotMarkers)
   if (options.draggableSpotId) watch(() => options.draggableSpotId?.value, syncSpotMarkers)
+  if (options.prioritizeVisibleSpots) watch(() => options.prioritizeVisibleSpots?.value, syncMarkerDensity)
   watch(() => options.floor.value.id, () => {
     if (!isReady.value) return
     const floor = options.floor.value
