@@ -18,7 +18,8 @@ const { data, error, status, refresh } = await useFetch<AdminSpotListResponse>(`
   query,
 })
 const selectedSpotIds = ref<string[]>([])
-const bulkCategoryIds = ref<string[]>([])
+const bulkCategoryId = ref('')
+const pendingCategoryAction = ref<'addCategory' | 'removeCategory' | null>(null)
 const bulkMessage = ref('')
 const isBulkSaving = ref(false)
 const bulkDeleteOpen = ref(false)
@@ -39,7 +40,7 @@ function toggleAllCurrent() {
   selectedSpotIds.value = allCurrentSelected.value ? [] : data.value?.spots.map(spot => spot.id) ?? []
 }
 
-async function runBulk(action: 'delete' | 'publish' | 'unpublish' | 'setCategories') {
+async function runBulk(action: 'delete' | 'publish' | 'unpublish') {
   if (!selectedSpotIds.value.length) return
   if (action === 'delete') {
     bulkDeleteOpen.value = true
@@ -48,17 +49,18 @@ async function runBulk(action: 'delete' | 'publish' | 'unpublish' | 'setCategori
   await executeBulk(action)
 }
 
-async function executeBulk(action: 'delete' | 'publish' | 'unpublish' | 'setCategories') {
+async function executeBulk(action: 'delete' | 'publish' | 'unpublish' | 'addCategory' | 'removeCategory') {
   isBulkSaving.value = true
   bulkMessage.value = ''
   try {
     await $fetch(`/api/maps/${mapId}/spots/bulk`, {
       method: 'PATCH',
-      body: { action, spotIds: selectedSpotIds.value, ...(action === 'setCategories' ? { categoryIds: bulkCategoryIds.value } : {}) },
+      body: { action, spotIds: selectedSpotIds.value, ...((action === 'addCategory' || action === 'removeCategory') ? { categoryId: bulkCategoryId.value } : {}) },
     })
     bulkMessage.value = `${selectedSpotIds.value.length}件を更新しました。`
     selectedSpotIds.value = []
     bulkDeleteOpen.value = false
+    pendingCategoryAction.value = null
     await refresh()
   }
   catch (error: any) { bulkMessage.value = error?.data?.statusMessage ?? '一括操作を完了できませんでした。' }
@@ -131,10 +133,11 @@ function formatDate(value: string) {
           <button type="button" :disabled="!selectedSpotIds.length || isBulkSaving" class="rounded-lg border px-3 py-2 text-sm disabled:opacity-40" @click="runBulk('unpublish')">非公開</button>
           <button type="button" :disabled="!selectedSpotIds.length || isBulkSaving" class="rounded-lg border border-red-200 px-3 py-2 text-sm text-red-700 disabled:opacity-40" @click="runBulk('delete')">削除</button>
         </div>
-        <div class="mt-4 flex flex-wrap items-center gap-2 border-t border-stone-200 pt-4">
-          <span class="text-sm font-semibold">カテゴリーを置換:</span>
-          <label v-for="category in data?.filters.categories" :key="category.id" class="flex items-center gap-1 text-sm"><input v-model="bulkCategoryIds" type="checkbox" :value="category.id">{{ category.name }}</label>
-          <button type="button" :disabled="!selectedSpotIds.length || isBulkSaving" class="rounded-lg bg-stone-900 px-3 py-2 text-sm font-semibold text-white disabled:opacity-40" @click="runBulk('setCategories')">適用</button>
+        <div v-if="selectedSpotIds.length" class="mt-4 flex flex-wrap items-center gap-2 border-t border-stone-200 pt-4">
+          <span class="text-sm font-semibold">Category一括操作:</span>
+          <select v-model="bulkCategoryId" class="rounded-lg border border-stone-300 px-3 py-2 text-sm"><option value="">1つ選択</option><option v-for="category in data?.filters.categories" :key="category.id" :value="category.id">{{ category.name }}</option></select>
+          <button type="button" :disabled="!bulkCategoryId || isBulkSaving" class="rounded-lg border px-3 py-2 text-sm font-semibold disabled:opacity-40" @click="pendingCategoryAction = 'addCategory'">追加</button>
+          <button type="button" :disabled="!bulkCategoryId || isBulkSaving" class="rounded-lg border px-3 py-2 text-sm font-semibold disabled:opacity-40" @click="pendingCategoryAction = 'removeCategory'">削除</button>
         </div>
         <p v-if="bulkMessage" role="status" class="mt-3 text-sm text-stone-600">{{ bulkMessage }}</p>
       </div>
@@ -177,5 +180,6 @@ function formatDate(value: string) {
       </div>
     </section>
     <ConfirmDialog :open="bulkDeleteOpen" title="スポットを一括削除" :message="`選択した${selectedSpotIds.length}件のスポットを削除します。関連する写真やカテゴリー設定も登録から外れ、元に戻せません。`" confirm-label="削除する" destructive :busy="isBulkSaving" @cancel="bulkDeleteOpen = false" @confirm="executeBulk('delete')" />
+    <ConfirmDialog :open="pendingCategoryAction !== null" title="Category一括操作" :message="`選択した${selectedSpotIds.length}件へ「${data?.filters.categories.find(category => category.id === bulkCategoryId)?.name ?? ''}」を${pendingCategoryAction === 'addCategory' ? '追加' : '削除'}します。他のCategoryは維持されます。`" confirm-label="実行する" :busy="isBulkSaving" @cancel="pendingCategoryAction = null" @confirm="pendingCategoryAction && executeBulk(pendingCategoryAction)" />
   </div>
 </template>

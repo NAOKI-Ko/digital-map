@@ -8,7 +8,7 @@ export default defineEventHandler(async (event): Promise<SpotBulkResponse> => {
 
   const input = result.data
   const spotIds = [...new Set(input.spotIds)]
-  const categoryIds = input.action === 'setCategories' ? input.categoryIds : null
+  const categoryId = input.action === 'addCategory' || input.action === 'removeCategory' ? input.categoryId : null
   const spots = await prisma.spot.findMany({
     where: { id: { in: spotIds }, floor: { mapId: map.id } },
     select: { id: true, x: true, y: true },
@@ -27,14 +27,16 @@ export default defineEventHandler(async (event): Promise<SpotBulkResponse> => {
       await transaction.spot.updateMany({ where: { id: { in: spotIds }, floor: { mapId: map.id } }, data: { isPublished: input.action === 'publish' } })
       return
     }
-    if (categoryIds === null) return
-    const categories = await validateSpotCategories(transaction, map.id, categoryIds)
-    await transaction.spotCategory.deleteMany({ where: { spotId: { in: spotIds } } })
-    if (categories.length) {
+    if (categoryId === null) return
+    const [category] = await validateSpotCategories(transaction, map.id, [categoryId])
+    if (!category) return
+    if (input.action === 'addCategory') {
       await transaction.spotCategory.createMany({
-        data: spotIds.flatMap(spotId => categories.map(category => ({ spotId, categoryId: category.id }))),
+        data: spotIds.map(spotId => ({ spotId, categoryId: category.id })),
+        skipDuplicates: true,
       })
     }
+    else await transaction.spotCategory.deleteMany({ where: { spotId: { in: spotIds }, categoryId: category.id } })
   })
 
   return { updatedCount: spotIds.length }

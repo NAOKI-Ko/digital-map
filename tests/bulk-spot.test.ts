@@ -6,8 +6,9 @@ describe('Spot一括操作validation', () => {
     expect(spotBulkSchema.safeParse({ action, spotIds: ['spot-1'] }).success).toBe(true)
   })
 
-  it('Category 0件を含む一括置換を受け付ける', () => {
-    expect(spotBulkSchema.safeParse({ action: 'setCategories', spotIds: ['spot-1'], categoryIds: [] }).success).toBe(true)
+  it.each(['addCategory', 'removeCategory'] as const)('%sはCategoryを1件だけ受け付ける', (action) => {
+    expect(spotBulkSchema.safeParse({ action, spotIds: ['spot-1'], categoryId: 'category-1' }).success).toBe(true)
+    expect(spotBulkSchema.safeParse({ action, spotIds: ['spot-1'], categoryIds: [] }).success).toBe(false)
   })
 
   it('対象Spotなしを拒否する', () => {

@@ -129,7 +129,7 @@ async function deleteCategory() {
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div class="flex min-w-0 items-center gap-3">
             <span class="grid size-10 shrink-0 place-items-center rounded-lg bg-stone-100 text-stone-700"><CategoryIcon :icon-type="category.iconType" :icon-preset-id="category.iconPresetId" :icon-image-url="category.iconImageUrl" size="lg" /><span v-if="!category.iconType" aria-hidden="true" class="text-xs text-stone-400">なし</span></span>
-            <div><strong>{{ category.name }}</strong><span class="ml-3 text-sm text-stone-500">{{ category.spotCount }}スポットで使用</span></div>
+            <div><strong>{{ category.name }}</strong><span class="ml-3 text-sm text-stone-500">{{ category.spotCount }}スポットで使用</span><NuxtLink v-if="category.spotCount" :to="{ path: `/admin/maps/${mapId}/spots`, query: { categoryId: category.id } }" class="ml-3 text-xs font-semibold text-terracotta-700">使用Spotを表示</NuxtLink></div>
           </div>
           <div class="flex gap-2">
             <button type="button" :disabled="index === 0" class="rounded border px-3 py-1.5 disabled:opacity-30" aria-label="上へ移動" @click="moveCategory(index, -1)">↑</button>

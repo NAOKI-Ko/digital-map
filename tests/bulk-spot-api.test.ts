@@ -70,8 +70,8 @@ describe('release security: Spot bulk API', () => {
     expect(mocks.transaction).not.toHaveBeenCalled()
   })
 
-  it('重複Spot IDを除去し、選択SpotだけのCategory relationをtransaction内で全置換する', async () => {
-    mocks.readBody.mockResolvedValue({ action: 'setCategories', spotIds: ['spot-a', 'spot-a', 'spot-b'], categoryIds: ['category-a'] })
+  it('重複Spot IDを除去し、既存Categoryを残したまま1件を冪等追加する', async () => {
+    mocks.readBody.mockResolvedValue({ action: 'addCategory', spotIds: ['spot-a', 'spot-a', 'spot-b'], categoryId: 'category-a' })
     mocks.findMany.mockResolvedValue([
       { id: 'spot-a', x: 0.25, y: 0.25 },
       { id: 'spot-b', x: 0.75, y: 0.75 },
@@ -80,13 +80,23 @@ describe('release security: Spot bulk API', () => {
 
     await expect(handler({})).resolves.toEqual({ updatedCount: 2 })
     expect(mocks.validateSpotCategories).toHaveBeenCalledWith(expect.anything(), 'map-a', ['category-a'])
-    expect(mocks.deleteManyRelations).toHaveBeenCalledWith({ where: { spotId: { in: ['spot-a', 'spot-b'] } } })
+    expect(mocks.deleteManyRelations).not.toHaveBeenCalled()
     expect(mocks.createManyRelations).toHaveBeenCalledWith({
       data: [
         { spotId: 'spot-a', categoryId: 'category-a' },
         { spotId: 'spot-b', categoryId: 'category-a' },
       ],
+      skipDuplicates: true,
     })
+  })
+
+  it('Category削除は他のrelationを残し、存在しないrelationも成功する', async () => {
+    mocks.readBody.mockResolvedValue({ action: 'removeCategory', spotIds: ['spot-a'], categoryId: 'category-a' })
+    mocks.findMany.mockResolvedValue([{ id: 'spot-a', x: 0.25, y: 0.25 }])
+    mocks.validateSpotCategories.mockResolvedValue([{ id: 'category-a' }])
+    await expect(handler({})).resolves.toEqual({ updatedCount: 1 })
+    expect(mocks.deleteManyRelations).toHaveBeenCalledWith({ where: { spotId: { in: ['spot-a'] }, categoryId: 'category-a' } })
+    expect(mocks.createManyRelations).not.toHaveBeenCalled()
   })
 
   it('transaction失敗時は成功responseを返さない', async () => {
