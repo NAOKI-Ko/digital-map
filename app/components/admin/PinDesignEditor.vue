@@ -50,6 +50,11 @@ const pinTypeOptions: Array<{ value: PinIconType, label: string, description: st
   { value: 'illustration', label: 'イラスト直置き', description: '画像を台座なしで地図へ配置' },
 ]
 const selectedPreset = computed(() => getPinIconPreset(design.pinIconId))
+const materialPresetGroups = computed(() => {
+  const groups = new Map<string, typeof materialSymbolPresets[number][]>()
+  materialSymbolPresets.forEach((preset) => groups.set(preset.group, [...(groups.get(preset.group) ?? []), preset]))
+  return [...groups.entries()]
+})
 const selectedIconFamily = computed(() => selectedPreset.value.family)
 const lastKanjiIconId = ref<PinIconPresetId>(
   selectedPreset.value.family === 'kanji'
@@ -176,11 +181,16 @@ async function save() {
               <span class="mt-2 block text-xs font-semibold text-stone-700">{{ preset.label }}</span>
             </button>
           </div>
-          <div v-else class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <button v-for="preset in materialSymbolPresets" :key="preset.id" type="button" class="rounded-xl border p-3 text-center transition" :class="design.pinIconId === preset.id ? 'border-terracotta-500 bg-terracotta-50 ring-2 ring-terracotta-100' : 'border-stone-200 hover:border-stone-400'" @click="design.pinIconId = preset.id">
-              <span class="material-symbols-outlined mx-auto grid h-10 w-10 place-items-center rounded-full text-lg text-white" :style="{ backgroundColor: design.pinColor }" aria-hidden="true">{{ preset.name }}</span>
-              <span class="mt-2 block text-xs font-semibold text-stone-700">{{ preset.label }}</span>
-            </button>
+          <div v-else class="mt-3 space-y-5">
+            <section v-for="[group, presets] in materialPresetGroups" :key="group">
+              <h4 class="text-xs font-bold text-stone-500">{{ group }}</h4>
+              <div class="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                <button v-for="preset in presets" :key="preset.id" type="button" class="rounded-xl border p-3 text-center transition" :class="design.pinIconId === preset.id ? 'border-terracotta-500 bg-terracotta-50 ring-2 ring-terracotta-100' : 'border-stone-200 hover:border-stone-400'" @click="design.pinIconId = preset.id">
+                  <span class="material-symbols-outlined mx-auto grid h-10 w-10 place-items-center rounded-full text-lg text-white" :style="{ backgroundColor: design.pinColor }" aria-hidden="true">{{ preset.name }}</span>
+                  <span class="mt-2 block text-xs font-semibold text-stone-700">{{ preset.label }}</span>
+                </button>
+              </div>
+            </section>
           </div>
         </fieldset>
 
