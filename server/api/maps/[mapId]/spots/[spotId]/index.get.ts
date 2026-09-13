@@ -11,5 +11,6 @@ export default defineEventHandler(async (event): Promise<AdminSpotResponse> => {
     spot: toAdminSpotDetail(spot),
     floors: await getMapFloorOptions(map.id),
     categories: await getMapCategoryOptions(map.id),
+    fields: await getMapSpotFieldDefinitions(map.id),
   }
 })

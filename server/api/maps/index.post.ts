@@ -1,5 +1,6 @@
 import { mapNameSchema } from '~~/shared/schemas/map'
 import type { AdminMapResponse } from '~~/shared/types/map'
+import { defaultSpotFieldDefinitions } from '~~/shared/constants/spot-fields'
 
 export default defineEventHandler(async (event): Promise<AdminMapResponse> => {
   const session = await requireAdminSession(event)
@@ -9,6 +10,7 @@ export default defineEventHandler(async (event): Promise<AdminMapResponse> => {
       tenantId: session.user.tenantId,
       name: input.name,
       slug: createMapSlug(input.name),
+      spotFieldDefinitions: { create: defaultSpotFieldDefinitions.map(field => ({ ...field })) },
     },
     select: {
       id: true,

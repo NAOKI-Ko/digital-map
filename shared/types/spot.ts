@@ -1,5 +1,6 @@
 import type { PinIconType, SpotImportance } from '../constants/spot'
 import type { SpotCategorySummary } from './category'
+import type { SpotFieldDefinitionItem } from './spot-field'
 
 export interface AdminSpotSummary {
   id: string
@@ -39,6 +40,9 @@ export interface AdminSpotListResponse {
 
 export interface AdminSpotDetail extends AdminSpotSummary {
   description: string | null
+  address: string | null
+  website: string | null
+  customValues: Record<string, string | number | boolean | null>
   photos: string[]
   photoAssetIds: Array<string | null>
   hoursText: string | null
@@ -51,6 +55,7 @@ export interface AdminSpotResponse {
   spot: AdminSpotDetail
   floors: SpotListFilterFloor[]
   categories: SpotCategorySummary[]
+  fields: SpotFieldDefinitionItem[]
 }
 
 export interface SpotPhotosResponse {

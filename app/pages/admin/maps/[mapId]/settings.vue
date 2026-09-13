@@ -190,6 +190,7 @@ async function saveBranding() {
         <h2 class="text-lg font-bold text-stone-900">カテゴリー</h2>
         <p class="mt-2 text-sm leading-6 text-stone-600">スポットで使用するカテゴリーの名称と表示順を管理します。</p>
         <NuxtLink :to="`/admin/maps/${mapId}/categories`" class="mt-5 inline-flex rounded-lg bg-stone-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-stone-700">カテゴリーを管理する</NuxtLink>
+        <NuxtLink :to="`/admin/maps/${mapId}/fields`" class="ml-3 mt-5 inline-flex rounded-lg bg-stone-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-stone-700">Spot情報項目を管理する</NuxtLink>
       </section>
 
       <section class="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">

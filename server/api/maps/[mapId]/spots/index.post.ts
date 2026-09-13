@@ -22,15 +22,21 @@ export default defineEventHandler(async (event): Promise<AdminSpotResponse> => {
 
   const spot = await prisma.$transaction(async (transaction) => {
     const categories = await validateSpotCategories(transaction, map.id, result.data.categoryIds ?? [])
-    const { categoryIds: _categoryIds, ...spotData } = result.data
+    await validateSpotFieldSubmission(transaction, map.id, result.data, result.data.customValues)
+    const { categoryIds: _categoryIds, customValues, ...spotData } = result.data
+    const fieldValues = Object.entries(customValues).flatMap(([fieldDefinitionId, value]) =>
+      value === null || value === '' ? [] : [{ fieldDefinitionId, valueJson: value }])
     return transaction.spot.create({
       data: {
         ...spotData,
         description: spotData.description || null,
+        address: spotData.address || null,
+        website: spotData.website || null,
         hoursText: spotData.hoursText || null,
         holidayText: spotData.holidayText || null,
         phone: spotData.phone || null,
         spotCategories: { create: categories.map(category => ({ categoryId: category.id })) },
+        fieldValues: { create: fieldValues },
       },
       include: adminSpotInclude,
     })
@@ -41,5 +47,6 @@ export default defineEventHandler(async (event): Promise<AdminSpotResponse> => {
     spot: toAdminSpotDetail(spot),
     floors: await getMapFloorOptions(map.id),
     categories: await getMapCategoryOptions(map.id),
+    fields: await getMapSpotFieldDefinitions(map.id),
   }
 })

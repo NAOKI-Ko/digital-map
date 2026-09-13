@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { spotImportances } from '../constants/spot'
+import { customSpotValuesSchema } from './spot-field'
 
 const optionalText = (maximum: number, message: string) => z.string().trim().max(maximum, message)
 const optionalCoordinate = (minimum: number, maximum: number, message: string) => z.preprocess(
@@ -13,12 +14,21 @@ export const spotFormSchema = z.object({
   categoryIds: z.array(z.string().min(1, 'カテゴリーIDが不正です。')).optional(),
   importance: z.enum(spotImportances).default('normal'),
   description: optionalText(2000, '説明文は2000文字以内で入力してください。'),
+  address: optionalText(500, '住所は500文字以内で入力してください。').default(''),
+  website: z.union([
+    z.literal(''),
+    z.string().trim().url('WebサイトURLの形式を確認してください。').refine(
+      value => /^https?:\/\//i.test(value),
+      'WebサイトURLはhttpまたはhttpsで入力してください。',
+    ),
+  ]).default(''),
   hoursText: optionalText(500, '営業時間は500文字以内で入力してください。'),
   holidayText: optionalText(500, '定休日は500文字以内で入力してください。'),
   phone: optionalText(50, '電話番号は50文字以内で入力してください。').refine(
     value => !value || /^[0-9+()\-ー―‐\s]+$/.test(value),
     '電話番号の形式を確認してください。',
   ),
+  customValues: customSpotValuesSchema,
   x: optionalCoordinate(0, 1, 'X座標は0〜1で入力してください。'),
   y: optionalCoordinate(0, 1, 'Y座標は0〜1で入力してください。'),
 }).superRefine((value, context) => {

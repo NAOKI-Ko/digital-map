@@ -32,22 +32,23 @@ model User {
 }
 
 model Map {
-  id               String      @id @default(cuid())
-  tenantId         String
-  tenant           Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  name             String
-  slug             String      @unique
-  organizationName String?
-  logoUrl          String?
-  logoAssetId      String?
-  logoAsset        MediaAsset? @relation("MapLogoAsset", fields: [logoAssetId], references: [id], onDelete: SetNull)
-  websiteUrl       String?
-  snsUrl           String?
-  isPublished      Boolean     @default(false)
-  floors           MapFloor[]
-  categories       Category[]
-  createdAt        DateTime    @default(now())
-  updatedAt        DateTime    @updatedAt
+  id                   String                @id @default(cuid())
+  tenantId             String
+  tenant               Tenant                @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  name                 String
+  slug                 String                @unique
+  organizationName     String?
+  logoUrl              String?
+  logoAssetId          String?
+  logoAsset            MediaAsset?           @relation("MapLogoAsset", fields: [logoAssetId], references: [id], onDelete: SetNull)
+  websiteUrl           String?
+  snsUrl               String?
+  isPublished          Boolean               @default(false)
+  floors               MapFloor[]
+  categories           Category[]
+  spotFieldDefinitions SpotFieldDefinition[]
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
 
   @@index([tenantId])
 }
@@ -98,32 +99,69 @@ model MapFloor {
 }
 
 model Spot {
-  id              String         @id @default(cuid())
+  id              String           @id @default(cuid())
   floorId         String
-  floor           MapFloor       @relation(fields: [floorId], references: [id], onDelete: Cascade)
+  floor           MapFloor         @relation(fields: [floorId], references: [id], onDelete: Cascade)
   name            String
   spotCategories  SpotCategory[]
   description     String?
+  address         String?
+  website         String?
   x               Float?
   y               Float?
-  photosJson      Json           @default("[]")
+  photosJson      Json             @default("[]")
   hoursText       String?
   holidayText     String?
   phone           String?
-  pinIconType     String         @default("preset")
+  pinIconType     String           @default("preset")
   pinIconId       String?
   pinIconImageUrl String?
   pinIconAssetId  String?
-  pinIconAsset    MediaAsset?    @relation("SpotPinAsset", fields: [pinIconAssetId], references: [id], onDelete: SetNull)
+  pinIconAsset    MediaAsset?      @relation("SpotPinAsset", fields: [pinIconAssetId], references: [id], onDelete: SetNull)
   photos          SpotPhoto[]
-  pinColor        String         @default("#C7401F")
-  importance      String         @default("normal")
-  isPublished     Boolean        @default(false)
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
+  fieldValues     SpotFieldValue[]
+  pinColor        String           @default("#C7401F")
+  importance      String           @default("normal")
+  isPublished     Boolean          @default(false)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 
   @@index([floorId])
   @@index([floorId, isPublished])
+}
+
+model SpotFieldDefinition {
+  id            String           @id @default(cuid())
+  mapId         String
+  map           Map              @relation(fields: [mapId], references: [id], onDelete: Cascade)
+  kind          String
+  semanticKey   String?
+  label         String
+  type          String
+  enabled       Boolean          @default(true)
+  publicVisible Boolean          @default(true)
+  required      Boolean          @default(false)
+  order         Int              @default(0)
+  values        SpotFieldValue[]
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  @@unique([mapId, semanticKey])
+  @@index([mapId, order])
+}
+
+model SpotFieldValue {
+  id                String              @id @default(cuid())
+  spotId            String
+  spot              Spot                @relation(fields: [spotId], references: [id], onDelete: Cascade)
+  fieldDefinitionId String
+  fieldDefinition   SpotFieldDefinition @relation(fields: [fieldDefinitionId], references: [id], onDelete: Restrict)
+  valueJson         Json
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+
+  @@unique([spotId, fieldDefinitionId])
+  @@index([fieldDefinitionId])
 }
 
 model MediaAsset {

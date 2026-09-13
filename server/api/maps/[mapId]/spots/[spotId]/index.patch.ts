@@ -31,12 +31,15 @@ export default defineEventHandler(async (event): Promise<AdminSpotResponse> => {
     const categories = result.data.categoryIds === undefined
       ? null
       : await validateSpotCategories(transaction, map.id, result.data.categoryIds)
-    const { categoryIds: _categoryIds, ...spotData } = result.data
-    return transaction.spot.update({
+    await validateSpotFieldSubmission(transaction, map.id, result.data, result.data.customValues, ownedSpot.id)
+    const { categoryIds: _categoryIds, customValues, ...spotData } = result.data
+    const updated = await transaction.spot.update({
       where: { id: ownedSpot.id },
       data: {
         ...spotData,
         description: spotData.description || null,
+        address: spotData.address || null,
+        website: spotData.website || null,
         hoursText: spotData.hoursText || null,
         holidayText: spotData.holidayText || null,
         phone: spotData.phone || null,
@@ -49,11 +52,25 @@ export default defineEventHandler(async (event): Promise<AdminSpotResponse> => {
       },
       include: adminSpotInclude,
     })
+    for (const [fieldDefinitionId, value] of Object.entries(customValues)) {
+      if (value === null || value === '') {
+        await transaction.spotFieldValue.deleteMany({ where: { spotId: ownedSpot.id, fieldDefinitionId } })
+      }
+      else {
+        await transaction.spotFieldValue.upsert({
+          where: { spotId_fieldDefinitionId: { spotId: ownedSpot.id, fieldDefinitionId } },
+          create: { spotId: ownedSpot.id, fieldDefinitionId, valueJson: value },
+          update: { valueJson: value },
+        })
+      }
+    }
+    return updated
   })
 
   return {
     spot: toAdminSpotDetail(spot),
     floors: await getMapFloorOptions(map.id),
     categories: await getMapCategoryOptions(map.id),
+    fields: await getMapSpotFieldDefinitions(map.id),
   }
 })
