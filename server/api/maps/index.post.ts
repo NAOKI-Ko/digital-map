@@ -1,15 +1,15 @@
-import { mapNameSchema } from '~~/shared/schemas/map'
+import { mapCreateSchema } from '~~/shared/schemas/map'
 import type { AdminMapResponse } from '~~/shared/types/map'
 import { defaultSpotFieldDefinitions } from '~~/shared/constants/spot-fields'
 
 export default defineEventHandler(async (event): Promise<AdminMapResponse> => {
   const session = await requireAdminSession(event)
-  const input = await readValidatedBody(event, mapNameSchema.parse)
+  const input = await readValidatedBody(event, mapCreateSchema.parse)
   const map = await prisma.map.create({
     data: {
       tenantId: session.user.tenantId,
       name: input.name,
-      slug: createMapSlug(input.name),
+      slug: input.slug,
       spotFieldDefinitions: { create: defaultSpotFieldDefinitions.map(field => ({ ...field })) },
     },
     select: {
