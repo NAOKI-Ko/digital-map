@@ -23,9 +23,12 @@ const initialValue = computed<SpotFormInput | undefined>(() => data.value
       categoryIds: data.value.spot.categories.map(category => category.id),
       importance: data.value.spot.importance,
       description: data.value.spot.description ?? '',
+      address: data.value.spot.address ?? '',
+      website: data.value.spot.website ?? '',
       hoursText: data.value.spot.hoursText ?? '',
       holidayText: data.value.spot.holidayText ?? '',
       phone: data.value.spot.phone ?? '',
+      customValues: data.value.spot.customValues,
       x: data.value.spot.x,
       y: data.value.spot.y,
     }
@@ -66,7 +69,7 @@ async function updateSpot(input: SpotFormInput) {
       <div v-if="successMessage" role="status" class="mt-6 rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{{ successMessage }}</div>
       <section class="mt-8 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
         <ClientOnly>
-          <SpotForm :floors="data.floors" :categories="data.categories" :initial-value="initialValue" :is-submitting="isSubmitting" @submit="updateSpot" />
+          <SpotForm :floors="data.floors" :categories="data.categories" :fields="data.fields" :initial-value="initialValue" :is-submitting="isSubmitting" @submit="updateSpot" />
           <template #fallback>
             <p class="text-sm text-stone-600">フォームを読み込んでいます…</p>
           </template>

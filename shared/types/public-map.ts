@@ -1,6 +1,14 @@
 import type { PinIconType, SpotImportance } from '../constants/spot'
 import type { SpotCategorySummary } from './category'
 
+export interface PublicSpotInformationField {
+  id: string
+  label: string
+  type: 'single_line_text' | 'multiline_text' | 'number' | 'url' | 'boolean'
+  value: string
+  href: string | null
+}
+
 export interface PublicSpot {
   id: string
   floorId: string
@@ -11,9 +19,8 @@ export interface PublicSpot {
   x: number
   y: number
   photos: string[]
-  hoursText: string | null
-  holidayText: string | null
-  phone: string | null
+  informationFields: PublicSpotInformationField[]
+  websiteAction: { label: string, url: string } | null
   pinIconType: PinIconType
   pinIconId: string | null
   pinIconImageUrl: string | null

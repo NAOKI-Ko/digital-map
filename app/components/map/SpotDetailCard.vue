@@ -65,20 +65,16 @@ watch(() => props.spot.id, () => {
             {{ spot.description }}
           </p>
 
-          <dl v-if="spot.hoursText || spot.holidayText || spot.phone" class="mt-6 divide-y divide-stone-200 border-y border-stone-200 text-sm">
-            <div v-if="spot.hoursText" class="grid grid-cols-[5.5rem_1fr] gap-3 py-3">
-              <dt class="font-semibold text-stone-500">営業時間</dt>
-              <dd class="whitespace-pre-line text-stone-800">{{ spot.hoursText }}</dd>
-            </div>
-            <div v-if="spot.holidayText" class="grid grid-cols-[5.5rem_1fr] gap-3 py-3">
-              <dt class="font-semibold text-stone-500">定休日</dt>
-              <dd class="whitespace-pre-line text-stone-800">{{ spot.holidayText }}</dd>
-            </div>
-            <div v-if="spot.phone" class="grid grid-cols-[5.5rem_1fr] gap-3 py-3">
-              <dt class="font-semibold text-stone-500">電話番号</dt>
-              <dd><a :href="`tel:${spot.phone}`" class="font-semibold text-terracotta-700 underline decoration-terracotta-300 underline-offset-4">{{ spot.phone }}</a></dd>
+          <dl v-if="spot.informationFields.length" class="mt-6 divide-y divide-stone-200 border-y border-stone-200 text-sm">
+            <div v-for="field in spot.informationFields" :key="field.id" class="grid grid-cols-[5.5rem_1fr] gap-3 py-3">
+              <dt class="font-semibold text-stone-500">{{ field.label }}</dt>
+              <dd class="whitespace-pre-line text-stone-800">
+                <a v-if="field.href" :href="field.href" class="font-semibold text-terracotta-700 underline decoration-terracotta-300 underline-offset-4" :target="field.type === 'url' ? '_blank' : undefined" :rel="field.type === 'url' ? 'noopener noreferrer' : undefined">{{ field.value }}</a>
+                <template v-else>{{ field.value }}</template>
+              </dd>
             </div>
           </dl>
+          <a v-if="spot.websiteAction" :href="spot.websiteAction.url" target="_blank" rel="noopener noreferrer" class="mt-5 inline-flex rounded-lg bg-terracotta-600 px-4 py-2.5 text-sm font-semibold text-white">{{ spot.websiteAction.label }}を見る</a>
         </div>
       </div>
     </article>

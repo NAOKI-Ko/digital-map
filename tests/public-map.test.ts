@@ -17,12 +17,15 @@ const publishedSpot = {
   importance: 'normal',
   spotCategories: [{ category: { id: 'category-1', name: '観光', order: 0 } }],
   description: null,
+  address: null,
+  website: null,
   x: 0.5,
   y: 0.5,
   photosJson: [],
   hoursText: null,
   holidayText: null,
   phone: null,
+  fieldValues: [],
   pinIconType: 'preset',
   pinIconId: 'sightseeing',
   pinIconImageUrl: null,
@@ -33,6 +36,7 @@ const publishedSpot = {
 function mapRecord(overrides: {
   isPublished?: boolean
   spots?: PublicMapRecord['floors'][number]['spots']
+  spotFieldDefinitions?: PublicMapRecord['spotFieldDefinitions']
 } = {}): PublicMapRecord {
   return {
     id: 'map-1',
@@ -43,6 +47,7 @@ function mapRecord(overrides: {
     websiteUrl: null,
     snsUrl: null,
     isPublished: overrides.isPublished ?? true,
+    spotFieldDefinitions: overrides.spotFieldDefinitions ?? [],
     floors: [{
       id: 'floor-1',
       name: '1階',
@@ -133,5 +138,45 @@ describe('GET /api/public/:mapSlug', () => {
     expect(result).not.toHaveProperty('isPublished')
     expect(result?.floors[0]?.spots[0]).not.toHaveProperty('isPublished')
     expect(result?.floors[0]?.spots[0]).not.toHaveProperty('spotCategories')
+  })
+
+  it('公開設定済みの項目だけを定義順で返し、内部・無効・空値を漏らさない', async () => {
+    mocks.findFirst.mockResolvedValue(mapRecord({
+      spotFieldDefinitions: [
+        { id: 'description', semanticKey: 'description', label: '紹介', type: 'multiline_text', order: 0 },
+        { id: 'address', semanticKey: 'address', label: '所在地', type: 'single_line_text', order: 1 },
+        { id: 'custom-public', semanticKey: null, label: '席数', type: 'number', order: 2 },
+        { id: 'website', semanticKey: 'website', label: '公式サイト', type: 'url', order: 3 },
+      ],
+      spots: [{
+        ...publishedSpot,
+        description: '公開紹介',
+        address: '',
+        website: 'https://example.com',
+        fieldValues: [
+          { fieldDefinitionId: 'custom-public', valueJson: 0 },
+          { fieldDefinitionId: 'internal-field', valueJson: '秘密' },
+          { fieldDefinitionId: 'disabled-field', valueJson: '退避値' },
+        ],
+      }],
+    }))
+
+    const spot = (await getPublicMapBySlug('test-map'))?.floors[0]?.spots[0]
+    expect(spot).toMatchObject({
+      description: '公開紹介',
+      informationFields: [{ id: 'custom-public', label: '席数', value: '0', href: null }],
+      websiteAction: { label: '公式サイト', url: 'https://example.com' },
+    })
+    expect(JSON.stringify(spot)).not.toContain('秘密')
+    expect(JSON.stringify(spot)).not.toContain('退避値')
+    expect(spot?.informationFields).not.toEqual(expect.arrayContaining([expect.objectContaining({ id: 'address' })]))
+  })
+
+  it('説明定義が内部設定なら説明本文を返さない', async () => {
+    mocks.findFirst.mockResolvedValue(mapRecord({
+      spotFieldDefinitions: [],
+      spots: [{ ...publishedSpot, description: '内部紹介' }],
+    }))
+    expect((await getPublicMapBySlug('test-map'))?.floors[0]?.spots[0]?.description).toBeNull()
   })
 })

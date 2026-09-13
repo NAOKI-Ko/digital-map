@@ -5,6 +5,7 @@ import type { SpotFormInput } from '~~/shared/schemas/spot'
 import type { MapFloorListResponse } from '~~/shared/types/floor'
 import type { CategoryListResponse } from '~~/shared/types/category'
 import type { AdminSpotResponse } from '~~/shared/types/spot'
+import type { SpotFieldDefinitionListResponse } from '~~/shared/types/spot-field'
 
 definePageMeta({ layout: 'admin', middleware: 'auth' })
 
@@ -12,6 +13,7 @@ const route = useRoute()
 const mapId = route.params.mapId as string
 const { data } = await useFetch<MapFloorListResponse>(`/api/maps/${mapId}/floors`)
 const { data: categoryData } = await useFetch<CategoryListResponse>(`/api/maps/${mapId}/categories`)
+const { data: fieldData } = await useFetch<SpotFieldDefinitionListResponse>(`/api/maps/${mapId}/spot-fields`)
 const floors = computed(() => data.value?.floors.map(floor => ({ id: floor.id, name: floor.name })) ?? [])
 const returnContext = computed(() => resolveMapEditorReturnContext(
   route.query,
@@ -40,9 +42,12 @@ const initialValue = computed<SpotFormInput>(() => {
     categoryIds: [],
     importance: 'normal',
     description: '',
+    address: '',
+    website: '',
     hoursText: '',
     holidayText: '',
     phone: '',
+    customValues: {},
     x: requestedX !== null && requestedY !== null ? requestedX : null,
     y: requestedX !== null && requestedY !== null ? requestedY : null,
   }
@@ -80,7 +85,7 @@ async function createSpot(input: SpotFormInput) {
     <div v-if="submitError" role="alert" class="mt-6 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{{ submitError }}</div>
     <section class="mt-8 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
       <ClientOnly>
-        <SpotForm :floors="floors" :categories="categoryData?.categories ?? []" :initial-value="initialValue" :is-submitting="isSubmitting" submit-label="スポットを登録する" @submit="createSpot" />
+        <SpotForm :floors="floors" :categories="categoryData?.categories ?? []" :fields="fieldData?.fields ?? []" :initial-value="initialValue" :is-submitting="isSubmitting" submit-label="スポットを登録する" @submit="createSpot" />
         <template #fallback>
           <p class="text-sm text-stone-600">フォームを読み込んでいます…</p>
         </template>

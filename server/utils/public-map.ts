@@ -19,6 +19,11 @@ export function buildPublicMapQuery(slug: string) {
       websiteUrl: true,
       snsUrl: true,
       isPublished: true,
+      spotFieldDefinitions: {
+        where: { enabled: true, publicVisible: true },
+        orderBy: [{ order: 'asc' as const }, { createdAt: 'asc' as const }],
+        select: { id: true, semanticKey: true, label: true, type: true, order: true },
+      },
       floors: {
         orderBy: [{ order: 'asc' as const }, { createdAt: 'asc' as const }],
         select: {
@@ -49,12 +54,15 @@ export function buildPublicMapQuery(slug: string) {
               name: true,
               importance: true,
               description: true,
+              address: true,
+              website: true,
               x: true,
               y: true,
               photosJson: true,
               hoursText: true,
               holidayText: true,
               phone: true,
+              fieldValues: { select: { fieldDefinitionId: true, valueJson: true } },
               pinIconType: true,
               pinIconId: true,
               pinIconImageUrl: true,
@@ -75,6 +83,8 @@ export type PublicMapRecord = Prisma.MapGetPayload<{
 
 export function serializePublicMap(record: PublicMapRecord | null): PublicMap | null {
   if (!record?.isPublished) return null
+
+  const publicFields = record.spotFieldDefinitions
 
   return {
     id: record.id,
@@ -104,6 +114,40 @@ export function serializePublicMap(record: PublicMapRecord | null): PublicMap | 
         const photos = Array.isArray(spot.photosJson)
           ? spot.photosJson.filter((value): value is string => typeof value === 'string')
           : []
+        const customValues = new Map(spot.fieldValues.map(value => [value.fieldDefinitionId, value.valueJson]))
+        const standardValues: Record<string, unknown> = {
+          description: spot.description,
+          address: spot.address,
+          phone: spot.phone,
+          website: spot.website,
+          hours: spot.hoursText,
+          holiday: spot.holidayText,
+        }
+        const descriptionField = publicFields.find(field => field.semanticKey === 'description')
+        const websiteField = publicFields.find(field => field.semanticKey === 'website')
+        const visibleDescription = descriptionField && typeof spot.description === 'string' && spot.description.trim()
+          ? spot.description
+          : null
+        const websiteAction = websiteField && typeof spot.website === 'string' && spot.website.trim()
+          ? { label: websiteField.label, url: spot.website }
+          : null
+        const informationFields = publicFields.flatMap((field) => {
+          if (field.semanticKey === 'description' || field.semanticKey === 'website') return []
+          const value = field.semanticKey ? standardValues[field.semanticKey] : customValues.get(field.id)
+          if (value === null || value === undefined || (typeof value === 'string' && value.trim() === '')) return []
+          if (!['string', 'number', 'boolean'].includes(typeof value)) return []
+          const renderedValue = typeof value === 'boolean' ? (value ? 'はい' : 'いいえ') : String(value)
+          const href = field.semanticKey === 'phone'
+            ? `tel:${renderedValue}`
+            : field.type === 'url' && /^https?:\/\//i.test(renderedValue) ? renderedValue : null
+          return [{
+            id: field.id,
+            label: field.label,
+            type: field.type as PublicMap['floors'][number]['spots'][number]['informationFields'][number]['type'],
+            value: renderedValue,
+            href,
+          }]
+        })
 
         return [{
           id: spot.id,
@@ -111,13 +155,12 @@ export function serializePublicMap(record: PublicMapRecord | null): PublicMap | 
           name: spot.name,
           categories: sortSpotCategories(spot.spotCategories.map(relation => relation.category)),
           importance: normalizeSpotImportance(spot.importance),
-          description: spot.description,
+          description: visibleDescription,
           x: spot.x,
           y: spot.y,
           photos,
-          hoursText: spot.hoursText,
-          holidayText: spot.holidayText,
-          phone: spot.phone,
+          informationFields,
+          websiteAction,
           pinIconType: normalizePinIconType(spot.pinIconType),
           pinIconId: spot.pinIconId,
           pinIconImageUrl: spot.pinIconImageUrl,

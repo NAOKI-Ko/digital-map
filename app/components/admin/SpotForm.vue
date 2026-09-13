@@ -3,10 +3,12 @@ import { useForm } from 'vee-validate'
 import { spotFormSchema, type SpotFormInput } from '~~/shared/schemas/spot'
 import type { SpotCategorySummary } from '~~/shared/types/category'
 import type { SpotListFilterFloor } from '~~/shared/types/spot'
+import type { SpotFieldDefinitionItem } from '~~/shared/types/spot-field'
 
 const props = withDefaults(defineProps<{
   floors: SpotListFilterFloor[]
   categories: SpotCategorySummary[]
+  fields?: SpotFieldDefinitionItem[]
   initialValue?: SpotFormInput
   isSubmitting?: boolean
   submitLabel?: string
@@ -17,12 +19,16 @@ const props = withDefaults(defineProps<{
     categoryIds: [],
     importance: 'normal',
     description: '',
+    address: '',
+    website: '',
     hoursText: '',
     holidayText: '',
     phone: '',
+    customValues: {},
     x: null,
     y: null,
   }),
+  fields: () => [],
   isSubmitting: false,
   submitLabel: '保存する',
 })
@@ -40,14 +46,39 @@ const [name, nameAttrs] = defineField('name')
 const [categoryIds] = defineField('categoryIds')
 const [importance, importanceAttrs] = defineField('importance')
 const [description, descriptionAttrs] = defineField('description')
+const [address, addressAttrs] = defineField('address')
+const [website, websiteAttrs] = defineField('website')
 const [hoursText, hoursTextAttrs] = defineField('hoursText')
 const [holidayText, holidayTextAttrs] = defineField('holidayText')
 const [phone, phoneAttrs] = defineField('phone')
+const [customValues] = defineField('customValues')
+const enabledFields = computed(() => props.fields.filter(field => field.enabled).toSorted((a, b) => a.order - b.order))
+const descriptionField = computed(() => enabledFields.value.find(field => field.semanticKey === 'description'))
+const informationFields = computed(() => enabledFields.value.filter(field => field.semanticKey !== 'description'))
+
+function customTextValue(fieldId: string) {
+  const value = customValues.value[fieldId]
+  return value === null || value === undefined ? '' : String(value)
+}
+
+function updateCustomText(fieldId: string, type: SpotFieldDefinitionItem['type'], event: Event) {
+  const rawValue = (event.target as HTMLInputElement | HTMLTextAreaElement).value
+  customValues.value[fieldId] = type === 'number' && rawValue !== '' ? Number(rawValue) : rawValue
+}
+
+function updateCustomBoolean(fieldId: string, event: Event) {
+  customValues.value[fieldId] = (event.target as HTMLInputElement).checked
+}
 
 watch(() => props.initialValue, value => resetForm({ values: value }), { deep: true })
 
 const submit = handleSubmit((values) => {
-  const result = spotFormSchema.safeParse(values)
+  const enabledCustomIds = new Set(enabledFields.value.filter(field => field.kind === 'custom').map(field => field.id))
+  const submittedValues = {
+    ...values,
+    customValues: Object.fromEntries(Object.entries(values.customValues).filter(([fieldId]) => enabledCustomIds.has(fieldId))),
+  }
+  const result = spotFormSchema.safeParse(submittedValues)
   if (!result.success) {
     const fieldErrors = result.error.flatten().fieldErrors
     setErrors(Object.fromEntries(
@@ -98,8 +129,8 @@ const submit = handleSubmit((values) => {
           <input id="spot-name" v-model="name" v-bind="nameAttrs" maxlength="100" class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5" placeholder="例：まちかどカフェ">
           <p v-if="errors.name" class="mt-1 text-sm text-red-600">{{ errors.name }}</p>
         </div>
-        <div class="sm:col-span-2">
-          <label for="spot-description" class="text-sm font-semibold text-stone-800">説明文</label>
+        <div v-if="descriptionField" class="sm:col-span-2">
+          <label for="spot-description" class="text-sm font-semibold text-stone-800">{{ descriptionField.label }} <span v-if="descriptionField.required" class="text-red-600">必須</span></label>
           <textarea id="spot-description" v-model="description" v-bind="descriptionAttrs" maxlength="2000" rows="6" class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5" placeholder="特徴やおすすめポイントを入力" />
           <p v-if="errors.description" class="mt-1 text-sm text-red-600">{{ errors.description }}</p>
         </div>
@@ -107,22 +138,35 @@ const submit = handleSubmit((values) => {
     </section>
 
     <section class="border-t border-stone-200 pt-8">
-      <h2 class="text-lg font-bold text-stone-900">営業情報</h2>
+      <h2 class="text-lg font-bold text-stone-900">Media</h2>
+      <p class="mt-2 text-sm text-stone-600">写真はSpot作成後、専用のMedia欄で複数追加・並び替えできます。最初の画像が代表画像です。</p>
+    </section>
+
+    <section class="border-t border-stone-200 pt-8">
+      <h2 class="text-lg font-bold text-stone-900">Spot情報</h2>
       <div class="mt-5 grid gap-5 sm:grid-cols-2">
-        <div>
-          <label for="spot-hours" class="text-sm font-semibold text-stone-800">営業時間</label>
-          <textarea id="spot-hours" v-model="hoursText" v-bind="hoursTextAttrs" maxlength="500" rows="3" class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5" placeholder="例：10:00〜18:00" />
-        </div>
-        <div>
-          <label for="spot-holiday" class="text-sm font-semibold text-stone-800">定休日</label>
-          <textarea id="spot-holiday" v-model="holidayText" v-bind="holidayTextAttrs" maxlength="500" rows="3" class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5" placeholder="例：毎週水曜日" />
-        </div>
-        <div>
-          <label for="spot-phone" class="text-sm font-semibold text-stone-800">電話番号</label>
-          <input id="spot-phone" v-model="phone" v-bind="phoneAttrs" type="tel" maxlength="50" autocomplete="tel" class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5" placeholder="例：03-1234-5678">
-          <p v-if="errors.phone" class="mt-1 text-sm text-red-600">{{ errors.phone }}</p>
+        <div v-for="field in informationFields" :key="field.id" :class="{ 'sm:col-span-2': field.type === 'multiline_text' }">
+          <label :for="`spot-field-${field.id}`" class="text-sm font-semibold text-stone-800">{{ field.label }} <span v-if="field.required" class="text-red-600">必須</span></label>
+          <textarea v-if="field.semanticKey === 'hours'" :id="`spot-field-${field.id}`" v-model="hoursText" v-bind="hoursTextAttrs" rows="3" class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5" />
+          <textarea v-else-if="field.semanticKey === 'holiday'" :id="`spot-field-${field.id}`" v-model="holidayText" v-bind="holidayTextAttrs" rows="3" class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5" />
+          <input v-else-if="field.semanticKey === 'phone'" :id="`spot-field-${field.id}`" v-model="phone" v-bind="phoneAttrs" type="tel" class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5">
+          <input v-else-if="field.semanticKey === 'address'" :id="`spot-field-${field.id}`" v-model="address" v-bind="addressAttrs" class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5">
+          <input v-else-if="field.semanticKey === 'website'" :id="`spot-field-${field.id}`" v-model="website" v-bind="websiteAttrs" type="url" class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5">
+          <label v-else-if="field.type === 'boolean'" class="mt-2 flex items-center gap-2"><input :checked="customValues[field.id] === true" type="checkbox" @change="updateCustomBoolean(field.id, $event)"> はい</label>
+          <textarea v-else-if="field.type === 'multiline_text'" :id="`spot-field-${field.id}`" :value="customTextValue(field.id)" rows="3" class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5" @input="updateCustomText(field.id, field.type, $event)" />
+          <input v-else :id="`spot-field-${field.id}`" :value="customTextValue(field.id)" :type="field.type === 'number' ? 'number' : field.type === 'url' ? 'url' : 'text'" class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5" @input="updateCustomText(field.id, field.type, $event)">
         </div>
       </div>
+    </section>
+
+    <section class="border-t border-stone-200 pt-8">
+      <h2 class="text-lg font-bold text-stone-900">Category / PIN・地図表示</h2>
+      <p class="mt-2 text-sm text-stone-600">Categoryと重要度はSpot情報項目とは独立して管理されます。</p>
+    </section>
+
+    <section class="border-t border-stone-200 pt-8">
+      <h2 class="text-lg font-bold text-stone-900">公開</h2>
+      <p class="mt-2 text-sm text-stone-600">公開状態は保存後の公開設定から変更します。</p>
     </section>
 
     <div class="flex justify-end border-t border-stone-200 pt-6">
