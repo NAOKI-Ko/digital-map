@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import AddressGeocoder from '~/components/admin/AddressGeocoder.vue'
 import GeoReferenceWizard from '~/components/admin/GeoReferenceWizard.vue'
+import ConfirmDialog from '~/components/ui/ConfirmDialog.vue'
 import { createEmptyGeoReferenceDraft, isGeoReferenceDraftComplete } from '~/composables/useGeoReference'
-import { getGeoReferenceValidationError, type CompleteFloorGeoReference, type LatLng } from '~~/lib/geo'
+import { getGeoReferenceValidationError, isGeoReferenced, type CompleteFloorGeoReference, type LatLng } from '~~/lib/geo'
 import type { MapFloorListResponse, MapFloorResponse } from '~~/shared/types/floor'
 import type { GeocodeResult } from '~~/shared/types/geocode'
 import type { GeoReferenceDraft } from '~~/shared/types/georeference'
@@ -22,11 +23,13 @@ const wizard = useTemplateRef<{ focusLocation: (position: LatLng) => void }>('wi
 const isSaving = ref(false)
 const saveError = ref('')
 const successMessage = ref('')
+const removeConfirmOpen = ref(false)
 const cameFromEditor = computed(() => route.query.from === 'editor')
 const backPath = computed(() => cameFromEditor.value
   ? { path: `/admin/maps/${mapId}/editor`, query: { floorId } }
   : `/admin/maps/${mapId}/floors`)
 const hasImageDimensions = computed(() => Boolean(floor.value?.imageWidth && floor.value?.imageHeight))
+const hasSavedGeoReference = computed(() => Boolean(floor.value && isGeoReferenced(floor.value)))
 const completeGeoReference = computed<CompleteFloorGeoReference | null>(() => {
   if (!floor.value?.imageWidth || !floor.value.imageHeight || !isGeoReferenceDraftComplete(draft.value)) return null
   return {
@@ -66,6 +69,36 @@ useHead(() => ({
 
 function focusSearchResult(result: GeocodeResult) {
   wizard.value?.focusLocation({ lat: result.lat, lng: result.lng })
+}
+
+function resetEditingPoints() {
+  draft.value = createEmptyGeoReferenceDraft()
+  saveError.value = ''
+  successMessage.value = '編集中の基準点をリセットしました。保存済みの設定はまだ変更されていません。'
+}
+
+async function removeGeoReference() {
+  if (!floor.value) return
+  isSaving.value = true
+  saveError.value = ''
+  successMessage.value = ''
+  try {
+    const response = await $fetch<MapFloorResponse>(`/api/maps/${mapId}/floors/${floorId}/georeference`, {
+      method: 'DELETE',
+    })
+    if (data.value) {
+      data.value = { floors: data.value.floors.map(item => item.id === floorId ? response.floor : item) }
+    }
+    draft.value = createEmptyGeoReferenceDraft()
+    removeConfirmOpen.value = false
+    successMessage.value = 'ジオリファレンスを解除しました。イラスト上のPIN位置は変更していません。'
+  }
+  catch (error) {
+    saveError.value = getErrorMessage(error)
+  }
+  finally {
+    isSaving.value = false
+  }
 }
 
 async function save() {
@@ -147,10 +180,14 @@ function getErrorMessage(error: unknown) {
       <div v-if="successMessage" role="status" class="mt-4 rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{{ successMessage }}</div>
       <div class="mt-5 flex flex-wrap justify-end gap-3">
         <NuxtLink v-if="cameFromEditor" :to="backPath" class="rounded-lg border border-stone-300 bg-white px-5 py-2.5 text-sm font-semibold text-stone-700 hover:bg-stone-50">ピン配置エディタに戻る</NuxtLink>
+        <button type="button" :disabled="isSaving" class="rounded-lg border border-stone-300 bg-white px-5 py-2.5 text-sm font-semibold text-stone-700 disabled:opacity-60" @click="resetEditingPoints">基準点をリセット</button>
+        <button v-if="hasSavedGeoReference" type="button" :disabled="isSaving" class="rounded-lg px-5 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-50 disabled:opacity-60" @click="removeConfirmOpen = true">ジオリファレンスを解除</button>
         <button type="button" :disabled="isSaving || !isGeoReferenceDraftComplete(draft) || Boolean(validationError)" class="rounded-lg bg-terracotta-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60" @click="save">
           {{ isSaving ? '保存中…' : 'この内容で保存' }}
         </button>
       </div>
+      <p v-if="floor.spotCount > 0" class="mt-3 text-right text-sm font-semibold text-amber-700">イラスト上のPIN位置は変わりません。実世界との対応のみ更新されます。</p>
+      <ConfirmDialog :open="removeConfirmOpen" title="ジオリファレンスを解除" message="保存済みの実世界との対応を解除します。Spotやイラスト上のPIN位置は削除・変更されません。" confirm-label="解除する" destructive :busy="isSaving" @cancel="removeConfirmOpen = false" @confirm="removeGeoReference" />
     </template>
   </div>
 </template>

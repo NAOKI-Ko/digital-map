@@ -23,6 +23,8 @@ const mapContainer = useTemplateRef<HTMLDivElement>('mapContainer')
 const mapError = ref('')
 const previewError = ref('')
 const previewReady = ref(false)
+const previewOpacity = ref(0.55)
+const imageZoom = ref(1)
 const step = computed(() => getGeoReferenceStep(draft.value))
 let map: MapLibreMap | undefined
 let maplibre: typeof import('maplibre-gl') | undefined
@@ -111,6 +113,12 @@ watch(draft, () => {
   renderReferenceMarkers()
   renderPreview()
 }, { deep: true })
+
+watch(previewOpacity, (value) => {
+  if (map?.getLayer(PREVIEW_LAYER_ID)) {
+    map.setPaintProperty(PREVIEW_LAYER_ID, 'raster-opacity', value)
+  }
+})
 
 function selectIllustrationPoint(event: MouseEvent) {
   if (!illustration.value || !['a-image', 'b-image'].includes(step.value)) return
@@ -233,7 +241,7 @@ function renderPreview() {
         id: PREVIEW_LAYER_ID,
         type: 'raster',
         source: PREVIEW_SOURCE_ID,
-        paint: { 'raster-opacity': 0.55 },
+        paint: { 'raster-opacity': previewOpacity.value },
       })
     }
 
@@ -283,6 +291,10 @@ function clamp(value: number, minimum: number, maximum: number) {
   return Math.min(maximum, Math.max(minimum, value))
 }
 
+function changeImageZoom(delta: number) {
+  imageZoom.value = clamp(imageZoom.value + delta, 1, 4)
+}
+
 defineExpose({ focusLocation })
 </script>
 
@@ -303,14 +315,17 @@ defineExpose({ focusLocation })
       <section>
         <div class="flex items-center justify-between gap-3">
           <h2 class="text-sm font-bold text-stone-900">1. イラスト上の目印</h2>
-          <div class="flex gap-2">
+          <div class="flex flex-wrap items-center justify-end gap-2">
+            <button type="button" :disabled="imageZoom <= 1" aria-label="イラストを縮小" class="rounded border border-stone-300 px-2 py-1 text-xs disabled:opacity-40" @click="changeImageZoom(-0.5)">−</button>
+            <span class="text-xs text-stone-500">{{ Math.round(imageZoom * 100) }}%</span>
+            <button type="button" :disabled="imageZoom >= 4" aria-label="イラストを拡大" class="rounded border border-stone-300 px-2 py-1 text-xs disabled:opacity-40" @click="changeImageZoom(0.5)">＋</button>
             <button v-if="draft.refAImageX !== null" type="button" class="text-xs font-semibold text-stone-500 hover:text-stone-900" @click="resetPoint('a')">Aを選び直す</button>
             <button v-if="draft.refBImageX !== null" type="button" class="text-xs font-semibold text-stone-500 hover:text-stone-900" @click="resetPoint('b')">Bを選び直す</button>
           </div>
         </div>
         <div class="mt-2 overflow-auto rounded-xl border border-stone-300 bg-stone-100 p-2 text-center">
-          <div class="relative inline-block max-w-full">
-            <img ref="illustration" :src="illustrationUrl" alt="基準点を選ぶフロアイラスト" class="block max-h-[36rem] max-w-full cursor-crosshair object-contain" @click="selectIllustrationPoint">
+          <div class="relative inline-block" :style="{ width: `${imageZoom * 100}%` }">
+            <img ref="illustration" :src="illustrationUrl" alt="基準点を選ぶフロアイラスト" class="block h-auto w-full cursor-crosshair object-contain" @click="selectIllustrationPoint">
             <span class="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-terracotta-600 px-2 py-1 text-xs font-bold text-white shadow" :style="markerStyle(draft.refAImageX, draft.refAImageY)">A</span>
             <span class="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-sky-600 px-2 py-1 text-xs font-bold text-white shadow" :style="markerStyle(draft.refBImageX, draft.refBImageY)">B</span>
           </div>
@@ -331,6 +346,11 @@ defineExpose({ focusLocation })
         <p v-if="mapError" role="alert" class="mt-2 text-sm text-red-600">{{ mapError }}</p>
         <p v-if="previewError" role="alert" class="mt-2 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800">{{ previewError }}</p>
         <p v-if="previewReady" class="mt-2 text-xs leading-5 text-stone-600">半透明のイラストと道路・建物の重なりを確認し、大きくずれている場合はAまたはBを選び直してください。</p>
+        <label v-if="previewReady" class="mt-3 flex items-center gap-3 text-xs font-semibold text-stone-700">
+          重ね合わせの濃さ
+          <input v-model.number="previewOpacity" type="range" min="0.1" max="0.9" step="0.05" class="flex-1" aria-label="重ね合わせの濃さ">
+          <span class="w-10 text-right">{{ Math.round(previewOpacity * 100) }}%</span>
+        </label>
       </section>
     </div>
   </div>
