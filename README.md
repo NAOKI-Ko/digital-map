@@ -12,7 +12,17 @@ Nuxt 4とMapLibre GL JSで構築した、デフォルメイラスト向けデジ
 - Vitest
 - Docker Compose（Nuxtアプリ + PostgreSQL）
 
-ジオリファレンスは、イラスト上と実地図上の基準点A・Bから相似変換で4隅を計算する「2点合わせ」方式です。四隅はDBへ保存せず、`lib/geo.ts`の`computeFloorCorners()`で表示時に計算します。
+Illustration MapのSpot位置の正本は画像左上を`(0, 0)`、右下を`(1, 1)`とする`Spot.x/y`です。ジオリファレンスは、イラスト上と実地図上の基準点A・Bから相似変換で4隅を計算する任意設定で、Spot位置そのものは変更しません。四隅はDBへ保存せず、`lib/geo.ts`で表示時に計算します。
+
+## Phase 1で利用できる機能
+
+- Tenant単位のMedia Library。1つの画像を複数MapのFloor、Spot写真、Category、Custom PIN、ロゴ、Decorationで再利用できます。
+- Map単位のSpot Field Definitions。標準項目の表示名・有効・公開・必須・順序と、5種類のカスタム項目を設定できます。
+- 現在のField Definitionsから生成するUTF-8 BOM CSVテンプレート、警告/エラー付きpreview、全件transactionによる新規Spot import。
+- Floor上の非対話Decorationと、`small`/`medium`/`large`のPINサイズ、離散的なPIN表示優先度。
+- 同名Spotの非blocking警告、未保存変更guard、共通の保存中/成功/失敗feedback。
+
+Real/GEO Mapは作成画面に将来機能として表示されますが未実装です。Illustration Mapから切り替える機能やSpot GEO座標の永続化はありません。
 
 ## 必要な環境
 
@@ -151,6 +161,7 @@ pnpm typecheck           # Nuxt/Vueの型チェック
 pnpm build               # 本番ビルド
 pnpm prisma:validate     # Prismaスキーマ検証
 pnpm prisma:generate     # Prisma Client生成
+pnpm audit:image-spatial-migration # legacy IMAGE位置のread-only preflight
 pnpm exec prisma migrate deploy
 pnpm db:seed             # 管理者・開発用fixtureの作成
 ```
@@ -180,7 +191,9 @@ docs/                要件・設計・画面仕様・タスク
 
 - 管理APIは管理者セッションと`tenantId`による所有権検証を通します。
 - 公開APIは`Map.isPublished === true`のマップだけを返します。
-- 公開マップ内でも、`Spot.isPublished === true`かつ`lat`/`lng`設定済みのスポットだけを返します。
+- 公開マップ内でも、`Spot.isPublished === true`かつ正規化`x`/`y`設定済みのスポットだけを返します。
+- MediaAssetの一覧・参照・削除はTenant境界を検証し、使用中assetの削除は拒否します。
+- Spot Fieldは有効かつ公開設定で空でない値だけを公開し、内部/無効項目を返しません。
 - 基準点A・Bの8項目が揃ったフロアだけに`GeolocateControl`を追加します。
 - 現在地はイラスト上のおおよその目安であり、正確なナビゲーション用途は保証しません。
 

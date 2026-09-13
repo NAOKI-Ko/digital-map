@@ -8,7 +8,6 @@
 
 - 対象機能は「マップの作成・編集・閲覧」のみ
 - 以下は明示的にスコープ外(次フェーズ):
-  - CSV一括インポート
   - 店舗オーナーによる自店舗編集・承認フロー
   - モデルコース/ルート機能
   - お知らせ・イベント機能
@@ -17,6 +16,11 @@
   - マップテンプレート、自由レイアウト、任意HTML/CSS、配色変更を含む高度なブランディング(団体名・ロゴ・公式WebサイトURL・SNS URLの限定表示はMVP内)
   - カテゴリ単位のデフォルトピンデザイン一括設定
   - custom PIN画像のcrop範囲editor(画像は事前に調整したものをアップロードする)
+  - Real/GEO Mapの永続化・編集・公開（作成画面には無効状態で表示）
+  - 画像内容を解析する自動alignment
+  - select/multi-select/date/time型のカスタムSpot項目
+  - CSVによる更新・upsert・削除・同期
+  - GEO座標上のDecoration
 
 ## 3. ロールとユーザーストーリー
 
@@ -34,6 +38,10 @@
 - US-09: 管理者として、登録済みスポットを一覧で確認・検索・絞り込みしたい
 - US-15: 管理者として、検索結果から複数スポットを選択し、公開状態・カテゴリーを一括更新または削除したい
 - US-16: 管理者として、公開ヘッダーに必要最小限の団体名・ロゴ・公式Webサイト・SNSリンクを表示したい
+- US-18: 管理者として、Tenant内で登録済み画像をMapや用途をまたいで再利用し、使用中画像を誤って削除しないようにしたい
+- US-19: 管理者として、MapごとにSpot情報項目の表示名・公開範囲・必須・順序を設定したい
+- US-20: 管理者として、現在のSpot項目に合うCSVをpreviewして、エラーがない全行だけを一括登録したい
+- US-21: 管理者として、イラスト上にSpotではない装飾画像を配置したい
 
 ### 3.2 一般閲覧者(観光客・地域住民)
 
@@ -65,6 +73,12 @@
 | FR-15 | 管理者ログイン・認証 | Must |
 | FR-16 | Spot重要度(`normal`/`featured`)とzoomに連動した意味的PINサイズ・表示優先度 | Should |
 | FR-17 | 公開ヘッダーへの限定的な団体情報(団体名/ロゴ/公式WebサイトURL/SNS URL)表示 | Should |
+| FR-18 | Tenant単位Media Libraryと共通picker、用途をまたぐ再利用、参照中削除の拒否 | Must |
+| FR-19 | Map単位Spot Field Definitions（標準6項目、カスタム5型、有効/公開/必須/順序） | Must |
+| FR-20 | 現在のField Definitionsから生成するCSV template、全行preview、エラー時0件・成功時1 transactionの新規import | Must |
+| FR-21 | IMAGE相対のFloor Decoration（配置・移動・縦横比維持resize・回転・順序・複製・instance削除） | Should |
+| FR-22 | PINサイズ`small`/`medium`/`large`と、selected > filter match > featured > normalの離散的表示優先度 | Should |
+| FR-23 | 同一Map内同名Spotの非blocking警告と、保存中/成功/失敗を区別するapplication feedback | Should |
 
 ## 5. 非機能要件
 
@@ -72,6 +86,8 @@
 - NFR-02: モバイル端末での閲覧を最優先(観光客はスマホ利用が前提)。管理画面はPC優先だがレスポンシブ対応
 - NFR-03: セルフホスト可能なこと(Docker Composeで起動できる)を将来的なOSS配布に備えて意識する
 - NFR-04: 現在地の精度は、選んだ2つの基準点の位置関係やイラストのデフォルメ度合いに依存することを利用者に誤解させない(過度に正確な現在地表示を演出しない)
+- NFR-05: Illustration MapのSpot位置は正規化IMAGE `x/y`だけを正本とし、Floor georeferenceの追加・変更・解除や画像差し替えで書き換えない
+- NFR-06: Tenant境界、公開状態、位置設定、Field公開範囲をAPIで強制し、UIだけの制御に依存しない
 
 ## 6. 現在地機能の制約
 

@@ -38,6 +38,19 @@ Start SHA: `a58b4353bd108e6586f329080c772f69b8aaffda`
 | WU-17 | KAN-35 | PASS | `0c5e82d` | Reusable guard intercepts dirty in-app navigation with AppDialog stay/discard choices and uses beforeunload only for browser close/reload. Wired to map creation/name, Spot and PIN design; submitting/successful reset clears dirty state. Full 37 files / 279 tests, typecheck and build PASS. |
 | WU-18 | KAN-36 | PASS | `c543f23` | Expanded the existing Material Symbols catalog into tourism-oriented groups covering history, culture, nature, photography, transport, facilities, food, shopping, lodging, information and medical needs. Old IDs and fallback normalization remain; Custom PIN architecture is unchanged. Full 38 files / 283 tests and typecheck PASS. |
 | WU-19 | KAN-46 | PASS | `229f64a` | Same-name lookup is case-insensitive and limited to the owned Map; edit excludes itself. Create/update shows Floor, Category and placement context and requires an explicit continue while leaving duplicates legal. Full 39 files / 286 tests, typecheck and build PASS. |
-| WU-20 | KAN-48 | PASS | PENDING COMMIT | Shared SaveFeedback distinguishes saving/success/error with live-region semantics across Spot, Floor, Category, Map settings/branding, and Spot field flows. Map and Spot create redirects carry visible success confirmation; core submit controls prevent repeat saves. Full 40 files / 290 tests, typecheck and build PASS. |
-| WU-21 | KAN-16 | PENDING | — | Regression-only audit |
-| WU-22 | — | PENDING | — | Documentation and QA handoff |
+| WU-20 | KAN-48 | PASS | `bdcc3b0` | Shared SaveFeedback distinguishes saving/success/error with live-region semantics across Spot, Floor, Category, Map settings/branding, and Spot field flows. Map and Spot create redirects carry visible success confirmation; core submit controls prevent repeat saves. Full 40 files / 290 tests, typecheck and build PASS. |
+| WU-21 | KAN-16 | PASS | — | Regression-only source/test audit; no corrective code or separate commit required. Map-first layout, Bottom Sheet, bottom Category controls, right-side touch controls, native pan/pinch, Media/Field detail content, and selected/filter density bypass remain intact. Focused mobile/public/density suite and full 40 files / 290 tests PASS. Live public fixture was unavailable because this worktree has no configured DATABASE_URL. |
+| WU-22 | — | PASS | PENDING COMMIT | README, design, requirements and task records synchronized; Human QA handoff created at `docs/qa/phase1-product-batch-20260913.md`. Final dependency, Prisma, static migration, test, type, build and source gates completed; live migration audit awaits a configured DATABASE_URL. |
+
+## Final validation
+
+| Check | Result | Notes |
+|---|---|---|
+| Frozen dependency integrity | PASS | `pnpm install --frozen-lockfile`; lockfile satisfied from installed/local content. Registry update metadata lookup failed but did not affect integrity. |
+| Prisma schema | PASS | `pnpm prisma:validate` |
+| IMAGE migration audit | NOT RUN (environment) | Command rerun and failed closed with exit 2 because `DATABASE_URL` is not configured in this worktree. No database was mutated. Run against the intended database before migration/deploy. |
+| Migration sanity | PASS (static) | Migration/audit unit coverage included in full suite; exact migration-only epsilon is `1e-12`, partial and genuine out-of-bounds values remain unresolved. |
+| Full tests | PASS | `pnpm test`: 40 files / 290 tests |
+| Typecheck | PASS | `pnpm typecheck` |
+| Production build | PASS | `pnpm build`; existing source-map and large-chunk warnings only |
+| Source audits | PASS | No native application `alert/confirm/prompt`; Spot has no persisted GEO coordinates; remaining URL image fields are documented legacy compatibility; no replacement-all Category UI, opacity-density implementation, or fixed CSV field list remains. |

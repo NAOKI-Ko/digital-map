@@ -54,138 +54,28 @@ Nuxt 4
 
 ## 3. データモデル
 
-```prisma
-model Tenant {
-  id        String   @id @default(cuid())
-  name      String
-  slug      String   @unique
-  users     User[]
-  maps      Map[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
+完全な定義は`prisma/schema.prisma`を正とする。主要entityと境界は次の通り。
 
-model User {
-  id           String   @id @default(cuid())
-  tenantId     String
-  tenant       Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  email        String   @unique
-  passwordHash String
-  role         String   @default("admin")
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+| Entity | Scope / responsibility |
+|---|---|
+| `Tenant`, `User` | 認証主体と所有境界。Tenantは複数MapとMediaAssetを持つ |
+| `Map` | Tenant配下のIllustration Map shell、slug、公開状態、限定branding、Category、Spot Field Definitions |
+| `MapFloor` | Map配下のillustration asset/寸法、順序、任意の2点georeference。SpotとDecorationを持つ |
+| `Spot` | Floor配下の情報entity。正本位置はnullableな正規化`x/y`、PINはtype/color/size/importanceを独立保持 |
+| `Category`, `SpotCategory` | Map単位CategoryとSpotのmany-to-many。Category 0件を許可 |
+| `MediaAsset`, `SpotPhoto` | Tenant単位assetと用途別relation。Spot写真は順序付き |
+| `SpotFieldDefinition`, `SpotFieldValue` | Map単位の表示/validation定義と、Spotごとのcustom value |
+| `FloorDecoration` | Floor配下のIMAGE相対visual object。MediaAsset、`x/y/width/rotation/order`を保持 |
 
-  @@index([tenantId])
-}
+重要な不変条件:
 
-model Map {
-  id               String     @id @default(cuid())
-  tenantId         String
-  tenant           Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  name             String
-  slug             String     @unique
-  organizationName String?
-  logoUrl          String?
-  websiteUrl       String?
-  snsUrl           String?
-  isPublished      Boolean    @default(false)
-  floors           MapFloor[]
-  categories       Category[]
-  createdAt        DateTime   @default(now())
-  updatedAt        DateTime   @updatedAt
-
-  @@index([tenantId])
-}
-
-model Category {
-  id             String         @id @default(cuid())
-  mapId          String
-  map            Map            @relation(fields: [mapId], references: [id], onDelete: Cascade)
-  name           String
-  order          Int            @default(0)
-  spotCategories SpotCategory[]
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
-
-  @@unique([mapId, name])
-  @@index([mapId, order])
-}
-
-model MapFloor {
-  id               String   @id @default(cuid())
-  mapId            String
-  map              Map      @relation(fields: [mapId], references: [id], onDelete: Cascade)
-  name             String
-  illustrationUrl  String
-  imageWidth       Int      // アップロード時に読み取ったピクセル幅
-  imageHeight      Int      // アップロード時に読み取ったピクセル高さ
-  order            Int      @default(0)
-
-  // 基準点A: イラスト上の正規化座標(0..1) + 対応する実世界の緯度経度
-  refAImageX       Float?
-  refAImageY       Float?
-  refALat          Float?
-  refALng          Float?
-  // 基準点B: 同上(Aとは別の目印を選ぶ)
-  refBImageX       Float?
-  refBImageY       Float?
-  refBLat          Float?
-  refBLng          Float?
-
-  spots            Spot[]
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-
-  @@index([mapId, order])
-}
-
-model Spot {
-  id               String   @id @default(cuid())
-  floorId          String
-  floor            MapFloor @relation(fields: [floorId], references: [id], onDelete: Cascade)
-  name             String
-  spotCategories   SpotCategory[]
-  description      String?
-  x                Float?  // イラスト上の正規化座標(0..1)
-  y                Float?  // イラスト上の正規化座標(0..1)
-  photosJson       Json     @default("[]")
-  hoursText        String?
-  holidayText      String?
-  phone            String?
-  pinIconType      String   @default("preset")
-  pinIconId        String?
-  pinIconImageUrl  String?
-  pinColor         String   @default("#C7401F")
-  importance       String   @default("normal")
-  isPublished      Boolean  @default(false)
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-
-  @@index([floorId])
-  @@index([floorId, isPublished])
-}
-
-model SpotCategory {
-  spotId     String
-  spot       Spot     @relation(fields: [spotId], references: [id], onDelete: Cascade)
-  categoryId String
-  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-
-  @@id([spotId, categoryId])
-  @@index([categoryId])
-}
-```
-
-**Ver.3からの変更点**
-- `MapFloor`の四隅8カラム(`topLeft/topRight/bottomRight/bottomLeft`の緯度経度)を削除
-- 代わりに、管理者が実際に指定する「基準点A・基準点B」(各点につき正規化画像座標+緯度経度の4値、合計8カラム)を保持する。四隅の座標はこの2点から都度計算する(保存しない)
-- `imageWidth`, `imageHeight`を追加(ピクセル⇔実距離の変換に必要)
-- `isOutdoor`は後続の実装変更で廃止。現在地機能は基準点A・Bの設定有無で判定する
-- IMAGE Spotの正本位置は`Spot.x, y`(各`0..1`)とし、位置未設定の下書きを扱えるよう両方nullableとする。緯度経度はMapLibre描画時だけ導出し、永続化・公開APIには使用しない
-- `Spot.pinIconType`は`preset`、`custom`、`illustration`を使用する。プリセットIDは`kanji:`/`material:`接頭辞でアイコンファミリーを識別し、旧IDは読み込み時に正規化する
-- 旧`Spot.category`文字列は廃止し、Map単位の`Category`と中間テーブル`SpotCategory`によるmany-to-manyを使用する。Category 0件を許可し、別MapのCategoryとの関連づけを拒否する
-- `Spot.importance`は`normal`/`featured`の2段階とし、PINデザインとは独立した公開表示優先度として扱う
-- `Map`の団体情報は公開ヘッダー用の4項目に限定し、任意HTML・CSS・自由レイアウトは保存しない
+- IMAGE Spotは`x/y`が両方`null`（未配置）または両方`0..1`（配置済み）。Spot-level `lat/lng`は保持しない。
+- Floor georeferenceは正規化画像点A/Bと対応する実世界lat/lngだけを保持し、四隅は計算する。追加・変更・解除でSpot/Decorationを更新しない。
+- MediaAssetはTenant単位でMap/用途をまたいで再利用する。legacy URL列は安全なread compatibilityのため残すが、新しいmanaged uploadはasset relationを使う。
+- 標準Spot値は通常列を維持し、Field Definitionがlabel/enabled/public/required/orderを決める。custom値だけを`SpotFieldValue.valueJson`に保存する。
+- DecorationはSpotではなく、PINより下の専用layerに描画する。
+- `pinSize = small | medium | large`、`importance = normal | featured`。サイズと表示優先度を混同しない。
+- `Map`の団体情報は団体名・ロゴ・公式Webサイト・SNS URLだけで、任意HTML/CSSを保存しない。
 
 ## 4. ジオリファレンスの設計(2点合わせ・相似変換)
 
@@ -335,11 +225,25 @@ fallback coordinatesは実世界の位置を表さない。したがって、次
 - CategoryはMap単位で管理し、Spotとのmany-to-many relationを`categoryIds`で更新する。公開絞り込みは複数選択ORとし、未使用Categoryだけを削除できる。表示順は`Category.order`を使う
 - Floor画像のupload前にはfilenameと画像previewを表示し、cancelまたは差し替えができる。既存Floorの画像差し替えではSpotの`x`/`y`と基準点A・Bを自動変更せず、再確認が必要な旨を警告する
 - cameraはFloor切り替え・初期表示でFloor全体へfitする。通常のMap clickやPIN配置ではfitせず、Spot登録画面との往復ではcenter/zoomを復元する
-- `importance === featured`は縮小時も不透明度と優先サイズを維持する。`normal`はフロア相対の最小zoomから2段階の範囲で、不透明度35%→100%、サイズ78%→100%へ連続変化する。raw zoom値は管理UIへ公開しない
-- Markerの位置基準は3方式ともbottom-center接地点とし、意味的なscale・opacity変更や選択状態で接地点をずらさない。MapLibreがMarker本体へ設定する`opacity`とは競合させず、内部DOMのCSS変数で密度表示を適用する
+- PIN visibilityは`selected > active category-filter match > featured > normal`の順で、表示/非表示を離散的に決める。selectedとfilter matchは通常のzoom抑制を回避し、featuredはnormalより遠方で残す。opacity fadeや管理者向けraw thresholdは使わない
+- Markerの位置基準は3方式ともbottom-center接地点とする。`pinSize`の`small`/`medium`/`large` scaleや選択状態で接地点をずらさない
 - custom PIN画像のcrop範囲editorは実装せず、PdM判断によりMVP対象外とする。画像の見え方に関する不具合修正と、新しいcrop編集機能の追加は区別する
 - mobile公開画面はMap操作を主とし、Categoryチップをsafe area対応の下部操作列、Spot詳細をcollapsed/expandedのBottom Sheetとして表示する。背景レイヤーはpan gestureを奪わない。desktopは右側dialogを維持する
 - 公開ヘッダーは団体名・ローカルuploadロゴ・http/httpsの公式Webサイト/SNSリンクだけを任意表示し、未設定時は従来表示を維持する
+
+### 4.9 Media・Spot Field・CSV・Decoration
+
+- 共通Media pickerは新規uploadとTenant Libraryを同じUIで扱い、最近使用/このMap/すべて/用途filterを提供する。filterは再利用を禁止する境界ではない
+- MediaAsset削除前に全consumerの参照を集計し、1件でも使用中なら拒否する。featureから外す操作はrelationだけを外し、asset bytesを削除しない
+- Spot Field Definitionの標準semantic keyは`description/address/phone/website/hours/holiday`。表示名は変更できるがsemantic keyは不変。custom型は`single_line_text/multiline_text/number/url/boolean`だけ
+- CSV templateは現在有効なField Definitionsからstable keyで生成する。previewで構造・必須・型・Categoryをerror、同名をwarningとして分類し、errorが1件でもあれば0件、なければ1 transactionで未配置・非公開Spotを新規作成する
+- Floor DecorationはMediaAssetを参照し、正規化IMAGE位置・相対幅・回転・layer順を保持する。base illustrationの上、すべてのSpot PINの下に非対話で描画する
+
+### 4.10 管理feedbackと重複
+
+- Spot名はidentityではなく、同一Map内の同名も合法。create/update前にFloor/Category/配置状態を含むwarningを出し、利用者が明示的に続行できる。別Mapと編集中record自身は対象外
+- core save flowは共通`SaveFeedback`でsaving/success/errorを区別し、status/alert live semanticsを使う。送信中は該当submitを無効化する
+- dirtyな管理formの内部遷移はapplication dialogでstay/discardを選ぶ。refresh/tab closeだけは`beforeunload`を使用できる
 
 ## 5. 画面一覧(参照)
 

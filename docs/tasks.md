@@ -28,7 +28,7 @@
 - [x] T-13: スポット登録編集フォーム(店名・カテゴリ・説明文・営業時間・定休日・電話番号)
 - [x] T-14: 写真アップロード(複数枚)
 - [x] T-15: 住所入力→Nominatim経由の自動ジオコーディング ※ジオリファレンス設定(⑤-2)での基準点検索補助としても継続使用
-- [x] T-16: ピン配置エディタ:MapLibre地図上でクリックしてピンを仮配置(緯度経度を取得)
+- [x] T-16: ピン配置エディタ:MapLibre上のクリック位置を逆変換し、正規化IMAGE `x`/`y`としてピンを仮配置
 - [x] T-17: 既存ピン(Marker)のドラッグによる位置調整
 - [x] T-18: ピンデザイン選択(プリセットアイコン一覧、カラーピッカー、カスタム画像アップロード)
 - [x] T-19: スポットの公開/非公開切り替え、プレビュー機能
@@ -160,14 +160,14 @@ Phase 9のT-46〜T-52を置き換える際、実装履歴では同じタスク�
 ## Phase 17: Map基本情報・Spot一括操作
 
 - [x] T-84: Map名編集と、slugを公開URL保護のためread-onlyとする案内を同期
-- [x] T-85: Spot一覧へ複数選択・検索結果全選択・公開/非公開・Category全置換を追加
+- [x] T-85: Spot一覧へ複数選択・検索結果全選択・公開/非公開・Categoryの1件追加/1件削除を追加（他Categoryは保持）
 - [x] T-86: 最大100件のtransaction一括削除と件数確認、Map ownership validationを追加
 
 ## Phase 18: 意味的PIN密度
 
 - [x] T-87: Spot重要度`normal`/`featured`をschema・API・管理フォームへ追加
-- [x] T-88: フロア相対zoomに応じて通常PINを連続的に縮小・減光し、注目PINを優先表示
-- [x] T-89: MapLibreが管理するmarker本体opacityとの競合を避け、内部DOMのCSS変数で減光
+- [x] T-88: フロア相対zoomに応じて通常PINを離散的に表示/非表示とし、selected・filter match・featuredを優先表示
+- [x] T-89: PINサイズを`small`/`medium`/`large`の独立presetとして実装し、opacity fadeと管理者向け数値thresholdを使わない
 - [x] T-90: PIN方式・接地点・選択状態と独立した密度表示を自動/実画面確認
 
 ## Phase 19: モバイル公開Map UX
@@ -186,6 +186,21 @@ Phase 9のT-46〜T-52を置き換える際、実装履歴では同じタスク�
 ## 対象外としたFB
 
 - custom PIN画像のcrop範囲editor: PdM判断により未実装・MVP対象外。画像表示の既存BUG修正とは別の新機能として扱う
+
+## Phase 21: Product Foundation & Feedback Batch（2026-09-13）
+
+- [x] T-98: Illustration Spotの正本を正規化IMAGE `x/y`へ統一し、legacy `lat/lng`をread-only preflight付きで移行
+- [x] T-99: Floor georeferenceの編集・解除・画像差し替えでSpot/DecorationのIMAGE相対位置を保持
+- [x] T-100: Tenant Media Libraryと共通picker、参照状況、使用中削除拒否を実装
+- [x] T-101: Map単位Spot Field Definitions、標準6項目、カスタム5型、admin/public適用を実装
+- [x] T-102: Field Definitions駆動CSV template/preview/transactional create-only importを実装
+- [x] T-103: Illustration Map作成・setup flowと無効状態のReal Map選択肢を実装
+- [x] T-104: Floor DecorationとPINより下のpublic renderingを実装
+- [x] T-105: PINサイズpreset、離散的density、観光向けMaterial Symbols catalogを実装
+- [x] T-106: Category 1件追加/削除bulk、Spot list navigation、同名警告を実装
+- [x] T-107: dirty guardと共通save feedbackを実装し、mobile public Mapをregression audit
+
+詳細なwork-unit結果は`docs/work-units/2026-09-13/PROGRESS.md`、人手確認は`docs/qa/phase1-product-batch-20260913.md`を参照する。
 
 ## 各タスクの依頼テンプレート(Codex用)
 
