@@ -66,8 +66,16 @@ describe('MapViewerのカメラ制約', () => {
       pitchWithRotate: true,
       minZoom: 0,
       maxZoom: 24,
+      doubleClickZoom: false,
     })
     expect(VIEWER_CAMERA_CONSTRAINTS.view.maxPitch).toBe(70)
+  })
+
+  it('double click zoomを無効化し、明示ボタンとtouch gestureを維持する', () => {
+    const options = createMapViewerOptions('map', 'view')
+    expect(options.doubleClickZoom).toBe(false)
+    expect(options.touchPitch).toBe(true)
+    expect(createMapViewerOptions('map', 'edit').doubleClickZoom).toBe(false)
   })
 
   it('編集モードはピン配置しやすい真上視点に固定する', () => {

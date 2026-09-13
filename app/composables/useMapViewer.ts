@@ -107,6 +107,8 @@ export function createMapViewerOptions(container: HTMLElement | string, mode: Ma
     zoom: 1,
     minZoom: ABSOLUTE_ZOOM_LIMITS.minZoom,
     maxZoom: ABSOLUTE_ZOOM_LIMITS.maxZoom,
+    // Disable conflicting double-click gestures; buttons and pinch/touch zoom remain native MapLibre controls.
+    doubleClickZoom: false,
     ...camera,
   }
 }
