@@ -8,8 +8,8 @@ export interface PublicSpot {
   categories: SpotCategorySummary[]
   importance: SpotImportance
   description: string | null
-  lat: number
-  lng: number
+  x: number
+  y: number
   photos: string[]
   hoursText: string | null
   holidayText: string | null
@@ -27,12 +27,12 @@ export interface PublicFloor {
   imageWidth: number
   imageHeight: number
   order: number
-  refAPixelX: number | null
-  refAPixelY: number | null
+  refAImageX: number | null
+  refAImageY: number | null
   refALat: number | null
   refALng: number | null
-  refBPixelX: number | null
-  refBPixelY: number | null
+  refBImageX: number | null
+  refBImageY: number | null
   refBLat: number | null
   refBLng: number | null
   spots: PublicSpot[]

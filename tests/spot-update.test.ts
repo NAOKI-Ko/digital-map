@@ -15,8 +15,8 @@ const baseBody = {
   hoursText: '',
   holidayText: '',
   phone: '',
-  lat: 35,
-  lng: 139,
+  x: 0.5,
+  y: 0.5,
 }
 
 type SpotUpdateHandler = (event: unknown) => Promise<unknown>
@@ -45,8 +45,8 @@ describe('PATCH /api/maps/:mapId/spots/:spotId', () => {
       spot: {
         id: 'spot-1',
         floorId: 'floor-1',
-        lat: 35,
-        lng: 139,
+        x: 0.5,
+        y: 0.5,
         isPublished: true,
       },
     })
@@ -57,8 +57,8 @@ describe('PATCH /api/maps/:mapId/spots/:spotId', () => {
 
   afterAll(() => vi.unstubAllGlobals())
 
-  it('公開中スポットのlat/lngを両方nullにする更新を422で拒否する', async () => {
-    mocks.readBody.mockResolvedValue({ ...baseBody, lat: null, lng: null })
+  it('公開中スポットのx/yを両方nullにする更新を422で拒否する', async () => {
+    mocks.readBody.mockResolvedValue({ ...baseBody, x: null, y: null })
 
     await expect(handler({})).rejects.toMatchObject({
       statusCode: 422,
@@ -69,15 +69,15 @@ describe('PATCH /api/maps/:mapId/spots/:spotId', () => {
   })
 
   it.each([
-    { label: 'latのみnull', lat: null, lng: 139 },
-    { label: 'lngのみnull', lat: 35, lng: null },
-  ])('公開中スポットの$labelにする更新を422で拒否する', async ({ lat, lng }) => {
-    mocks.readBody.mockResolvedValue({ ...baseBody, lat, lng })
+    { label: 'xのみnull', x: null, y: 0.5 },
+    { label: 'yのみnull', x: 0.5, y: null },
+  ])('公開中スポットの$labelにする更新を422で拒否する', async ({ x, y }) => {
+    mocks.readBody.mockResolvedValue({ ...baseBody, x, y })
 
     await expect(handler({})).rejects.toMatchObject({
       statusCode: 422,
-      statusMessage: '緯度と経度は両方入力するか、両方空欄にしてください。',
-      message: '緯度と経度は両方入力するか、両方空欄にしてください。',
+      statusMessage: 'X座標とY座標は両方入力するか、両方空欄にしてください。',
+      message: 'X座標とY座標は両方入力するか、両方空欄にしてください。',
     })
     expect(mocks.floorFindFirst).not.toHaveBeenCalled()
     expect(mocks.spotUpdate).not.toHaveBeenCalled()

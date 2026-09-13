@@ -11,10 +11,10 @@ export default defineEventHandler(async (event): Promise<SpotBulkResponse> => {
   const categoryIds = input.action === 'setCategories' ? input.categoryIds : null
   const spots = await prisma.spot.findMany({
     where: { id: { in: spotIds }, floor: { mapId: map.id } },
-    select: { id: true, lat: true, lng: true },
+    select: { id: true, x: true, y: true },
   })
   if (spots.length !== spotIds.length) throw createError({ statusCode: 404, statusMessage: '選択したスポットが見つかりません。' })
-  if (input.action === 'publish' && spots.some(spot => spot.lat === null || spot.lng === null)) {
+  if (input.action === 'publish' && spots.some(spot => spot.x === null || spot.y === null)) {
     throw createError({ statusCode: 422, statusMessage: '位置未設定のスポットは公開できません。' })
   }
 

@@ -1,10 +1,10 @@
 export interface GeoReferenceDraft {
-  refAPixelX: number | null
-  refAPixelY: number | null
+  refAImageX: number | null
+  refAImageY: number | null
   refALat: number | null
   refALng: number | null
-  refBPixelX: number | null
-  refBPixelY: number | null
+  refBImageX: number | null
+  refBImageY: number | null
   refBLat: number | null
   refBLng: number | null
 }

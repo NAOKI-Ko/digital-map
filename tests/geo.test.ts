@@ -6,8 +6,11 @@ import {
   getFloorCorners,
   getGeoReferenceBounds,
   getGeoReferenceValidationError,
+  imageToRenderCoordinates,
   isGeoReferenced,
+  isValidImagePosition,
   isWithinFloorArea,
+  renderToImageCoordinates,
   REFERENCE_DISTANCE_ERROR,
   toImageCoordinates,
   type CompleteFloorGeoReference,
@@ -18,12 +21,12 @@ import {
 const baseFloor: CompleteFloorGeoReference = {
   imageWidth: 1000,
   imageHeight: 500,
-  refAPixelX: 0,
-  refAPixelY: 0,
+  refAImageX: 0,
+  refAImageY: 0,
   refALat: 35,
   refALng: 139,
-  refBPixelX: 1000,
-  refBPixelY: 0,
+  refBImageX: 1,
+  refBImageY: 0,
   refBLat: 35,
   refBLng: 139.01,
 }
@@ -54,7 +57,7 @@ describe('computeFloorCorners', () => {
   it('斜め方向に離れた基準点の対応を維持する', () => {
     const corners = computeFloorCorners(floor({
       imageHeight: 1000,
-      refBPixelY: 1000,
+      refBImageY: 1,
       refBLat: 35.01,
       refBLng: 139.01,
     }))
@@ -74,7 +77,7 @@ describe('computeFloorCorners', () => {
   })
 
   it('極端に大きい縮尺でも有限な4隅を返す', () => {
-    const corners = computeFloorCorners(floor({ refBPixelX: 50, refBLng: 140 }))
+    const corners = computeFloorCorners(floor({ refBImageX: 0.05, refBLng: 140 }))
 
     for (const point of Object.values(corners)) {
       expect(Number.isFinite(point.lat)).toBe(true)
@@ -95,19 +98,63 @@ describe('computeFloorCorners', () => {
   })
 
   it.each([
-    ['ピクセル距離が50未満', { refBPixelX: 49 }],
-    ['実距離が20m未満', { refBPixelX: 100, refBLat: 35 + 10 / 111_319.490_793_273_57, refBLng: 139 }],
+    ['ピクセル距離が50未満', { refBImageX: 0.049 }],
+    ['実距離が20m未満', { refBImageX: 0.1, refBLat: 35 + 10 / 111_319.490_793_273_57, refBLng: 139 }],
   ])('%sならエラーにする', (_label, overrides) => {
     expect(() => computeFloorCorners(floor(overrides))).toThrow(REFERENCE_DISTANCE_ERROR)
   })
 
   it('基準点AとBが完全に同一ならエラーにする', () => {
     expect(() => computeFloorCorners(floor({
-      refBPixelX: 0,
-      refBPixelY: 0,
+      refBImageX: 0,
+      refBImageY: 0,
       refBLat: 35,
       refBLng: 139,
     }))).toThrow(REFERENCE_DISTANCE_ERROR)
+  })
+})
+
+describe('normalized IMAGE placement transform', () => {
+  it.each([
+    ['top-left', { x: 0, y: 0 }],
+    ['center', { x: 0.5, y: 0.5 }],
+    ['bottom-right', { x: 1, y: 1 }],
+  ])('%sをgeoreference座標へ変換して誤差なく逆変換する', (_label, imagePosition) => {
+    const rendered = imageToRenderCoordinates(baseFloor, imagePosition)
+    expect(rendered).not.toBeNull()
+    const restored = renderToImageCoordinates(baseFloor, rendered!)
+    expect(restored?.x).toBeCloseTo(imagePosition.x, 11)
+    expect(restored?.y).toBeCloseTo(imagePosition.y, 11)
+  })
+
+  it('fallback表示でもIMAGE座標を往復する', () => {
+    const fallbackFloor = {
+      ...baseFloor,
+      refAImageX: null,
+      refAImageY: null,
+      refALat: null,
+      refALng: null,
+      refBImageX: null,
+      refBImageY: null,
+      refBLat: null,
+      refBLng: null,
+    }
+    const rendered = imageToRenderCoordinates(fallbackFloor, { x: 0.2, y: 0.8 })
+    expect(renderToImageCoordinates(fallbackFloor, rendered!)).toEqual({ x: 0.2, y: 0.8 })
+  })
+
+  it('partial/out-of-range IMAGE positionをinvalidとする', () => {
+    expect(isValidImagePosition({ x: 0, y: 1 })).toBe(true)
+    expect(isValidImagePosition({ x: -0.0001, y: 0.5 })).toBe(false)
+    expect(isValidImagePosition({ x: 0.5, y: 1.0001 })).toBe(false)
+  })
+
+  it('georeference変更はcanonical x/yを変更しない', () => {
+    const canonical = Object.freeze({ x: 0.3, y: 0.7 })
+    const before = imageToRenderCoordinates(baseFloor, canonical)
+    const after = imageToRenderCoordinates({ ...baseFloor, refBLng: 139.02 }, canonical)
+    expect(after).not.toEqual(before)
+    expect(canonical).toEqual({ x: 0.3, y: 0.7 })
   })
 })
 
@@ -144,12 +191,12 @@ describe('isGeoReferenced', () => {
   })
 
   it.each([
-    'refAPixelX',
-    'refAPixelY',
+    'refAImageX',
+    'refAImageY',
     'refALat',
     'refALng',
-    'refBPixelX',
-    'refBPixelY',
+    'refBImageX',
+    'refBImageY',
     'refBLat',
     'refBLng',
   ] satisfies Array<keyof FloorGeoReferenceFields>)('%sだけ未設定でもfalseを返す', (field) => {
@@ -206,12 +253,12 @@ describe('ジオリファレンス設定有無による4隅振り分け', () => 
   it('基準点がすべて未設定でも画像寸法から自動算出する', () => {
     expect(getFloorCorners({
       ...baseFloor,
-      refAPixelX: null,
-      refAPixelY: null,
+      refAImageX: null,
+      refAImageY: null,
       refALat: null,
       refALng: null,
-      refBPixelX: null,
-      refBPixelY: null,
+      refBImageX: null,
+      refBImageY: null,
       refBLat: null,
       refBLng: null,
     })).toEqual(computeFallbackCorners(baseFloor.imageWidth, baseFloor.imageHeight))
@@ -220,12 +267,12 @@ describe('ジオリファレンス設定有無による4隅振り分け', () => 
   it('未設定かつ画像寸法が不正ならnullを返す', () => {
     expect(getFloorCorners({
       ...baseFloor,
-      refAPixelX: null,
-      refAPixelY: null,
+      refAImageX: null,
+      refAImageY: null,
       refALat: null,
       refALng: null,
-      refBPixelX: null,
-      refBPixelY: null,
+      refBImageX: null,
+      refBImageY: null,
       refBLat: null,
       refBLng: null,
       imageWidth: 0,
@@ -236,7 +283,7 @@ describe('ジオリファレンス設定有無による4隅振り分け', () => 
 
 describe('2点合わせのバリデーションとMapLibre変換', () => {
   it('画像外のピクセル座標を拒否する', () => {
-    expect(getGeoReferenceValidationError(floor({ refBPixelX: 1001 })))
+    expect(getGeoReferenceValidationError(floor({ refBImageX: 1.001 })))
       .toBe('イラスト上の基準点を画像の内側で選んでください。')
   })
 

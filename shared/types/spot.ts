@@ -8,8 +8,8 @@ export interface AdminSpotSummary {
   name: string
   categories: SpotCategorySummary[]
   importance: SpotImportance
-  lat: number | null
-  lng: number | null
+  x: number | null
+  y: number | null
   isPublished: boolean
   pinIconType: PinIconType
   pinIconId: string | null
@@ -19,8 +19,8 @@ export interface AdminSpotSummary {
 }
 
 export type PositionedAdminSpotSummary = AdminSpotSummary & {
-  lat: number
-  lng: number
+  x: number
+  y: number
 }
 
 export interface SpotListFilterFloor {
@@ -57,8 +57,8 @@ export interface SpotPhotosResponse {
 
 export interface SpotPositionResponse {
   position: {
-    lat: number
-    lng: number
+    x: number
+    y: number
   }
 }
 

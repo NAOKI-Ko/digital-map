@@ -17,8 +17,8 @@ const publishedSpot = {
   importance: 'normal',
   spotCategories: [{ category: { id: 'category-1', name: '観光', order: 0 } }],
   description: null,
-  lat: 35,
-  lng: 139,
+  x: 0.5,
+  y: 0.5,
   photosJson: [],
   hoursText: null,
   holidayText: null,
@@ -50,12 +50,12 @@ function mapRecord(overrides: {
       imageWidth: 0,
       imageHeight: 0,
       order: 0,
-      refAPixelX: null,
-      refAPixelY: null,
+      refAImageX: null,
+      refAImageY: null,
       refALat: null,
       refALng: null,
-      refBPixelX: null,
-      refBPixelY: null,
+      refBImageX: null,
+      refBImageY: null,
       refBLat: null,
       refBLng: null,
       spots: overrides.spots ?? [publishedSpot],
@@ -79,8 +79,8 @@ describe('GET /api/public/:mapSlug', () => {
             spots: expect.objectContaining({
               where: {
                 isPublished: true,
-                lat: { not: null },
-                lng: { not: null },
+                x: { not: null },
+                y: { not: null },
               },
             }),
           }),
@@ -112,7 +112,7 @@ describe('GET /api/public/:mapSlug', () => {
 
   it('公開フラグが揃っていても座標未設定スポットを返さない', async () => {
     mocks.findFirst.mockResolvedValue(mapRecord({
-      spots: [{ ...publishedSpot, lat: null, lng: null }],
+      spots: [{ ...publishedSpot, x: null, y: null }],
     }))
 
     const result = await getPublicMapBySlug('test-map')

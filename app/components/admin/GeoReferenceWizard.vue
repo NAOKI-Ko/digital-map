@@ -116,36 +116,36 @@ function selectIllustrationPoint(event: MouseEvent) {
   if (!illustration.value || !['a-image', 'b-image'].includes(step.value)) return
 
   const bounds = illustration.value.getBoundingClientRect()
-  const pixelX = clamp((event.clientX - bounds.left) / bounds.width * props.imageWidth, 0, props.imageWidth)
-  const pixelY = clamp((event.clientY - bounds.top) / bounds.height * props.imageHeight, 0, props.imageHeight)
+  const imageX = clamp((event.clientX - bounds.left) / bounds.width, 0, 1)
+  const imageY = clamp((event.clientY - bounds.top) / bounds.height, 0, 1)
 
   if (step.value === 'a-image') {
-    draft.value.refAPixelX = pixelX
-    draft.value.refAPixelY = pixelY
+    draft.value.refAImageX = imageX
+    draft.value.refAImageY = imageY
   }
   else {
-    draft.value.refBPixelX = pixelX
-    draft.value.refBPixelY = pixelY
+    draft.value.refBImageX = imageX
+    draft.value.refBImageY = imageY
   }
 }
 
 function resetPoint(point: 'a' | 'b') {
   if (point === 'a') {
     Object.assign(draft.value, {
-      refAPixelX: null,
-      refAPixelY: null,
+      refAImageX: null,
+      refAImageY: null,
       refALat: null,
       refALng: null,
-      refBPixelX: null,
-      refBPixelY: null,
+      refBImageX: null,
+      refBImageY: null,
       refBLat: null,
       refBLng: null,
     })
   }
   else {
     Object.assign(draft.value, {
-      refBPixelX: null,
-      refBPixelY: null,
+      refBImageX: null,
+      refBImageY: null,
       refBLat: null,
       refBLng: null,
     })
@@ -153,11 +153,11 @@ function resetPoint(point: 'a' | 'b') {
   renderReferenceMarkers()
 }
 
-function markerStyle(pixelX: number | null, pixelY: number | null) {
-  if (pixelX === null || pixelY === null) return { display: 'none' }
+function markerStyle(imageX: number | null, imageY: number | null) {
+  if (imageX === null || imageY === null) return { display: 'none' }
   return {
-    left: `${pixelX / props.imageWidth * 100}%`,
-    top: `${pixelY / props.imageHeight * 100}%`,
+    left: `${imageX * 100}%`,
+    top: `${imageY * 100}%`,
   }
 }
 
@@ -264,12 +264,12 @@ function completeGeoReference(): CompleteFloorGeoReference | null {
   return {
     imageWidth: props.imageWidth,
     imageHeight: props.imageHeight,
-    refAPixelX: draft.value.refAPixelX!,
-    refAPixelY: draft.value.refAPixelY!,
+    refAImageX: draft.value.refAImageX!,
+    refAImageY: draft.value.refAImageY!,
     refALat: draft.value.refALat!,
     refALng: draft.value.refALng!,
-    refBPixelX: draft.value.refBPixelX!,
-    refBPixelY: draft.value.refBPixelY!,
+    refBImageX: draft.value.refBImageX!,
+    refBImageY: draft.value.refBImageY!,
     refBLat: draft.value.refBLat!,
     refBLng: draft.value.refBLng!,
   }
@@ -304,15 +304,15 @@ defineExpose({ focusLocation })
         <div class="flex items-center justify-between gap-3">
           <h2 class="text-sm font-bold text-stone-900">1. イラスト上の目印</h2>
           <div class="flex gap-2">
-            <button v-if="draft.refAPixelX !== null" type="button" class="text-xs font-semibold text-stone-500 hover:text-stone-900" @click="resetPoint('a')">Aを選び直す</button>
-            <button v-if="draft.refBPixelX !== null" type="button" class="text-xs font-semibold text-stone-500 hover:text-stone-900" @click="resetPoint('b')">Bを選び直す</button>
+            <button v-if="draft.refAImageX !== null" type="button" class="text-xs font-semibold text-stone-500 hover:text-stone-900" @click="resetPoint('a')">Aを選び直す</button>
+            <button v-if="draft.refBImageX !== null" type="button" class="text-xs font-semibold text-stone-500 hover:text-stone-900" @click="resetPoint('b')">Bを選び直す</button>
           </div>
         </div>
         <div class="mt-2 overflow-auto rounded-xl border border-stone-300 bg-stone-100 p-2 text-center">
           <div class="relative inline-block max-w-full">
             <img ref="illustration" :src="illustrationUrl" alt="基準点を選ぶフロアイラスト" class="block max-h-[36rem] max-w-full cursor-crosshair object-contain" @click="selectIllustrationPoint">
-            <span class="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-terracotta-600 px-2 py-1 text-xs font-bold text-white shadow" :style="markerStyle(draft.refAPixelX, draft.refAPixelY)">A</span>
-            <span class="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-sky-600 px-2 py-1 text-xs font-bold text-white shadow" :style="markerStyle(draft.refBPixelX, draft.refBPixelY)">B</span>
+            <span class="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-terracotta-600 px-2 py-1 text-xs font-bold text-white shadow" :style="markerStyle(draft.refAImageX, draft.refAImageY)">A</span>
+            <span class="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-sky-600 px-2 py-1 text-xs font-bold text-white shadow" :style="markerStyle(draft.refBImageX, draft.refBImageY)">B</span>
           </div>
         </div>
       </section>

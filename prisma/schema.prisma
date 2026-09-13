@@ -75,12 +75,12 @@ model MapFloor {
   imageWidth      Int
   imageHeight     Int
   order           Int      @default(0)
-  refAPixelX      Float?
-  refAPixelY      Float?
+  refAImageX      Float?
+  refAImageY      Float?
   refALat         Float?
   refALng         Float?
-  refBPixelX      Float?
-  refBPixelY      Float?
+  refBImageX      Float?
+  refBImageY      Float?
   refBLat         Float?
   refBLng         Float?
   spots           Spot[]
@@ -97,8 +97,8 @@ model Spot {
   name            String
   spotCategories  SpotCategory[]
   description     String?
-  lat             Float?
-  lng             Float?
+  x               Float?
+  y               Float?
   photosJson      Json     @default("[]")
   hoursText       String?
   holidayText     String?

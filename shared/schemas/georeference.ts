@@ -2,15 +2,15 @@ import { z } from 'zod'
 
 const latitude = z.number().finite().min(-90).max(90)
 const longitude = z.number().finite().min(-180).max(180)
-const pixelCoordinate = z.number().finite().nonnegative()
+const imageCoordinate = z.number().finite().min(0).max(1)
 
 export const geoReferenceSchema = z.object({
-  refAPixelX: pixelCoordinate,
-  refAPixelY: pixelCoordinate,
+  refAImageX: imageCoordinate,
+  refAImageY: imageCoordinate,
   refALat: latitude,
   refALng: longitude,
-  refBPixelX: pixelCoordinate,
-  refBPixelY: pixelCoordinate,
+  refBImageX: imageCoordinate,
+  refBImageY: imageCoordinate,
   refBLat: latitude,
   refBLng: longitude,
 })

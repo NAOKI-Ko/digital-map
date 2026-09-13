@@ -121,14 +121,14 @@ model MapFloor {
   imageHeight      Int      // アップロード時に読み取ったピクセル高さ
   order            Int      @default(0)
 
-  // 基準点A: イラスト上のピクセル座標 + 対応する実世界の緯度経度
-  refAPixelX       Float?
-  refAPixelY       Float?
+  // 基準点A: イラスト上の正規化座標(0..1) + 対応する実世界の緯度経度
+  refAImageX       Float?
+  refAImageY       Float?
   refALat          Float?
   refALng          Float?
   // 基準点B: 同上(Aとは別の目印を選ぶ)
-  refBPixelX       Float?
-  refBPixelY       Float?
+  refBImageX       Float?
+  refBImageY       Float?
   refBLat          Float?
   refBLng          Float?
 
@@ -146,8 +146,8 @@ model Spot {
   name             String
   spotCategories   SpotCategory[]
   description      String?
-  lat              Float?
-  lng              Float?
+  x                Float?  // イラスト上の正規化座標(0..1)
+  y                Float?  // イラスト上の正規化座標(0..1)
   photosJson       Json     @default("[]")
   hoursText        String?
   holidayText      String?
@@ -178,10 +178,10 @@ model SpotCategory {
 
 **Ver.3からの変更点**
 - `MapFloor`の四隅8カラム(`topLeft/topRight/bottomRight/bottomLeft`の緯度経度)を削除
-- 代わりに、管理者が実際に指定する「基準点A・基準点B」(各点につきピクセル座標+緯度経度の4値、合計8カラム)を保持する。四隅の座標はこの2点から都度計算する(保存しない)
+- 代わりに、管理者が実際に指定する「基準点A・基準点B」(各点につき正規化画像座標+緯度経度の4値、合計8カラム)を保持する。四隅の座標はこの2点から都度計算する(保存しない)
 - `imageWidth`, `imageHeight`を追加(ピクセル⇔実距離の変換に必要)
 - `isOutdoor`は後続の実装変更で廃止。現在地機能は基準点A・Bの設定有無で判定する
-- `Spot.lat, lng`の命名はVer.3から維持し、位置未設定の下書きを扱えるようnullableとする
+- IMAGE Spotの正本位置は`Spot.x, y`(各`0..1`)とし、位置未設定の下書きを扱えるよう両方nullableとする。緯度経度はMapLibre描画時だけ導出し、永続化・公開APIには使用しない
 - `Spot.pinIconType`は`preset`、`custom`、`illustration`を使用する。プリセットIDは`kanji:`/`material:`接頭辞でアイコンファミリーを識別し、旧IDは読み込み時に正規化する
 - 旧`Spot.category`文字列は廃止し、Map単位の`Category`と中間テーブル`SpotCategory`によるmany-to-manyを使用する。Category 0件を許可し、別MapのCategoryとの関連づけを拒否する
 - `Spot.importance`は`normal`/`featured`の2段階とし、PINデザインとは独立した公開表示優先度として扱う
@@ -218,16 +218,20 @@ function localMetersToLngLat(x: number, y: number, originLat: number, originLng:
 
 export function computeFloorCorners(floor: {
   imageWidth: number; imageHeight: number;
-  refAPixelX: number; refAPixelY: number; refALat: number; refALng: number;
-  refBPixelX: number; refBPixelY: number; refBLat: number; refBLng: number;
+  refAImageX: number; refAImageY: number; refALat: number; refALng: number;
+  refBImageX: number; refBImageY: number; refBLat: number; refBLng: number;
 }) {
   const origin = { lat: floor.refALat, lng: floor.refALng };
 
   // 実世界側のベクトル(A→B、メートル)
   const bMeters = lngLatToLocalMeters(floor.refBLat, floor.refBLng, origin.lat, origin.lng);
-  // ピクセル側のベクトル(A→B。画像はy軸下向きなので符号に注意)
-  const pxDx = floor.refBPixelX - floor.refAPixelX;
-  const pxDy = floor.refBPixelY - floor.refAPixelY;
+  // 正規化座標を元画像ピクセルへ戻す。画像はy軸下向きなので符号に注意
+  const refAPixelX = floor.refAImageX * floor.imageWidth;
+  const refAPixelY = floor.refAImageY * floor.imageHeight;
+  const refBPixelX = floor.refBImageX * floor.imageWidth;
+  const refBPixelY = floor.refBImageY * floor.imageHeight;
+  const pxDx = refBPixelX - refAPixelX;
+  const pxDy = refBPixelY - refAPixelY;
 
   const pixelDist = Math.hypot(pxDx, pxDy);
   const metersDist = Math.hypot(bMeters.x, bMeters.y);
@@ -243,8 +247,8 @@ export function computeFloorCorners(floor: {
 
   const cos = Math.cos(rotation), sin = Math.sin(rotation);
   function pixelToMeters(px: number, py: number) {
-    const dx = px - floor.refAPixelX;
-    const dy = -(py - floor.refAPixelY); // y反転
+    const dx = px - refAPixelX;
+    const dy = -(py - refAPixelY); // y反転
     const mx = (dx * cos - dy * sin) * scale;
     const my = (dx * sin + dy * cos) * scale;
     return { x: mx, y: my };
@@ -327,9 +331,9 @@ fallback coordinatesは実世界の位置を表さない。したがって、次
 
 ### 4.8 Spot lifecycle・意味的PIN密度・モバイル公開UI
 
-- Spotは情報を先に作成し、`lat`/`lng`を後からエディタで設定できる。公開APIは位置未設定Spotを返さず、公開操作も拒否する。PINを独立entityにはしない
+- Spotは情報を先に作成し、`x`/`y`を後からエディタで設定できる。公開APIは位置未設定Spotを返さず、公開操作も拒否する。PINを独立entityにはしない
 - CategoryはMap単位で管理し、Spotとのmany-to-many relationを`categoryIds`で更新する。公開絞り込みは複数選択ORとし、未使用Categoryだけを削除できる。表示順は`Category.order`を使う
-- Floor画像のupload前にはfilenameと画像previewを表示し、cancelまたは差し替えができる。既存Floorの画像差し替えではSpotの`lat`/`lng`と基準点A・Bを自動変更せず、再確認が必要な旨を警告する
+- Floor画像のupload前にはfilenameと画像previewを表示し、cancelまたは差し替えができる。既存Floorの画像差し替えではSpotの`x`/`y`と基準点A・Bを自動変更せず、再確認が必要な旨を警告する
 - cameraはFloor切り替え・初期表示でFloor全体へfitする。通常のMap clickやPIN配置ではfitせず、Spot登録画面との往復ではcenter/zoomを復元する
 - `importance === featured`は縮小時も不透明度と優先サイズを維持する。`normal`はフロア相対の最小zoomから2段階の範囲で、不透明度35%→100%、サイズ78%→100%へ連続変化する。raw zoom値は管理UIへ公開しない
 - Markerの位置基準は3方式ともbottom-center接地点とし、意味的なscale・opacity変更や選択状態で接地点をずらさない。MapLibreがMarker本体へ設定する`opacity`とは競合させず、内部DOMのCSS変数で密度表示を適用する
@@ -344,7 +348,7 @@ fallback coordinatesは実世界の位置を表さない。したがって、次
 ## 6. セキュリティ・認可
 
 - 管理画面配下は全てNuxtのルートミドルウェア(`middleware/auth.ts`)でセッションチェックを通す
-- 公開マップ画面・APIは認証不要だが、`Map.isPublished === true`のマップだけを返し、その中でも`Spot.isPublished === true`かつ`lat`/`lng`設定済みのスポットだけを返す
+- 公開マップ画面・APIは認証不要だが、`Map.isPublished === true`のマップだけを返し、その中でも`Spot.isPublished === true`かつ`x`/`y`設定済みのスポットだけを返す
 - Category CRUD、Spot relation更新・一括操作、Map branding更新はすべてセッションの`tenantId`とMap ownershipを検証する。Category relationはSpotと同じMapに属するものだけを許可する
 
 ## 7. ディレクトリ構造

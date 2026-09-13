@@ -38,7 +38,7 @@ describe('release security: tenant / Map ownership boundary', () => {
     mocks.getRouterParam.mockReset().mockImplementation((_event, key) => ({ mapId: 'map-a', floorId: 'floor-a', spotId: 'spot-a' })[key])
     mocks.mapFindFirst.mockReset().mockResolvedValue({ id: 'map-a', name: 'Map A' })
     mocks.floorFindFirst.mockReset().mockResolvedValue({ id: 'floor-a', mapId: 'map-a', order: 0, imageWidth: 1000, imageHeight: 500 })
-    mocks.spotFindFirst.mockReset().mockResolvedValue({ id: 'spot-a', floorId: 'floor-a', lat: 35, lng: 139, isPublished: false })
+    mocks.spotFindFirst.mockReset().mockResolvedValue({ id: 'spot-a', floorId: 'floor-a', x: 0.5, y: 0.5, isPublished: false })
     mocks.categoryFindFirst.mockReset().mockResolvedValue({ id: 'category-a', mapId: 'map-a', _count: { spotCategories: 0 } })
   })
 

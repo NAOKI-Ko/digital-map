@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { useMapViewer, type MapViewerMode } from '~/composables/useMapViewer'
-import type { LatLng } from '~~/lib/geo'
+import type { ImagePosition } from '~~/lib/geo'
 import type { MapViewerCameraState, MapViewerFloor, MapViewerSpot } from '~~/shared/types/map-viewer'
 
 const props = withDefaults(defineProps<{
   floor: MapViewerFloor
   spots?: readonly MapViewerSpot[]
   mode?: MapViewerMode
-  modelValue?: LatLng | null
+  modelValue?: ImagePosition | null
   selectedSpotId?: string | null
   height?: string
   label?: string
@@ -25,8 +25,8 @@ const props = withDefaults(defineProps<{
 })
 
 const emit = defineEmits<{
-  'update:modelValue': [position: LatLng]
-  'spotMoved': [value: { spotId: string, lat: number, lng: number }]
+  'update:modelValue': [position: ImagePosition]
+  'spotMoved': [value: { spotId: string, x: number, y: number }]
   'spotSelected': [spot: MapViewerSpot]
   'cameraChanged': [camera: MapViewerCameraState]
 }>()

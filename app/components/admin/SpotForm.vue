@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import AddressGeocoder from '~/components/admin/AddressGeocoder.vue'
 import { useForm } from 'vee-validate'
 import { spotFormSchema, type SpotFormInput } from '~~/shared/schemas/spot'
 import type { SpotCategorySummary } from '~~/shared/types/category'
@@ -21,8 +20,8 @@ const props = withDefaults(defineProps<{
     hoursText: '',
     holidayText: '',
     phone: '',
-    lat: null,
-    lng: null,
+    x: null,
+    y: null,
   }),
   isSubmitting: false,
   submitLabel: '保存する',
@@ -32,7 +31,7 @@ const emit = defineEmits<{
   submit: [input: SpotFormInput]
 }>()
 
-const { defineField, errors, handleSubmit, resetForm, setErrors, setFieldValue } = useForm<SpotFormInput>({
+const { defineField, errors, handleSubmit, resetForm, setErrors } = useForm<SpotFormInput>({
   initialValues: props.initialValue,
 })
 
@@ -44,8 +43,6 @@ const [description, descriptionAttrs] = defineField('description')
 const [hoursText, hoursTextAttrs] = defineField('hoursText')
 const [holidayText, holidayTextAttrs] = defineField('holidayText')
 const [phone, phoneAttrs] = defineField('phone')
-const [lat, latAttrs] = defineField('lat')
-const [lng, lngAttrs] = defineField('lng')
 
 watch(() => props.initialValue, value => resetForm({ values: value }), { deep: true })
 
@@ -62,10 +59,6 @@ const submit = handleSubmit((values) => {
   emit('submit', result.data)
 })
 
-function useGeocodeResult(result: { lat: number, lng: number }) {
-  setFieldValue('lat', result.lat)
-  setFieldValue('lng', result.lng)
-}
 </script>
 
 <template>
@@ -128,26 +121,6 @@ function useGeocodeResult(result: { lat: number, lng: number }) {
           <label for="spot-phone" class="text-sm font-semibold text-stone-800">電話番号</label>
           <input id="spot-phone" v-model="phone" v-bind="phoneAttrs" type="tel" maxlength="50" autocomplete="tel" class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5" placeholder="例：03-1234-5678">
           <p v-if="errors.phone" class="mt-1 text-sm text-red-600">{{ errors.phone }}</p>
-        </div>
-      </div>
-    </section>
-
-    <section class="border-t border-stone-200 pt-8">
-      <h2 class="text-lg font-bold text-stone-900">位置</h2>
-      <p class="mt-1 text-sm text-stone-600">住所検索または緯度・経度の直接入力で位置を指定します。位置は後から設定できますが、未設定のスポットは公開できません。</p>
-      <div class="mt-5">
-        <AddressGeocoder @select="useGeocodeResult" />
-      </div>
-      <div class="mt-5 grid gap-5 sm:grid-cols-2">
-        <div>
-          <label for="spot-lat" class="text-sm font-semibold text-stone-800">緯度（lat）</label>
-          <input id="spot-lat" v-model.number="lat" v-bind="latAttrs" type="number" min="-90" max="90" step="any" class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5">
-          <p v-if="errors.lat" class="mt-1 text-sm text-red-600">{{ errors.lat }}</p>
-        </div>
-        <div>
-          <label for="spot-lng" class="text-sm font-semibold text-stone-800">経度（lng）</label>
-          <input id="spot-lng" v-model.number="lng" v-bind="lngAttrs" type="number" min="-180" max="180" step="any" class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5">
-          <p v-if="errors.lng" class="mt-1 text-sm text-red-600">{{ errors.lng }}</p>
         </div>
       </div>
     </section>

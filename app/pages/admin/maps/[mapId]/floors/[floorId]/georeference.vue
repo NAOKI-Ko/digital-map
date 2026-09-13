@@ -32,12 +32,12 @@ const completeGeoReference = computed<CompleteFloorGeoReference | null>(() => {
   return {
     imageWidth: floor.value.imageWidth,
     imageHeight: floor.value.imageHeight,
-    refAPixelX: draft.value.refAPixelX!,
-    refAPixelY: draft.value.refAPixelY!,
+    refAImageX: draft.value.refAImageX!,
+    refAImageY: draft.value.refAImageY!,
     refALat: draft.value.refALat!,
     refALng: draft.value.refALng!,
-    refBPixelX: draft.value.refBPixelX!,
-    refBPixelY: draft.value.refBPixelY!,
+    refBImageX: draft.value.refBImageX!,
+    refBImageY: draft.value.refBImageY!,
     refBLat: draft.value.refBLat!,
     refBLng: draft.value.refBLng!,
   }
@@ -49,12 +49,12 @@ const validationError = computed(() => completeGeoReference.value
 watch(floor, (value) => {
   if (!value) return
   draft.value = {
-    refAPixelX: value.refAPixelX,
-    refAPixelY: value.refAPixelY,
+    refAImageX: value.refAImageX,
+    refAImageY: value.refAImageY,
     refALat: value.refALat,
     refALng: value.refALng,
-    refBPixelX: value.refBPixelX,
-    refBPixelY: value.refBPixelY,
+    refBImageX: value.refBImageX,
+    refBImageY: value.refBImageY,
     refBLat: value.refBLat,
     refBLng: value.refBLng,
   }

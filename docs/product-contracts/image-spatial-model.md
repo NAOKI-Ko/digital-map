@@ -36,6 +36,6 @@ The current rendered contact point is authoritative. A reusable read-only `audit
 - partial legacy `lat/lng`, including Spot ID, Floor ID, name, and values.
 - complete legacy positions whose deterministic inverse of the current render transform produces raw `x/y` outside the illustration, including IDs, name, legacy coordinates, and raw `x/y`.
 
-For migration calculations only, values within `1e-9` of `0` or `1` may snap to the boundary. Genuine out-of-bounds values must not be clamped. Visual PIN contact-point drift must be at most one CSS pixel under an equivalent viewport/camera.
+For migration calculations and the migration audit only, values within `1e-12` of `0` or `1` may snap to the boundary. Genuine out-of-bounds values must not be clamped. This epsilon is not used for normal interactive placement. Visual PIN contact-point drift must be at most one CSS pixel under an equivalent viewport/camera.
 
 Invalid dimensions may be repaired only from exact metadata of the currently referenced, locally available managed image bytes, followed by another read-only audit. Missing/corrupt/inaccessible/external-only bytes remain exceptions. Partial coordinates and genuinely out-of-bounds Spots require explicit operator correction to a valid complete position or explicit unpositioning. Migration aborts until all exceptions are resolved.

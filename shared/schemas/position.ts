@@ -1,8 +1,8 @@
 import { z } from 'zod'
 
 export const spotPositionSchema = z.object({
-  lat: z.number().finite().min(-90).max(90),
-  lng: z.number().finite().min(-180).max(180),
+  x: z.number().finite().min(0).max(1),
+  y: z.number().finite().min(0).max(1),
 })
 
 export type SpotPositionInput = z.infer<typeof spotPositionSchema>

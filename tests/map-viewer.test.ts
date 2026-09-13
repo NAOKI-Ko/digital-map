@@ -6,9 +6,11 @@ import {
   createFloorZoomConstraints,
   createMapViewerOptions,
   createSpotMarkerOptions,
+  constrainImagePlacementCandidate,
   GEOLOCATE_CONTROL_OPTIONS,
   GEOLOCATION_OUTSIDE_MESSAGE,
   getFloorLayerIds,
+  getImagePlacementCandidate,
   getMapViewerCameraState,
   restoreMapViewerCamera,
   shouldEnableGeolocate,
@@ -26,8 +28,8 @@ const baseSpot: MapViewerSpot = {
   name: 'テストスポット',
   categories: [{ id: 'category-1', name: '温泉', order: 0 }],
   importance: 'normal',
-  lat: 35.7,
-  lng: 139.7,
+  x: 0.5,
+  y: 0.5,
   pinIconType: 'preset',
   pinIconId: null,
   pinIconImageUrl: null,
@@ -40,12 +42,12 @@ const geoReferencedFloor: MapViewerFloor = {
   illustrationUrl: '/uploads/floor.png',
   imageWidth: 1000,
   imageHeight: 500,
-  refAPixelX: 0,
-  refAPixelY: 0,
+  refAImageX: 0,
+  refAImageY: 0,
   refALat: 35.7,
   refALng: 139.7,
-  refBPixelX: 1000,
-  refBPixelY: 0,
+  refBImageX: 1,
+  refBImageY: 0,
   refBLat: 35.7,
   refBLng: 139.71,
 }
@@ -215,6 +217,18 @@ describe('Markerの表示内容', () => {
       color: '#C7401F',
       subpixelPositioning: true,
     })
+  })
+})
+
+describe('IMAGE placement interaction', () => {
+  it('illustration外のmap clickをcandidateにしない', () => {
+    expect(getImagePlacementCandidate(geoReferencedFloor, { lat: 35.7, lng: 139.711 })).toBeNull()
+  })
+
+  it('illustration外へdragしたcandidateを境界内へ制約する', () => {
+    const candidate = constrainImagePlacementCandidate(geoReferencedFloor, { lat: 35.7, lng: 139.711 })
+    expect(candidate?.x).toBe(1)
+    expect(candidate?.y).toBeCloseTo(0, 10)
   })
 })
 

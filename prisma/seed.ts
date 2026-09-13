@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url'
 import { PrismaPg } from '@prisma/adapter-pg'
 import { hash } from 'bcryptjs'
 import { PrismaClient } from './generated/client'
+import { renderToImageCoordinates } from '../lib/geo'
 
 const connectionString =
   process.env.DATABASE_URL
@@ -51,6 +52,19 @@ const arimatsuDemoAssets = [
   { source: 'illustration-torii.png', target: 'illustration-torii.png' },
   { source: 'illustration-tree.png', target: 'illustration-tree.png' },
 ] as const
+
+const arimatsuFloorSpatial = {
+  imageWidth: 1448,
+  imageHeight: 1086,
+  refAImageX: 55.47892720306513 / 1448,
+  refAImageY: 36.06130268199234 / 1086,
+  refALat: 35.06912258387551,
+  refALng: 136.96684317481913,
+  refBImageX: 1217.7624521072796 / 1448,
+  refBImageY: 1056.8735632183907 / 1086,
+  refBLat: 35.06355742961577,
+  refBLng: 136.97447378024134,
+} as const
 
 const arimatsuDemoSpots = [
   {
@@ -303,42 +317,27 @@ async function seedArimatsuDemo(tenantId: string) {
       mapId: map.id,
       name: '有松町（デモ）',
       illustrationUrl: '/uploads/arimatsu-demo-map.png',
-      imageWidth: 1448,
-      imageHeight: 1086,
+      ...arimatsuFloorSpatial,
       order: 0,
-      refAPixelX: 55.47892720306513,
-      refAPixelY: 36.06130268199234,
-      refALat: 35.06912258387551,
-      refALng: 136.96684317481913,
-      refBPixelX: 1217.7624521072796,
-      refBPixelY: 1056.8735632183907,
-      refBLat: 35.06355742961577,
-      refBLng: 136.97447378024134,
     },
     create: {
       id: 'demo-arimatsu-floor',
       mapId: map.id,
       name: '有松町（デモ）',
       illustrationUrl: '/uploads/arimatsu-demo-map.png',
-      imageWidth: 1448,
-      imageHeight: 1086,
+      ...arimatsuFloorSpatial,
       order: 0,
-      refAPixelX: 55.47892720306513,
-      refAPixelY: 36.06130268199234,
-      refALat: 35.06912258387551,
-      refALng: 136.96684317481913,
-      refBPixelX: 1217.7624521072796,
-      refBPixelY: 1056.8735632183907,
-      refBLat: 35.06355742961577,
-      refBLng: 136.97447378024134,
     },
   })
 
   await prisma.$transaction(arimatsuDemoSpots.map((spot) => {
-    const { id, category: _category, ...spotData } = spot
+    const { id, category: _category, lat, lng, ...spotData } = spot
+    const imagePosition = renderToImageCoordinates(arimatsuFloorSpatial, { lat, lng })
+    if (!imagePosition) throw new Error(`Spot ${id} のIMAGE位置を計算できません。`)
     const data = {
       floorId: floor.id,
       ...spotData,
+      ...imagePosition,
       isPublished: false,
     }
 

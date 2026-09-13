@@ -70,7 +70,7 @@ design.md Ver.5 / wireframe-spec.md Ver.5を正として、ジオリファレン
 緯度経度ベースの設計をVer.3から維持した。現在地の有効判定は、その後Phase 10で
 屋内外ではなくジオリファレンス設定有無へ変更済み。
 
-- [x] T-36: Prismaスキーマ移行:`MapFloor`の四隅8カラム(`topLeft/topRight/bottomRight/bottomLeft`)を削除し、基準点A・B用の8カラム(`refAPixelX/Y, refALat/Lng, refBPixelX/Y, refBLat/Lng`)と`imageWidth`, `imageHeight`を追加
+- [x] T-36: Prismaスキーマ移行:`MapFloor`の四隅8カラム(`topLeft/topRight/bottomRight/bottomLeft`)を削除し、基準点A・B用の8カラム(現在は`refAImageX/Y, refALat/Lng, refBImageX/Y, refBLat/Lng`)と`imageWidth`, `imageHeight`を追加
 - [x] T-37: 画像アップロードAPI(`server/api/uploads/image.post.ts`)で、アップロード時に画像のピクセル幅・高さを計測し`MapFloor.imageWidth/imageHeight`に保存する処理を追加
 - [x] T-38: `lib/geo.ts`に`computeFloorCorners()`(2点合わせによる相似変換で4隅を算出)を実装し、design.md 4.2節のロジックに沿って実装する。四隅個別ドラッグ・経度正規化のための旧ロジックは削除する
 - [x] T-39: ジオリファレンス設定UI(`⑤-2`相当)を、4隅個別ドラッグのUIから「2点合わせウィザード」(`GeoReferenceWizard.vue`)に作り直す。イラスト側クリック→実地図側クリック(住所検索可)を、基準点A・Bそれぞれについて行う
@@ -146,7 +146,7 @@ Phase 9のT-46〜T-52を置き換える際、実装履歴では同じタスク�
 
 ## Phase 15: 柔軟なSpot作成・後配置
 
-- [x] T-77: `lat`/`lng`未設定でSpot情報を先に作成できるフォーム・APIを実装
+- [x] T-77: 位置(`x`/`y`)未設定でSpot情報を先に作成できるフォーム・APIを実装
 - [x] T-78: Spot一覧・詳細で未配置を明示し、エディタから既存Spotを後配置できる導線を追加
 - [x] T-79: editor起点の位置付き新規Spotフローを維持し、camera contextを往復で保持
 - [x] T-80: 位置未設定Spotの公開拒否と公開API非漏洩をテスト

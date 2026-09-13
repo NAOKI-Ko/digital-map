@@ -19,13 +19,13 @@ export const spotFormSchema = z.object({
     value => !value || /^[0-9+()\-ー―‐\s]+$/.test(value),
     '電話番号の形式を確認してください。',
   ),
-  lat: optionalCoordinate(-90, 90, '緯度は-90〜90で入力してください。'),
-  lng: optionalCoordinate(-180, 180, '経度は-180〜180で入力してください。'),
+  x: optionalCoordinate(0, 1, 'X座標は0〜1で入力してください。'),
+  y: optionalCoordinate(0, 1, 'Y座標は0〜1で入力してください。'),
 }).superRefine((value, context) => {
-  if ((value.lat === null) !== (value.lng === null)) {
-    const message = '緯度と経度は両方入力するか、両方空欄にしてください。'
-    context.addIssue({ code: 'custom', path: ['lat'], message })
-    context.addIssue({ code: 'custom', path: ['lng'], message })
+  if ((value.x === null) !== (value.y === null)) {
+    const message = 'X座標とY座標は両方入力するか、両方空欄にしてください。'
+    context.addIssue({ code: 'custom', path: ['x'], message })
+    context.addIssue({ code: 'custom', path: ['y'], message })
   }
 })
 

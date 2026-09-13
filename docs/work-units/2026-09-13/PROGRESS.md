@@ -18,8 +18,8 @@ Start SHA: `a58b4353bd108e6586f329080c772f69b8aaffda`
 
 | WU | Jira | Status | Commit | Tests / notes |
 |---|---|---|---|---|
-| WU-00 | KAN-49/50/51 and referenced PdM decisions | PASS | PENDING COMMIT | Product contracts created; baseline 24 files / 197 tests; runtime unchanged |
-| WU-01 | KAN-49 | PENDING | — | Supervisor migration resolution received 2026-09-13 |
+| WU-00 | KAN-49/50/51 and referenced PdM decisions | PASS | `75e64c4` | Product contracts created; baseline 24 files / 197 tests; runtime unchanged |
+| WU-01 | KAN-49 | PASS | PENDING COMMIT | IMAGE x/y and normalized reference points; migration-only epsilon `1e-12`; focused 83 tests, full 26 files / 219 tests, typecheck, Prisma validate, build PASS. Read-only audit command exits 2 because this worktree has no configured `DATABASE_URL`; migration remains fail-closed for unresolved rows. |
 | WU-02 | KAN-7/40/49 | PENDING | — | |
 | WU-03 | KAN-33/40 | PENDING | — | |
 | WU-04 | KAN-30 | PENDING | — | |

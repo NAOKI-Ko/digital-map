@@ -6,12 +6,12 @@ export interface LatLng {
 export interface FloorGeoReferenceFields {
   imageWidth: number | null
   imageHeight: number | null
-  refAPixelX: number | null
-  refAPixelY: number | null
+  refAImageX: number | null
+  refAImageY: number | null
   refALat: number | null
   refALng: number | null
-  refBPixelX: number | null
-  refBPixelY: number | null
+  refBImageX: number | null
+  refBImageY: number | null
   refBLat: number | null
   refBLng: number | null
 }
@@ -19,12 +19,12 @@ export interface FloorGeoReferenceFields {
 export interface CompleteFloorGeoReference {
   imageWidth: number
   imageHeight: number
-  refAPixelX: number
-  refAPixelY: number
+  refAImageX: number
+  refAImageY: number
   refALat: number
   refALng: number
-  refBPixelX: number
-  refBPixelY: number
+  refBImageX: number
+  refBImageY: number
   refBLat: number
   refBLng: number
 }
@@ -45,15 +45,17 @@ export const REFERENCE_DISTANCE_ERROR = '基準点が近すぎます。もっと
 export const FALLBACK_ORIGIN = { lat: 0, lng: 0 } as const
 export const FALLBACK_EXTENT_DEG = 0.01
 export const AREA_MARGIN_METERS = 300
+/** Boundary noise tolerance used only by the legacy IMAGE position migration/audit. */
+export const IMAGE_SPATIAL_MIGRATION_EPSILON = 1e-12
 
 const EARTH_RADIUS_METERS = 6_378_137
 const GEO_REFERENCE_FIELDS = [
-  'refAPixelX',
-  'refAPixelY',
+  'refAImageX',
+  'refAImageY',
   'refALat',
   'refALng',
-  'refBPixelX',
-  'refBPixelY',
+  'refBImageX',
+  'refBImageY',
   'refBLat',
   'refBLng',
 ] as const
@@ -103,8 +105,8 @@ function localMetersToLngLat(x: number, y: number, originLat: number, originLng:
 
 export function getReferencePointDistances(floor: CompleteFloorGeoReference) {
   const pixelDistance = Math.hypot(
-    floor.refBPixelX - floor.refAPixelX,
-    floor.refBPixelY - floor.refAPixelY,
+    (floor.refBImageX - floor.refAImageX) * floor.imageWidth,
+    (floor.refBImageY - floor.refAImageY) * floor.imageHeight,
   )
   const bMeters = lngLatToLocalMeters(
     floor.refBLat,
@@ -129,8 +131,12 @@ export function computeFloorCorners(floor: CompleteFloorGeoReference): FloorCorn
 
   const origin = { lat: floor.refALat, lng: floor.refALng }
   const bMeters = lngLatToLocalMeters(floor.refBLat, floor.refBLng, origin.lat, origin.lng)
-  const pxDx = floor.refBPixelX - floor.refAPixelX
-  const pxDy = floor.refBPixelY - floor.refAPixelY
+  const refAPixelX = floor.refAImageX * floor.imageWidth
+  const refAPixelY = floor.refAImageY * floor.imageHeight
+  const refBPixelX = floor.refBImageX * floor.imageWidth
+  const refBPixelY = floor.refBImageY * floor.imageHeight
+  const pxDx = refBPixelX - refAPixelX
+  const pxDy = refBPixelY - refAPixelY
   const { pixelDistance, meterDistance } = getReferencePointDistances(floor)
 
   if (pixelDistance < MIN_REFERENCE_PIXEL_DISTANCE || meterDistance < MIN_REFERENCE_METER_DISTANCE) {
@@ -145,8 +151,8 @@ export function computeFloorCorners(floor: CompleteFloorGeoReference): FloorCorn
   const sin = Math.sin(rotation)
 
   function corner(px: number, py: number): LatLng {
-    const dx = px - floor.refAPixelX
-    const dy = -(py - floor.refAPixelY)
+    const dx = px - refAPixelX
+    const dy = -(py - refAPixelY)
     const x = (dx * cos - dy * sin) * scale
     const y = (dx * sin + dy * cos) * scale
     return localMetersToLngLat(x, y, origin.lat, origin.lng)
@@ -176,12 +182,12 @@ function getGeoReferenceInputError(floor: CompleteFloorGeoReference) {
   const values = [
     floor.imageWidth,
     floor.imageHeight,
-    floor.refAPixelX,
-    floor.refAPixelY,
+    floor.refAImageX,
+    floor.refAImageY,
     floor.refALat,
     floor.refALng,
-    floor.refBPixelX,
-    floor.refBPixelY,
+    floor.refBImageX,
+    floor.refBImageY,
     floor.refBLat,
     floor.refBLng,
   ]
@@ -196,10 +202,10 @@ function getGeoReferenceInputError(floor: CompleteFloorGeoReference) {
     || !isValidLatLng({ lat: floor.refBLat, lng: floor.refBLng })) {
     return '基準点の緯度経度を確認してください。'
   }
-  if (floor.refAPixelX < 0 || floor.refAPixelX > floor.imageWidth
-    || floor.refBPixelX < 0 || floor.refBPixelX > floor.imageWidth
-    || floor.refAPixelY < 0 || floor.refAPixelY > floor.imageHeight
-    || floor.refBPixelY < 0 || floor.refBPixelY > floor.imageHeight) {
+  if (floor.refAImageX < 0 || floor.refAImageX > 1
+    || floor.refBImageX < 0 || floor.refBImageX > 1
+    || floor.refAImageY < 0 || floor.refAImageY > 1
+    || floor.refBImageY < 0 || floor.refBImageY > 1) {
     return 'イラスト上の基準点を画像の内側で選んでください。'
   }
   return null
@@ -255,6 +261,77 @@ export function toImageCoordinates(corners: FloorCorners): MapLibreImageCoordina
     [corners.bottomRight.lng, corners.bottomRight.lat],
     [corners.bottomLeft.lng, corners.bottomLeft.lat],
   ]
+}
+
+export interface ImagePosition {
+  x: number
+  y: number
+}
+
+export function snapMigrationImageCoordinate(value: number) {
+  if (Math.abs(value) <= IMAGE_SPATIAL_MIGRATION_EPSILON) return 0
+  if (Math.abs(value - 1) <= IMAGE_SPATIAL_MIGRATION_EPSILON) return 1
+  return value
+}
+
+export function isValidImagePosition(position: ImagePosition) {
+  return Number.isFinite(position.x) && Number.isFinite(position.y)
+    && position.x >= 0 && position.x <= 1
+    && position.y >= 0 && position.y <= 1
+}
+
+/** Convert canonical normalized IMAGE placement to transient MapLibre coordinates. */
+export function imageToRenderCoordinates(
+  floor: FloorGeoReferenceFields,
+  position: ImagePosition,
+): LatLng | null {
+  if (!isValidImagePosition(position)) return null
+  const corners = getFloorCorners(floor)
+  if (!corners) return null
+
+  const horizontal = {
+    lat: corners.topRight.lat - corners.topLeft.lat,
+    lng: corners.topRight.lng - corners.topLeft.lng,
+  }
+  const vertical = {
+    lat: corners.bottomLeft.lat - corners.topLeft.lat,
+    lng: corners.bottomLeft.lng - corners.topLeft.lng,
+  }
+  return {
+    lat: corners.topLeft.lat + horizontal.lat * position.x + vertical.lat * position.y,
+    lng: corners.topLeft.lng + horizontal.lng * position.x + vertical.lng * position.y,
+  }
+}
+
+/** Invert the current Floor render transform without clamping genuine out-of-bounds values. */
+export function renderToImageCoordinates(
+  floor: FloorGeoReferenceFields,
+  position: LatLng,
+): ImagePosition | null {
+  if (!isValidLatLng(position)) return null
+  const corners = getFloorCorners(floor)
+  if (!corners) return null
+
+  const hLng = corners.topRight.lng - corners.topLeft.lng
+  const hLat = corners.topRight.lat - corners.topLeft.lat
+  const vLng = corners.bottomLeft.lng - corners.topLeft.lng
+  const vLat = corners.bottomLeft.lat - corners.topLeft.lat
+  const dLng = position.lng - corners.topLeft.lng
+  const dLat = position.lat - corners.topLeft.lat
+  const determinant = hLng * vLat - hLat * vLng
+  if (!Number.isFinite(determinant) || Math.abs(determinant) < Number.EPSILON) return null
+
+  return {
+    x: (dLng * vLat - dLat * vLng) / determinant,
+    y: (hLng * dLat - hLat * dLng) / determinant,
+  }
+}
+
+export function constrainImagePosition(position: ImagePosition): ImagePosition {
+  return {
+    x: Math.min(1, Math.max(0, position.x)),
+    y: Math.min(1, Math.max(0, position.y)),
+  }
 }
 
 export function getGeoReferenceBounds(corners: FloorCorners) {

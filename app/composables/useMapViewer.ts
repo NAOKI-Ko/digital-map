@@ -1,6 +1,6 @@
 import { onBeforeUnmount, onMounted, readonly, ref, shallowRef, watch, type Ref } from 'vue'
 import type { GeolocateControl, IControl, Map as MapLibreMap, MapOptions, Marker, MarkerOptions, StyleSpecification } from 'maplibre-gl'
-import { getFloorCorners, getGeoReferenceBounds, isGeoReferenced, isWithinFloorArea, toImageCoordinates, type FloorCorners, type LatLng } from '~~/lib/geo'
+import { getFloorCorners, getGeoReferenceBounds, imageToRenderCoordinates, isGeoReferenced, isValidImagePosition, isWithinFloorArea, renderToImageCoordinates, toImageCoordinates, type FloorCorners, type ImagePosition, type LatLng } from '~~/lib/geo'
 import type { MapViewerCameraState, MapViewerFloor, MapViewerSpot } from '~~/shared/types/map-viewer'
 import { createSpotMarkerElement } from '~/utils/marker-element'
 import { applyMarkerDensityPresentation, getMarkerDensityPresentation } from '~/utils/marker-density'
@@ -45,13 +45,13 @@ export interface UseMapViewerOptions {
   mode: MapViewerMode
   floor: Readonly<Ref<MapViewerFloor>>
   spots: Readonly<Ref<readonly MapViewerSpot[]>>
-  position: Readonly<Ref<LatLng | null>>
+  position: Readonly<Ref<ImagePosition | null>>
   selectedSpotId: Readonly<Ref<string | null>>
   initialCamera?: MapViewerCameraState | null
   onReady?: (map: MapLibreMap) => void
   onCameraChanged?: (camera: MapViewerCameraState) => void
-  onPositionChanged?: (position: LatLng) => void
-  onSpotMoved?: (value: { spotId: string, lat: number, lng: number }) => void
+  onPositionChanged?: (position: ImagePosition) => void
+  onSpotMoved?: (value: { spotId: string, x: number, y: number }) => void
   onSpotSelected?: (spot: MapViewerSpot) => void
 }
 
@@ -132,6 +132,20 @@ export function addMarkerAtPosition<T extends PositionableMarker>(
   marker.setLngLat([position.lng, position.lat])
   marker.addTo(instance)
   return marker
+}
+
+export function getImagePlacementCandidate(floor: MapViewerFloor, position: LatLng) {
+  const candidate = renderToImageCoordinates(floor, position)
+  return candidate && isValidImagePosition(candidate) ? candidate : null
+}
+
+export function constrainImagePlacementCandidate(floor: MapViewerFloor, position: LatLng) {
+  const candidate = renderToImageCoordinates(floor, position)
+  if (!candidate) return null
+  return {
+    x: Math.min(1, Math.max(0, candidate.x)),
+    y: Math.min(1, Math.max(0, candidate.y)),
+  }
 }
 
 export function createSpotMarkerOptions(element: HTMLElement, mode: MapViewerMode): MarkerOptions {
@@ -272,7 +286,8 @@ export function useMapViewer(
           const target = event.originalEvent.target
           if (target instanceof Element && target.closest('.map-viewer-marker')) return
 
-          const position = { lat: event.lngLat.lat, lng: event.lngLat.lng }
+          const position = getImagePlacementCandidate(options.floor.value, event.lngLat)
+          if (!position) return
           syncDraftMarker(position)
           options.onPositionChanged?.(position)
         })
@@ -375,7 +390,9 @@ export function useMapViewer(
     const currentMaplibre = maplibre.value
     if (!instance || !currentMaplibre || !isReady.value) return
 
-    spotMarkers = options.spots.value.map((spot) => {
+    spotMarkers = options.spots.value.flatMap((spot) => {
+      const renderPosition = imageToRenderCoordinates(options.floor.value, spot)
+      if (!renderPosition) return []
       const element = createSpotMarkerElement(spot, {
         mode: options.mode,
         selected: spot.id === options.selectedSpotId.value,
@@ -384,13 +401,17 @@ export function useMapViewer(
       spotMarkerElements.push({ element, spot })
 
       const marker = new currentMaplibre.Marker(createSpotMarkerOptions(element, options.mode))
-        .setLngLat([spot.lng, spot.lat])
+        .setLngLat([renderPosition.lng, renderPosition.lat])
         .addTo(instance)
 
       if (options.mode === 'edit') {
         marker.on('dragend', () => {
           const lngLat = marker.getLngLat()
-          options.onSpotMoved?.({ spotId: spot.id, lat: lngLat.lat, lng: lngLat.lng })
+          const position = constrainImagePlacementCandidate(options.floor.value, lngLat)
+          if (!position) return
+          const constrainedRenderPosition = imageToRenderCoordinates(options.floor.value, position)
+          if (constrainedRenderPosition) marker.setLngLat([constrainedRenderPosition.lng, constrainedRenderPosition.lat])
+          options.onSpotMoved?.({ spotId: spot.id, ...position })
         })
       }
 
@@ -414,13 +435,16 @@ export function useMapViewer(
     })
   }
 
-  function syncDraftMarker(position: LatLng | null) {
+  function syncDraftMarker(position: ImagePosition | null) {
     if (options.mode !== 'edit') return
     const instance = map.value
     const currentMaplibre = maplibre.value
     if (!instance || !currentMaplibre || !isReady.value) return
 
-    if (!position) {
+    const renderPosition = position
+      ? imageToRenderCoordinates(options.floor.value, position)
+      : null
+    if (!renderPosition) {
       draftMarker?.remove()
       draftMarker = null
       return
@@ -430,11 +454,11 @@ export function useMapViewer(
       draftMarker = addMarkerAtPosition(
         new currentMaplibre.Marker(createDraftMarkerOptions()),
         instance,
-        position,
+        renderPosition,
       )
       return
     }
-    draftMarker.setLngLat([position.lng, position.lat])
+    draftMarker.setLngLat([renderPosition.lng, renderPosition.lat])
   }
 
   function removeFloorImage() {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { defineAsyncComponent } from 'vue'
 import { createMapEditorReturnQuery, resolveMapEditorReturnContext } from '~/utils/map-editor-camera'
-import { isGeoReferenced, type LatLng } from '~~/lib/geo'
+import { isGeoReferenced, type ImagePosition } from '~~/lib/geo'
 import type { MapFloorListResponse } from '~~/shared/types/floor'
 import type { MapViewerCameraState } from '~~/shared/types/map-viewer'
 import type { AdminSpotListResponse, AdminSpotSummary, PositionedAdminSpotSummary, SpotPositionResponse } from '~~/shared/types/spot'
@@ -21,7 +21,7 @@ const returnContext = resolveMapEditorReturnContext(
   data.value?.floors.map(floor => floor.id) ?? [],
 )
 const selectedFloorId = ref(requestedFloorId)
-const position = ref<LatLng | null>(null)
+const position = ref<ImagePosition | null>(null)
 const camera = ref<MapViewerCameraState | null>(returnContext)
 const initialCamera = ref<MapViewerCameraState | null>(returnContext)
 const selectedFloor = computed(() => data.value?.floors.find(floor => floor.id === selectedFloorId.value))
@@ -54,7 +54,7 @@ watch(selectedFloorId, () => {
 useHead({ title: 'ピン配置エディタ | デジタルマップ' })
 
 function hasPosition(spot: AdminSpotSummary): spot is PositionedAdminSpotSummary {
-  return spot.lat !== null && spot.lng !== null
+  return spot.x !== null && spot.y !== null
 }
 
 function startRegistration() {
@@ -66,8 +66,8 @@ function startRegistration() {
   return navigateTo({
     path: `/admin/maps/${mapId}/spots/new`,
     query: {
-      lat: position.value.lat.toString(),
-      lng: position.value.lng.toString(),
+      x: position.value.x.toString(),
+      y: position.value.y.toString(),
       ...returnQuery,
     },
   })
@@ -103,12 +103,12 @@ function handleCameraChanged(value: MapViewerCameraState) {
   }, { replace: true })
 }
 
-async function saveMovedSpot(value: { spotId: string, lat: number, lng: number }) {
+async function saveMovedSpot(value: { spotId: string, x: number, y: number }) {
   moveStatus.value = '位置を保存しています…'
   try {
     const response = await $fetch<SpotPositionResponse>(`/api/maps/${mapId}/spots/${value.spotId}/position`, {
       method: 'PATCH',
-      body: { lat: value.lat, lng: value.lng },
+      body: { x: value.x, y: value.y },
     })
     if (spotData.value) {
       spotData.value = {
@@ -174,8 +174,8 @@ async function saveMovedSpot(value: { spotId: string, lat: number, lng: number }
           </select>
           <h2 class="font-bold text-stone-900">仮配置した位置</h2>
           <div v-if="position" class="mt-4 rounded-lg bg-stone-100 p-4 font-mono text-sm text-stone-700">
-            <p>lat {{ position.lat.toFixed(7) }}</p>
-            <p class="mt-1">lng {{ position.lng.toFixed(7) }}</p>
+            <p>x {{ position.x.toFixed(7) }}</p>
+            <p class="mt-1">y {{ position.y.toFixed(7) }}</p>
           </div>
           <p v-else class="mt-4 text-sm leading-6 text-stone-600">まだピンはありません。地図上の登録したい場所をクリックしてください。</p>
           <button v-if="placementSpot" type="button" :disabled="!position" class="mt-5 w-full rounded-lg bg-terracotta-600 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50" @click="placeExistingSpot">この位置に配置する</button>
@@ -189,7 +189,7 @@ async function saveMovedSpot(value: { spotId: string, lat: number, lng: number }
             <ul v-else class="mt-3 space-y-2">
               <li v-for="spot in selectedFloorSpots" :key="spot.id" class="rounded-lg bg-stone-100 p-3">
                 <NuxtLink :to="`/admin/maps/${mapId}/spots/${spot.id}`" class="text-sm font-semibold text-stone-900 hover:text-terracotta-700">{{ spot.name }}</NuxtLink>
-                <p v-if="spot.lat !== null && spot.lng !== null" class="mt-1 font-mono text-[0.7rem] text-stone-500">{{ spot.lat.toFixed(6) }}, {{ spot.lng.toFixed(6) }}</p>
+                <p v-if="spot.x !== null && spot.y !== null" class="mt-1 font-mono text-[0.7rem] text-stone-500">x {{ spot.x.toFixed(4) }}, y {{ spot.y.toFixed(4) }}</p>
                 <button v-else type="button" class="mt-1 text-left text-xs font-semibold text-terracotta-700" @click="placementSpotId = spot.id">このスポットを地図上に配置</button>
               </li>
             </ul>

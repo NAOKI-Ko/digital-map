@@ -12,7 +12,7 @@ export default defineEventHandler(async (event): Promise<SpotPublishResponse> =>
     })
   }
 
-  if (result.data.isPublished && (spot.lat === null || spot.lng === null)) {
+  if (result.data.isPublished && (spot.x === null || spot.y === null)) {
     throw createError({
       statusCode: 422,
       statusMessage: '位置が未設定のスポットは公開できません。緯度と経度を設定してください。',

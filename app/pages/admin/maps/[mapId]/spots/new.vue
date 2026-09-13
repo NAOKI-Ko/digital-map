@@ -24,16 +24,16 @@ const editorReturnLocation = computed(() => returnContext.value
     }
   : null)
 
-function parseCoordinate(value: unknown, minimum: number, maximum: number) {
+function parseCoordinate(value: unknown) {
   if (typeof value !== 'string' || value.trim() === '') return null
   const parsed = Number(value)
-  return Number.isFinite(parsed) && parsed >= minimum && parsed <= maximum ? parsed : null
+  return Number.isFinite(parsed) && parsed >= 0 && parsed <= 1 ? parsed : null
 }
 
 const initialValue = computed<SpotFormInput>(() => {
   const requestedFloorId = typeof route.query.floorId === 'string' ? route.query.floorId : ''
-  const requestedLat = parseCoordinate(route.query.lat, -90, 90)
-  const requestedLng = parseCoordinate(route.query.lng, -180, 180)
+  const requestedX = parseCoordinate(route.query.x)
+  const requestedY = parseCoordinate(route.query.y)
   return {
     floorId: floors.value.some(floor => floor.id === requestedFloorId) ? requestedFloorId : '',
     name: '',
@@ -43,8 +43,8 @@ const initialValue = computed<SpotFormInput>(() => {
     hoursText: '',
     holidayText: '',
     phone: '',
-    lat: requestedLat !== null && requestedLng !== null ? requestedLat : null,
-    lng: requestedLat !== null && requestedLng !== null ? requestedLng : null,
+    x: requestedX !== null && requestedY !== null ? requestedX : null,
+    y: requestedX !== null && requestedY !== null ? requestedY : null,
   }
 })
 const isSubmitting = ref(false)

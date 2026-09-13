@@ -13,8 +13,8 @@ export interface MapViewerSpot {
   name: string
   categories: SpotCategorySummary[]
   importance: SpotImportance
-  lat: number
-  lng: number
+  x: number
+  y: number
   pinIconType: PinIconType
   pinIconId: string | null
   pinIconImageUrl: string | null

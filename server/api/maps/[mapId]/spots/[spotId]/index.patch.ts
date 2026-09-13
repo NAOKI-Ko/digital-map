@@ -20,7 +20,7 @@ export default defineEventHandler(async (event): Promise<AdminSpotResponse> => {
     throw createError({ statusCode: 422, statusMessage: '選択したフロアが見つかりません。' })
   }
 
-  if (ownedSpot.isPublished && (result.data.lat === null || result.data.lng === null)) {
+  if (ownedSpot.isPublished && (result.data.x === null || result.data.y === null)) {
     throw createError({
       statusCode: 422,
       statusMessage: '公開中のスポットから位置を削除できません。先に下書きへ戻してください。',

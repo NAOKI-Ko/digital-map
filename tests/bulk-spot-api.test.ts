@@ -53,7 +53,7 @@ describe('release security: Spot bulk API', () => {
 
   it('他Map Spotが1件でも混ざればtransaction前に全体を拒否する', async () => {
     mocks.readBody.mockResolvedValue({ action: 'delete', spotIds: ['spot-a', 'spot-b'] })
-    mocks.findMany.mockResolvedValue([{ id: 'spot-a', lat: 35, lng: 139 }])
+    mocks.findMany.mockResolvedValue([{ id: 'spot-a', x: 0.5, y: 0.5 }])
 
     await expect(handler({})).rejects.toMatchObject({ statusCode: 404 })
     expect(mocks.findMany).toHaveBeenCalledWith(expect.objectContaining({
@@ -64,7 +64,7 @@ describe('release security: Spot bulk API', () => {
 
   it('位置未設定Spotを含む一括公開をtransaction前に拒否する', async () => {
     mocks.readBody.mockResolvedValue({ action: 'publish', spotIds: ['spot-a'] })
-    mocks.findMany.mockResolvedValue([{ id: 'spot-a', lat: null, lng: null }])
+    mocks.findMany.mockResolvedValue([{ id: 'spot-a', x: null, y: null }])
 
     await expect(handler({})).rejects.toMatchObject({ statusCode: 422 })
     expect(mocks.transaction).not.toHaveBeenCalled()
@@ -73,8 +73,8 @@ describe('release security: Spot bulk API', () => {
   it('重複Spot IDを除去し、選択SpotだけのCategory relationをtransaction内で全置換する', async () => {
     mocks.readBody.mockResolvedValue({ action: 'setCategories', spotIds: ['spot-a', 'spot-a', 'spot-b'], categoryIds: ['category-a'] })
     mocks.findMany.mockResolvedValue([
-      { id: 'spot-a', lat: 35, lng: 139 },
-      { id: 'spot-b', lat: 36, lng: 140 },
+      { id: 'spot-a', x: 0.25, y: 0.25 },
+      { id: 'spot-b', x: 0.75, y: 0.75 },
     ])
     mocks.validateSpotCategories.mockResolvedValue([{ id: 'category-a' }])
 
@@ -91,7 +91,7 @@ describe('release security: Spot bulk API', () => {
 
   it('transaction失敗時は成功responseを返さない', async () => {
     mocks.readBody.mockResolvedValue({ action: 'unpublish', spotIds: ['spot-a'] })
-    mocks.findMany.mockResolvedValue([{ id: 'spot-a', lat: 35, lng: 139 }])
+    mocks.findMany.mockResolvedValue([{ id: 'spot-a', x: 0.5, y: 0.5 }])
     mocks.transaction.mockRejectedValue(new Error('transaction failed'))
 
     await expect(handler({})).rejects.toThrow('transaction failed')

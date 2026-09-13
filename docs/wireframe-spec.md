@@ -74,7 +74,7 @@ Ver.5 ― 2点合わせジオリファレンス方式(現行実装同期版)
 - 基準点A・Bの8項目が未設定または不完全なフロアでは現在地ボタンを非表示
 
 **データ項目**
-- ピン:lat, lng、categories[]、店名、importance(normal/featured)、pin_icon_type/pin_icon_id/pin_icon_image_url、pin_color
+- ピン:x, y(イラスト上の正規化座標)、categories[]、店名、importance(normal/featured)、pin_icon_type/pin_icon_id/pin_icon_image_url、pin_color
 
 ---
 
@@ -125,7 +125,7 @@ Ver.5 ― 2点合わせジオリファレンス方式(現行実装同期版)
    - 「この内容で保存」ボタン
 
 **データ項目**
-- refAPixelX/Y, refALat/Lng, refBPixelX/Y, refBLat/Lng
+- refAImageX/Y(各0..1), refALat/Lng, refBImageX/Y(各0..1), refBLat/Lng
 
 **留意点**
 - 基準点AとBが近すぎる場合(ピクセル距離・実距離のいずれかが一定未満)、保存時にエラーとし、「もっと離れた目印を選んでください」と案内する
@@ -180,10 +180,10 @@ User     (id, tenant_id, email, password_hash, role)
 Map      (id, tenant_id, name, slug, organization_name?, logo_url?, website_url?, sns_url?, is_published)
 Category (id, map_id, name, order)
 MapFloor (id, map_id, name, illustration_url, image_width, image_height, order,
-          ref_a_pixel_x, ref_a_pixel_y, ref_a_lat, ref_a_lng,
-          ref_b_pixel_x, ref_b_pixel_y, ref_b_lat, ref_b_lng)
+          ref_a_image_x, ref_a_image_y, ref_a_lat, ref_a_lng,
+          ref_b_image_x, ref_b_image_y, ref_b_lat, ref_b_lng)
 Spot     (id, floor_id, name, description,
-          lat?, lng?,
+          x?, y?,
           photos_json, hours_text, holiday_text, phone,
           pin_icon_type, pin_icon_id, pin_icon_image_url, pin_color, importance,
           is_published)
