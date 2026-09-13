@@ -28,3 +28,15 @@ export interface MapViewerCameraState {
   }
   zoom: number
 }
+
+export interface MapViewerDecoration {
+  id: string
+  imageUrl: string
+  imageWidth: number
+  imageHeight: number
+  x: number
+  y: number
+  width: number
+  rotation: number
+  order: number
+}

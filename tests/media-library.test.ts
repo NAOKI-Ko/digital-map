@@ -92,5 +92,6 @@ function emptyCounts() {
     categoryIcons: 0,
     spotPins: 0,
     spotPhotos: 0,
+    decorations: 0,
   }
 }

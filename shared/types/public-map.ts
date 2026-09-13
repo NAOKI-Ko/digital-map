@@ -1,5 +1,6 @@
 import type { PinIconType, SpotImportance } from '../constants/spot'
 import type { SpotCategorySummary } from './category'
+import type { MapViewerDecoration } from './map-viewer'
 
 export interface PublicSpotInformationField {
   id: string
@@ -43,6 +44,7 @@ export interface PublicFloor {
   refBLat: number | null
   refBLng: number | null
   spots: PublicSpot[]
+  decorations: MapViewerDecoration[]
 }
 
 export interface PublicMap {

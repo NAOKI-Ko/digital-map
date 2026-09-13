@@ -73,16 +73,16 @@ model Category {
 }
 
 model MapFloor {
-  id                  String      @id @default(cuid())
+  id                  String            @id @default(cuid())
   mapId               String
-  map                 Map         @relation(fields: [mapId], references: [id], onDelete: Cascade)
+  map                 Map               @relation(fields: [mapId], references: [id], onDelete: Cascade)
   name                String
   illustrationUrl     String
   illustrationAssetId String?
-  illustrationAsset   MediaAsset? @relation("FloorIllustrationAsset", fields: [illustrationAssetId], references: [id], onDelete: SetNull)
+  illustrationAsset   MediaAsset?       @relation("FloorIllustrationAsset", fields: [illustrationAssetId], references: [id], onDelete: SetNull)
   imageWidth          Int
   imageHeight         Int
-  order               Int         @default(0)
+  order               Int               @default(0)
   refAImageX          Float?
   refAImageY          Float?
   refALat             Float?
@@ -92,8 +92,9 @@ model MapFloor {
   refBLat             Float?
   refBLng             Float?
   spots               Spot[]
-  createdAt           DateTime    @default(now())
-  updatedAt           DateTime    @updatedAt
+  decorations         FloorDecoration[]
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
 
   @@index([mapId, order])
 }
@@ -128,6 +129,24 @@ model Spot {
 
   @@index([floorId])
   @@index([floorId, isPublished])
+}
+
+model FloorDecoration {
+  id        String     @id @default(cuid())
+  floorId   String
+  floor     MapFloor   @relation(fields: [floorId], references: [id], onDelete: Cascade)
+  assetId   String
+  asset     MediaAsset @relation(fields: [assetId], references: [id], onDelete: Restrict)
+  x         Float
+  y         Float
+  width     Float
+  rotation  Float      @default(0)
+  order     Int        @default(0)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@index([floorId, order])
+  @@index([assetId])
 }
 
 model SpotFieldDefinition {
@@ -165,23 +184,24 @@ model SpotFieldValue {
 }
 
 model MediaAsset {
-  id                 String      @id @default(cuid())
+  id                 String            @id @default(cuid())
   tenantId           String
-  tenant             Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  storageKey         String      @unique
+  tenant             Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  storageKey         String            @unique
   originalFilename   String
   mimeType           String
   width              Int
   height             Int
   fileSize           Int
   sha256             String?
-  mapLogos           Map[]       @relation("MapLogoAsset")
-  floorIllustrations MapFloor[]  @relation("FloorIllustrationAsset")
-  categoryIcons      Category[]  @relation("CategoryIconAsset")
-  spotPins           Spot[]      @relation("SpotPinAsset")
+  mapLogos           Map[]             @relation("MapLogoAsset")
+  floorIllustrations MapFloor[]        @relation("FloorIllustrationAsset")
+  categoryIcons      Category[]        @relation("CategoryIconAsset")
+  spotPins           Spot[]            @relation("SpotPinAsset")
   spotPhotos         SpotPhoto[]
-  createdAt          DateTime    @default(now())
-  updatedAt          DateTime    @updatedAt
+  decorations        FloorDecoration[]
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
 
   @@index([tenantId, createdAt])
   @@index([tenantId, sha256])

@@ -119,6 +119,7 @@ function selectSpot(spot: MapViewerSpot) {
           <LazyMapViewer
             :floor="selectedFloor"
             :spots="visibleSpots"
+            :decorations="selectedFloor.decorations"
             mode="view"
             :selected-spot-id="selectedSpotId"
             height="calc(100svh - 4rem)"

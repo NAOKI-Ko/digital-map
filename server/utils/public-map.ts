@@ -71,6 +71,10 @@ export function buildPublicMapQuery(slug: string) {
               spotCategories: { select: spotCategorySelect },
             },
           },
+          decorations: {
+            orderBy: [{ order: 'asc' as const }, { createdAt: 'asc' as const }],
+            select: { id: true, x: true, y: true, width: true, rotation: true, order: true, asset: { select: { storageKey: true, width: true, height: true } } },
+          },
         },
       },
     },
@@ -167,6 +171,7 @@ export function serializePublicMap(record: PublicMapRecord | null): PublicMap | 
           pinColor: spot.pinColor,
         }]
       }),
+      decorations: floor.decorations.map(item => ({ id: item.id, imageUrl: `/uploads/${item.asset.storageKey}`, imageWidth: item.asset.width, imageHeight: item.asset.height, x: item.x, y: item.y, width: item.width, rotation: item.rotation, order: item.order })),
     })),
   }
 }

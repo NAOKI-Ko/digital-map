@@ -1,7 +1,8 @@
 import { onBeforeUnmount, onMounted, readonly, ref, shallowRef, watch, type Ref } from 'vue'
 import type { GeolocateControl, IControl, Map as MapLibreMap, MapOptions, Marker, MarkerOptions, StyleSpecification } from 'maplibre-gl'
 import { getFloorCorners, getGeoReferenceBounds, imageToRenderCoordinates, isGeoReferenced, isValidImagePosition, isWithinFloorArea, renderToImageCoordinates, toImageCoordinates, type FloorCorners, type ImagePosition, type LatLng } from '~~/lib/geo'
-import type { MapViewerCameraState, MapViewerFloor, MapViewerSpot } from '~~/shared/types/map-viewer'
+import { getDecorationRenderCoordinates } from '~~/lib/decoration'
+import type { MapViewerCameraState, MapViewerDecoration, MapViewerFloor, MapViewerSpot } from '~~/shared/types/map-viewer'
 import { createSpotMarkerElement } from '~/utils/marker-element'
 import { applyMarkerDensityPresentation, getMarkerDensityPresentation } from '~/utils/marker-density'
 
@@ -45,6 +46,7 @@ export interface UseMapViewerOptions {
   mode: MapViewerMode
   floor: Readonly<Ref<MapViewerFloor>>
   spots: Readonly<Ref<readonly MapViewerSpot[]>>
+  decorations: Readonly<Ref<readonly MapViewerDecoration[]>>
   position: Readonly<Ref<ImagePosition | null>>
   selectedSpotId: Readonly<Ref<string | null>>
   draggableSpotId?: Readonly<Ref<string | null>>
@@ -254,6 +256,7 @@ export function useMapViewer(
   let currentLocationMarker: Marker | null = null
   let activeSourceId: string | null = null
   let activeLayerId: string | null = null
+  let decorationLayers: Array<{ sourceId: string, layerId: string }> = []
 
   async function initialize() {
     if (!container.value || map.value) return
@@ -467,6 +470,11 @@ export function useMapViewer(
     const instance = map.value
     if (!instance) return
 
+    decorationLayers.toReversed().forEach(({ sourceId, layerId }) => {
+      if (instance.getLayer(layerId)) instance.removeLayer(layerId)
+      if (instance.getSource(sourceId)) instance.removeSource(sourceId)
+    })
+    decorationLayers = []
     if (activeLayerId && instance.getLayer(activeLayerId)) {
       instance.removeLayer(activeLayerId)
     }
@@ -475,6 +483,25 @@ export function useMapViewer(
     }
     activeLayerId = null
     activeSourceId = null
+  }
+
+  function syncDecorations() {
+    const instance = map.value
+    if (!instance || !isReady.value) return
+    decorationLayers.toReversed().forEach(({ sourceId, layerId }) => {
+      if (instance.getLayer(layerId)) instance.removeLayer(layerId)
+      if (instance.getSource(sourceId)) instance.removeSource(sourceId)
+    })
+    decorationLayers = []
+    options.decorations.value.toSorted((a, b) => a.order - b.order).forEach((decoration) => {
+      const coordinates = getDecorationRenderCoordinates(options.floor.value, decoration)
+      if (!coordinates) return
+      const sourceId = `decoration-${decoration.id}`
+      const layerId = `${sourceId}-layer`
+      instance.addSource(sourceId, { type: 'image', url: decoration.imageUrl, coordinates })
+      instance.addLayer({ id: layerId, type: 'raster', source: sourceId })
+      decorationLayers.push({ sourceId, layerId })
+    })
   }
 
   function fitFloorBounds(corners: FloorCorners, animate: boolean) {
@@ -531,6 +558,7 @@ export function useMapViewer(
     })
     activeSourceId = sourceId
     activeLayerId = layerId
+    syncDecorations()
 
     fitFloorBounds(corners, animate)
     return true
@@ -540,6 +568,7 @@ export function useMapViewer(
   onBeforeUnmount(destroy)
 
   watch(() => options.spots.value, syncSpotMarkers, { deep: true })
+  watch(() => options.decorations.value, syncDecorations, { deep: true })
   watch(() => options.position.value, syncDraftMarker, { deep: true })
   watch(() => options.selectedSpotId.value, syncSpotMarkers)
   if (options.draggableSpotId) watch(() => options.draggableSpotId?.value, syncSpotMarkers)

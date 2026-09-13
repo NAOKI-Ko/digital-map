@@ -7,13 +7,14 @@ export interface MediaUsageCounts {
   categoryIcons: number
   spotPins: number
   spotPhotos: number
+  decorations: number
 }
 
 export function summarizeMediaUsage(counts: MediaUsageCounts): MediaAssetUsage {
   return {
     ...counts,
     total: counts.mapLogos + counts.floorIllustrations + counts.categoryIcons
-      + counts.spotPins + counts.spotPhotos,
+      + counts.spotPins + counts.spotPhotos + counts.decorations,
   }
 }
 
@@ -39,6 +40,7 @@ export async function requireOwnedMediaAsset(event: H3Event) {
           categoryIcons: true,
           spotPins: true,
           spotPhotos: true,
+          decorations: true,
         },
       },
     },

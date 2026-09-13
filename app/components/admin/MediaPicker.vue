@@ -4,7 +4,7 @@ import type { MediaAssetItem, MediaAssetListResponse } from '~~/shared/types/med
 import type { UploadedImage } from '~~/shared/types/upload'
 
 type Scope = 'recent' | 'map' | 'all'
-type UsageFilter = 'all' | 'floor' | 'photo' | 'category' | 'pin' | 'logo'
+type UsageFilter = 'all' | 'floor' | 'photo' | 'category' | 'pin' | 'logo' | 'decoration'
 
 const props = withDefaults(defineProps<{
   mapId: string
@@ -32,6 +32,7 @@ const visibleAssets = computed(() => {
       category: 'categoryIcons',
       pin: 'spotPins',
       logo: 'mapLogos',
+      decoration: 'decorations',
     }[usageFilter.value] as keyof MediaAssetItem['usage']
     assets = assets.filter(asset => asset.usage[field] > 0)
   }
@@ -70,7 +71,7 @@ async function useUpload(image: UploadedImage) {
         </div>
         <label class="mt-3 block text-xs font-semibold text-stone-700">用途フィルター
           <select v-model="usageFilter" class="mt-1 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm">
-            <option value="all">すべての用途</option><option value="floor">フロアイラスト</option><option value="photo">Spot写真</option><option value="category">Category</option><option value="pin">Custom PIN</option><option value="logo">ロゴ</option>
+            <option value="all">すべての用途</option><option value="floor">フロアイラスト</option><option value="photo">Spot写真</option><option value="category">Category</option><option value="pin">Custom PIN</option><option value="logo">ロゴ</option><option value="decoration">Decoration</option>
           </select>
         </label>
         <p class="mt-2 text-xs text-stone-500">用途は絞り込みだけに使われ、別用途の画像も選択できます。</p>

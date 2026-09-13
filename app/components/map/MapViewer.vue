@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { useMapViewer, type MapViewerMode } from '~/composables/useMapViewer'
 import type { ImagePosition } from '~~/lib/geo'
-import type { MapViewerCameraState, MapViewerFloor, MapViewerSpot } from '~~/shared/types/map-viewer'
+import type { MapViewerCameraState, MapViewerDecoration, MapViewerFloor, MapViewerSpot } from '~~/shared/types/map-viewer'
 
 const props = withDefaults(defineProps<{
   floor: MapViewerFloor
   spots?: readonly MapViewerSpot[]
+  decorations?: readonly MapViewerDecoration[]
   mode?: MapViewerMode
   modelValue?: ImagePosition | null
   selectedSpotId?: string | null
@@ -16,6 +17,7 @@ const props = withDefaults(defineProps<{
   initialCamera?: MapViewerCameraState | null
 }>(), {
   spots: () => [],
+  decorations: () => [],
   mode: 'view',
   modelValue: null,
   selectedSpotId: null,
@@ -36,12 +38,14 @@ const emit = defineEmits<{
 const container = useTemplateRef<HTMLDivElement>('container')
 const floor = toRef(props, 'floor')
 const spots = toRef(props, 'spots')
+const decorations = toRef(props, 'decorations')
 const position = toRef(props, 'modelValue')
 const selectedSpotId = toRef(props, 'selectedSpotId')
 const draggableSpotId = toRef(props, 'draggableSpotId')
 const { floorError, geolocationAreaMessage, mapError } = useMapViewer(container, {
   floor,
   spots,
+  decorations,
   position,
   selectedSpotId,
   draggableSpotId,

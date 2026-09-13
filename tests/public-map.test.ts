@@ -64,6 +64,7 @@ function mapRecord(overrides: {
       refBLat: null,
       refBLng: null,
       spots: overrides.spots ?? [publishedSpot],
+      decorations: [],
     }],
   }
 }
