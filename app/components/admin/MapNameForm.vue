@@ -16,7 +16,7 @@ const emit = defineEmits<{
   submit: [input: MapNameInput]
 }>()
 
-const { defineField, errors, handleSubmit, setErrors, setFieldValue } = useForm<MapNameInput>({
+const { defineField, errors, handleSubmit, meta, resetForm, setErrors } = useForm<MapNameInput>({
   initialValues: { name: props.initialName },
 })
 
@@ -24,7 +24,7 @@ const [name, nameAttrs] = defineField('name')
 
 watch(
   () => props.initialName,
-  value => setFieldValue('name', value),
+  value => resetForm({ values: { name: value } }),
 )
 
 const submit = handleSubmit((values) => {
@@ -77,4 +77,5 @@ const submit = handleSubmit((values) => {
       </button>
     </div>
   </form>
+  <UnsavedChangesGuard :dirty="meta.dirty && !isSubmitting" />
 </template>

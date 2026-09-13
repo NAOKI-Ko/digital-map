@@ -37,7 +37,7 @@ const emit = defineEmits<{
   submit: [input: SpotFormInput]
 }>()
 
-const { defineField, errors, handleSubmit, resetForm, setErrors } = useForm<SpotFormInput>({
+const { defineField, errors, handleSubmit, meta, resetForm, setErrors } = useForm<SpotFormInput>({
   initialValues: props.initialValue,
 })
 
@@ -175,4 +175,5 @@ const submit = handleSubmit((values) => {
       </button>
     </div>
   </form>
+  <UnsavedChangesGuard :dirty="meta.dirty && !isSubmitting" />
 </template>

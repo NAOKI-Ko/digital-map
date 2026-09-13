@@ -42,6 +42,7 @@ const design = reactive<PinDesignInput>({
 const isSaving = ref(false)
 const errorMessage = ref('')
 const successMessage = ref('')
+const isDirty = computed(() => JSON.stringify(design) !== JSON.stringify({ ...props.initialValue, pinIconId: normalizePinIconId(props.initialValue.pinIconId) }))
 const colorPresets = ['#C7401F', '#2563EB', '#047857', '#7C3AED', '#D97706', '#292524']
 const pinTypeOptions: Array<{ value: PinIconType, label: string, description: string }> = [
   { value: 'preset', label: 'プリセット', description: '用意された記号をピンの中に表示' },
@@ -239,6 +240,7 @@ async function save() {
     <p v-if="successMessage" role="status" class="mt-5 text-sm text-emerald-700">{{ successMessage }}</p>
     <div class="mt-6 flex justify-end"><button type="button" :disabled="isSaving" class="rounded-lg bg-terracotta-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60" @click="save">{{ isSaving ? '保存中…' : 'ピンデザインを保存' }}</button></div>
   </div>
+  <UnsavedChangesGuard :dirty="isDirty && !isSaving" />
 </template>
 
 <style>

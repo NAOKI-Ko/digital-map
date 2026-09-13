@@ -34,8 +34,8 @@ Start SHA: `a58b4353bd108e6586f329080c772f69b8aaffda`
 | WU-13 | KAN-11/14/31 | PASS | `4448f78` | Added independent small/medium/large pin size with medium migration default. Density uses discrete visibility: selected, active-category, featured, then normal; selected/filter matches bypass suppression, featured survives far zoom, and no opacity fade or user numeric tuning remains. Full 35 files / 269 tests, typecheck and build PASS. |
 | WU-14 | KAN-26/27/43 | PASS | `c977163` | Category management shows usage count and a filtered Spot-list link. Bulk Category controls appear only with a selection, operate on exactly one Category with confirmation, and use idempotent add/remove that preserves unrelated relations and rejects cross-Map IDs. Full 35 files / 271 tests, typecheck and build PASS. |
 | WU-15 | KAN-12/25/47 | PASS | `30e9d88` | Debounced real-time search, Category/Floor/position/publication filters and three sorts persist in URL; scroll and return location survive detail/bulk flows. Same-name rows show Category/Floor/placement and link to a selected editor PIN. Full 36 files / 274 tests, typecheck and build PASS. |
-| WU-16 | KAN-28 | PASS | PENDING COMMIT | Chose contract branch 2: MapLibre double-click zoom is explicitly disabled in both modes to avoid limit conflicts; supported Rhythm +/- navigation and native touch behavior remain enabled. Full 36 files / 275 tests and typecheck PASS. |
-| WU-17 | KAN-35 | PENDING | — | |
+| WU-16 | KAN-28 | PASS | `308374d` | Chose contract branch 2: MapLibre double-click zoom is explicitly disabled in both modes to avoid limit conflicts; supported +/- navigation and native touch behavior remain enabled. Full 36 files / 275 tests, typecheck and build PASS. |
+| WU-17 | KAN-35 | PASS | PENDING COMMIT | Reusable guard intercepts dirty in-app navigation with AppDialog stay/discard choices and uses beforeunload only for browser close/reload. Wired to map creation/name, Spot and PIN design; submitting/successful reset clears dirty state. Full 37 files / 279 tests and typecheck PASS. |
 | WU-18 | KAN-36 | PENDING | — | |
 | WU-19 | KAN-46 | PENDING | — | |
 | WU-20 | KAN-48 | PENDING | — | |

@@ -9,6 +9,7 @@ const selectedType = ref<'illustration' | null>(null)
 const form = reactive({ name: '', slug: '' })
 const errorMessage = ref('')
 const isSubmitting = ref(false)
+const isDirty = computed(() => selectedType.value !== null || form.name !== '' || form.slug !== '')
 
 function suggestSlug() {
   if (form.slug || !form.name) return
@@ -74,4 +75,5 @@ async function createMap() {
       </form>
     </section>
   </div>
+  <UnsavedChangesGuard :dirty="isDirty && !isSubmitting" />
 </template>
