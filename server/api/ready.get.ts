@@ -3,8 +3,9 @@ export default defineEventHandler(async (event) => {
   try { await prisma.$queryRaw`SELECT 1`; database = true }
   catch { database = false }
   const config = useRuntimeConfig(event)
-  const mailConfigured = process.env.NODE_ENV !== 'production' || (Boolean(config.resendApiKey) && Boolean(config.mailFrom))
+  const fakeMail = config.deploymentEnvironment !== 'production' && process.env.MAIL_PROVIDER === 'fake'
+  const mailConfigured = fakeMail || (Boolean(config.resendApiKey) && Boolean(config.mailFrom))
   const ready = database && mailConfigured
   if (!ready) setResponseStatus(event, 503)
-  return { status: ready ? 'ready' : 'not_ready', dependencies: { database, mail: mailConfigured ? 'configured' : 'not_configured' } }
+  return { status: ready ? 'ready' : 'not_ready', dependencies: { database, mail: fakeMail ? 'fake' : mailConfigured ? 'configured' : 'not_configured' } }
 })

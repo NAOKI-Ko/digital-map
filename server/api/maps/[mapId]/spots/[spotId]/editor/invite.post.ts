@@ -7,5 +7,5 @@ export default defineEventHandler(async (event) => {
   const result = await issueSpotEditorInvitation({ tenantId: map.tenantId, spotId: spot.id, email: input.email, createdById: session.user.id })
   const acceptanceUrl = `${configuredAdminBaseUrl(event)}/invite/accept?token=${encodeURIComponent(result.rawToken)}`
   const delivery = await sendTransactionalMail({ purpose: 'SPOT_EDITOR_INVITATION', to: input.email, url: acceptanceUrl })
-  return { invitation: result.invitation, delivery, ...(process.env.NODE_ENV !== 'production' ? { acceptanceUrl } : {}) }
+  return { invitation: result.invitation, delivery, ...(useRuntimeConfig(event).deploymentEnvironment !== 'production' ? { acceptanceUrl } : {}) }
 })

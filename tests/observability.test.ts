@@ -13,7 +13,7 @@ describe('WU-28 observability', () => {
   beforeAll(async () => {
     vi.stubGlobal('defineEventHandler', (handler: unknown) => handler)
     vi.stubGlobal('setResponseStatus', mocks.setResponseStatus)
-    vi.stubGlobal('useRuntimeConfig', () => ({ resendApiKey: 'configured', mailFrom: 'mail@example.com', opsAlertWebhookUrl: 'https://ops.example/hook' }))
+    vi.stubGlobal('useRuntimeConfig', () => ({ deploymentEnvironment: 'production', resendApiKey: 'configured', mailFrom: 'mail@example.com', opsAlertWebhookUrl: 'https://ops.example/hook' }))
     vi.stubGlobal('prisma', { $queryRaw: mocks.queryRaw })
     vi.stubGlobal('fetch', mocks.fetch)
     ;({ notifyOperations, operationalLog, resetAlertDedupeForTest } = await import('../server/utils/observability'))

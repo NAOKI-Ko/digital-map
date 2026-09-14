@@ -9,5 +9,5 @@ export default defineEventHandler(async (event) => {
   const verificationUrl = `${configuredAdminBaseUrl(event)}/signup/verify?token=${encodeURIComponent(rawToken)}`
   const delivery = await sendTransactionalMail({ purpose: 'SIGNUP_VERIFICATION', to: input.email, url: verificationUrl })
   setResponseStatus(event, 202)
-  return { accepted: true, deliveryStatus: delivery.status, ...(process.env.NODE_ENV !== 'production' && process.env.MAIL_PROVIDER !== 'resend' ? { verificationUrl } : {}) }
+  return { accepted: true, deliveryStatus: delivery.status, ...(useRuntimeConfig(event).deploymentEnvironment !== 'production' && process.env.MAIL_PROVIDER !== 'resend' ? { verificationUrl } : {}) }
 })

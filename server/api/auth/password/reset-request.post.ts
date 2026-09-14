@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
   if (issued) {
     const resetUrl = `${configuredAdminBaseUrl(event)}/reset-password?token=${encodeURIComponent(issued.rawToken)}`
     await sendTransactionalMail({ purpose: 'PASSWORD_RESET', to: input.email, url: resetUrl })
-    if (process.env.NODE_ENV !== 'production') response.resetUrl = resetUrl
+    if (useRuntimeConfig(event).deploymentEnvironment !== 'production') response.resetUrl = resetUrl
   }
   return response
 })

@@ -44,6 +44,17 @@ describe('WU-39 fixed URL/domain/TLS readiness', () => {
     expect(publicPage).toContain('public.publicBaseUrl')
   })
 
+  it('uses deployment environment—not optimized build mode—for QA-only raw links and fake-mail readiness', async () => {
+    const sources = await Promise.all([
+      readFile('server/api/ready.get.ts', 'utf8'),
+      readFile('server/api/auth/password/reset-request.post.ts', 'utf8'),
+      readFile('server/api/organization/invitations/index.post.ts', 'utf8'),
+      readFile('server/api/signup/index.post.ts', 'utf8'),
+    ])
+    for (const source of sources) expect(source).toContain('deploymentEnvironment')
+    expect(sources.join('\n')).not.toContain("process.env.NODE_ENV !== 'production'")
+  })
+
   it('enforces trusted hosts, HTTPS redirect, Secure-cookie/HSTS policy in production source', async () => {
     const [middleware, plugin, configSource] = await Promise.all([readFile('server/middleware/01.security.ts', 'utf8'), readFile('server/plugins/00.production-config.ts', 'utf8'), readFile('nuxt.config.ts', 'utf8')])
     expect(middleware).toContain("config.deploymentEnvironment === 'production'")

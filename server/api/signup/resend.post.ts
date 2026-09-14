@@ -15,5 +15,5 @@ export default defineEventHandler(async (event) => {
     await sendTransactionalMail({ purpose: 'SIGNUP_VERIFICATION', to: intent.email, url: verificationUrl })
   }
   setResponseStatus(event, 202)
-  return { accepted: true, ...(verificationUrl && process.env.NODE_ENV !== 'production' && process.env.MAIL_PROVIDER !== 'resend' ? { verificationUrl } : {}) }
+  return { accepted: true, ...(verificationUrl && useRuntimeConfig(event).deploymentEnvironment !== 'production' && process.env.MAIL_PROVIDER !== 'resend' ? { verificationUrl } : {}) }
 })

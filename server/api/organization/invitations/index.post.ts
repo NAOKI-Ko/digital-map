@@ -9,6 +9,6 @@ export default defineEventHandler(async (event) => {
   return {
     invitation: result.invitation,
     delivery,
-    ...(process.env.NODE_ENV !== 'production' ? { acceptanceUrl } : {}),
+    ...(useRuntimeConfig(event).deploymentEnvironment !== 'production' ? { acceptanceUrl } : {}),
   }
 })
