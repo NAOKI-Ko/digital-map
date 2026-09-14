@@ -165,3 +165,10 @@
 - Final code SHA `57aec7cc7ce8486038e92fcad306166b9e8780fa` passed local and Windows full suites at 62 files / 405 tests, typecheck, Prisma validate/generate, production build, and 28/28 migration status. Windows health and readiness pass with database=true and mail=fake.
 - The former local/Windows test-count discrepancy was caused by different tested SHAs, not a platform skip. Same-SHA final counts are exactly 405/405.
 - Evidence and full results are in `docs/qa/WU23-40-CODEX-AI-UAT-20260914.md` and `docs/qa/evidence/wu40-stageb/`. Stage B verdict is **READY FOR HUMAN UAT**; Human UAT remains **PENDING HUMAN EXECUTION**, WU-40 remains incomplete, and main is not merged.
+
+## WU-41 / KAN-71 release-in notes
+
+- Final code SHA `9245b4d77ddfb3ce828fc73cab2c6cc6b1f8ef59` adds one-Floor v2 round-trip CSV export, stable Spot identity, schema/row concurrency tokens, field-level preview, mixed CREATE/UPDATE, serializable atomic apply, bounded audit, reversible spreadsheet-formula protection, and preserves v1 create-only behavior.
+- Local and Windows gates match at focused 1 file / 16 tests and full 62 files / 413 tests; typecheck, Prisma validate/generate, production build, 28/28 migration status, health, and readiness pass. No migration was added.
+- Windows OWNER round-trip/conflict/Snapshot/SpotRevision, assigned/unassigned Map EDITOR, Spot Editor, cross-Tenant, public ja/en, and 390 x 844 responsive browser checks pass. Current QA code deployment is `9245b4d...`; rollback backup and old releases remain preserved.
+- WU-41 open defects are P0 0 / P1 0 / core P2 0 / P3 0. Human UAT remains **PENDING HUMAN EXECUTION** but may resume against the WU-41 SHA. Main has not been merged and Production has not been deployed.
