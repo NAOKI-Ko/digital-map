@@ -1,4 +1,5 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { readFile } from 'node:fs/promises'
 
 const mocks = vi.hoisted(() => ({
   requireUser: vi.fn(),
@@ -81,5 +82,14 @@ describe('release security: tenant / Map ownership boundary', () => {
     mocks.categoryFindFirst.mockResolvedValue(null)
     await expect(requireOwnedCategory('map-a', 'category-b')).rejects.toMatchObject({ statusCode: 404 })
     expect(mocks.categoryFindFirst).toHaveBeenCalledWith(expect.objectContaining({ where: { id: 'category-b', mapId: 'map-a' } }))
+  })
+
+  it('IMAGE spatial audit supports both legacy GEO and already-migrated schemas', async () => {
+    const source = await readFile('scripts/audit-image-spatial-migration.ts', 'utf8')
+    expect(source).toContain("column_name = 'lat'")
+    expect(source).toContain("schema: 'IMAGE'")
+    expect(source).toContain("schema: 'LEGACY_GEO'")
+    expect(source).toContain('("x" IS NULL) <> ("y" IS NULL)')
+    expect(source).toContain('"x" < 0 OR "x" > 1')
   })
 })

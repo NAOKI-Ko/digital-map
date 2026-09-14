@@ -38,8 +38,25 @@ else {
   try {
     await client.connect()
     await client.query('BEGIN TRANSACTION READ ONLY')
+    let exceptionCount = 0
+    const legacySchema = (await client.query<{ present: boolean }>(`
+      SELECT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_schema = current_schema() AND table_name = 'Spot' AND column_name = 'lat'
+      ) AS present
+    `)).rows[0]?.present === true
 
-    const floors = (await client.query<FloorRow>(`
+    if (!legacySchema) {
+      const invalidFloors = (await client.query(`SELECT "id", "mapId", "imageWidth", "imageHeight" FROM "MapFloor" WHERE "imageWidth" <= 0 OR "imageHeight" <= 0 ORDER BY "mapId", "id"`)).rows
+      const partialSpots = (await client.query(`SELECT "id", "floorId", "name", "x", "y" FROM "Spot" WHERE ("x" IS NULL) <> ("y" IS NULL) ORDER BY "floorId", "id"`)).rows
+      const outsideSpots = (await client.query(`SELECT "id", "floorId", "name", "x", "y" FROM "Spot" WHERE "x" < 0 OR "x" > 1 OR "y" < 0 OR "y" > 1 ORDER BY "floorId", "id"`)).rows
+      const invalidReferences = (await client.query(`SELECT "id", "mapId", "refAImageX", "refAImageY", "refBImageX", "refBImageY" FROM "MapFloor" WHERE ("refAImageX" IS NOT NULL AND ("refAImageX" < 0 OR "refAImageX" > 1)) OR ("refAImageY" IS NOT NULL AND ("refAImageY" < 0 OR "refAImageY" > 1)) OR ("refBImageX" IS NOT NULL AND ("refBImageX" < 0 OR "refBImageX" > 1)) OR ("refBImageY" IS NOT NULL AND ("refBImageY" < 0 OR "refBImageY" > 1)) ORDER BY "mapId", "id"`)).rows
+      const publishedUnpositionedSpots = (await client.query(`SELECT "id", "floorId", "name" FROM "Spot" WHERE "isPublished" AND ("x" IS NULL OR "y" IS NULL) ORDER BY "floorId", "id"`)).rows
+      console.log(JSON.stringify({ schema: 'IMAGE', invalidFloors, invalidReferences, partialSpots, outsideSpots, publishedUnpositionedSpots }, null, 2))
+      exceptionCount = invalidFloors.length + invalidReferences.length + partialSpots.length + outsideSpots.length
+    }
+    else {
+      const floors = (await client.query<FloorRow>(`
       SELECT f."id", f."mapId", f."illustrationUrl", f."imageWidth", f."imageHeight",
         f."refAPixelX", f."refAPixelY", f."refALat", f."refALng",
         f."refBPixelX", f."refBPixelY", f."refBLat", f."refBLng",
@@ -106,11 +123,12 @@ else {
       return [{ ...spot, rawX: position.x, rawY: position.y }]
     })
 
-    console.log(JSON.stringify({ invalidFloors, invalidReferences, partialSpots, outsideSpots, transformErrors }, null, 2))
+      console.log(JSON.stringify({ schema: 'LEGACY_GEO', invalidFloors, invalidReferences, partialSpots, outsideSpots, transformErrors }, null, 2))
+      exceptionCount = invalidFloors.length + invalidReferences.length
+        + partialSpots.length + outsideSpots.length + transformErrors.length
+    }
     await client.query('ROLLBACK')
 
-    const exceptionCount = invalidFloors.length + invalidReferences.length
-      + partialSpots.length + outsideSpots.length + transformErrors.length
     if (exceptionCount > 0) {
       console.error(`IMAGE spatial migration audit failed with ${exceptionCount} unresolved exception(s).`)
       process.exitCode = 1
