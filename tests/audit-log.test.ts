@@ -26,11 +26,14 @@ describe('WU-25 append-only audit log', () => {
 
   it('enforces owner-only tenant-scoped newest-first reads and exposes no mutation route', () => {
     const route = readFileSync(new URL('../server/api/organization/audit/index.get.ts', import.meta.url), 'utf8')
+    const page = readFileSync(new URL('../app/pages/admin/organization/audit.vue', import.meta.url), 'utf8')
     const migration = readFileSync(new URL('../prisma/migrations/20260914030000_audit_events/migration.sql', import.meta.url), 'utf8')
     expect(route).toContain('requireTenantOwner')
     expect(route).toContain('tenantId: tenant.id')
     expect(route).toContain("createdAt: 'desc'")
     expect(route).not.toMatch(/auditEvent\.(?:update|delete)/)
+    expect(page).toContain("await useFetch('/api/organization/audit')")
+    expect(page).not.toContain('await load()')
     expect(migration).toContain('AuditEvent_no_update_or_delete')
   })
 })
