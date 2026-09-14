@@ -197,6 +197,10 @@ model Map {
   logoAsset            MediaAsset?           @relation("MapLogoAsset", fields: [logoAssetId], references: [id], onDelete: SetNull)
   websiteUrl           String?
   snsUrl               String?
+  seoTitle             String?
+  seoDescription       String?
+  seoImageAssetId      String?
+  seoImageAsset        MediaAsset?           @relation("MapSeoImageAsset", fields: [seoImageAssetId], references: [id], onDelete: SetNull)
   isPublished          Boolean               @default(false)
   defaultLocale        String                @default("ja")
   enabledLocales       String[]              @default(["ja"])
@@ -214,6 +218,7 @@ model Map {
   updatedAt            DateTime              @updatedAt
 
   @@index([tenantId])
+  @@index([seoImageAssetId])
 }
 
 model PublicRelease {
@@ -539,6 +544,7 @@ model MediaAsset {
   fileSize           Int
   sha256             String?
   mapLogos           Map[]             @relation("MapLogoAsset")
+  mapSeoImages       Map[]             @relation("MapSeoImageAsset")
   floorIllustrations MapFloor[]        @relation("FloorIllustrationAsset")
   categoryIcons      Category[]        @relation("CategoryIconAsset")
   spotPins           Spot[]            @relation("SpotPinAsset")

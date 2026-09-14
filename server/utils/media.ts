@@ -4,6 +4,7 @@ import { selectMediaVariant } from './media-variants'
 
 export interface MediaUsageCounts {
   mapLogos: number
+  mapSeoImages?: number
   floorIllustrations: number
   categoryIcons: number
   spotPins: number
@@ -16,7 +17,8 @@ export interface MediaUsageCounts {
 export function summarizeMediaUsage(counts: MediaUsageCounts): MediaAssetUsage {
   return {
     ...counts,
-    total: counts.mapLogos + counts.floorIllustrations + counts.categoryIcons
+    mapSeoImages: counts.mapSeoImages ?? 0,
+    total: counts.mapLogos + (counts.mapSeoImages ?? 0) + counts.floorIllustrations + counts.categoryIcons
       + counts.spotPins + counts.spotPhotos + counts.revisionPhotos + counts.decorations + counts.tenantLogos,
   }
 }
@@ -41,6 +43,7 @@ export async function requireOwnedMediaAsset(event: H3Event) {
       _count: {
         select: {
           mapLogos: true,
+          mapSeoImages: true,
           floorIllustrations: true,
           categoryIcons: true,
           spotPins: true,

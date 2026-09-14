@@ -28,6 +28,9 @@ export function buildPublicMapQuery(slug: string) {
       organizationName: true,
       logoUrl: true,
       logoAsset: { select: { storageKey: true, variants: true } },
+      seoTitle: true,
+      seoDescription: true,
+      seoImageAsset: { select: { storageKey: true, variants: true } },
       websiteUrl: true,
       snsUrl: true,
       isPublished: true,
@@ -109,14 +112,21 @@ export function serializePublicMap(record: PublicMapRecord | null, requestedLoca
   const publicFields = record.spotFieldDefinitions
   const enabledLocales = record.enabledLocales?.length ? record.enabledLocales : ['ja']
   const locale = normalizeLocale(requestedLocale, enabledLocales)
+  const localizedName = translatedValue(record.name, record.translations ?? [], locale, 'name') ?? record.name
+  const localizedDescription = translatedValue(null, record.translations ?? [], locale, 'description') ?? ''
 
   return {
     id: record.id,
-    name: translatedValue(record.name, record.translations ?? [], locale, 'name') ?? record.name,
+    name: localizedName,
     slug: record.slug,
     locale,
     defaultLocale: 'ja',
     enabledLocales: enabledLocales.filter((value): value is AppLocale => value === 'ja' || value === 'en'),
+    seo: {
+      title: record.seoTitle || localizedName,
+      description: record.seoDescription || localizedDescription,
+      imageUrl: optimizedUrl(record.seoImageAsset, 'spot-photo', null) ?? optimizedUrl(record.logoAsset, 'logo', record.logoUrl) ?? record.floors[0]?.illustrationUrl ?? null,
+    },
     organizationName: record.organizationName,
     logoUrl: optimizedUrl(record.logoAsset, 'logo', record.logoUrl),
     websiteUrl: record.websiteUrl,

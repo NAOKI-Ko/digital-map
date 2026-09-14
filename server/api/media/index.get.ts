@@ -9,6 +9,7 @@ export default defineEventHandler(async (event): Promise<MediaAssetListResponse>
     orderBy: { createdAt: 'desc' },
     include: {
       mapLogos: { select: { id: true } },
+      mapSeoImages: { select: { id: true } },
       floorIllustrations: { select: { mapId: true } },
       categoryIcons: { select: { mapId: true } },
       spotPins: { select: { floor: { select: { mapId: true } } } },
@@ -18,6 +19,7 @@ export default defineEventHandler(async (event): Promise<MediaAssetListResponse>
       _count: {
         select: {
           mapLogos: true,
+          mapSeoImages: true,
           floorIllustrations: true,
           categoryIcons: true,
           spotPins: true,
@@ -49,6 +51,7 @@ export default defineEventHandler(async (event): Promise<MediaAssetListResponse>
       usage: summarizeMediaUsage(asset._count),
       usedInMapIds: [...new Set([
         ...asset.mapLogos.map(map => map.id),
+        ...asset.mapSeoImages.map(map => map.id),
         ...asset.floorIllustrations.map(floor => floor.mapId),
         ...asset.categoryIcons.map(category => category.mapId),
         ...asset.spotPins.map(spot => spot.floor.mapId),

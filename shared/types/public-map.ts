@@ -56,6 +56,7 @@ export interface PublicMap {
   locale: 'ja' | 'en'
   defaultLocale: 'ja'
   enabledLocales: Array<'ja' | 'en'>
+  seo: { title: string, description: string, imageUrl: string | null }
   organizationName: string | null
   logoUrl: string | null
   websiteUrl: string | null

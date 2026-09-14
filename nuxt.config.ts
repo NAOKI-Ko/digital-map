@@ -48,5 +48,8 @@ export default defineNuxtConfig({
         path: '/',
       },
     },
+    public: {
+      publicBaseUrl: process.env.PUBLIC_BASE_URL || 'http://localhost:3000',
+    },
   },
 })

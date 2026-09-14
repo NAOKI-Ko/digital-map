@@ -17,7 +17,8 @@
 | WU-30 | KAN-60 | `c607b5d` | `3529701` | `20260914060000_ja_en_translations` | 3 files / 20 tests PASS | 51 files / 343 tests PASS | PASS | validate + generate PASS | PASS | none | PASS |
 | WU-31 | KAN-64 | `3529701` | `e63d79a` | `20260914070000_media_variants` | 3 files / 14 tests PASS | 52 files / 347 tests PASS | PASS | validate + generate PASS | phase boundary pending | none | PASS |
 | WU-32 | KAN-57 | `e63d79a` | `6d383b0` | `20260914080000_public_releases` | 3 files / 16 tests PASS | 53 files / 353 tests PASS | PASS | validate + generate PASS | PASS | Cloudflare R2 credentials pending; local adapter PASS | PASS |
-| WU-33 | KAN-55 | `6d383b0` | this WU commit | `20260914090000_public_analytics` | 3 files / 17 tests PASS | 54 files / 359 tests PASS | PASS | validate + generate PASS | not required | none | PASS |
+| WU-33 | KAN-55 | `6d383b0` | `d05583a` | `20260914090000_public_analytics` | 3 files / 17 tests PASS | 54 files / 359 tests PASS | PASS | validate + generate PASS | not required | none | PASS |
+| WU-34 | KAN-62 | `d05583a` | this WU commit | `20260914100000_map_seo` | 4 files / 24 tests PASS | 55 files / 364 tests PASS | PASS | validate + generate PASS | not required | none | PASS |
 
 ## WU-23 notes
 
@@ -96,3 +97,10 @@
 - Events remain in a process-local UTC daily aggregate buffer and flush every 30 seconds or at threshold. Abrupt process loss may lose a small number of non-critical events; JST is the dashboard display policy.
 - Flush validates published Map and Map–Spot relationships in batches, then uses atomic aggregate upserts. Raw event rows, IP addresses, cookies, fingerprints, and persistent visitor identifiers are not stored.
 - Analytics uses the WU-27 irreversible rate-key framework with a higher public threshold and obvious-bot filtering. OWNER and assigned Map EDITOR reads remain tenant/Map constrained.
+
+## WU-34 notes
+
+- Authorized OWNER/Map EDITOR may set optional SEO title, description, and a same-Tenant representative MediaAsset. Empty settings fall back to the localized Snapshot Map name/description and available public imagery.
+- Public title, description, canonical, Open Graph, X card, locale, and hreflang values are computed exclusively from the current Snapshot payload plus configured public origin; no per-view admin DB query exists.
+- Japanese retains the path-only canonical, English uses `?lang=en`, and `x-default` points to Japanese. Missing/unpublished Snapshot responses are noindex.
+- Sitemap output is cached, includes only published Maps with a current release, and carries locale alternates. Robots exposes the sitemap and excludes admin/API crawling.

@@ -28,6 +28,9 @@ const translation = reactive({
 })
 const translationState = ref<'idle' | 'saving' | 'success' | 'error'>('idle')
 const translationMessage = ref('')
+const seo = reactive({ title: data.value?.map.seoTitle ?? '', description: data.value?.map.seoDescription ?? '', imageAssetId: data.value?.map.seoImageAssetId ?? null as string | null })
+const seoState = ref<'idle' | 'saving' | 'success' | 'error'>('idle')
+const seoMessage = ref('')
 const branding = reactive({
   organizationName: data.value?.map.organizationName ?? '',
   logoUrl: data.value?.map.logoUrl ?? '',
@@ -112,6 +115,12 @@ async function saveTranslation() {
     translationMessage.value = error?.data?.statusMessage ?? '英語訳を保存できませんでした。'
   }
 }
+
+async function saveSeo() {
+  seoState.value = 'saving'
+  try { await $fetch(`/api/maps/${mapId}/seo`, { method: 'PATCH', body: seo }); seoState.value = 'success'; seoMessage.value = 'SEO設定を保存しました。次回公開時にSnapshotへ反映されます。' }
+  catch { seoState.value = 'error'; seoMessage.value = 'SEO設定を保存できませんでした。' }
+}
 </script>
 
 <template>
@@ -177,6 +186,8 @@ async function saveTranslation() {
           <button class="rounded-lg bg-stone-900 px-5 py-2.5 text-sm font-semibold text-white" :disabled="translationState === 'saving'">言語設定を保存</button>
         </form>
       </section>
+
+      <section class="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8"><h2 class="text-lg font-bold">SEO / シェア表示</h2><p class="mt-1 text-sm text-stone-600">空欄は公開言語のMap名・説明・画像へフォールバックします。</p><form class="mt-5 space-y-4" @submit.prevent="saveSeo"><label class="block text-sm font-semibold">SEO title<input v-model="seo.title" maxlength="100" class="mt-1 w-full rounded border px-3 py-2"></label><label class="block text-sm font-semibold">Description<textarea v-model="seo.description" maxlength="300" rows="3" class="mt-1 w-full rounded border px-3 py-2" /></label><MediaPicker :map-id="mapId" label="代表画像" usage="logo" @selected="seo.imageAssetId = $event.assetId" /><SaveFeedback :state="seoState" :message="seoMessage" /><button class="rounded bg-stone-900 px-4 py-2 text-sm font-semibold text-white">SEO設定を保存</button></form></section>
 
       <section class="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
         <div>

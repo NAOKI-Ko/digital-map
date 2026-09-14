@@ -1,5 +1,6 @@
 export interface MediaAssetUsage {
   mapLogos: number
+  mapSeoImages: number
   floorIllustrations: number
   categoryIcons: number
   spotPins: number
