@@ -1,13 +1,9 @@
 import { z } from 'zod'
-
-const localUploadUrlSchema = z.string().regex(
-  /^\/uploads\/[0-9a-f-]+\.(?:png|jpg)$/,
-  'アップロード済みの画像を選択してください。',
-)
+import { uploadedImageUrlSchema } from '~~/shared/schemas/photo'
 
 export const floorCreateSchema = z.object({
   name: z.string().trim().min(1, 'フロア名を入力してください。').max(50, 'フロア名は50文字以内で入力してください。'),
-  illustrationUrl: localUploadUrlSchema,
+  illustrationUrl: uploadedImageUrlSchema,
   imageWidth: z.number().int().positive('画像の幅を読み取れませんでした。'),
   imageHeight: z.number().int().positive('画像の高さを読み取れませんでした。'),
   illustrationAssetId: z.string().min(1).optional(),
@@ -15,7 +11,7 @@ export const floorCreateSchema = z.object({
 
 export const floorUpdateSchema = z.object({
   name: z.string().trim().min(1, 'フロア名を入力してください。').max(50, 'フロア名は50文字以内で入力してください。'),
-  illustrationUrl: localUploadUrlSchema.optional(),
+  illustrationUrl: uploadedImageUrlSchema.optional(),
   imageWidth: z.number().int().positive().optional(),
   imageHeight: z.number().int().positive().optional(),
   illustrationAssetId: z.string().min(1).nullable().optional(),

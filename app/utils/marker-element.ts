@@ -28,10 +28,26 @@ export function getSpotMarkerPresentation(spot: MapViewerSpot) {
 export interface CreateSpotMarkerElementOptions {
   mode: 'view' | 'edit'
   selected: boolean
+  draggable?: boolean
   onSelected?: () => void
 }
 
 type MarkerDocument = Pick<Document, 'createElement'>
+
+export function createDraftMarkerElement(ownerDocument: MarkerDocument = document) {
+  const element = ownerDocument.createElement('div')
+  element.className = 'map-viewer-draft-marker'
+  element.setAttribute('role', 'img')
+  element.setAttribute('aria-label', '仮配置したピン')
+  const badge = ownerDocument.createElement('span')
+  badge.className = 'map-viewer-draft-marker__badge'
+  badge.textContent = '仮配置'
+  const pin = ownerDocument.createElement('span')
+  pin.className = 'map-viewer-draft-marker__pin'
+  pin.setAttribute('aria-hidden', 'true')
+  element.append(badge, pin)
+  return element
+}
 
 export function createSpotMarkerElement(
   spot: MapViewerSpot,
@@ -52,7 +68,9 @@ export function createSpotMarkerElement(
   element.style.setProperty('--pin-color-light', presentation.lightColor)
   element.style.setProperty('--pin-color-dark', presentation.darkColor)
   element.setAttribute('aria-label', options.mode === 'edit'
-    ? `${spot.name}をドラッグして位置調整`
+    ? options.draggable
+      ? `${spot.name}をドラッグして位置調整`
+      : `${spot.name}を選択`
     : `${spot.name}の詳細を表示`)
   element.title = spot.name
 

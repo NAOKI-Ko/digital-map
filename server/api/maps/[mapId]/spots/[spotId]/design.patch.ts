@@ -1,5 +1,5 @@
 import { pinDesignSchema } from '~~/shared/schemas/pin-design'
-import { normalizePinIconType, normalizePinSize } from '~~/shared/constants/spot'
+import { normalizePinIconType, normalizePinSize, normalizeSpotImportance } from '~~/shared/constants/spot'
 import type { SpotPinDesignResponse } from '~~/shared/types/spot'
 import { resolveTenantMediaAsset } from '~~/server/utils/media'
 
@@ -25,6 +25,7 @@ export default defineEventHandler(async (event): Promise<SpotPinDesignResponse> 
       pinIconAssetId: result.data.pinIconType === 'preset' ? null : asset?.id,
       pinColor: result.data.pinColor.toUpperCase(),
       pinSize: result.data.pinSize,
+      ...(result.data.importance ? { importance: result.data.importance } : {}),
     },
     select: {
       pinIconType: true,
@@ -33,6 +34,7 @@ export default defineEventHandler(async (event): Promise<SpotPinDesignResponse> 
       pinIconAssetId: true,
       pinColor: true,
       pinSize: true,
+      importance: true,
     },
   })
 
@@ -41,6 +43,7 @@ export default defineEventHandler(async (event): Promise<SpotPinDesignResponse> 
       ...updatedSpot,
       pinIconType: normalizePinIconType(updatedSpot.pinIconType),
       pinSize: normalizePinSize(updatedSpot.pinSize),
+      importance: normalizeSpotImportance(updatedSpot.importance),
     },
   }
 })

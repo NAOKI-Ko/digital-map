@@ -29,6 +29,7 @@ const props = defineProps<{
     pinIconAssetId?: string | null
     pinColor: string
     pinSize: PinSize
+    importance?: 'normal' | 'featured'
   }
 }>()
 
@@ -39,11 +40,13 @@ const emit = defineEmits<{
 const design = reactive<PinDesignInput>({
   ...props.initialValue,
   pinIconId: normalizePinIconId(props.initialValue.pinIconId),
+  importance: props.initialValue.importance ?? 'normal',
 })
 const isSaving = ref(false)
 const errorMessage = ref('')
 const successMessage = ref('')
-const isDirty = computed(() => JSON.stringify(design) !== JSON.stringify({ ...props.initialValue, pinIconId: normalizePinIconId(props.initialValue.pinIconId) }))
+const normalizedInitialValue = computed(() => ({ ...props.initialValue, pinIconId: normalizePinIconId(props.initialValue.pinIconId), importance: props.initialValue.importance ?? 'normal' }))
+const isDirty = computed(() => JSON.stringify(design) !== JSON.stringify(normalizedInitialValue.value))
 const colorPresets = ['#C7401F', '#2563EB', '#047857', '#7C3AED', '#D97706', '#292524']
 const pinTypeOptions: Array<{ value: PinIconType, label: string, description: string }> = [
   { value: 'preset', label: 'プリセット', description: '用意された記号をピンの中に表示' },
@@ -80,7 +83,7 @@ const previewStyle = computed(() => {
 })
 
 watch(() => props.initialValue, (value) => {
-  Object.assign(design, value, { pinIconId: normalizePinIconId(value.pinIconId) })
+  Object.assign(design, value, { pinIconId: normalizePinIconId(value.pinIconId), importance: value.importance ?? 'normal' })
 }, { deep: true })
 
 watch(() => design.pinIconId, (pinIconId) => {
@@ -135,7 +138,6 @@ async function save() {
     <div class="grid gap-8 lg:grid-cols-[1fr_15rem]">
       <div>
         <h2 class="text-lg font-bold text-stone-900">ピンデザイン</h2>
-        <p class="mt-1 text-sm text-stone-600">地図上でスポットをどのように見せるか選びます。</p>
 
         <fieldset class="mt-6">
           <legend class="text-sm font-semibold text-stone-800">表示方式</legend>
@@ -213,11 +215,20 @@ async function save() {
           </div>
         </fieldset>
 
+        <fieldset class="mt-7">
+          <legend class="text-sm font-semibold text-stone-800">表示優先度</legend>
+          <div class="mt-3 flex gap-2">
+            <label v-for="item in [{ id: 'normal', label: '通常' }, { id: 'featured', label: '注目' }]" :key="item.id" class="rounded-lg border px-4 py-2 text-sm">
+              <input v-model="design.importance" type="radio" name="pin-importance" :value="item.id" class="mr-2">{{ item.label }}
+            </label>
+          </div>
+        </fieldset>
+
         <div v-if="usesUploadedImage" class="mt-7 border-t border-stone-200 pt-7">
           <h3 class="text-sm font-semibold text-stone-800">{{ uploadHeading }}</h3>
           <p v-if="design.pinIconType === 'custom'" class="mt-1 text-xs leading-5 text-stone-500">ロゴなど、背景が透明で正方形に近いPNG/JPEGを推奨します。</p>
           <p v-else class="mt-1 text-xs leading-5 text-stone-500">透過PNGを推奨します。画像の縦横比は保ったまま、台座を付けずに表示します。</p>
-          <div class="mt-3 max-w-3xl"><MediaPicker :map-id="mapId" :label="uploadLabel" usage="pin" @selected="useCustomImage" /></div>
+          <div class="mt-3 max-w-3xl"><MediaPicker :map-id="mapId" :label="uploadLabel" usage="pin" :selected-url="design.pinIconImageUrl" @selected="useCustomImage" /></div>
         </div>
       </div>
 

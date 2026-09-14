@@ -1,6 +1,8 @@
 import { z } from 'zod'
 
-export const uploadedImageUrlSchema = z.string().regex(/^\/uploads\/[0-9a-f-]+\.(?:png|jpg)$/)
+export const uploadedImageUrlSchema = z.string().regex(
+  /^\/uploads\/[A-Za-z0-9][A-Za-z0-9._-]*\.(?:png|jpe?g|webp)$/,
+)
 
 export const spotPhotosSchema = z.object({
   photos: z.array(uploadedImageUrlSchema).max(6, '写真は6枚まで登録できます。').refine(

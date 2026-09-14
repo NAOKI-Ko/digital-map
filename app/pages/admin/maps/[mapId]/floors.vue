@@ -102,6 +102,7 @@ async function createFloor() {
       illustrationUrl: '',
       imageWidth: 0,
       imageHeight: 0,
+      illustrationAssetId: undefined,
     })
     createPickerRevision.value += 1
     saveMessage.value = 'フロアを追加しました。'
@@ -232,7 +233,6 @@ async function confirmDeleteFloor() {
     <header class="mt-5">
       <p class="text-sm font-medium text-terracotta-700">マップ設定</p>
       <h1 class="mt-1 text-2xl font-bold tracking-tight text-stone-900 sm:text-2xl">フロア管理</h1>
-      <p class="mt-2 text-sm text-stone-600">フロアごとのイラスト、名称、ジオリファレンス設定状況を管理します。</p>
     </header>
     <SaveFeedback class="mt-6" :state="saveState" :message="saveMessage" />
 
@@ -245,8 +245,7 @@ async function confirmDeleteFloor() {
             <label for="new-floor-name" class="text-sm font-semibold text-stone-800">フロア名</label>
             <input id="new-floor-name" v-model="createInput.name" maxlength="50" class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5" placeholder="例：1F / B1 / 屋外エリア">
           </div>
-          <p class="rounded-lg bg-stone-50 p-4 text-sm leading-6 text-stone-700">フロア追加後、必要に応じて2点合わせを設定できます。未設定でもイラスト表示とピン配置は利用できますが、現在地機能は利用できません。</p>
-          <p v-if="createInput.illustrationUrl" class="break-all text-xs text-emerald-700">画像を選択済み: {{ createInput.illustrationUrl }}</p>
+          <p class="text-sm leading-6 text-stone-600">現在地機能を使う場合は、追加後に2点合わせを設定します。</p>
           <p v-if="createError" role="alert" class="text-sm text-red-600">{{ createError }}</p>
           <button type="submit" :disabled="isCreating" class="rounded-lg bg-terracotta-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60">
             {{ isCreating ? '追加中…' : 'フロアを追加する' }}
@@ -259,7 +258,6 @@ async function confirmDeleteFloor() {
       <div class="flex items-end justify-between">
         <div>
           <h2 class="text-lg font-bold text-stone-900">登録済みフロア</h2>
-          <p class="mt-1 text-sm text-stone-600">上下ボタンで公開画面の表示順を変更できます。</p>
         </div>
         <span v-if="data" class="text-sm text-stone-500">{{ data.floors.length }}件</span>
       </div>

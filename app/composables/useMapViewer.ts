@@ -3,7 +3,7 @@ import type { GeolocateControl, GeolocatePositionEvent, IControl, Map as MapLibr
 import { getFloorCorners, getGeoReferenceBounds, imageToRenderCoordinates, isGeoReferenced, isValidImagePosition, isWithinFloorArea, renderToImageCoordinates, toImageCoordinates, type FloorCorners, type ImagePosition, type LatLng } from '~~/lib/geo'
 import { getDecorationRenderCoordinates } from '~~/lib/decoration'
 import type { MapViewerCameraState, MapViewerDecoration, MapViewerFloor, MapViewerSpot } from '~~/shared/types/map-viewer'
-import { createSpotMarkerElement } from '~/utils/marker-element'
+import { createDraftMarkerElement, createSpotMarkerElement } from '~/utils/marker-element'
 import { applyMarkerDensityPresentation, getMarkerDensityPresentation } from '~/utils/marker-density'
 
 export type MapViewerMode = 'view' | 'edit'
@@ -49,6 +49,7 @@ export interface UseMapViewerOptions {
   decorations: Readonly<Ref<readonly MapViewerDecoration[]>>
   position: Readonly<Ref<ImagePosition | null>>
   selectedSpotId: Readonly<Ref<string | null>>
+  placementEnabled?: Readonly<Ref<boolean>>
   draggableSpotId?: Readonly<Ref<string | null>>
   prioritizeVisibleSpots?: Readonly<Ref<boolean>>
   initialCamera?: MapViewerCameraState | null
@@ -165,7 +166,8 @@ export function createSpotMarkerOptions(element: HTMLElement, mode: MapViewerMod
 
 export function createDraftMarkerOptions(): MarkerOptions {
   return {
-    color: '#C7401F',
+    ...(typeof document === 'undefined' ? {} : { element: createDraftMarkerElement() }),
+    anchor: 'bottom',
     subpixelPositioning: true,
   }
 }
@@ -295,6 +297,7 @@ export function useMapViewer(
 
       if (options.mode === 'edit') {
         instance.on('click', (event) => {
+          if (!options.placementEnabled?.value) return
           const target = event.originalEvent.target
           if (target instanceof Element && target.closest('.map-viewer-marker')) return
 
@@ -405,14 +408,15 @@ export function useMapViewer(
     spotMarkers = options.spots.value.flatMap((spot) => {
       const renderPosition = imageToRenderCoordinates(options.floor.value, spot)
       if (!renderPosition) return []
+      const isDraggable = options.mode === 'edit' && options.draggableSpotId?.value === spot.id
       const element = createSpotMarkerElement(spot, {
         mode: options.mode,
         selected: spot.id === options.selectedSpotId.value,
+        draggable: isDraggable,
         onSelected: () => options.onSpotSelected?.(spot),
       })
       spotMarkerElements.push({ element, spot })
 
-      const isDraggable = options.mode === 'edit' && options.draggableSpotId?.value === spot.id
       const marker = new currentMaplibre.Marker(createSpotMarkerOptions(element, options.mode, isDraggable))
         .setLngLat([renderPosition.lng, renderPosition.lat])
         .addTo(instance)

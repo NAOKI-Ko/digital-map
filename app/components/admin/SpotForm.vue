@@ -46,7 +46,6 @@ const { defineField, errors, handleSubmit, meta, resetForm, setErrors } = useFor
 const [floorId, floorIdAttrs] = defineField('floorId')
 const [name, nameAttrs] = defineField('name')
 const [categoryIds] = defineField('categoryIds')
-const [importance, importanceAttrs] = defineField('importance')
 const [description, descriptionAttrs] = defineField('description')
 const [address, addressAttrs] = defineField('address')
 const [website, websiteAttrs] = defineField('website')
@@ -123,14 +122,6 @@ const submit = handleSubmit((values) => {
             </label>
           </div>
           <p v-else class="mt-2 text-sm text-amber-700">カテゴリーはまだありません。マップ設定のカテゴリー管理から追加できます。</p>
-        </div>
-        <div>
-          <label for="spot-importance" class="text-sm font-semibold text-stone-800">地図上の重要度</label>
-          <select id="spot-importance" v-model="importance" v-bind="importanceAttrs" class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5">
-            <option value="normal">通常</option>
-            <option value="featured">注目（縮小時も優先表示）</option>
-          </select>
-          <p class="mt-1 text-xs text-stone-500">PINの種類や画像とは独立した表示優先度です。</p>
         </div>
         <div v-if="descriptionField" class="sm:col-span-2">
           <label for="spot-description" class="text-sm font-semibold text-stone-800">{{ descriptionField.label }} <span v-if="descriptionField.required" class="text-red-600">必須</span></label>

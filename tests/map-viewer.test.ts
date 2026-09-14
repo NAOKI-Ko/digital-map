@@ -227,7 +227,7 @@ describe('Markerの表示内容', () => {
 
   it('仮Markerもzoom時に投影座標を整数pixelへ丸めない', () => {
     expect(createDraftMarkerOptions()).toEqual({
-      color: '#C7401F',
+      anchor: 'bottom',
       subpixelPositioning: true,
     })
   })

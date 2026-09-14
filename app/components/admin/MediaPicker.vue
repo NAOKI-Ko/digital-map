@@ -4,17 +4,22 @@ import type { MediaAssetItem, MediaAssetListResponse } from '~~/shared/types/med
 import type { UploadedImage } from '~~/shared/types/upload'
 
 type Scope = 'recent' | 'map' | 'all'
-type UsageFilter = 'all' | 'floor' | 'photo' | 'category' | 'pin' | 'logo' | 'decoration'
+type UsageFilter = 'all' | 'floor' | 'photo' | 'category' | 'pin' | 'logo' | 'seo' | 'decoration'
 
 const props = withDefaults(defineProps<{
   mapId: string
   label?: string
   usage?: Exclude<UsageFilter, 'all'>
+  selectedUrl?: string | null
 }>(), { label: '画像', usage: 'photo' })
 const emit = defineEmits<{ selected: [image: UploadedImage] }>()
 const { data, refresh } = await useFetch<MediaAssetListResponse>('/api/media')
 const scope = ref<Scope>('recent')
-const usageFilter = ref<UsageFilter>('all')
+const usageFilter = ref<UsageFilter>(props.usage)
+const selected = ref<UploadedImage | null>(null)
+const initialSelectionDismissed = ref(false)
+const selectionSource = ref<'upload' | 'library' | 'initial'>('initial')
+const selectedPreviewUrl = computed(() => selected.value?.url ?? (!initialSelectionDismissed.value ? props.selectedUrl : null))
 const scopeOptions: Array<{ id: Scope, label: string }> = [
   { id: 'recent', label: '最近使用' },
   { id: 'map', label: 'このMAPで使用' },
@@ -32,6 +37,7 @@ const visibleAssets = computed(() => {
       category: 'categoryIcons',
       pin: 'spotPins',
       logo: 'mapLogos',
+      seo: 'mapSeoImages',
       decoration: 'decorations',
     }[usageFilter.value] as keyof MediaAssetItem['usage']
     assets = assets.filter(asset => asset.usage[field] > 0)
@@ -40,7 +46,7 @@ const visibleAssets = computed(() => {
 })
 
 function selectAsset(asset: MediaAssetItem) {
-  emit('selected', {
+  const image: UploadedImage = {
     assetId: asset.id,
     url: asset.url,
     filename: asset.originalFilename,
@@ -48,18 +54,37 @@ function selectAsset(asset: MediaAssetItem) {
     size: asset.fileSize,
     width: asset.width,
     height: asset.height,
-  })
+  }
+  selected.value = image
+  selectionSource.value = 'library'
+  emit('selected', image)
 }
 
 async function useUpload(image: UploadedImage) {
+  selected.value = image
+  selectionSource.value = 'upload'
   emit('selected', image)
   await refresh()
+}
+
+function changeSelection() {
+  selected.value = null
+  initialSelectionDismissed.value = true
+  selectionSource.value = 'initial'
+  usageFilter.value = props.usage
 }
 </script>
 
 <template>
   <div class="rounded-xl border border-stone-200 p-4">
-    <div class="grid gap-5 lg:grid-cols-2">
+    <div v-if="selectedPreviewUrl" class="overflow-hidden rounded-lg border border-stone-200 bg-stone-50">
+      <img :src="selectedPreviewUrl" :alt="`${label}の選択プレビュー`" class="h-64 w-full object-contain">
+      <div class="flex flex-wrap items-center justify-between gap-3 border-t border-stone-200 bg-white px-4 py-3">
+        <p role="status" class="text-sm font-semibold text-emerald-700">{{ selectionSource === 'upload' ? '画像をアップロードしました。' : '画像を選択しました。' }}</p>
+        <button type="button" class="rounded-lg border border-stone-300 px-3 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-50" @click="changeSelection">画像を変更</button>
+      </div>
+    </div>
+    <div v-else class="grid gap-5 lg:grid-cols-2">
       <section>
         <h3 class="text-sm font-bold text-stone-900">新規アップロード</h3>
         <ImageUploader :label="label" @uploaded="useUpload" />
@@ -71,10 +96,10 @@ async function useUpload(image: UploadedImage) {
         </div>
         <label class="mt-3 block text-xs font-semibold text-stone-700">用途フィルター
           <select v-model="usageFilter" class="mt-1 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm">
-            <option value="all">すべての用途</option><option value="floor">フロアイラスト</option><option value="photo">Spot写真</option><option value="category">Category</option><option value="pin">Custom PIN</option><option value="logo">ロゴ</option><option value="decoration">Decoration</option>
+            <option value="all">すべての用途</option><option value="floor">フロアイラスト</option><option value="photo">スポット写真</option><option value="category">カテゴリーアイコン</option><option value="pin">カスタムPIN</option><option value="logo">ロゴ</option><option value="seo">シェア画像</option><option value="decoration">装飾</option>
           </select>
         </label>
-        <p class="mt-2 text-xs text-stone-500">用途は絞り込みだけに使われ、別用途の画像も選択できます。</p>
+        <p class="mt-2 text-xs text-stone-500">別用途の画像は「すべての用途」から選べます。</p>
         <div v-if="visibleAssets.length" class="mt-3 grid max-h-72 grid-cols-3 gap-2 overflow-auto">
           <button v-for="asset in visibleAssets" :key="asset.id" type="button" class="overflow-hidden rounded-lg border border-stone-200 bg-white p-1 hover:border-terracotta-500" :title="asset.originalFilename" @click="selectAsset(asset)">
             <img :src="asset.url" :alt="asset.originalFilename" class="aspect-square w-full object-contain">

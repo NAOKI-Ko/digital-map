@@ -280,6 +280,62 @@ export function isValidImagePosition(position: ImagePosition) {
     && position.y >= 0 && position.y <= 1
 }
 
+const MAX_MERCATOR_LATITUDE = 85.0511287798066
+
+function projectWebMercator(position: LatLng) {
+  const latitude = Math.min(MAX_MERCATOR_LATITUDE, Math.max(-MAX_MERCATOR_LATITUDE, position.lat))
+  const sin = Math.sin(latitude * Math.PI / 180)
+  return {
+    x: (position.lng + 180) / 360,
+    y: 0.5 - Math.log((1 + sin) / (1 - sin)) / (4 * Math.PI),
+  }
+}
+
+function unprojectWebMercator(position: { x: number, y: number }): LatLng {
+  const normalizedX = ((position.x % 1) + 1) % 1
+  const mercatorY = Math.PI * (1 - 2 * position.y)
+  return {
+    lat: Math.atan(Math.sinh(mercatorY)) * 180 / Math.PI,
+    lng: normalizedX * 360 - 180,
+  }
+}
+
+function unwrapMercatorX(value: number, origin: number) {
+  let result = value
+  while (result - origin > 0.5) result -= 1
+  while (result - origin < -0.5) result += 1
+  return result
+}
+
+function getProjectedFloorCorners(corners: FloorCorners) {
+  const topLeft = projectWebMercator(corners.topLeft)
+  const project = (corner: LatLng) => {
+    const projected = projectWebMercator(corner)
+    return { ...projected, x: unwrapMercatorX(projected.x, topLeft.x) }
+  }
+  return {
+    topLeft,
+    topRight: project(corners.topRight),
+    bottomRight: project(corners.bottomRight),
+    bottomLeft: project(corners.bottomLeft),
+  }
+}
+
+function interpolateProjectedFloor(corners: ReturnType<typeof getProjectedFloorCorners>, position: ImagePosition) {
+  const topWeight = 1 - position.y
+  const leftWeight = 1 - position.x
+  return {
+    x: corners.topLeft.x * leftWeight * topWeight
+      + corners.topRight.x * position.x * topWeight
+      + corners.bottomRight.x * position.x * position.y
+      + corners.bottomLeft.x * leftWeight * position.y,
+    y: corners.topLeft.y * leftWeight * topWeight
+      + corners.topRight.y * position.x * topWeight
+      + corners.bottomRight.y * position.x * position.y
+      + corners.bottomLeft.y * leftWeight * position.y,
+  }
+}
+
 /** Convert canonical normalized IMAGE placement to transient MapLibre coordinates. */
 export function imageToRenderCoordinates(
   floor: FloorGeoReferenceFields,
@@ -289,18 +345,7 @@ export function imageToRenderCoordinates(
   const corners = getFloorCorners(floor)
   if (!corners) return null
 
-  const horizontal = {
-    lat: corners.topRight.lat - corners.topLeft.lat,
-    lng: corners.topRight.lng - corners.topLeft.lng,
-  }
-  const vertical = {
-    lat: corners.bottomLeft.lat - corners.topLeft.lat,
-    lng: corners.bottomLeft.lng - corners.topLeft.lng,
-  }
-  return {
-    lat: corners.topLeft.lat + horizontal.lat * position.x + vertical.lat * position.y,
-    lng: corners.topLeft.lng + horizontal.lng * position.x + vertical.lng * position.y,
-  }
+  return unprojectWebMercator(interpolateProjectedFloor(getProjectedFloorCorners(corners), position))
 }
 
 /** Invert the current Floor render transform without clamping genuine out-of-bounds values. */
@@ -312,18 +357,58 @@ export function renderToImageCoordinates(
   const corners = getFloorCorners(floor)
   if (!corners) return null
 
-  const hLng = corners.topRight.lng - corners.topLeft.lng
-  const hLat = corners.topRight.lat - corners.topLeft.lat
-  const vLng = corners.bottomLeft.lng - corners.topLeft.lng
-  const vLat = corners.bottomLeft.lat - corners.topLeft.lat
-  const dLng = position.lng - corners.topLeft.lng
-  const dLat = position.lat - corners.topLeft.lat
-  const determinant = hLng * vLat - hLat * vLng
-  if (!Number.isFinite(determinant) || Math.abs(determinant) < Number.EPSILON) return null
+  const projectedCorners = getProjectedFloorCorners(corners)
+  const target = projectWebMercator(position)
+  target.x = unwrapMercatorX(target.x, projectedCorners.topLeft.x)
 
+  const horizontal = {
+    x: projectedCorners.topRight.x - projectedCorners.topLeft.x,
+    y: projectedCorners.topRight.y - projectedCorners.topLeft.y,
+  }
+  const vertical = {
+    x: projectedCorners.bottomLeft.x - projectedCorners.topLeft.x,
+    y: projectedCorners.bottomLeft.y - projectedCorners.topLeft.y,
+  }
+  const delta = {
+    x: target.x - projectedCorners.topLeft.x,
+    y: target.y - projectedCorners.topLeft.y,
+  }
+  const initialDeterminant = horizontal.x * vertical.y - horizontal.y * vertical.x
+  if (!Number.isFinite(initialDeterminant) || Math.abs(initialDeterminant) < Number.EPSILON) return null
+
+  let x = (delta.x * vertical.y - delta.y * vertical.x) / initialDeterminant
+  let y = (horizontal.x * delta.y - horizontal.y * delta.x) / initialDeterminant
+  for (let iteration = 0; iteration < 12; iteration += 1) {
+    const current = interpolateProjectedFloor(projectedCorners, { x, y })
+    const errorX = current.x - target.x
+    const errorY = current.y - target.y
+    if (Math.abs(errorX) + Math.abs(errorY) < 1e-16) break
+
+    const dx = {
+      x: (projectedCorners.topRight.x - projectedCorners.topLeft.x) * (1 - y)
+        + (projectedCorners.bottomRight.x - projectedCorners.bottomLeft.x) * y,
+      y: (projectedCorners.topRight.y - projectedCorners.topLeft.y) * (1 - y)
+        + (projectedCorners.bottomRight.y - projectedCorners.bottomLeft.y) * y,
+    }
+    const dy = {
+      x: (projectedCorners.bottomLeft.x - projectedCorners.topLeft.x) * (1 - x)
+        + (projectedCorners.bottomRight.x - projectedCorners.topRight.x) * x,
+      y: (projectedCorners.bottomLeft.y - projectedCorners.topLeft.y) * (1 - x)
+        + (projectedCorners.bottomRight.y - projectedCorners.topRight.y) * x,
+    }
+    const determinant = dx.x * dy.y - dx.y * dy.x
+    if (!Number.isFinite(determinant) || Math.abs(determinant) < Number.EPSILON) return null
+    x -= (errorX * dy.y - errorY * dy.x) / determinant
+    y -= (dx.x * errorY - dx.y * errorX) / determinant
+  }
+
+  if (!Number.isFinite(x) || !Number.isFinite(y)) return null
+  // Geographic projection round-trips lose a few ulps at normal building-scale extents.
+  // Canonical IMAGE coordinates are persisted at substantially lower precision, so remove
+  // projection noise before validation without clamping genuine out-of-bounds values.
   return {
-    x: (dLng * vLat - dLat * vLng) / determinant,
-    y: (hLng * dLat - hLat * dLng) / determinant,
+    x: Math.round(x * 1e10) / 1e10,
+    y: Math.round(y * 1e10) / 1e10,
   }
 }
 

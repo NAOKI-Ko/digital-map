@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import SaveFeedback from '~/components/ui/SaveFeedback.vue'
-import PinDesignEditor from '~/components/admin/PinDesignEditor.vue'
 import SpotPhotoManager from '~/components/admin/SpotPhotoManager.vue'
 import SpotPublishPanel from '~/components/admin/SpotPublishPanel.vue'
 import SpotForm from '~/components/admin/SpotForm.vue'
@@ -125,9 +124,11 @@ async function saveEnglish() {
       <header class="mt-5">
         <p class="text-sm font-medium text-terracotta-700">スポット編集</p>
         <h1 class="mt-1 text-2xl font-bold tracking-tight text-stone-900 sm:text-3xl">{{ data.spot.name }}</h1>
-        <p class="mt-2 text-sm text-stone-600">基本情報や営業情報を編集します。</p>
       </header>
-      <NuxtLink :to="{ path: `/admin/maps/${mapId}/editor`, query: { floorId: data.spot.floorId, placeSpotId: data.spot.id } }" class="mt-5 inline-flex rounded-lg bg-terracotta-600 px-4 py-2.5 text-sm font-semibold text-white">{{ data.spot.x === null || data.spot.y === null ? '位置を設定' : '位置を再設定' }}</NuxtLink>
+      <div class="mt-5 flex flex-wrap items-center gap-3 border-y border-stone-200 py-3 text-sm">
+        <span class="font-semibold text-stone-700">PIN: {{ data.spot.x === null || data.spot.y === null ? '未配置' : '配置済み' }}</span>
+        <NuxtLink :to="{ path: `/admin/maps/${mapId}/editor`, query: { floorId: data.spot.floorId, placeSpotId: data.spot.id } }" class="font-semibold text-terracotta-700 hover:text-terracotta-800">PIN配置画面で編集</NuxtLink>
+      </div>
       <NuxtLink :to="`/admin/maps/${mapId}/spots/${spotId}/assignee`" class="ml-2 mt-5 inline-flex rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-sm font-semibold">スポット担当者</NuxtLink>
       <SaveFeedback class="mt-6" :state="isSubmitting ? 'saving' : submitError ? 'error' : successMessage ? 'success' : 'idle'" :message="submitError || successMessage" />
       <section class="mt-6 border-t border-stone-200 pt-5">
@@ -158,14 +159,6 @@ async function saveEnglish() {
           :initial-photos="data.spot.photos"
           :initial-photo-asset-ids="data.spot.photoAssetIds"
           @updated="data.spot.photos = $event"
-        />
-      </details>
-      <details class="mt-6 border-t border-stone-200 pt-5"><summary class="mb-4 w-fit cursor-pointer text-base font-semibold">ピンデザインを編集</summary>
-        <PinDesignEditor
-          :map-id="mapId"
-          :spot-id="spotId"
-          :initial-value="data.spot"
-          @updated="Object.assign(data.spot, $event)"
         />
       </details>
       <section class="mt-6 border-t border-stone-200 pt-5">

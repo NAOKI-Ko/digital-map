@@ -128,6 +128,14 @@ describe('Marker DOM生成', () => {
     expect(createElement().attributes.get('data-spot-id')).toBe('spot-1')
   })
 
+  it('編集時は移動対象だけをドラッグ可能として読み上げる', () => {
+    const selectable = createSpotMarkerElement(baseSpot, { mode: 'edit', selected: false }, fakeDocument as unknown as Pick<Document, 'createElement'>) as unknown as FakeElement
+    const draggable = createSpotMarkerElement(baseSpot, { mode: 'edit', selected: true, draggable: true }, fakeDocument as unknown as Pick<Document, 'createElement'>) as unknown as FakeElement
+
+    expect(selectable.attributes.get('aria-label')).toBe('テストスポットを選択')
+    expect(draggable.attributes.get('aria-label')).toBe('テストスポットをドラッグして位置調整')
+  })
+
   it('presetとcustomは外形を広げず内部contentが本体幅の75%以上を使う', () => {
     const shapeRule = cssRule(mapViewerSource, '.map-viewer-marker__shape')
     const contentRule = cssRule(mapViewerSource, '.map-viewer-marker__content')

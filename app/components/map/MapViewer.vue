@@ -11,6 +11,7 @@ const props = withDefaults(defineProps<{
   modelValue?: ImagePosition | null
   selectedSpotId?: string | null
   draggableSpotId?: string | null
+  placementEnabled?: boolean
   height?: string
   label?: string
   floorErrorActionTo?: string | null
@@ -23,6 +24,7 @@ const props = withDefaults(defineProps<{
   modelValue: null,
   selectedSpotId: null,
   draggableSpotId: null,
+  placementEnabled: false,
   height: '38rem',
   label: 'デジタルマップ',
   floorErrorActionTo: null,
@@ -44,6 +46,7 @@ const decorations = toRef(props, 'decorations')
 const position = toRef(props, 'modelValue')
 const selectedSpotId = toRef(props, 'selectedSpotId')
 const draggableSpotId = toRef(props, 'draggableSpotId')
+const placementEnabled = toRef(props, 'placementEnabled')
 const prioritizeVisibleSpots = toRef(props, 'prioritizeVisibleSpots')
 const { floorError, geolocationAreaMessage, mapError } = useMapViewer(container, {
   floor,
@@ -52,6 +55,7 @@ const { floorError, geolocationAreaMessage, mapError } = useMapViewer(container,
   position,
   selectedSpotId,
   draggableSpotId,
+  placementEnabled,
   prioritizeVisibleSpots,
   mode: props.mode,
   initialCamera: props.initialCamera,
@@ -68,17 +72,17 @@ const { floorError, geolocationAreaMessage, mapError } = useMapViewer(container,
       <div
         ref="container"
         class="w-full"
-        :class="mode === 'edit' ? 'cursor-crosshair' : 'cursor-grab'"
+        :class="mode === 'edit' && placementEnabled ? 'cursor-crosshair' : 'cursor-grab'"
         :style="{ height }"
         :aria-label="label"
         role="region"
         tabindex="0"
       />
       <div
-        v-if="mode === 'edit'"
+        v-if="mode === 'edit' && placementEnabled"
         class="pointer-events-none absolute left-3 top-3 rounded-lg bg-white/95 px-4 py-3 text-sm font-semibold text-stone-800 shadow"
       >
-        地図をクリックしてピンを置く
+        地図をクリックして仮配置
       </div>
       <div
         v-if="floorError"
@@ -230,6 +234,41 @@ const { floorError, geolocationAreaMessage, mapError } = useMapViewer(container,
     drop-shadow(0 0 3px rgb(255 255 255 / 95%))
     drop-shadow(0 6px 6px rgb(37 48 58 / 42%));
   scale: calc(var(--marker-size-scale, 1) * 1.12);
+}
+
+.map-viewer-draft-marker {
+  position: relative;
+  display: flex;
+  width: 5.5rem;
+  height: 4.75rem;
+  align-items: flex-end;
+  justify-content: center;
+  filter: drop-shadow(0 4px 5px rgb(37 48 58 / 30%));
+}
+
+.map-viewer-draft-marker__badge {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: 2;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  border-radius: 9999px;
+  background: #1c1917;
+  padding: 0.2rem 0.55rem;
+  color: white;
+  font-size: 0.6875rem;
+  font-weight: 700;
+}
+
+.map-viewer-draft-marker__pin {
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 4px solid white;
+  border-radius: 9999px 9999px 9999px 0;
+  background: #c7401f;
+  box-shadow: 0 0 0 4px rgb(28 25 23 / 72%);
+  transform: rotate(-45deg);
 }
 
 .map-viewer-current-location-marker {

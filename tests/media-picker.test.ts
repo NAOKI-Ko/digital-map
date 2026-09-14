@@ -23,7 +23,8 @@ describe('共通Media Picker', () => {
     expect(picker).toContain("id: 'map'")
     expect(picker).toContain("id: 'all'")
     expect(picker).toContain('用途フィルター')
-    expect(picker).toContain('用途は絞り込みだけに使われ')
+    expect(picker).toContain("const usageFilter = ref<UsageFilter>(props.usage)")
+    expect(picker).toContain('すべての用途')
   })
 
   it('Phase 1の既存画像consumerが同じpickerを使う', () => {
@@ -32,6 +33,23 @@ describe('共通Media Picker', () => {
 
   it('選択結果はURLだけでなくassetIdをconsumerへ渡す', () => {
     expect(consumers.join('\n')).toMatch(/AssetId\s*=\s*image\.assetId|assetId:\s*image\.assetId/)
+  })
+
+  it('uploadとLibrary選択を同じpreview stateへ正規化する', () => {
+    expect(picker).toContain("selected.value = image")
+    expect(picker).toContain('selectedPreviewUrl')
+    expect(picker).toContain('画像を変更')
+    expect(picker).not.toContain('画像を選択済み:')
+  })
+
+  it('consumerごとの用途defaultを宣言し、SEO画像も既存usage metadataを使う', () => {
+    expect(consumers[0]).toContain('usage="floor"')
+    expect(consumers[1]).toContain('usage="photo"')
+    expect(consumers[2]).toContain('usage="category"')
+    expect(consumers[3]).toContain('usage="pin"')
+    expect(consumers[4]).toContain('usage="logo"')
+    expect(consumers[4]).toContain('usage="seo"')
+    expect(picker).toContain("seo: 'mapSeoImages'")
   })
 
   it('Spot写真detachはrelationだけを更新し物理削除APIを呼ばない', () => {

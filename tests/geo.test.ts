@@ -140,7 +140,21 @@ describe('normalized IMAGE placement transform', () => {
       refBLng: null,
     }
     const rendered = imageToRenderCoordinates(fallbackFloor, { x: 0.2, y: 0.8 })
-    expect(renderToImageCoordinates(fallbackFloor, rendered!)).toEqual({ x: 0.2, y: 0.8 })
+    const restored = renderToImageCoordinates(fallbackFloor, rendered!)
+    expect(restored?.x).toBeCloseTo(0.2, 10)
+    expect(restored?.y).toBeCloseTo(0.8, 10)
+  })
+
+  it('Web Mercator描画平面で補間し、zoom後も画像とPINの基準点を一致させる', () => {
+    const highLatitudeFloor = floor({ refALat: 70, refBLat: 70, refBLng: 139.4, imageHeight: 1000 })
+    const corners = getFloorCorners(highLatitudeFloor)!
+    const rendered = imageToRenderCoordinates(highLatitudeFloor, { x: 0.5, y: 0.5 })!
+    const mercatorY = (lat: number) => {
+      const sin = Math.sin(lat * Math.PI / 180)
+      return 0.5 - Math.log((1 + sin) / (1 - sin)) / (4 * Math.PI)
+    }
+    const expectedProjectedY = Object.values(corners).reduce((sum, corner) => sum + mercatorY(corner.lat), 0) / 4
+    expect(mercatorY(rendered.lat)).toBeCloseTo(expectedProjectedY, 12)
   })
 
   it('partial/out-of-range IMAGE positionをinvalidとする', () => {

@@ -89,6 +89,7 @@ export interface SpotPinDesignResponse {
     pinIconAssetId?: string | null
     pinColor: string
     pinSize: PinSize
+    importance: SpotImportance
   }
 }
 
