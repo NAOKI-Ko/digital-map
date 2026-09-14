@@ -107,8 +107,8 @@ const { floorError, geolocationAreaMessage, mapError } = useMapViewer(container,
 </template>
 
 <style>
-.map-viewer-marker {
-  position: relative;
+.maplibregl-marker.map-viewer-marker {
+  position: absolute;
   display: flex;
   width: 3.75rem;
   height: 3.75rem;
@@ -236,8 +236,9 @@ const { floorError, geolocationAreaMessage, mapError } = useMapViewer(container,
   scale: calc(var(--marker-size-scale, 1) * 1.12);
 }
 
-.map-viewer-draft-marker {
-  position: relative;
+.maplibregl-marker.map-viewer-draft-marker {
+  position: absolute;
+  z-index: 20;
   display: flex;
   width: 5.5rem;
   height: 4.75rem;

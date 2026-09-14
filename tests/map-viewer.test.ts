@@ -13,6 +13,7 @@ import {
   getImagePlacementCandidate,
   getMapViewerCameraState,
   restoreMapViewerCamera,
+  setFlatImageSourceWarp,
   shouldEnableGeolocate,
   VIEWER_CAMERA_CONSTRAINTS,
   ZOOM_IN_ALLOWANCE,
@@ -88,6 +89,28 @@ describe('MapViewerのカメラ制約', () => {
       touchPitch: false,
       pitchWithRotate: false,
     })
+  })
+})
+
+describe('画像ソースとPIN座標の描画方式', () => {
+  it('MapLibre画像ソースをcanonical PIN座標と同じflat warpへ固定する', () => {
+    const setWarp = vi.fn()
+    const instance = {
+      getSource: vi.fn(() => ({ setWarp })),
+    } as unknown as MapLibreMap
+
+    setFlatImageSourceWarp(instance, 'floor-floor-1')
+
+    expect(instance.getSource).toHaveBeenCalledWith('floor-floor-1')
+    expect(setWarp).toHaveBeenCalledWith('flat')
+  })
+
+  it('古いMapLibre互換ソースでも安全に何もしない', () => {
+    const instance = {
+      getSource: vi.fn(() => ({})),
+    } as unknown as MapLibreMap
+
+    expect(() => setFlatImageSourceWarp(instance, 'floor-floor-1')).not.toThrow()
   })
 })
 

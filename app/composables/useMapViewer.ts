@@ -172,6 +172,16 @@ export function createDraftMarkerOptions(): MarkerOptions {
   }
 }
 
+interface FlatWarpImageSource {
+  setWarp?: (warp: 'flat') => unknown
+}
+
+/** Keep the raster image on the same bilinear surface used by canonical PIN coordinates. */
+export function setFlatImageSourceWarp(instance: MapLibreMap, sourceId: string) {
+  const source = instance.getSource(sourceId) as FlatWarpImageSource | undefined
+  source?.setWarp?.('flat')
+}
+
 export function getMapViewerCameraState(instance: MapLibreMap): MapViewerCameraState {
   const center = instance.getCenter()
   return {
@@ -513,6 +523,7 @@ export function useMapViewer(
       const sourceId = `decoration-${decoration.id}`
       const layerId = `${sourceId}-layer`
       instance.addSource(sourceId, { type: 'image', url: decoration.imageUrl, coordinates })
+      setFlatImageSourceWarp(instance, sourceId)
       instance.addLayer({ id: layerId, type: 'raster', source: sourceId })
       decorationLayers.push({ sourceId, layerId })
     })
@@ -564,6 +575,7 @@ export function useMapViewer(
       url: floor.illustrationUrl,
       coordinates: toImageCoordinates(corners),
     })
+    setFlatImageSourceWarp(instance, sourceId)
     instance.addLayer({
       id: layerId,
       type: 'raster',

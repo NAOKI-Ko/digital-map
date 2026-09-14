@@ -148,6 +148,15 @@ describe('Marker DOM生成', () => {
     expect(contentRule).toMatch(/object-position:\s*center;/)
   })
 
+  it('既存PINと仮PINをMapLibreの絶対配置から外さず、仮PINを最前面に保つ', () => {
+    const markerRule = cssRule(mapViewerSource, '.maplibregl-marker.map-viewer-marker')
+    const draftRule = cssRule(mapViewerSource, '.maplibregl-marker.map-viewer-draft-marker')
+
+    expect(markerRule).toMatch(/position:\s*absolute;/)
+    expect(draftRule).toMatch(/position:\s*absolute;/)
+    expect(draftRule).toMatch(/z-index:\s*20;/)
+  })
+
   it('管理画面のcustom previewも共通content classで内部領域を広げる', () => {
     const pinDesignShapeWidth = remValue(cssRule(pinDesignEditorSource, '.pin-design-preview'), 'width')
     const pinDesignContentWidth = remValue(cssRule(pinDesignEditorSource, '.pin-design-preview__content'), 'width')
