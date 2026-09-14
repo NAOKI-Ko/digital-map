@@ -111,6 +111,7 @@ async function handleLogout() {
       >
         {{ isLoggingOut ? 'ログアウト中…' : 'ログアウト' }}
       </button>
+      <NuxtLink to="/admin/account/password" class="mt-2 block text-center text-xs text-stone-400 hover:text-white" @click="$emit('navigate')">パスワード変更</NuxtLink>
     </div>
   </div>
 </template>

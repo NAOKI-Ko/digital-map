@@ -3,7 +3,9 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vites
 const mocks = vi.hoisted(() => ({
   memberFindUnique: vi.fn(), memberFindMany: vi.fn(), memberCount: vi.fn(), memberUpdate: vi.fn(), memberDelete: vi.fn(),
   mapMemberFindUnique: vi.fn(), mapMemberFindFirst: vi.fn(), mapMemberUpsert: vi.fn(), mapMemberDeleteMany: vi.fn(),
+  userFindUnique: vi.fn(), userUpdate: vi.fn(),
   requireUserSession: vi.fn(),
+  clearUserSession: vi.fn(),
 }))
 
 function testError(input: { statusCode: number, statusMessage: string }) {
@@ -22,13 +24,16 @@ describe('KAN-52 organization / map RBAC', () => {
     const tx = {
       tenantMember: { findUnique: mocks.memberFindUnique, count: mocks.memberCount, update: mocks.memberUpdate, delete: mocks.memberDelete },
       mapMember: { deleteMany: mocks.mapMemberDeleteMany },
+      user: { update: mocks.userUpdate },
     }
     vi.stubGlobal('createError', testError)
     vi.stubGlobal('requireUserSession', mocks.requireUserSession)
+    vi.stubGlobal('clearUserSession', mocks.clearUserSession)
     vi.stubGlobal('prisma', {
       $transaction: (callback: (client: typeof tx) => unknown) => callback(tx),
       tenantMember: { findUnique: mocks.memberFindUnique, findMany: mocks.memberFindMany },
       mapMember: { findUnique: mocks.mapMemberFindUnique, findFirst: mocks.mapMemberFindFirst, upsert: mocks.mapMemberUpsert, deleteMany: mocks.mapMemberDeleteMany },
+      user: { findUnique: mocks.userFindUnique, update: mocks.userUpdate },
     })
     ;({ changeTenantMemberRole, removeTenantMember, assignMapEditor } = await import('../server/utils/membership'))
     ;({ buildSessionUser, requireTenantOwner, requireTenantMediaAccess } = await import('../server/utils/session'))
@@ -43,7 +48,9 @@ describe('KAN-52 organization / map RBAC', () => {
     mocks.mapMemberDeleteMany.mockResolvedValue({ count: 1 })
     mocks.mapMemberUpsert.mockResolvedValue({ id: 'mm-1', role: 'EDITOR' })
     mocks.mapMemberFindFirst.mockResolvedValue({ id: 'mm-1' })
-    mocks.requireUserSession.mockResolvedValue({ user: { id: 'user-a', tenantId: 'tenant-a' } })
+    mocks.userFindUnique.mockResolvedValue({ isActive: true, authVersion: 1 })
+    mocks.userUpdate.mockResolvedValue({})
+    mocks.requireUserSession.mockResolvedValue({ user: { id: 'user-a', tenantId: 'tenant-a', authVersion: 1 } })
   })
 
   afterAll(() => vi.unstubAllGlobals())
@@ -88,8 +95,8 @@ describe('KAN-52 organization / map RBAC', () => {
 
   it('複数組織membershipからactive組織だけをsessionへ選ぶ', async () => {
     mocks.memberFindMany.mockResolvedValue([
-      { tenantId: 'tenant-a', role: 'OWNER', tenant: { name: '組織A' }, user: { email: 'u@example.com', displayName: null } },
-      { tenantId: 'tenant-b', role: 'MEMBER', tenant: { name: '組織B' }, user: { email: 'u@example.com', displayName: null } },
+      { tenantId: 'tenant-a', role: 'OWNER', tenant: { name: '組織A' }, user: { email: 'u@example.com', displayName: null, authVersion: 1, isActive: true } },
+      { tenantId: 'tenant-b', role: 'MEMBER', tenant: { name: '組織B' }, user: { email: 'u@example.com', displayName: null, authVersion: 1, isActive: true } },
     ])
     const user = await buildSessionUser('user-a', 'tenant-b')
     expect(user).toMatchObject({ tenantId: 'tenant-b', tenantRole: 'MEMBER', tenantName: '組織B' })

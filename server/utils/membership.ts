@@ -6,7 +6,11 @@ export async function changeTenantMemberRole(tenantId: string, userId: string, r
       const ownerCount = await tx.tenantMember.count({ where: { tenantId, role: 'OWNER' } })
       if (ownerCount <= 1) throw createError({ statusCode: 409, statusMessage: '組織には最低1名のオーナーが必要です。最後のオーナーは降格できません。' })
     }
-    return tx.tenantMember.update({ where: { id: current.id }, data: { role } })
+    const updated = await tx.tenantMember.update({ where: { id: current.id }, data: { role } })
+    if (current.role !== role) {
+      await tx.user.update({ where: { id: userId }, data: { authVersion: { increment: 1 } } })
+    }
+    return updated
   }, { isolationLevel: 'Serializable' })
 }
 
@@ -20,8 +24,16 @@ export async function removeTenantMember(tenantId: string, userId: string) {
     }
     await tx.mapMember.deleteMany({ where: { userId, map: { tenantId } } })
     await tx.tenantMember.delete({ where: { id: current.id } })
+    await tx.user.update({ where: { id: userId }, data: { authVersion: { increment: 1 } } })
     return { removedUserId: userId }
   }, { isolationLevel: 'Serializable' })
+}
+
+export async function setUserActive(userId: string, isActive: boolean) {
+  return prisma.user.update({
+    where: { id: userId },
+    data: { isActive, authVersion: { increment: 1 } },
+  })
 }
 
 export async function assignMapEditor(mapId: string, tenantId: string, userId: string) {
@@ -33,4 +45,3 @@ export async function assignMapEditor(mapId: string, tenantId: string, userId: s
     update: {},
   })
 }
-

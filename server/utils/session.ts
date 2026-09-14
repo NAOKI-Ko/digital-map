@@ -5,6 +5,14 @@ const forbidden = () => createError({ statusCode: 403, statusMessage: 'この操
 export async function requireUser(event: H3Event) {
   const session = await requireUserSession(event)
   if (!session.user?.id) throw forbidden()
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { isActive: true, authVersion: true },
+  })
+  if (!user?.isActive || user.authVersion !== session.user.authVersion) {
+    await clearUserSession(event)
+    throw forbidden()
+  }
   return session
 }
 
@@ -29,10 +37,11 @@ export async function requireTenantOwner(event: H3Event, tenantId?: string) {
 export async function buildSessionUser(userId: string, tenantId?: string) {
   const memberships = await prisma.tenantMember.findMany({
     where: { userId },
-    include: { tenant: true, user: { select: { email: true, displayName: true } } },
+    include: { tenant: true, user: { select: { email: true, displayName: true, authVersion: true, isActive: true } } },
     orderBy: [{ createdAt: 'asc' }, { tenantId: 'asc' }],
   })
   const active = memberships.find(item => item.tenantId === tenantId) ?? memberships[0]
+  if (active && !active.user.isActive) return null
   if (!active) return null
   return {
     id: userId,
@@ -46,6 +55,7 @@ export async function buildSessionUser(userId: string, tenantId?: string) {
       name: item.tenant.name,
       role: item.role,
     })),
+    authVersion: active.user.authVersion,
   }
 }
 

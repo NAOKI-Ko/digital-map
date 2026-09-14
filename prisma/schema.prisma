@@ -19,6 +19,7 @@ model Tenant {
   members     TenantMember[]
   maps        Map[]
   mediaAssets MediaAsset[]   @relation("TenantMediaAssets")
+  invitations OrganizationInvitation[]
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
 }
@@ -30,8 +31,58 @@ model User {
   passwordHash  String
   tenantMembers TenantMember[]
   mapMembers    MapMember[]
+  createdInvitations OrganizationInvitation[] @relation("InvitationCreator")
+  acceptedInvitations OrganizationInvitation[] @relation("InvitationAcceptor")
+  passwordResetTokens PasswordResetToken[]
+  isActive      Boolean        @default(true)
+  authVersion   Int            @default(1)
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  REVOKED
+  EXPIRED
+}
+
+enum InvitationPurpose {
+  ORGANIZATION_MEMBER
+}
+
+model OrganizationInvitation {
+  id           String            @id @default(cuid())
+  tenantId     String
+  tenant       Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  email        String
+  tokenHash    String            @unique
+  purpose      InvitationPurpose @default(ORGANIZATION_MEMBER)
+  status       InvitationStatus  @default(PENDING)
+  expiresAt    DateTime
+  createdById  String
+  createdBy    User              @relation("InvitationCreator", fields: [createdById], references: [id], onDelete: Restrict)
+  acceptedById String?
+  acceptedBy   User?             @relation("InvitationAcceptor", fields: [acceptedById], references: [id], onDelete: SetNull)
+  acceptedAt   DateTime?
+  revokedAt    DateTime?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  @@index([tenantId, createdAt])
+  @@index([tenantId, email, status])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
 }
 
 enum TenantRole {

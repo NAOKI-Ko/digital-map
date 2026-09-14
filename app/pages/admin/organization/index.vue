@@ -7,11 +7,13 @@ useHead({ title: '組織設定・メンバー | デジタルマップ' })
 
 const { data: organizationData, error: organizationError, refresh: refreshOrganization } = await useFetch('/api/organization')
 const { data: memberData, refresh: refreshMembers } = await useFetch<OrganizationMembersResponse>('/api/organization/members')
+const { data: invitationData, refresh: refreshInvitations } = await useFetch('/api/organization/invitations')
 const organization = computed(() => organizationData.value?.organization)
 const email = ref('')
 const message = ref('')
 const errorMessage = ref('')
 const saving = ref(false)
+const acceptanceUrl = ref('')
 const removeTarget = ref<{ userId: string, label: string } | null>(null)
 const form = reactive({ name: '', logoUrl: '', logoAssetId: null as string | null, websiteUrl: '', snsUrl: '' })
 
@@ -43,10 +45,19 @@ function useLogo(image: UploadedImage) {
 
 async function addMember() {
   await run(async () => {
-    await $fetch('/api/organization/members', { method: 'POST', body: { email: email.value } })
+    const result = await $fetch('/api/organization/invitations', { method: 'POST', body: { email: email.value } })
+    acceptanceUrl.value = result.acceptanceUrl
     email.value = ''
-    await refreshMembers()
-    message.value = '組織メンバーを追加しました。'
+    await refreshInvitations()
+    message.value = '招待を作成しました。開発・QAでは下のURLを安全に共有してください。'
+  })
+}
+
+async function revokeInvitation(invitationId: string) {
+  await run(async () => {
+    await $fetch(`/api/organization/invitations/${invitationId}`, { method: 'DELETE' })
+    await refreshInvitations()
+    message.value = '招待を取り消しました。'
   })
 }
 
@@ -105,12 +116,23 @@ async function run(action: () => Promise<void>) {
     </section>
 
     <section v-if="organization" class="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-      <h2 class="text-lg font-bold">組織メンバー</h2>
-      <p class="mt-1 text-sm text-stone-600">登録済みユーザーをメールアドレス完全一致で追加します。ユーザー検索候補は表示しません。</p>
+      <h2 class="text-lg font-bold">組織メンバー招待</h2>
+      <p class="mt-1 text-sm text-stone-600">招待を承認するまでメンバーには追加されません。招待リンクは発行時だけ表示されます。</p>
       <form class="mt-5 flex gap-3" @submit.prevent="addMember">
         <input v-model="email" required type="email" autocomplete="off" placeholder="member@example.com" class="min-w-0 flex-1 rounded-lg border border-stone-300 px-3 py-2.5">
-        <button :disabled="saving" class="rounded-lg bg-terracotta-600 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50">追加</button>
+        <button :disabled="saving" class="rounded-lg bg-terracotta-600 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50">招待を作成</button>
       </form>
+      <div v-if="acceptanceUrl" class="mt-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-950">
+        <p class="font-semibold">このリンクは今だけ表示されます</p>
+        <input readonly :value="acceptanceUrl" class="mt-2 w-full rounded border border-amber-200 bg-white px-2 py-1 font-mono text-xs">
+      </div>
+      <div class="mt-5 space-y-2">
+        <article v-for="invitation in invitationData?.invitations ?? []" :key="invitation.id" class="flex items-center justify-between rounded-lg border p-3 text-sm">
+          <div><p class="font-semibold">{{ invitation.email }}</p><p class="text-stone-500">{{ invitation.status }} · {{ new Date(invitation.expiresAt).toLocaleString('ja-JP') }}</p></div>
+          <button v-if="invitation.status === 'PENDING'" type="button" class="font-semibold text-red-700" @click="revokeInvitation(invitation.id)">取り消す</button>
+        </article>
+      </div>
+      <h3 class="mt-8 font-bold">現在のメンバー</h3>
       <div class="mt-6 divide-y divide-stone-200">
         <article v-for="member in memberData?.members ?? []" :key="member.userId" class="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div>

@@ -11,6 +11,7 @@ declare module '#auth-utils' {
       name: string
       role: 'OWNER' | 'MEMBER'
     }>
+    authVersion: number
   }
 
   interface UserSession {

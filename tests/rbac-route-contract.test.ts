@@ -31,12 +31,12 @@ describe('KAN-52 route authorization contract', () => {
     for (const route of protectedRoutes) expect(readFileSync(join(root, route), 'utf8')).toContain('requireTenantOwner')
   })
 
-  it('member追加はexact unique email lookupのみでdirectory検索を公開しない', () => {
+  it('member招待はdirectory検索や事前membership作成を公開しない', () => {
     const source = readFileSync(join(root, 'server/api/organization/members/index.post.ts'), 'utf8')
-    expect(source).toContain('user.findUnique')
     expect(source).not.toContain('findMany')
     expect(source).not.toContain('contains:')
-    expect(source).toContain('招待機能は今後対応予定')
+    expect(source).toContain('issueOrganizationInvitation')
+    expect(source).not.toContain('tenantMember.create')
   })
 
   it('migrationは決定不能なOwnerを推測せず中断し、Spot Editorを先行実装しない', () => {

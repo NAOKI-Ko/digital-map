@@ -158,9 +158,7 @@ const submit = handleSubmit(async (values) => {
           </button>
         </form>
 
-        <p class="mt-6 text-center text-sm text-stone-500">
-          パスワードをお忘れの場合は、運営担当者へお問い合わせください。
-        </p>
+        <p class="mt-6 text-center text-sm text-stone-500"><NuxtLink to="/reset-password" class="underline">パスワードをお忘れですか？</NuxtLink></p>
       </div>
     </section>
   </main>

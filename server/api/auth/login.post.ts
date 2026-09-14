@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
     where: { email: credentials.email },
   })
 
-  const isValidPassword = user
+  const isValidPassword = user?.isActive
     ? await compare(credentials.password, user.passwordHash)
     : false
 

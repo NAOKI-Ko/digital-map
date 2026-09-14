@@ -21,6 +21,10 @@ export default defineNuxtConfig({
     typeCheck: true,
   },
   runtimeConfig: {
+    auth: {
+      invitationTtlHours: 72,
+      passwordResetTtlMinutes: 60,
+    },
     uploadDir: '',
     nominatimBaseUrl: 'https://nominatim.openstreetmap.org',
     nominatimUserAgent: 'digital-map-platform/0.1 (self-hosted Nuxt application)',
