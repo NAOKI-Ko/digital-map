@@ -1,6 +1,7 @@
 import { mkdtemp, mkdir, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { buildMediaManifest, retentionPlan, safeRelativePath, verifyMediaManifest } from '../scripts/backup-lib'
 
@@ -28,5 +29,16 @@ describe('WU-29 backup and restore helpers', () => {
     expect(plan.keep.length).toBeLessThanOrEqual(11)
     expect(plan.keep.map(item => item.path)).toContain('backup-0')
     expect(plan.remove.length + plan.keep.length).toBe(50)
+  })
+
+  it('uses cross-platform DB commands without exposing the database URL as a process argument', () => {
+    const backup = readFileSync('scripts/backup-db.ts', 'utf8')
+    const restore = readFileSync('scripts/restore-db.ts', 'utf8')
+    const windowsBackup = readFileSync('scripts/windows/backup.ps1', 'utf8')
+    expect(backup).toContain('PGPASSWORD')
+    expect(backup).not.toContain("connectionArgs = [process.env.DATABASE_URL")
+    expect(restore).toContain("process.env.ALLOW_DISPOSABLE_RESTORE !== 'true'")
+    expect(restore).toContain('Refusing to restore into DATABASE_URL')
+    expect(windowsBackup).not.toContain('bash ')
   })
 })
