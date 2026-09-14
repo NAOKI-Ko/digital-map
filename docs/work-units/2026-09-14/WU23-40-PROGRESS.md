@@ -11,9 +11,9 @@
 | WU-24 | KAN-53 | `6ab5eb3` | `1db0dc0` | `20260914020000_spot_editor_revisions` | 4 files / 19 tests PASS | 45 files / 317 tests PASS | PASS | validate + generate PASS | PASS | Email delivery deferred to WU-26 | PASS |
 | WU-25 | KAN-54 | `1db0dc0` | `b6e72d3` | `20260914030000_audit_events` | 3 files / 14 tests PASS | 46 files / 321 tests PASS | PASS | validate + generate PASS | not required | none | PASS |
 | WU-26 | KAN-69 | `b6e72d3` | `6638d40` | `20260914040000_mail_delivery` | 3 files / 11 tests PASS | 47 files / 325 tests PASS | PASS | validate + generate PASS | PASS | Resend credentials pending; fake provider PASS | PASS |
-| WU-27 | KAN-66 | `6638d40` | `38be3d2` | `20260914050000_security_rate_limits` | 4 files / 20 tests PASS | 48 files / 330 tests PASS | PASS | validate + generate PASS | not required | npm advisory API unreachable | PASS |
+| WU-27 | KAN-66 | `6638d40` | `38be3d2` | `20260914050000_security_rate_limits` | 4 files / 20 tests PASS | 48 files / 330 tests PASS | PASS | validate + generate PASS | not required | Final audit: 0 Critical/Moderate/Low; 1 High Prisma transitive risk recorded | PASS |
 | WU-28 | KAN-67 | `38be3d2` | `1b0fd3c` | none | 2 files / 9 tests PASS | 49 files / 334 tests PASS | PASS | validate PASS | PASS | Alert webhook pending; logs active | PASS |
-| WU-29 | KAN-65 | `1b0fd3c` | `c607b5d` | none | 1 file / 3 tests PASS | 50 files / 337 tests PASS | PASS | validate PASS | not required | PostgreSQL restore drill pending (tools unavailable) | PASS |
+| WU-29 | KAN-65 | `1b0fd3c` | `c607b5d` | none | 1 file / 3 tests PASS | 50 files / 337 tests PASS | PASS | validate PASS | not required | Disposable DB backup/upgrade and Windows QA DB+Media backup verified | PASS |
 | WU-30 | KAN-60 | `c607b5d` | `3529701` | `20260914060000_ja_en_translations` | 3 files / 20 tests PASS | 51 files / 343 tests PASS | PASS | validate + generate PASS | PASS | none | PASS |
 | WU-31 | KAN-64 | `3529701` | `e63d79a` | `20260914070000_media_variants` | 3 files / 14 tests PASS | 52 files / 347 tests PASS | PASS | validate + generate PASS | phase boundary pending | none | PASS |
 | WU-32 | KAN-57 | `e63d79a` | `6d383b0` | `20260914080000_public_releases` | 3 files / 16 tests PASS | 53 files / 353 tests PASS | PASS | validate + generate PASS | PASS | Cloudflare R2 credentials pending; local adapter PASS | PASS |
@@ -24,7 +24,7 @@
 | WU-37 | KAN-59 | `9542996` | `7964dfb` | none | 2 files / 14 tests PASS | 58 files / 381 tests PASS | PASS | validate PASS | PASS | none | PASS |
 | WU-38 | KAN-70 | `7964dfb` | `8632d39` | `20260914110000_self_service_onboarding` | 7 files / 33 tests PASS | 59 files / 388 tests PASS | PASS | validate + generate PASS | PASS | Live verification email pending; fake provider path PASS | PASS |
 | WU-39 | KAN-68 | `8632d39` | `8772e06` | none | 7 files / 35 tests PASS | 60 files / 393 tests PASS | PASS | validate PASS | PASS | Domain/DNS/TLS activation pending | PASS |
-| WU-40 | KAN-58 | `8772e06` | Stage A commits pending | none | release gate PASS | 60 files / 393 tests PASS | PASS | validate + generate PASS | PASS | Windows QA + Human UAT pending | STAGE A IN PROGRESS |
+| WU-40 | KAN-58 | `8772e06` | `14f292e` + Stage A docs | none | final Snapshot/PDF 2 files / 15 tests PASS | local 61 files / 397 tests PASS; Windows 61 / 396 PASS before final focused fix | PASS local + Windows | validate + generate PASS; QA 28/28 migrations | PASS local + Windows | Resend/R2/production domain pending; QA adapters PASS | READY FOR HUMAN UAT |
 
 ## WU-23 notes
 
@@ -60,7 +60,7 @@
 - Authenticated cookie mutations enforce a centralized trusted-Origin policy; invite/reset token endpoints remain exempt from cookie CSRF handling.
 - Session cookies are bounded, HttpOnly, SameSite=Lax, and Secure in production; CSP, nosniff, referrer, frame, permissions, and HTTPS-only HSTS headers are set centrally.
 - Uploads retain the existing 10 MiB limit, verify PNG/JPEG signatures and dimensions, use random storage keys, sanitize original names, and retain tenant authorization.
-- `pnpm audit --prod` could not reach the npm advisory API (`ENOTFOUND`); dependency audit is external verification pending, with no unsafe upgrade attempted.
+- The final `pnpm audit --prod` has zero Critical/Moderate/Low advisories. One High advisory remains in Prisma config's transitive `deepmerge-ts`; the available change requires an unsafe major override and was deliberately not forced.
 
 ## WU-28 notes
 
@@ -74,7 +74,7 @@
 - DB backup uses `pg_dump -Fc` with timestamp, commit SHA, PostgreSQL version, and SHA-256 sidecar metadata; restore requires an explicitly approved disposable target and refuses `DATABASE_URL` equality.
 - Managed media is archived with a sorted relative-path/size/SHA-256 manifest and archive checksum; restore verifies both archive and extracted files.
 - Retention is centralized at 7 daily / 4 weekly, marker-root constrained, filename constrained, and dry-run by default. PowerShell wrappers and an operator runbook are included.
-- This host has no `pg_dump`, `pg_restore`, `psql`, or Docker server. The disposable PostgreSQL restore drill is external verification pending; no QA/shared database was accessed.
+- Stage A verified the command set against disposable PostgreSQL for fresh and baseline-upgrade paths. Windows QA DB and five-file Media backup/checksums were verified before its isolated QA migration; no shared/production database was used.
 
 ## WU-30 notes
 
@@ -152,3 +152,8 @@
 - Production dependency audit initially found two Critical advisories. MapLibre, Nuxt DevTools, and Nuxt were upgraded to patched releases; existing semver ranges were refreshed and mysql2 was pinned to a safe same-major release. Final audit has zero Critical/Moderate/Low and one High in Prisma config's `deepmerge-ts`; its fix requires an unsafe major override and is recorded rather than forced.
 - The complete Human UAT checklist is `docs/qa/WU23-40-HUMAN-UAT-20260914.md`. Human UAT remains pending and main has not been merged.
 - Windows preflight found the original PowerShell wrapper delegated DB backup/restore to bash. The release gate replaced this with cross-platform Node commands that keep passwords out of arguments/output and retain the explicit disposable-restore guard.
+- Windows backup is retained at `C:\DigitalMap\backups\wu23-40-b2581f3`: custom-format DB dump plus metadata/checksum and a five-file Media archive/manifest/checksum. Rollback is restore DB/Media, restore the pre-WU QA environment file, and repoint to the prior release `3d4ee73749c0ae23f5cacebd9c752d55b337adc3`.
+- The mandatory Windows IMAGE audit passed before and after migration with zero invalid dimensions/references, partial coordinates, or out-of-range positions. All 12 pending migrations applied in order; QA now reports 28/28 migrations and preserved 1 User, 1 Tenant, 1 OWNER membership, 3 Maps, 3 Floors, and 10 Spots.
+- Windows ran the full suite at 61 files / 396 tests, typecheck, and production build on `d24b01f`; final SHA `14f292e` then passed focused Snapshot/PDF tests (2 files / 15 tests), typecheck, and production build. The final local consolidated gate is 61 files / 397 tests plus Prisma validate/generate and production build.
+- QA smoke passes local/public health and readiness (`mail=fake`), admin login, OWNER Map access, immutable Snapshot publish, public API/page, static assets, 2,046,784-byte PDF generation, Terms, Privacy, request-ID propagation, and unauthenticated 401. The current process has zero request errors.
+- Windows QA runs `14f292e0c5432a3814f83e26bf52ff73faacb930` at `https://sur-context-basin-concert.trycloudflare.com`. Resend, Cloudflare R2, and production Domain/DNS/TLS remain **EXTERNAL ACTIVATION PENDING**. Human UAT is **PENDING HUMAN EXECUTION**.
