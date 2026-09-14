@@ -1,6 +1,7 @@
 import { releaseRoot } from '~~/server/utils/public-release'
 import { getPublicStorage } from '~~/server/utils/public-storage'
 
+// Keep this hierarchy identical to the immutable URL emitted by rewriteReleaseAssets.
 export default defineEventHandler(async (event) => {
   const mapSlug = getRouterParam(event, 'mapSlug') ?? ''
   const releaseId = getRouterParam(event, 'releaseId') ?? ''

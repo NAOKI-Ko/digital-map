@@ -1,6 +1,8 @@
+import { existsSync } from 'node:fs'
 import { mkdtemp, readFile, rm, unlink, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { loadCurrentPublicSnapshot, rewriteReleaseAssets, validatePublicSnapshot } from '../server/utils/public-release'
 import { immutableCacheControl, LocalPublicStorage, pointerCacheControl } from '../server/utils/public-storage'
@@ -9,6 +11,11 @@ const roots: string[] = []
 afterEach(async () => { while (roots.length) await rm(roots.pop()!, { recursive: true, force: true }) })
 
 describe('CDN-first public release', () => {
+  it('Snapshotが出力する/releases階層とimmutable asset配信routeが一致する', () => {
+    const route = fileURLToPath(new URL('../server/routes/api/public-assets/[mapSlug]/releases/[releaseId]/assets/[filename].get.ts', import.meta.url))
+    expect(existsSync(route)).toBe(true)
+  })
+
   it('immutable objectは同一内容だけ冪等で、上書きを拒否する', async () => {
     const root = await mkdtemp(join(tmpdir(), 'public-storage-')); roots.push(root)
     const storage = new LocalPublicStorage(root)
