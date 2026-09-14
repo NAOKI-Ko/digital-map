@@ -113,37 +113,95 @@ constraints prevent duplicate membership. User, Map, and Phase 1 content tables 
 - Typecheck: PASS.
 - Production build: PASS. Existing sourcemap and large-chunk warnings remain non-fatal.
 
-## Disposable database verification
+## Migration Verification
 
-REAL-DB MIGRATION VERIFICATION PENDING.
+Migration-only verification passed on 2026-09-14 using PostgreSQL 17.10 in an isolated local
+Docker container. Two separate disposable databases were used: `fresh_gate` and `legacy_gate`.
+No QA, staging, production, Windows, or other shared database was contacted.
 
-Docker CLI is installed, but its configured `desktop-linux` daemon socket is unavailable, and
-no local `psql`, `initdb`, or `postgres` binaries are installed. Therefore neither a fresh
-`prisma migrate deploy` nor the seeded legacy-upgrade exercise could be run without using an
-external/shared database. No QA, staging, production, or Windows database was contacted.
+### Fresh database
 
-The pending pre-merge gate is:
+`prisma migrate deploy` applied all 17 repository migrations, from
+`20260720000000_init` through `20260913060000_organization_map_rbac`, to an empty database with
+zero migration errors. `prisma migrate status` reported the database schema up to date, and
+`_prisma_migrations` contained 17 completed migrations with no unfinished or rolled-back row.
 
-1. apply the full chain to an empty disposable PostgreSQL database;
-2. seed a pre-RBAC database with two Tenants and Phase 1 content;
-3. apply remaining migrations and verify IDs/counts, exact OWNER backfill, memberships, and
-   preservation of Maps, Spots, Categories, Media, fields, placement, and Decorations.
+Prisma validation passed, Prisma Client 7.8.0 generated successfully, and a read-only
+`prisma migrate diff --exit-code` found no difference between the database and
+`prisma/schema.prisma`. The expected Phase 1 tables and columns were asserted, including
+`MediaAsset`, `SpotPhoto`, `SpotFieldDefinition`, `SpotFieldValue`, `FloorDecoration`, normalized
+Spot/Floor spatial columns, media-asset references, and Spot `pinSize`. `TenantMember` and
+`MapMember` were also present with the final RBAC schema.
 
-## Browser smoke
+### Legacy upgrade
 
-Browser login/edit smoke was not run because the local environment has no disposable PostgreSQL
-database or safe auth fixtures. The production build completed, public/admin route contracts are
-covered by the test suite, and no remote or shared environment was used. A browser smoke remains
-part of the same disposable-environment pre-merge gate.
+The second database was built by applying the first 11 migration folders in their repository
+order, ending at `20260825000000_add_category_icon`. The seed was then loaded into that actual
+historical schema before the remaining six migrations were applied through integration HEAD by
+the normal `prisma migrate deploy` path. All six migrations succeeded with zero errors and the
+final migration history reported all 17 migrations complete.
 
-The existing untracked `docs/qa/browser-exploratory-20260913/` artifact in the Phase 1 source
-worktree was not read into, modified, staged, or deleted. No new screenshot/binary evidence was
-created.
+The deterministic legacy seed contained:
+
+- Tenant A: admins `user_a1` and `user_a2`, Maps `map_a1` and `map_a2`, two Floors, a Category,
+  a georeferenced positioned Spot, an unpositioned Spot, and a positioned fallback-render Spot.
+- Tenant B: admin `user_b1`, Map `map_b1`, one Floor, a Category, and a positioned
+  fallback-render Spot.
+- Distinct IDs, slugs, emails, descriptions, publication state, category relations, photo JSON,
+  pin metadata, and other representative legacy fields were retained for survival checks.
+
+The repository's read-only `audit:image-spatial-migration` logic reported no invalid Floor
+dimensions, invalid references, partial coordinates, out-of-bounds Spots, or transform errors
+before migration.
+
+### Spatial and owner results
+
+The IMAGE migration preserved all four Spots. The georeferenced Spot at reference A converted
+from `(lat, lng) = (35, 139)` to normalized `(x, y) = (0.1, 0.2)`. The two valid fallback-render
+positions converted to `(0.25, 0.75)` and `(0.5, 0.5)`. The unpositioned Spot remained
+unpositioned with both coordinates null. All positioned results were within `[0,1]`, exact
+against the deterministic expected values within `1e-12`, and required no clamping or manual
+remediation. Floor reference pixels `(100,100)` and `(900,100)` on a `1000x500` image converted
+to `(0.1,0.2)` and `(0.9,0.2)` while retaining their geographic reference values.
+
+KAN-52 created exactly three OWNER memberships: `user_a1` and `user_a2` for `tenant_a`, and
+`user_b1` for `tenant_b`. This matches the legacy model in which every supported legacy User had
+`role = admin`. Assertions found no cross-Tenant assignment and no duplicate `(tenantId,userId)`
+membership. A transactionally rolled-back fixture also proved that a `TenantMember` with
+`MEMBER` and a `MapMember` with `EDITOR` can be created together with valid final-schema
+relations.
+
+### Before and after counts
+
+|Entity|Before|After|Result|
+|---|---:|---:|---|
+|Tenant|2|2|Preserved|
+|User|3|3|Preserved|
+|Map|3|3|Preserved|
+|MapFloor|3|3|Preserved|
+|Spot|4|4|Preserved|
+|Category|3|3|Preserved|
+
+All seeded IDs in these six entity sets remained present. Map publication state, Spot publication
+and importance, Category associations, image dimensions, geographic reference coordinates, and
+representative content fields were retained. Storage changes were semantically preserved as
+normalized IMAGE coordinates and OWNER memberships; there was no unexplained row loss.
+
+### Migration risks and deferred validation
+
+No unresolved migration risk was observed for the valid historical scenarios exercised here.
+The migrations intentionally continue to fail closed for invalid image dimensions, incomplete
+coordinates, out-of-bounds legacy positions, invalid georeferences, tenants without an owner
+candidate, and unsupported legacy roles; real datasets must pass the existing preflight before
+upgrade.
+
+Browser smoke: DEFERRED. Human UAT is intentionally deferred until the feature-development batch
+is complete.
 
 ## Remaining risks
 
-- Real PostgreSQL fresh-chain and legacy-upgrade application are not yet demonstrated.
-- Authenticated Owner/Editor and public browser flows still require disposable database fixtures.
+- Browser and authenticated user-flow behavior is outside this migration-only task and remains
+  deferred to the later Human UAT batch.
 - A clean offline dependency reinstall requires priming the missing pnpm-store tarball (or an
   approved network-backed frozen install); this does not affect the passing tracked-source build.
 
