@@ -21,6 +21,10 @@ export default defineNuxtConfig({
     typeCheck: true,
   },
   runtimeConfig: {
+    resendApiKey: '',
+    mailFrom: '',
+    mailReplyTo: '',
+    publicBaseUrl: 'http://localhost:3000',
     auth: {
       invitationTtlHours: 72,
       passwordResetTtlMinutes: 60,

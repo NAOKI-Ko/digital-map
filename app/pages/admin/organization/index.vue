@@ -46,10 +46,10 @@ function useLogo(image: UploadedImage) {
 async function addMember() {
   await run(async () => {
     const result = await $fetch('/api/organization/invitations', { method: 'POST', body: { email: email.value } })
-    acceptanceUrl.value = result.acceptanceUrl
+    acceptanceUrl.value = result.acceptanceUrl ?? ''
     email.value = ''
     await refreshInvitations()
-    message.value = '招待を作成しました。開発・QAでは下のURLを安全に共有してください。'
+    message.value = result.delivery.status === 'SENT' ? '招待メールを送信しました。' : '招待を作成しましたが、メール配信設定を確認してください。'
   })
 }
 

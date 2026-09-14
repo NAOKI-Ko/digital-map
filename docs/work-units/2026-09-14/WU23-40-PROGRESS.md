@@ -9,7 +9,8 @@
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | WU-23 | KAN-56 | `3f373e6` | `6ab5eb3` | `20260914010000_auth_lifecycle` | 2 files / 12 tests PASS | 44 files / 312 tests PASS | PASS | validate + generate PASS | phase boundary pending | Email delivery deferred to WU-26 | PASS |
 | WU-24 | KAN-53 | `6ab5eb3` | `1db0dc0` | `20260914020000_spot_editor_revisions` | 4 files / 19 tests PASS | 45 files / 317 tests PASS | PASS | validate + generate PASS | PASS | Email delivery deferred to WU-26 | PASS |
-| WU-25 | KAN-54 | `1db0dc0` | this WU commit | `20260914030000_audit_events` | 3 files / 14 tests PASS | 46 files / 321 tests PASS | PASS | validate + generate PASS | not required | none | PASS |
+| WU-25 | KAN-54 | `1db0dc0` | `b6e72d3` | `20260914030000_audit_events` | 3 files / 14 tests PASS | 46 files / 321 tests PASS | PASS | validate + generate PASS | not required | none | PASS |
+| WU-26 | KAN-69 | `b6e72d3` | this WU commit | `20260914040000_mail_delivery` | 3 files / 11 tests PASS | 47 files / 325 tests PASS | PASS | validate + generate PASS | PASS | Resend credentials pending; fake provider PASS | PASS |
 
 ## WU-23 notes
 
@@ -31,3 +32,10 @@
 - The centralized writer recursively strips secret/token/password/header/body/hash metadata keys.
 - Membership, Map role, invitation, Spot Editor, revision, publication, and high-impact deletion events are inserted inside the protected mutation transaction where practical.
 - Audit reads are Owner-only, tenant constrained, newest first, and cursor paginated; no mutation route exists.
+
+## WU-26 notes
+
+- Production provider is Resend via HTTPS with stable delivery-id idempotency; transient 429/5xx/network errors retry at most three times.
+- `MailDelivery` stores only purpose, normalized recipient, provider id, status, attempts, timestamps, and sanitized error category.
+- Raw links exist only in the transient provider message. Production responses do not return raw links; local/QA fake mode may show the one-time URL at issuance.
+- `RESEND_API_KEY` and `MAIL_FROM` are not available in this environment, so live delivery is **EXTERNAL ACTIVATION PENDING**; fake-provider delivery is verified.

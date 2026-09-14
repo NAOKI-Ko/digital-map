@@ -25,6 +25,28 @@ model Tenant {
   updatedAt   DateTime       @updatedAt
 }
 
+enum MailDeliveryStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+model MailDelivery {
+  id                String             @id @default(cuid())
+  purpose           String
+  recipient         String
+  providerMessageId String?
+  status            MailDeliveryStatus @default(PENDING)
+  attemptCount      Int                @default(0)
+  errorCategory     String?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  sentAt            DateTime?
+
+  @@index([status, createdAt])
+  @@index([recipient, createdAt])
+}
+
 model User {
   id            String         @id @default(cuid())
   email         String         @unique
