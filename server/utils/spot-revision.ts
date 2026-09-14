@@ -81,10 +81,12 @@ export async function approveSpotRevision(event: H3Event, revisionId: string) {
       await tx.spotPhoto.createMany({ data: revision.photos.map(photo => ({ spotId: revision.spotId, assetId: photo.assetId, order: photo.order })) })
     }
     await appendAuditEvent(tx, { tenantId: map.tenantId, actorUserId: session.user.id, action: 'SPOT_REVISION_APPROVED', targetType: 'SpotRevision', targetId: revision.id, mapId: map.id, metadata: { spotId: revision.spotId, baseVersion: revision.baseVersion, photoCount: revision.photos.length } })
-    return tx.spotRevision.update({
+    const approved = await tx.spotRevision.update({
       where: { id: revision.id },
       data: { status: 'APPROVED', reviewerId: session.user.id, reviewedAt: new Date() },
     })
+    await tx.spotRevisionPhoto.deleteMany({ where: { revisionId: revision.id } })
+    return approved
   }, { isolationLevel: 'Serializable' })
 }
 
@@ -92,7 +94,10 @@ export async function rejectSpotRevision(event: H3Event, revisionId: string, rea
   const { session, map } = await requireMapAccess(event)
   const updated = await prisma.$transaction(async (tx) => {
     const result = await tx.spotRevision.updateMany({ where: { id: revisionId, status: 'PENDING', spot: { floor: { mapId: map.id } } }, data: { status: 'REJECTED', reviewerId: session.user.id, reviewedAt: new Date(), rejectReason: reason } })
-    if (result.count === 1) await appendAuditEvent(tx, { tenantId: map.tenantId, actorUserId: session.user.id, action: 'SPOT_REVISION_REJECTED', targetType: 'SpotRevision', targetId: revisionId, mapId: map.id, metadata: { reasonProvided: true } })
+    if (result.count === 1) {
+      await tx.spotRevisionPhoto.deleteMany({ where: { revisionId } })
+      await appendAuditEvent(tx, { tenantId: map.tenantId, actorUserId: session.user.id, action: 'SPOT_REVISION_REJECTED', targetType: 'SpotRevision', targetId: revisionId, mapId: map.id, metadata: { reasonProvided: true } })
+    }
     return result
   })
   if (updated.count !== 1) throw createError({ statusCode: 404, statusMessage: '承認待ちRevisionが見つかりません。' })

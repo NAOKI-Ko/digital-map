@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 
 const feedback = readFileSync(new URL('../app/components/ui/SaveFeedback.vue', import.meta.url), 'utf8')
 const spotCreate = readFileSync(new URL('../app/pages/admin/maps/[mapId]/spots/new.vue', import.meta.url), 'utf8')
-const spotEdit = readFileSync(new URL('../app/pages/admin/maps/[mapId]/spots/[spotId].vue', import.meta.url), 'utf8')
+const spotEdit = readFileSync(new URL('../app/pages/admin/maps/[mapId]/spots/[spotId]/index.vue', import.meta.url), 'utf8')
 const mapCreate = readFileSync(new URL('../app/pages/admin/maps/new.vue', import.meta.url), 'utf8')
 const mapSetup = readFileSync(new URL('../app/pages/admin/maps/[mapId]/setup.vue', import.meta.url), 'utf8')
 const floors = readFileSync(new URL('../app/pages/admin/maps/[mapId]/floors.vue', import.meta.url), 'utf8')

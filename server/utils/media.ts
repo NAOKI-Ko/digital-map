@@ -48,7 +48,7 @@ export async function requireOwnedMediaAsset(event: H3Event) {
           categoryIcons: true,
           spotPins: true,
           spotPhotos: true,
-          revisionPhotos: true,
+          revisionPhotos: { where: { revision: { status: 'PENDING' } } },
           decorations: true,
           tenantLogos: true,
         },

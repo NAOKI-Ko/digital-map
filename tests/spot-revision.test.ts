@@ -14,10 +14,11 @@ const testError = (input: { statusCode: number, statusMessage: string }) => Obje
 describe('WU-24 Spot Editor revision', () => {
   let saveSpotRevision: typeof import('../server/utils/spot-revision').saveSpotRevision
   let approveSpotRevision: typeof import('../server/utils/spot-revision').approveSpotRevision
+  let rejectSpotRevision: typeof import('../server/utils/spot-revision').rejectSpotRevision
 
   beforeAll(async () => {
     const tx = {
-      spotRevision: { findFirst: mocks.revisionFindFirst, create: mocks.revisionCreate, update: mocks.revisionUpdate },
+      spotRevision: { findFirst: mocks.revisionFindFirst, create: mocks.revisionCreate, update: mocks.revisionUpdate, updateMany: vi.fn().mockResolvedValue({ count: 1 }) },
       spotRevisionPhoto: { deleteMany: mocks.revisionPhotoDeleteMany, createMany: mocks.revisionPhotoCreateMany },
       spot: { update: mocks.spotUpdate },
       spotFieldValue: { deleteMany: mocks.fieldDeleteMany, create: mocks.fieldCreate },
@@ -32,7 +33,7 @@ describe('WU-24 Spot Editor revision', () => {
       spotFieldDefinition: { count: mocks.fieldCount }, mediaAsset: { count: mocks.assetCount },
       $transaction: (callback: (client: typeof tx) => unknown) => callback(tx),
     })
-    ;({ saveSpotRevision, approveSpotRevision } = await import('../server/utils/spot-revision'))
+    ;({ saveSpotRevision, approveSpotRevision, rejectSpotRevision } = await import('../server/utils/spot-revision'))
   })
 
   beforeEach(() => {
@@ -100,5 +101,11 @@ describe('WU-24 Spot Editor revision', () => {
     expect(data).not.toHaveProperty('pinIconId')
     expect(mocks.photoCreateMany).toHaveBeenCalledWith({ data: [{ spotId: 'spot-1', assetId: 'asset-1', order: 0 }] })
     expect(mocks.revisionUpdate).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ status: 'APPROVED', reviewerId: 'reviewer-1' }) }))
+    expect(mocks.revisionPhotoDeleteMany).toHaveBeenCalledWith({ where: { revisionId: 'revision-1' } })
+  })
+
+  it('removes pending media references after rejection so zero-reference assets can become GC candidates', async () => {
+    await rejectSpotRevision({} as never, 'revision-1', '差し戻し')
+    expect(mocks.revisionPhotoDeleteMany).toHaveBeenCalledWith({ where: { revisionId: 'revision-1' } })
   })
 })

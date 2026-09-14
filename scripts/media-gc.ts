@@ -8,7 +8,7 @@ const uploadDirectory = resolve(process.env.NUXT_UPLOAD_DIR || './public/uploads
 const apply = process.argv.includes('--delete')
 const assets = await prisma.mediaAsset.findMany({ include: {
   variants: true,
-  _count: { select: { mapLogos: true, mapSeoImages: true, floorIllustrations: true, categoryIcons: true, spotPins: true, spotPhotos: true, revisionPhotos: true, decorations: true, tenantLogos: true } },
+  _count: { select: { mapLogos: true, mapSeoImages: true, floorIllustrations: true, categoryIcons: true, spotPins: true, spotPhotos: true, revisionPhotos: { where: { revision: { status: 'PENDING' } } }, decorations: true, tenantLogos: true } },
 } })
 const candidates = planMediaGc(assets)
 console.info(JSON.stringify({ dryRun: !apply, graceDays: Number(process.env.MEDIA_GC_GRACE_DAYS || 7), candidates: candidates.map(asset => ({ id: asset.id, storageKey: asset.storageKey })) }, null, 2))

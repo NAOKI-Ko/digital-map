@@ -14,7 +14,7 @@ export default defineEventHandler(async (event): Promise<MediaAssetListResponse>
       categoryIcons: { select: { mapId: true } },
       spotPins: { select: { floor: { select: { mapId: true } } } },
       spotPhotos: { select: { spot: { select: { floor: { select: { mapId: true } } } } } },
-      revisionPhotos: { select: { revision: { select: { spot: { select: { floor: { select: { mapId: true } } } } } } } },
+      revisionPhotos: { where: { revision: { status: 'PENDING' } }, select: { revision: { select: { spot: { select: { floor: { select: { mapId: true } } } } } } } },
       decorations: { select: { floor: { select: { mapId: true } } } },
       _count: {
         select: {
@@ -24,7 +24,7 @@ export default defineEventHandler(async (event): Promise<MediaAssetListResponse>
           categoryIcons: true,
           spotPins: true,
           spotPhotos: true,
-          revisionPhotos: true,
+          revisionPhotos: { where: { revision: { status: 'PENDING' } } },
           decorations: true,
           tenantLogos: true,
         },

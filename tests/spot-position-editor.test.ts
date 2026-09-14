@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 
 const editorSource = readFileSync(new URL('../app/pages/admin/maps/[mapId]/editor.vue', import.meta.url), 'utf8')
-const detailSource = readFileSync(new URL('../app/pages/admin/maps/[mapId]/spots/[spotId].vue', import.meta.url), 'utf8')
+const detailSource = readFileSync(new URL('../app/pages/admin/maps/[mapId]/spots/[spotId]/index.vue', import.meta.url), 'utf8')
 
 describe('Spot位置再設定モード', () => {
   it('詳細画面から配置状態に応じた専用モードへ入る', () => {

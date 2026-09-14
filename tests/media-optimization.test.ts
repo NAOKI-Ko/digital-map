@@ -63,6 +63,6 @@ describe('Media optimization and GC', () => {
     const source = await readFile(new URL('../scripts/media-gc.ts', import.meta.url), 'utf8')
     expect(source).toContain("process.argv.includes('--delete')")
     expect(source).toContain('dryRun: !apply')
-    expect(source).toContain('revisionPhotos: true')
+    expect(source).toContain("revisionPhotos: { where: { revision: { status: 'PENDING' } } }")
   })
 })

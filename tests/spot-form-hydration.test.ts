@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 
 const newSpotPage = readFileSync(new URL('../app/pages/admin/maps/[mapId]/spots/new.vue', import.meta.url), 'utf8')
-const editSpotPage = readFileSync(new URL('../app/pages/admin/maps/[mapId]/spots/[spotId].vue', import.meta.url), 'utf8')
+const editSpotPage = readFileSync(new URL('../app/pages/admin/maps/[mapId]/spots/[spotId]/index.vue', import.meta.url), 'utf8')
 
 describe('SpotForm hydration boundary', () => {
   it.each([
