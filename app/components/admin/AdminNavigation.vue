@@ -141,7 +141,7 @@ function handleNavigate() {
       </div>
     </div>
 
-    <nav class="min-h-0 flex-1 overflow-y-auto px-2 py-3" aria-label="管理画面メニュー">
+    <nav class="admin-navigation-scroll min-h-0 flex-1 overflow-y-auto px-2 py-3" aria-label="管理画面メニュー">
       <template v-if="showLabels">
         <section v-for="group in groupedNavigation" :key="group.id" class="mb-4">
           <h2 class="px-3 pb-1.5 text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-stone-500">{{ group.label }}</h2>
@@ -199,5 +199,14 @@ function handleNavigate() {
 }
 .group:hover > .admin-nav-tooltip,
 .group:focus-visible > .admin-nav-tooltip { transform: translateY(-50%) translateX(0); opacity: 1; }
+.admin-navigation-scroll {
+  scrollbar-color: rgb(87 83 78) transparent;
+  scrollbar-width: thin;
+}
+.admin-navigation-scroll::-webkit-scrollbar { width: 5px; }
+.admin-navigation-scroll::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgb(87 83 78);
+}
 @media (prefers-reduced-motion: reduce) { .admin-nav-tooltip { transition: none; } }
 </style>
