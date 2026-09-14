@@ -84,6 +84,8 @@ describe('Phase 1 + KAN-52 integration contract', () => {
         'server/api/maps/[mapId]/spot-fields/index.post.ts',
         'server/api/maps/[mapId]/spot-fields/[fieldId].patch.ts',
         'server/api/maps/[mapId]/spot-fields/[fieldId].delete.ts',
+        'server/api/maps/[mapId]/spots/import/template.get.ts',
+        'server/api/maps/[mapId]/spots/import/export.get.ts',
         'server/api/maps/[mapId]/spots/import/preview.post.ts',
         'server/api/maps/[mapId]/spots/import/index.post.ts',
       ],

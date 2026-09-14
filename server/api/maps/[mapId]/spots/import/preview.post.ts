@@ -6,5 +6,5 @@ export default defineEventHandler(async (event): Promise<SpotCsvPreviewResponse>
   const body = await readBody<{ floorId?: string, csv?: string }>(event)
   if (!body.floorId || typeof body.csv !== 'string') throw createError({ statusCode: 422, statusMessage: 'フロアとCSVを指定してください。' })
   const context = await loadSpotCsvContext(prisma, map.id, body.floorId)
-  return { preview: previewSpotCsv(body.csv, context.fields, context.categories, context.existingNames, context.enabledLocales).preview }
+  return { preview: previewSpotCsv(body.csv, context.fields, context.categories, context.existingNames, context.enabledLocales, context.spots, context.floor.id).preview }
 })

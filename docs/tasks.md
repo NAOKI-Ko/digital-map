@@ -202,6 +202,14 @@ Phase 9のT-46〜T-52を置き換える際、実装履歴では同じタスク�
 
 詳細なwork-unit結果は`docs/work-units/2026-09-13/PROGRESS.md`、人手確認は`docs/qa/phase1-product-batch-20260913.md`を参照する。
 
+## WU-41 / KAN-71: CSV Export・既存Spot安全一括編集（2026-09-14）
+
+- [x] T-108: v1 create-only互換を維持し、1 Floor全Spotのv2 CSV Exportを追加
+- [x] T-109: stable Spot ID、schemaVersion、全編集可能状態rowVersionとformula-safe可逆round-tripを実装
+- [x] T-110: NEW/UPDATE/UNCHANGED/WARNING/CONFLICT/ERRORとfield-level diff previewを実装
+- [x] T-111: CREATE/UPDATE/Category/Custom/i18n/liveVersion/auditのserializable transaction applyを実装
+- [x] T-112: OWNER/assigned Map EDITOR gate、Snapshot/Revision/除外状態不変contract、100/1000行sanityを検証
+
 ## 各タスクの依頼テンプレート(Codex用)
 
 ```

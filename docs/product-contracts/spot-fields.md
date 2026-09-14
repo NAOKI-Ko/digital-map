@@ -33,8 +33,12 @@ Public detail order is: name and Category; media area when images exist; enabled
 
 ## CSV
 
-CSV creates new Spots only and targets exactly one Floor. It never updates, upserts, deletes, or synchronizes. Every imported Spot is unpositioned and unpublished.
+Legacy v1 CSV targets exactly one Floor and remains create-only. Every v1-created Spot is unpositioned and unpublished. v2 exports every positioned/unpositioned and published/unpublished Spot on one selected Floor, independent of list filters. A v2 row with `__spotId` updates that exact Spot; a blank ID creates a Spot. Missing rows never delete or synchronize Spots.
 
 The UTF-8 BOM template is generated from the current Map Field Definitions and includes Spot name, enabled standard fields, enabled custom fields, categories, and enabled Description. It excludes photos, PIN, PIN size, importance, position, and publication. Mapping is stable and unambiguous and never depends on duplicate user-facing labels.
 
-Categories may reference multiple existing categories but are never created. Unknown categories are errors. Missing required values, incompatible custom types, and structurally invalid rows are errors; existing or within-file duplicate names are warnings and remain legal. All rows are previewed with totals and row messages. Any error rejects all writes; zero errors permits one transaction with no partial success.
+The reserved v2 columns are `__csvVersion`, `__schemaVersion`, `__spotId`, and `__rowVersion`. Users must not edit them. Schema tokens cover stable Field Definition identity/type/enabled/required and locale configuration without conflicting on label-only changes. Row tokens cover all enabled CSV-editable standard/custom values, ja/en translations, and Category membership. Tokens are recomputed in the final serializable transaction.
+
+Categories may reference multiple existing categories but are never created. On update, the CSV value is the desired final set and blank removes all memberships. Unknown categories are errors. Missing required values, incompatible custom types, duplicate/unknown/wrong-Floor IDs, and structurally invalid rows are errors; duplicate names are warnings and remain legal. A conflict or error rejects all writes. UTF-8 BOM/RFC4180 output protects formula-like cells with a reversible apostrophe convention (`=`, `+`, `-`, `@`; an original leading apostrophe is doubled).
+
+UPDATE may change name, enabled standard/custom fields, ja/en translations, and Categories only. Position/Floor/georeference, publication, PIN appearance, importance/size, Media/photos, and Decoration remain unchanged. Increasing `Spot.liveVersion` preserves pending revisions and makes their later approval hit the existing stale-revision conflict. Immutable public releases remain unchanged until the next publish.

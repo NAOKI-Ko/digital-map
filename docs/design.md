@@ -236,7 +236,9 @@ fallback coordinatesは実世界の位置を表さない。したがって、次
 - 共通Media pickerは新規uploadとTenant Libraryを同じUIで扱い、最近使用/このMap/すべて/用途filterを提供する。filterは再利用を禁止する境界ではない
 - MediaAsset削除前に全consumerの参照を集計し、1件でも使用中なら拒否する。featureから外す操作はrelationだけを外し、asset bytesを削除しない
 - Spot Field Definitionの標準semantic keyは`description/address/phone/website/hours/holiday`。表示名は変更できるがsemantic keyは不変。custom型は`single_line_text/multiline_text/number/url/boolean`だけ
-- CSV templateは現在有効なField Definitionsからstable keyで生成する。previewで構造・必須・型・Categoryをerror、同名をwarningとして分類し、errorが1件でもあれば0件、なければ1 transactionで未配置・非公開Spotを新規作成する
+- v1 CSV templateは現在有効なField Definitionsからstable keyで生成し、従来どおり全行を未配置・非公開Spotとして新規作成する。v2 Exportは1 Floorの全Spotを対象とし、`__csvVersion/__schemaVersion/__spotId/__rowVersion`を予約system列として付与する
+- v2の`__spotId`は唯一の更新identityとし、空欄はCREATE、値ありはUPDATE。同名はwarningに留め、未知・重複・別Floor ID、構造/型/Category error、schema/row conflictが1件でもあれば全件0 writeとする。UPDATEはCSV編集可能項目だけを変更し、位置・公開・PIN・Media・Decoration等を保持する
+- `__schemaVersion`はlabel/orderを除くField Definition identity/type/enabled/requiredとlocale構成、`__rowVersion`は有効な標準/Custom値、ja/en翻訳、Category集合をcanonical SHA-256 token化する。applyはfresh stateをserializable transaction内で再hashし、Spot/relations/liveVersion/auditをatomic更新する。現在の公開Snapshotはpublishまで不変とする
 - Floor DecorationはMediaAssetを参照し、正規化IMAGE位置・相対幅・回転・layer順を保持する。base illustrationの上、すべてのSpot PINの下に非対話で描画する
 
 ### 4.10 管理feedbackと重複

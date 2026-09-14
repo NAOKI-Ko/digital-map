@@ -19,7 +19,7 @@
   - Real/GEO Mapの永続化・編集・公開（作成画面には無効状態で表示）
   - 画像内容を解析する自動alignment
   - select/multi-select/date/time型のカスタムSpot項目
-  - CSVによる更新・upsert・削除・同期
+  - CSVによる削除・全件同期（既存SpotのID指定安全更新はWU-41でMVPへ追加）
   - GEO座標上のDecoration
 
 ## 3. ロールとユーザーストーリー
@@ -42,6 +42,7 @@
 - US-19: 管理者として、MapごとにSpot情報項目の表示名・公開範囲・必須・順序を設定したい
 - US-20: 管理者として、現在のSpot項目に合うCSVをpreviewして、エラーがない全行だけを一括登録したい
 - US-21: 管理者として、イラスト上にSpotではない装飾画像を配置したい
+- US-22: 管理者として、1 Floorの既存SpotをCSV Exportし、差分と競合を確認してから新規・更新を安全に一括保存したい
 
 ### 3.2 一般閲覧者(観光客・地域住民)
 
@@ -79,6 +80,7 @@
 | FR-21 | IMAGE相対のFloor Decoration（配置・移動・縦横比維持resize・回転・順序・複製・instance削除） | Should |
 | FR-22 | PINサイズ`small`/`medium`/`large`と、selected > filter match > featured > normalの離散的表示優先度 | Should |
 | FR-23 | 同一Map内同名Spotの非blocking警告と、保存中/成功/失敗を区別するapplication feedback | Should |
+| FR-24 | 1 Floorの既存Spot CSV Export、stable ID・schema/row concurrency token、field差分preview、CREATE/UPDATE混在のall-or-nothing import | Must |
 
 ## 5. 非機能要件
 
