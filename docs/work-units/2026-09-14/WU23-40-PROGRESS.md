@@ -20,7 +20,8 @@
 | WU-33 | KAN-55 | `6d383b0` | `d05583a` | `20260914090000_public_analytics` | 3 files / 17 tests PASS | 54 files / 359 tests PASS | PASS | validate + generate PASS | not required | none | PASS |
 | WU-34 | KAN-62 | `d05583a` | `50ca8b7` | `20260914100000_map_seo` | 4 files / 24 tests PASS | 55 files / 364 tests PASS | PASS | validate + generate PASS | not required | none | PASS |
 | WU-35 | KAN-63 | `50ca8b7` | `c051963` | none | 3 files / 15 tests PASS | 56 files / 368 tests PASS | PASS | validate PASS | not required | Legal review pending | PASS |
-| WU-36 | KAN-61 | `c051963` | this WU commit | none | 2 files / 21 tests PASS | 57 files / 373 tests PASS | PASS | validate PASS | PASS | none | PASS |
+| WU-36 | KAN-61 | `c051963` | `9542996` | none | 2 files / 21 tests PASS | 57 files / 373 tests PASS | PASS | validate PASS | PASS | none | PASS |
+| WU-37 | KAN-59 | `9542996` | this WU commit | none | 2 files / 14 tests PASS | 58 files / 381 tests PASS | PASS | validate PASS | PASS | none | PASS |
 
 ## WU-23 notes
 
@@ -120,3 +121,10 @@
 - Floor tabs use roving focus and Arrow/Home/End keyboard navigation. The Spot detail dialog traps focus, closes with Escape, and restores focus to the invoking marker or list entry.
 - Icon controls expose accessible names, decoration remains assistive-technology hidden, and a global visible focus treatment covers keyboard-operable public controls.
 - Automated axe checks cover the public initial/category/list state, Spot dialog, legal page, and login form with no critical/serious violations. A deterministic palette audit separately verifies major text/control contrast at WCAG AA thresholds.
+
+## WU-37 notes
+
+- Authorized OWNER/assigned Map EDITOR export uses the current immutable public Snapshot when published. A never-published Map uses the live preview source with a visible `未公開プレビュー` label and no QR.
+- A4/A3 portrait/landscape pages use 300-DPI Sharp composition and pdf-lib without a GUI browser dependency. Multi-floor export creates one or more pages per Floor, and long Spot legends flow onto continuation pages.
+- Every Floor page contains the background, Decorations, deterministic numbered PINs, Spot/Category legend, title, organization identity/logo when configured, and a fixed-URL QR for published Maps.
+- A generated two-page A4 landscape sample was parsed with Poppler/pdf-lib and rendered to PNG for visual inspection; margins, legend, markers, and QR were unclipped and legible.

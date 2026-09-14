@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import PublicSharePanel from '~/components/admin/PublicSharePanel.vue'
+import PaperExportPanel from '~/components/admin/PaperExportPanel.vue'
 import { buildPublicMapUrl } from '~~/shared/utils/public-url'
 import type { AdminMapResponse } from '~~/shared/types/map'
 import type { MapPublicationResponse } from '~~/shared/types/map-publication'
+import type { MapFloorListResponse } from '~~/shared/types/floor'
 
 definePageMeta({ layout: 'admin', middleware: 'auth' })
 
 const route = useRoute()
 const mapId = route.params.mapId as string
 const { data, error, status } = await useFetch<AdminMapResponse>(`/api/maps/${mapId}`)
+const { data: floorData } = await useFetch<MapFloorListResponse>(`/api/maps/${mapId}/floors`)
 const { data: releaseData, refresh: refreshReleases } = await useFetch<{ currentReleaseId: string | null, releases: Array<{ id: string, createdAt: string, readyAt: string | null }> }>(`/api/maps/${mapId}/releases`)
 const isSaving = ref(false)
 const errorMessage = ref('')
@@ -145,6 +148,9 @@ async function rollbackRelease(releaseId: string) {
             <section class="h-96 animate-pulse rounded-2xl bg-stone-200" />
           </template>
         </ClientOnly>
+      </div>
+      <div class="mt-6">
+        <PaperExportPanel :map-id="mapId" :floors="floorData?.floors ?? []" :is-published="data.map.isPublished" />
       </div>
     </template>
   </div>
