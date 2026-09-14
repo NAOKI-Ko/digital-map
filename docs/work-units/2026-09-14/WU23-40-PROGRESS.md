@@ -11,7 +11,8 @@
 | WU-24 | KAN-53 | `6ab5eb3` | `1db0dc0` | `20260914020000_spot_editor_revisions` | 4 files / 19 tests PASS | 45 files / 317 tests PASS | PASS | validate + generate PASS | PASS | Email delivery deferred to WU-26 | PASS |
 | WU-25 | KAN-54 | `1db0dc0` | `b6e72d3` | `20260914030000_audit_events` | 3 files / 14 tests PASS | 46 files / 321 tests PASS | PASS | validate + generate PASS | not required | none | PASS |
 | WU-26 | KAN-69 | `b6e72d3` | `6638d40` | `20260914040000_mail_delivery` | 3 files / 11 tests PASS | 47 files / 325 tests PASS | PASS | validate + generate PASS | PASS | Resend credentials pending; fake provider PASS | PASS |
-| WU-27 | KAN-66 | `6638d40` | this WU commit | `20260914050000_security_rate_limits` | 4 files / 20 tests PASS | 48 files / 330 tests PASS | PASS | validate + generate PASS | not required | npm advisory API unreachable | PASS |
+| WU-27 | KAN-66 | `6638d40` | `38be3d2` | `20260914050000_security_rate_limits` | 4 files / 20 tests PASS | 48 files / 330 tests PASS | PASS | validate + generate PASS | not required | npm advisory API unreachable | PASS |
+| WU-28 | KAN-67 | `38be3d2` | this WU commit | none | 2 files / 9 tests PASS | 49 files / 334 tests PASS | PASS | validate PASS | PASS | Alert webhook pending; logs active | PASS |
 
 ## WU-23 notes
 
@@ -48,3 +49,10 @@
 - Session cookies are bounded, HttpOnly, SameSite=Lax, and Secure in production; CSP, nosniff, referrer, frame, permissions, and HTTPS-only HSTS headers are set centrally.
 - Uploads retain the existing 10 MiB limit, verify PNG/JPEG signatures and dimensions, use random storage keys, sanitize original names, and retain tenant authorization.
 - `pnpm audit --prod` could not reach the npm advisory API (`ENOTFOUND`); dependency audit is external verification pending, with no unsafe upgrade attempted.
+
+## WU-28 notes
+
+- `/api/health` is DB-independent; `/api/ready` checks PostgreSQL and production mail readiness without exposing versions or secrets.
+- Safe incoming request IDs are preserved and invalid/missing IDs are replaced with UUIDs and returned in `X-Request-Id`.
+- Production logs are structured JSON and recursively sanitized. Major server failures flow through one Nitro hook.
+- The optional operations webhook sends sanitized summaries and deduplicates repeated alert fingerprints for five minutes. No webhook is configured here, so log-only observability is active.

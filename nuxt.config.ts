@@ -26,6 +26,7 @@ export default defineNuxtConfig({
     mailReplyTo: '',
     publicBaseUrl: 'http://localhost:3000',
     trustedOrigins: '',
+    opsAlertWebhookUrl: '',
     rateLimits: {
       loginFailures: { limit: 5, windowSeconds: 15 * 60 },
       passwordReset: { limit: 5, windowSeconds: 60 * 60 },
