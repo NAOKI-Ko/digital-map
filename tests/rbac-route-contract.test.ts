@@ -47,4 +47,11 @@ describe('KAN-52 route authorization contract', () => {
     expect(migration).toContain('COMMIT;')
     expect(migration).not.toContain('SpotAssignment')
   })
+
+  it('Spot担当者UIはSpot詳細pageと衝突しない独立routeを使う', () => {
+    const spotPage = readFileSync(join(root, 'app/pages/admin/maps/[mapId]/spots/[spotId].vue'), 'utf8')
+    expect(spotPage).toContain('/assignee`')
+    expect(spotPage).not.toContain('/spots/${spotId}/editor`')
+    expect(() => readFileSync(join(root, 'app/pages/admin/maps/[mapId]/spots/[spotId]/assignee.vue'), 'utf8')).not.toThrow()
+  })
 })

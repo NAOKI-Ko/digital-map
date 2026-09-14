@@ -127,7 +127,7 @@ async function saveEnglish() {
         <p class="mt-2 text-sm text-stone-600">基本情報や営業情報を編集します。</p>
       </header>
       <NuxtLink :to="{ path: `/admin/maps/${mapId}/editor`, query: { floorId: data.spot.floorId, placeSpotId: data.spot.id } }" class="mt-5 inline-flex rounded-lg bg-terracotta-600 px-4 py-2.5 text-sm font-semibold text-white">{{ data.spot.x === null || data.spot.y === null ? '位置を設定' : '位置を再設定' }}</NuxtLink>
-      <NuxtLink :to="`/admin/maps/${mapId}/spots/${spotId}/editor`" class="ml-2 mt-5 inline-flex rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-sm font-semibold">Spot担当者</NuxtLink>
+      <NuxtLink :to="`/admin/maps/${mapId}/spots/${spotId}/assignee`" class="ml-2 mt-5 inline-flex rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-sm font-semibold">Spot担当者</NuxtLink>
       <SaveFeedback class="mt-6" :state="isSubmitting ? 'saving' : submitError ? 'error' : successMessage ? 'success' : 'idle'" :message="submitError || successMessage" />
       <section class="mt-8 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
         <ClientOnly>
