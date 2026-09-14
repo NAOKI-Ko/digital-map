@@ -41,6 +41,7 @@ describe('ジオリファレンス調整と解除', () => {
 
   it('編集リセットと保存済み設定の解除を別操作として示す', () => {
     expect(pageSource).toContain('基準点をリセット')
+    expect(pageSource.indexOf('基準点をリセット')).toBeLessThan(pageSource.indexOf('<AddressGeocoder'))
     expect(pageSource).toContain('保存済みの設定はまだ変更されていません')
     expect(pageSource).toContain('ジオリファレンスを解除')
     expect(pageSource).toContain('<ConfirmDialog')

@@ -147,11 +147,14 @@ function getErrorMessage(error: unknown) {
     <section v-if="status === 'pending'" class="mt-8 rounded-xl bg-white p-8 text-sm text-stone-600">読み込んでいます…</section>
     <section v-else-if="error || !floor" class="mt-8 rounded-xl bg-red-50 p-8 text-sm text-red-700">フロアが見つかりません。</section>
     <template v-else>
-      <header class="mt-5">
-        <p class="text-sm font-medium text-terracotta-700">{{ floor.name }}</p>
-        <h1 class="mt-1 text-2xl font-bold tracking-tight text-stone-900 sm:text-3xl">2点合わせ設定</h1>
-        <p class="mt-2 text-sm text-stone-600">イラストと実地図で同じ目印を2組選ぶと、位置・向き・大きさを自動計算します。</p>
-        <p class="mt-2 text-sm text-stone-500">設定しない場合もイラスト表示とピン配置は利用できますが、このフロアでは現在地機能が使えません。</p>
+      <header class="mt-5 flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p class="text-sm font-medium text-terracotta-700">{{ floor.name }}</p>
+          <h1 class="mt-1 text-2xl font-bold tracking-tight text-stone-900 sm:text-3xl">2点合わせ設定</h1>
+          <p class="mt-2 text-sm text-stone-600">イラストと実地図で同じ目印を2組選ぶと、位置・向き・大きさを自動計算します。</p>
+          <p class="mt-2 text-sm text-stone-500">設定しない場合もイラスト表示とピン配置は利用できますが、このフロアでは現在地機能が使えません。</p>
+        </div>
+        <button type="button" :disabled="isSaving" class="rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-sm font-semibold text-stone-700 shadow-sm hover:bg-stone-50 disabled:opacity-60" @click="resetEditingPoints">基準点をリセット</button>
       </header>
 
       <section class="mt-6">
@@ -180,7 +183,6 @@ function getErrorMessage(error: unknown) {
       <div v-if="successMessage" role="status" class="mt-4 rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{{ successMessage }}</div>
       <div class="mt-5 flex flex-wrap justify-end gap-3">
         <NuxtLink v-if="cameFromEditor" :to="backPath" class="rounded-lg border border-stone-300 bg-white px-5 py-2.5 text-sm font-semibold text-stone-700 hover:bg-stone-50">ピン配置エディタに戻る</NuxtLink>
-        <button type="button" :disabled="isSaving" class="rounded-lg border border-stone-300 bg-white px-5 py-2.5 text-sm font-semibold text-stone-700 disabled:opacity-60" @click="resetEditingPoints">基準点をリセット</button>
         <button v-if="hasSavedGeoReference" type="button" :disabled="isSaving" class="rounded-lg px-5 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-50 disabled:opacity-60" @click="removeConfirmOpen = true">ジオリファレンスを解除</button>
         <button type="button" :disabled="isSaving || !isGeoReferenceDraftComplete(draft) || Boolean(validationError)" class="rounded-lg bg-terracotta-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60" @click="save">
           {{ isSaving ? '保存中…' : 'この内容で保存' }}
