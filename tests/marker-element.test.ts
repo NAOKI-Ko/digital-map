@@ -124,6 +124,10 @@ describe('Marker DOM生成', () => {
     expect(mapViewerSource).toMatch(/\.map-viewer-marker__illustration\s*\{[\s\S]*?transform-origin:\s*bottom center;/)
   })
 
+  it('focus return用のstable Spot identityをmarkerへ付与する', () => {
+    expect(createElement().attributes.get('data-spot-id')).toBe('spot-1')
+  })
+
   it('presetとcustomは外形を広げず内部contentが本体幅の75%以上を使う', () => {
     const shapeRule = cssRule(mapViewerSource, '.map-viewer-marker__shape')
     const contentRule = cssRule(mapViewerSource, '.map-viewer-marker__content')

@@ -26,6 +26,7 @@ const selectedFloorId = ref('')
 const selectedSpotId = ref<string | null>(null)
 const selectedCategoryIds = ref<string[]>([])
 let spotTrigger: HTMLElement | null = null
+let spotTriggerId: string | null = null
 
 const selectedFloor = computed(() => (
   data.value?.map.floors.find(floor => floor.id === selectedFloorId.value)
@@ -86,13 +87,21 @@ useHead(() => ({
 
 function selectSpot(spot: MapViewerSpot) {
   if (document.activeElement instanceof HTMLElement) spotTrigger = document.activeElement
+  spotTriggerId = spot.id
   selectedSpotId.value = spot.id
   if (data.value?.map.id) sendPublicAnalytics({ type: 'SPOT_VIEW', mapId: data.value.map.id, spotId: spot.id })
 }
 
 function closeSpot() {
   selectedSpotId.value = null
-  nextTick(() => { spotTrigger?.focus(); spotTrigger = null })
+  nextTick(() => requestAnimationFrame(() => {
+    const fallback = spotTriggerId
+      ? [...document.querySelectorAll<HTMLElement>('[data-spot-id]')].find(element => element.dataset.spotId === spotTriggerId)
+      : null
+    ;(spotTrigger?.isConnected ? spotTrigger : fallback)?.focus()
+    spotTrigger = null
+    spotTriggerId = null
+  }))
 }
 
 async function switchLocale(locale: 'ja' | 'en') {
