@@ -96,7 +96,7 @@ function closeSpot() {
   selectedSpotId.value = null
   nextTick(() => requestAnimationFrame(() => {
     const fallback = spotTriggerId
-      ? [...document.querySelectorAll<HTMLElement>('[data-spot-id]')].find(element => element.dataset.spotId === spotTriggerId)
+      ? [...document.querySelectorAll<HTMLElement>('.map-viewer-marker[data-spot-id]')].find(element => element.dataset.spotId === spotTriggerId)
       : null
     ;(spotTrigger?.isConnected ? spotTrigger : fallback)?.focus()
     spotTrigger = null

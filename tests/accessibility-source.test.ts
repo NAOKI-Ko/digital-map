@@ -12,7 +12,7 @@ describe('WCAG implementation source contract', () => {
     expect(marker).toContain("image.alt = ''")
     expect(page).toContain('SpotAccessibleList')
     expect(page).toContain('spotTrigger?.isConnected ? spotTrigger : fallback')
-    expect(page).toContain("querySelectorAll<HTMLElement>('[data-spot-id]')")
+    expect(page).toContain("querySelectorAll<HTMLElement>('.map-viewer-marker[data-spot-id]')")
     expect(marker).toContain("element.setAttribute('data-spot-id', spot.id)")
     expect(dialog).toContain('aria-modal="true"')
     expect(dialog).toContain("event.key !== 'Tab'")
