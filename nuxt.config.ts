@@ -50,6 +50,7 @@ export default defineNuxtConfig({
     },
     public: {
       publicBaseUrl: process.env.PUBLIC_BASE_URL || 'http://localhost:3000',
+      legalContact: process.env.LEGAL_CONTACT_EMAIL || 'support@example.invalid',
     },
   },
 })

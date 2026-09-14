@@ -18,7 +18,8 @@
 | WU-31 | KAN-64 | `3529701` | `e63d79a` | `20260914070000_media_variants` | 3 files / 14 tests PASS | 52 files / 347 tests PASS | PASS | validate + generate PASS | phase boundary pending | none | PASS |
 | WU-32 | KAN-57 | `e63d79a` | `6d383b0` | `20260914080000_public_releases` | 3 files / 16 tests PASS | 53 files / 353 tests PASS | PASS | validate + generate PASS | PASS | Cloudflare R2 credentials pending; local adapter PASS | PASS |
 | WU-33 | KAN-55 | `6d383b0` | `d05583a` | `20260914090000_public_analytics` | 3 files / 17 tests PASS | 54 files / 359 tests PASS | PASS | validate + generate PASS | not required | none | PASS |
-| WU-34 | KAN-62 | `d05583a` | this WU commit | `20260914100000_map_seo` | 4 files / 24 tests PASS | 55 files / 364 tests PASS | PASS | validate + generate PASS | not required | none | PASS |
+| WU-34 | KAN-62 | `d05583a` | `50ca8b7` | `20260914100000_map_seo` | 4 files / 24 tests PASS | 55 files / 364 tests PASS | PASS | validate + generate PASS | not required | none | PASS |
+| WU-35 | KAN-63 | `50ca8b7` | this WU commit | none | 3 files / 15 tests PASS | 56 files / 368 tests PASS | PASS | validate PASS | not required | Legal review pending | PASS |
 
 ## WU-23 notes
 
@@ -104,3 +105,10 @@
 - Public title, description, canonical, Open Graph, X card, locale, and hreflang values are computed exclusively from the current Snapshot payload plus configured public origin; no per-view admin DB query exists.
 - Japanese retains the path-only canonical, English uses `?lang=en`, and `x-default` points to Japanese. Missing/unpublished Snapshot responses are noindex.
 - Sitemap output is cached, includes only published Maps with a current release, and carries locale alternates. Robots exposes the sitemap and excludes admin/API crawling.
+
+## WU-35 notes
+
+- Terms and Privacy are stable `/terms` and `/privacy` routes backed by replaceable, versioned repository content instead of wording duplicated in Vue templates.
+- Both expose version `2026-09-14-v1`, effective date `2026-09-14`, and an environment-configured contact point. Public Map and login surfaces link to both routes.
+- Privacy describes only implemented behavior: account/organization data, hash-only auth lifecycle tokens, transactional email, sanitized operational logs, aggregate Map/Spot analytics, session cookies, uploaded media, immutable releases, retention, and backups.
+- The wording is explicitly a product/legal draft. Formal legal approval remains external review and does not block implementation PASS.

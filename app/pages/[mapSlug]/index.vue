@@ -124,6 +124,8 @@ onMounted(() => {
           </div>
         </div>
         <nav aria-label="団体リンク" class="flex shrink-0 items-center gap-1 sm:gap-2">
+          <NuxtLink to="/terms" class="text-xs text-stone-600 underline">規約</NuxtLink>
+          <NuxtLink to="/privacy" class="text-xs text-stone-600 underline">Privacy</NuxtLink>
           <label v-if="data.map.enabledLocales.includes('en')" class="sr-only" for="public-locale">{{ t.language }}</label>
           <select v-if="data.map.enabledLocales.includes('en')" id="public-locale" :value="data.map.locale" class="rounded-full border border-stone-200 px-2.5 py-1.5 text-xs" @change="switchLocale(($event.target as HTMLSelectElement).value as 'ja' | 'en')"><option value="ja">日本語</option><option value="en">English</option></select>
           <a v-if="data.map.websiteUrl" :href="data.map.websiteUrl" target="_blank" rel="noopener noreferrer" class="rounded-full border border-stone-200 px-2.5 py-1.5 text-xs font-semibold text-stone-700 hover:bg-stone-50 sm:px-3">{{ t.official }}</a>

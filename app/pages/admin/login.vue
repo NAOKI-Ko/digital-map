@@ -159,6 +159,7 @@ const submit = handleSubmit(async (values) => {
         </form>
 
         <p class="mt-6 text-center text-sm text-stone-500"><NuxtLink to="/reset-password" class="underline">パスワードをお忘れですか？</NuxtLink></p>
+        <nav aria-label="法的情報" class="mt-4 flex justify-center gap-4 text-xs text-stone-500"><NuxtLink to="/terms" class="underline">利用規約</NuxtLink><NuxtLink to="/privacy" class="underline">プライバシーポリシー</NuxtLink></nav>
       </div>
     </section>
   </main>
