@@ -99,7 +99,7 @@ async function run(action: () => Promise<void>) {
 
     <section v-if="organizationError" class="mt-6 rounded-xl border border-red-200 bg-red-50 p-5 text-sm text-red-800">組織設定とメンバー管理は、組織オーナーだけが利用できます。</section>
 
-    <section v-if="organization" class="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+    <section v-if="organization" id="settings" class="mt-6 scroll-mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
       <h2 class="text-lg font-bold">組織設定</h2>
       <form class="mt-5 grid gap-4" @submit.prevent="saveOrganization">
         <label class="text-sm font-semibold">組織名<input v-model="form.name" required maxlength="100" class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5"></label>
@@ -116,7 +116,7 @@ async function run(action: () => Promise<void>) {
       </form>
     </section>
 
-    <section v-if="organization" class="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+    <section v-if="organization" id="members" class="mt-6 scroll-mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
       <h2 class="text-lg font-bold">組織メンバー招待</h2>
       <p class="mt-1 text-sm text-stone-600">招待を承認するまでメンバーには追加されません。招待リンクは発行時だけ表示されます。</p>
       <form class="mt-5 flex gap-3" @submit.prevent="addMember">

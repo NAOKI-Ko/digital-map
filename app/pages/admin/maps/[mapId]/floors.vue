@@ -223,6 +223,7 @@ async function confirmDeleteFloor() {
 <template>
   <NuxtPage v-if="route.params.floorId" />
   <div v-else class="max-w-5xl">
+    <AdminSubnavigation :map-id="mapId" area="map-edit" />
     <NuxtLink :to="`/admin/maps/${mapId}/settings`" class="text-sm font-medium text-stone-600 hover:text-stone-900">
       ← マップ設定に戻る
     </NuxtLink>

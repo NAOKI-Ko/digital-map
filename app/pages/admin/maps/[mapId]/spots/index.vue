@@ -98,6 +98,7 @@ function formatDate(value: string) {
 
 <template>
   <div class="max-w-6xl">
+    <AdminSubnavigation :map-id="mapId" area="spot" />
     <NuxtLink :to="`/admin/maps/${mapId}/settings`" class="text-sm font-medium text-stone-600 hover:text-stone-900">← マップ設定に戻る</NuxtLink>
 
     <header class="mt-5 flex flex-wrap items-end justify-between gap-4">

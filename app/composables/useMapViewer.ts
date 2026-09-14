@@ -260,6 +260,11 @@ export function useMapViewer(
   let activeSourceId: string | null = null
   let activeLayerId: string | null = null
   let decorationLayers: Array<{ sourceId: string, layerId: string }> = []
+  let containerResizeObserver: ResizeObserver | null = null
+
+  function resize() {
+    map.value?.resize()
+  }
 
   async function initialize() {
     if (!container.value || map.value) return
@@ -569,8 +574,20 @@ export function useMapViewer(
     return true
   }
 
-  onMounted(initialize)
-  onBeforeUnmount(destroy)
+  onMounted(() => {
+    void initialize()
+    window.addEventListener('admin-sidebar-resize', resize)
+    if (typeof ResizeObserver !== 'undefined' && container.value) {
+      containerResizeObserver = new ResizeObserver(resize)
+      containerResizeObserver.observe(container.value)
+    }
+  })
+  onBeforeUnmount(() => {
+    window.removeEventListener('admin-sidebar-resize', resize)
+    containerResizeObserver?.disconnect()
+    containerResizeObserver = null
+    destroy()
+  })
 
   watch(() => options.spots.value, syncSpotMarkers, { deep: true })
   watch(() => options.decorations.value, syncDecorations, { deep: true })
@@ -595,6 +612,7 @@ export function useMapViewer(
     geolocationAvailable: readonly(geolocationAvailable),
     geolocationAreaMessage: readonly(geolocationAreaMessage),
     initialize,
+    resize,
     destroy,
     showFloor,
     removeFloorImage,

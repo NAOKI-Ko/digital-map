@@ -190,6 +190,7 @@ function updateCandidateFromDrag(value: { spotId: string, x: number, y: number }
 
 <template>
   <div class="max-w-7xl">
+    <AdminSubnavigation :map-id="mapId" area="map-edit" />
     <NuxtLink :to="`/admin/maps/${mapId}/spots`" class="text-sm font-medium text-stone-600 hover:text-stone-900">← スポット一覧に戻る</NuxtLink>
     <header class="mt-5">
       <p class="text-sm font-medium text-terracotta-700">スポット管理</p>

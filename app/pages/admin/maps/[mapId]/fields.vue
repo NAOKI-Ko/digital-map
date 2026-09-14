@@ -73,6 +73,7 @@ async function saveEnglishLabel(field: SpotFieldDefinitionItem) {
 
 <template>
   <div class="max-w-5xl">
+    <AdminSubnavigation :map-id="mapId" area="map-edit" />
     <NuxtLink :to="`/admin/maps/${mapId}/settings`" class="text-sm font-medium text-stone-600">← マップ設定に戻る</NuxtLink>
     <header class="mt-5"><h1 class="text-3xl font-bold">Spot情報項目</h1><p class="mt-2 text-sm text-stone-600">名称は常に必須です。標準項目の意味は変えず、表示名・有効・公開・必須・順序を設定します。</p></header>
     <SaveFeedback class="mt-4" :state="saveState" :message="message" />

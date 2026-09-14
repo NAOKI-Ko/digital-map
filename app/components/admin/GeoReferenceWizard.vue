@@ -30,9 +30,14 @@ let map: MapLibreMap | undefined
 let maplibre: typeof import('maplibre-gl') | undefined
 let referenceMarkers: Marker[] = []
 let lastPreviewSignature = ''
+let mapResizeObserver: ResizeObserver | null = null
 
 const PREVIEW_SOURCE_ID = 'georeference-preview'
 const PREVIEW_LAYER_ID = 'georeference-preview-layer'
+
+function resizeMap() {
+  map?.resize()
+}
 
 const stepTitle = computed(() => ({
   'a-image': '基準点A：イラストの目印を選ぶ',
@@ -52,6 +57,12 @@ const stepGuide = computed(() => ({
 
 onMounted(async () => {
   if (!mapContainer.value) return
+
+  window.addEventListener('admin-sidebar-resize', resizeMap)
+  if (typeof ResizeObserver !== 'undefined') {
+    mapResizeObserver = new ResizeObserver(resizeMap)
+    mapResizeObserver.observe(mapContainer.value)
+  }
 
   try {
     maplibre = await import('maplibre-gl')
@@ -103,6 +114,9 @@ onMounted(async () => {
 })
 
 onBeforeUnmount(() => {
+  window.removeEventListener('admin-sidebar-resize', resizeMap)
+  mapResizeObserver?.disconnect()
+  mapResizeObserver = null
   clearReferenceMarkers()
   map?.remove()
   map = undefined

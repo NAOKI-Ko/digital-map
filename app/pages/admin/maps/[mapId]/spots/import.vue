@@ -55,6 +55,7 @@ async function importCsv() {
 
 <template>
   <div class="max-w-5xl">
+    <AdminSubnavigation :map-id="mapId" area="spot" />
     <NuxtLink :to="`/admin/maps/${mapId}/spots`" class="text-sm font-medium text-stone-600">← スポット一覧に戻る</NuxtLink>
     <header class="mt-5">
       <p class="text-sm font-medium text-terracotta-700">スポット管理</p>

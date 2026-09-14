@@ -125,6 +125,7 @@ async function saveSeo() {
 
 <template>
   <div class="max-w-4xl">
+    <AdminSubnavigation :map-id="mapId" area="map-edit" />
     <NuxtLink to="/admin/dashboard" class="text-sm font-medium text-stone-600 hover:text-stone-900">
       ← マップ一覧に戻る
     </NuxtLink>
