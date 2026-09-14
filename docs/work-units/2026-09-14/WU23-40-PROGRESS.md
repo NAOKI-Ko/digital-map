@@ -157,3 +157,11 @@
 - Windows ran the full suite at 61 files / 396 tests, typecheck, and production build on `d24b01f`; final SHA `14f292e` then passed focused Snapshot/PDF tests (2 files / 15 tests), typecheck, and production build. The final local consolidated gate is 61 files / 397 tests plus Prisma validate/generate and production build.
 - QA smoke passes local/public health and readiness (`mail=fake`), admin login, OWNER Map access, immutable Snapshot publish, public API/page, static assets, 2,046,784-byte PDF generation, Terms, Privacy, request-ID propagation, and unauthenticated 401. The current process has zero request errors.
 - Windows QA runs `14f292e0c5432a3814f83e26bf52ff73faacb930` at `https://sur-context-basin-concert.trycloudflare.com`. Resend, Cloudflare R2, and production Domain/DNS/TLS remain **EXTERNAL ACTIVATION PENDING**. Human UAT is **PENDING HUMAN EXECUTION**.
+
+## WU-40 Stage B notes
+
+- Codex Full AI-UAT ran against Windows QA for both WU-23〜WU-39 integration integrity and whole-product/Phase 1 regression. OWNER, Map EDITOR, Spot Editor, anonymous desktop/mobile, all seven mandatory cross-feature scenarios, exploratory, visual, accessibility, and security/RBAC gates passed.
+- Ten deterministic defects found during Stage B were fixed in focused commits and rerun on Windows. Final open counts are P0 0, P1 0, core P2 0; one accepted cosmetic P3 is recorded in the AI-UAT report.
+- Final code SHA `57aec7cc7ce8486038e92fcad306166b9e8780fa` passed local and Windows full suites at 62 files / 405 tests, typecheck, Prisma validate/generate, production build, and 28/28 migration status. Windows health and readiness pass with database=true and mail=fake.
+- The former local/Windows test-count discrepancy was caused by different tested SHAs, not a platform skip. Same-SHA final counts are exactly 405/405.
+- Evidence and full results are in `docs/qa/WU23-40-CODEX-AI-UAT-20260914.md` and `docs/qa/evidence/wu40-stageb/`. Stage B verdict is **READY FOR HUMAN UAT**; Human UAT remains **PENDING HUMAN EXECUTION**, WU-40 remains incomplete, and main is not merged.
