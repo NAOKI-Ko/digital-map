@@ -9,6 +9,7 @@ describe('WU-27 security hardening', () => {
   let consumeRateLimit: typeof import('../server/utils/rate-limit').consumeRateLimit
   let rateLimitKey: typeof import('../server/utils/rate-limit').rateLimitKey
   let enforceCsrfOrigin: typeof import('../server/utils/security').enforceCsrfOrigin
+  let contentSecurityPolicy: typeof import('../server/utils/security').contentSecurityPolicy
 
   beforeAll(async () => {
     vi.stubGlobal('prisma', { rateLimitBucket: { upsert: mocks.upsert } })
@@ -19,7 +20,7 @@ describe('WU-27 security hardening', () => {
     vi.stubGlobal('getHeader', mocks.getHeader)
     vi.stubGlobal('useRuntimeConfig', () => ({ trustedOrigins: 'https://admin.example.com', publicBaseUrl: 'https://public.example.com' }))
     ;({ consumeRateLimit, rateLimitKey } = await import('../server/utils/rate-limit'))
-    ;({ enforceCsrfOrigin } = await import('../server/utils/security'))
+    ;({ enforceCsrfOrigin, contentSecurityPolicy } = await import('../server/utils/security'))
   })
 
   beforeEach(() => {
@@ -61,6 +62,14 @@ describe('WU-27 security hardening', () => {
     expect(config).toContain("secure: process.env.NODE_ENV === 'production'")
     for (const header of ['Content-Security-Policy', 'X-Content-Type-Options', 'Referrer-Policy', 'Permissions-Policy', 'Strict-Transport-Security']) expect(middleware).toContain(header)
     expect(middleware).not.toContain("default-src *")
+  })
+
+  it('allows MapLibre to fetch the configured OpenStreetMap tile host', () => {
+    const connectSource = contentSecurityPolicy
+      .split('; ')
+      .find(directive => directive.startsWith('connect-src '))
+
+    expect(connectSource?.split(' ')).toContain('https://tile.openstreetmap.org')
   })
 
   it('keeps Spot Editor payload strict and owner audit access isolated', () => {
