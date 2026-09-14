@@ -204,6 +204,8 @@ model Map {
   releases             PublicRelease[]       @relation("MapReleases")
   currentReleaseId     String?               @unique
   currentRelease       PublicRelease?        @relation("MapCurrentRelease", fields: [currentReleaseId], references: [id], onDelete: SetNull)
+  dailyAnalytics       MapDailyAnalytics[]
+  spotDailyAnalytics   SpotDailyAnalytics[]
   floors               MapFloor[]
   categories           Category[]
   spotFieldDefinitions SpotFieldDefinition[]
@@ -229,6 +231,34 @@ model PublicRelease {
 
   @@index([mapId, createdAt])
   @@index([mapId, status])
+}
+
+model MapDailyAnalytics {
+  id        String   @id @default(cuid())
+  tenantId  String
+  mapId     String
+  map       Map      @relation(fields: [mapId], references: [id], onDelete: Cascade)
+  date      DateTime @db.Date
+  viewCount Int      @default(0)
+  updatedAt DateTime @updatedAt
+
+  @@unique([mapId, date])
+  @@index([tenantId, date])
+}
+
+model SpotDailyAnalytics {
+  id        String   @id @default(cuid())
+  tenantId  String
+  mapId     String
+  map       Map      @relation(fields: [mapId], references: [id], onDelete: Cascade)
+  spotId    String
+  spot      Spot     @relation(fields: [spotId], references: [id], onDelete: Cascade)
+  date      DateTime @db.Date
+  viewCount Int      @default(0)
+  updatedAt DateTime @updatedAt
+
+  @@unique([spotId, date])
+  @@index([tenantId, mapId, date])
 }
 
 model MapTranslation {
@@ -331,6 +361,7 @@ model Spot {
   revisions       SpotRevision[]
   translations    SpotTranslation[]
   fieldValueTranslations SpotFieldValueTranslation[]
+  dailyAnalytics SpotDailyAnalytics[]
   targetedInvitations OrganizationInvitation[]
   liveVersion     Int              @default(1)
   pinColor        String           @default("#C7401F")

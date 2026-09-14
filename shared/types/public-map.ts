@@ -50,6 +50,7 @@ export interface PublicFloor {
 
 export interface PublicMap {
   id: string
+  releaseId?: string
   name: string
   slug: string
   locale: 'ja' | 'en'

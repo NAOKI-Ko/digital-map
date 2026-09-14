@@ -117,5 +117,6 @@ export async function loadCurrentPublicSnapshot(slug: string, locale: unknown, s
   const manifest = await storage.get(pointer.manifestKey)
   if (!manifest) throw new Error('CURRENT_RELEASE_MANIFEST_MISSING')
   const release = parseJson<{ locales: ReleaseLocales }>(manifest.bytes)
-  return locale === 'en' && release.locales.en ? release.locales.en : release.locales.ja
+  const map = locale === 'en' && release.locales.en ? release.locales.en : release.locales.ja
+  return { ...map, releaseId: pointer.releaseId ?? undefined }
 }

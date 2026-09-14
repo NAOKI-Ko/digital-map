@@ -16,7 +16,8 @@
 | WU-29 | KAN-65 | `1b0fd3c` | `c607b5d` | none | 1 file / 3 tests PASS | 50 files / 337 tests PASS | PASS | validate PASS | not required | PostgreSQL restore drill pending (tools unavailable) | PASS |
 | WU-30 | KAN-60 | `c607b5d` | `3529701` | `20260914060000_ja_en_translations` | 3 files / 20 tests PASS | 51 files / 343 tests PASS | PASS | validate + generate PASS | PASS | none | PASS |
 | WU-31 | KAN-64 | `3529701` | `e63d79a` | `20260914070000_media_variants` | 3 files / 14 tests PASS | 52 files / 347 tests PASS | PASS | validate + generate PASS | phase boundary pending | none | PASS |
-| WU-32 | KAN-57 | `e63d79a` | this WU commit | `20260914080000_public_releases` | 3 files / 16 tests PASS | 53 files / 353 tests PASS | PASS | validate + generate PASS | PASS | Cloudflare R2 credentials pending; local adapter PASS | PASS |
+| WU-32 | KAN-57 | `e63d79a` | `6d383b0` | `20260914080000_public_releases` | 3 files / 16 tests PASS | 53 files / 353 tests PASS | PASS | validate + generate PASS | PASS | Cloudflare R2 credentials pending; local adapter PASS | PASS |
+| WU-33 | KAN-55 | `6d383b0` | this WU commit | `20260914090000_public_analytics` | 3 files / 17 tests PASS | 54 files / 359 tests PASS | PASS | validate + generate PASS | not required | none | PASS |
 
 ## WU-23 notes
 
@@ -88,3 +89,10 @@
 - Pointer/DB divergence uses deterministic restoration of the previous pointer and emits a sanitized operations failure. A failed build marks only the new release FAILED and never changes the prior public release.
 - Public rendering reads object storage only and has no normal Prisma/live-DB fallback. READY releases are immutable and retained for authorized OWNER/Map EDITOR rollback.
 - Local filesystem storage and Cloudflare R2/S3-compatible storage share the same release semantics. R2 credentials are unavailable here, so R2 activation is **EXTERNAL ACTIVATION PENDING**; the local adapter, cache policies, and copied-asset independence are verified.
+
+## WU-33 notes
+
+- The public client emits only `MAP_VIEW` and `SPOT_VIEW` asynchronously. Map views are deduplicated in sessionStorage per Map/release; intentional Spot opens may count repeatedly, and admin preview contains no instrumentation.
+- Events remain in a process-local UTC daily aggregate buffer and flush every 30 seconds or at threshold. Abrupt process loss may lose a small number of non-critical events; JST is the dashboard display policy.
+- Flush validates published Map and Map–Spot relationships in batches, then uses atomic aggregate upserts. Raw event rows, IP addresses, cookies, fingerprints, and persistent visitor identifiers are not stored.
+- Analytics uses the WU-27 irreversible rate-key framework with a higher public threshold and obvious-bot filtering. OWNER and assigned Map EDITOR reads remain tenant/Map constrained.

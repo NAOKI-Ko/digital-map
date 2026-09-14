@@ -8,6 +8,7 @@ import { collectSpotCategories, filterSpotsByCategoryIds } from '~/utils/categor
 import type { MapViewerSpot } from '~~/shared/types/map-viewer'
 import type { PublicMapResponse } from '~~/shared/types/public-map'
 import { messages, normalizeLocale } from '~~/shared/i18n/messages'
+import { recordMapViewOnce, sendPublicAnalytics } from '~/utils/public-analytics'
 
 const LazyMapViewer = defineAsyncComponent(() => import('~/components/map/MapViewer.vue'))
 
@@ -65,6 +66,7 @@ useHead(() => ({
 
 function selectSpot(spot: MapViewerSpot) {
   selectedSpotId.value = spot.id
+  if (data.value?.map.id) sendPublicAnalytics({ type: 'SPOT_VIEW', mapId: data.value.map.id, spotId: spot.id })
 }
 
 async function switchLocale(locale: 'ja' | 'en') {
@@ -73,6 +75,7 @@ async function switchLocale(locale: 'ja' | 'en') {
 
 onMounted(() => {
   if (!route.query.lang && data.value?.map.enabledLocales.includes('en') && navigator.language.toLowerCase().startsWith('en')) void switchLocale('en')
+  if (data.value?.map.id && data.value.map.releaseId) recordMapViewOnce(data.value.map.id, data.value.map.releaseId)
 })
 </script>
 
