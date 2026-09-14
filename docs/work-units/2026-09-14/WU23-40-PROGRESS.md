@@ -22,7 +22,8 @@
 | WU-35 | KAN-63 | `50ca8b7` | `c051963` | none | 3 files / 15 tests PASS | 56 files / 368 tests PASS | PASS | validate PASS | not required | Legal review pending | PASS |
 | WU-36 | KAN-61 | `c051963` | `9542996` | none | 2 files / 21 tests PASS | 57 files / 373 tests PASS | PASS | validate PASS | PASS | none | PASS |
 | WU-37 | KAN-59 | `9542996` | `7964dfb` | none | 2 files / 14 tests PASS | 58 files / 381 tests PASS | PASS | validate PASS | PASS | none | PASS |
-| WU-38 | KAN-70 | `7964dfb` | this WU commit | `20260914110000_self_service_onboarding` | 7 files / 33 tests PASS | 59 files / 388 tests PASS | PASS | validate + generate PASS | PASS | Live verification email pending; fake provider path PASS | PASS |
+| WU-38 | KAN-70 | `7964dfb` | `8632d39` | `20260914110000_self_service_onboarding` | 7 files / 33 tests PASS | 59 files / 388 tests PASS | PASS | validate + generate PASS | PASS | Live verification email pending; fake provider path PASS | PASS |
+| WU-39 | KAN-68 | `8632d39` | this WU commit | none | 7 files / 35 tests PASS | 60 files / 393 tests PASS | PASS | validate PASS | PASS | Domain/DNS/TLS activation pending | PASS |
 
 ## WU-23 notes
 
@@ -136,3 +137,10 @@
 - New-account verification atomically creates the User, SETUP Tenant, OWNER membership, legal acceptance, and completed intent, then establishes a session and routes into the existing Map setup flow. Creating the first Map advances the Tenant to ACTIVE without publishing it.
 - An existing account is never duplicated or password-overwritten. Email verification requires normal login before an explicitly reconfirmed legal acceptance can atomically create another OWNER Tenant.
 - Signup and resend use PostgreSQL-backed email+IP rate limits and generic acceptance responses. Existing organization invitations are neither queried nor consumed, so a later invitation acceptance remains independent.
+
+## WU-39 notes
+
+- `PUBLIC_BASE_URL` is authoritative for public Map links, PDF QR, canonical/OGP, sitemap, and public locale metadata. `ADMIN_BASE_URL` is authoritative for invitation, reset, and signup-verification links.
+- Production startup rejects non-HTTPS, localhost, credential-bearing, and `*.trycloudflare.com` base URLs. Local/QA may still explicitly use localhost or the existing QA Quick Tunnel.
+- Production requests enforce the configured public/admin host allowlist, honor forwarded host/protocol only with `TRUST_PROXY=true`, redirect external HTTP to HTTPS, retain Secure cookies, and emit HSTS only for effective HTTPS.
+- Credential-free Cloudflare named Tunnel configuration and DNS/TLS/Windows service steps are documented. No domain, DNS record, Tunnel, or credential was created, so **DOMAIN/DNS/TLS ACTIVATION PENDING**.

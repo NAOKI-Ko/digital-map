@@ -1,0 +1,11 @@
+# Copy to the host's protected cloudflared configuration directory.
+# Never commit credentials.json or tunnel tokens.
+tunnel: REPLACE_WITH_NAMED_TUNNEL_UUID
+credentials-file: C:\\ProgramData\\cloudflared\\REPLACE_WITH_NAMED_TUNNEL_UUID.json
+
+ingress:
+  - hostname: maps.example.invalid
+    service: http://127.0.0.1:3000
+  - hostname: admin.example.invalid
+    service: http://127.0.0.1:3000
+  - service: http_status:404

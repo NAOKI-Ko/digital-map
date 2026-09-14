@@ -98,7 +98,3 @@ export async function sendTransactionalMail(input: { purpose: TransactionalMailP
   await prisma.mailDelivery.update({ where: { id: delivery.id }, data: { status: 'FAILED', attemptCount: attempts, errorCategory: lastCategory } })
   return { deliveryId: delivery.id, status: 'FAILED' as const }
 }
-
-export function configuredPublicBaseUrl() {
-  return String(useRuntimeConfig().publicBaseUrl).replace(/\/$/, '')
-}

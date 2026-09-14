@@ -16,9 +16,9 @@ const { data: releaseData, refresh: refreshReleases } = await useFetch<{ current
 const isSaving = ref(false)
 const errorMessage = ref('')
 const successMessage = ref('')
-const requestUrl = useRequestURL()
+const configuredPublicOrigin = useRuntimeConfig().public.publicBaseUrl as string
 const publicUrl = computed(() => data.value
-  ? buildPublicMapUrl(requestUrl.origin, data.value.map.slug)
+  ? buildPublicMapUrl(configuredPublicOrigin, data.value.map.slug)
   : '')
 
 useHead(() => ({

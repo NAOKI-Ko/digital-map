@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
   if (intent) {
     const token = createAuthToken()
     await prisma.signupIntent.update({ where: { id: intent.id }, data: { verificationTokenHash: token.tokenHash, expiresAt: new Date(Date.now() + signupConfig().verificationTtlMs), verifiedAt: null } })
-    verificationUrl = `${configuredPublicBaseUrl()}/signup/verify?token=${encodeURIComponent(token.rawToken)}`
+    verificationUrl = `${configuredAdminBaseUrl(event)}/signup/verify?token=${encodeURIComponent(token.rawToken)}`
     await sendTransactionalMail({ purpose: 'SIGNUP_VERIFICATION', to: intent.email, url: verificationUrl })
   }
   setResponseStatus(event, 202)
