@@ -9,6 +9,9 @@ export default defineNuxtConfig({
   css: ['~/assets/css/tailwind.css'],
   app: {
     head: {
+      htmlAttrs: {
+        lang: 'ja',
+      },
       link: [
         {
           rel: 'stylesheet',

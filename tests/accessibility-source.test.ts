@@ -18,4 +18,9 @@ describe('WCAG implementation source contract', () => {
     expect(dialog).toContain("event.key !== 'Tab'")
     expect(map).toContain("button.setAttribute('aria-label', label)")
   })
+
+  it('public以外のlegal/login/onboardingページにも既定のdocument languageがある', () => {
+    const config = readFileSync(join(process.cwd(), 'nuxt.config.ts'), 'utf8')
+    expect(config).toMatch(/htmlAttrs:\s*\{\s*lang:\s*'ja'/)
+  })
 })
