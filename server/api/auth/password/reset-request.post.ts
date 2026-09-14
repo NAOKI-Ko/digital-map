@@ -2,6 +2,7 @@ import { passwordResetRequestSchema } from '~~/shared/schemas/auth'
 
 export default defineEventHandler(async (event) => {
   const input = await readValidatedBody(event, passwordResetRequestSchema.parse)
+  await enforceRateLimit(event, 'password-reset', [input.email, rateLimitClientIp(event)], configuredRateLimit('passwordReset'))
   const issued = await issuePasswordReset(input.email)
   const response: { accepted: true, resetUrl?: string } = { accepted: true }
   if (issued) {

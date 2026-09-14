@@ -12,6 +12,7 @@ export default defineEventHandler(async (event) => {
     : false
 
   if (!user || !isValidPassword) {
+    await enforceRateLimit(event, 'login-failure', [credentials.email, rateLimitClientIp(event)], configuredRateLimit('loginFailures'))
     throw createError({
       statusCode: 401,
       statusMessage: 'メールアドレスまたはパスワードが正しくありません。',

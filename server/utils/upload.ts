@@ -1,7 +1,12 @@
-import { extname, resolve } from 'node:path'
+import { basename, extname, resolve } from 'node:path'
 import type { H3Event } from 'h3'
 
 export const MAX_IMAGE_SIZE = 10 * 1024 * 1024
+
+export function sanitizeOriginalFilename(value?: string) {
+  const safe = basename(value ?? 'upload').replace(/[\u0000-\u001f\u007f]/g, '').replace(/[^0-9A-Za-z._ -]/g, '_').slice(0, 200)
+  return safe || 'upload'
+}
 
 const allowedFiles = {
   'image/png': {

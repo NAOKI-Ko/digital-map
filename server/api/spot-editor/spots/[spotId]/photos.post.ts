@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
   await writeFile(`${uploadDirectory}/${filename}`, file.data, { flag: 'wx' })
   try {
     const asset = await prisma.mediaAsset.create({ data: {
-      tenantId: map.tenantId, storageKey: filename, originalFilename: file.filename ?? filename,
+      tenantId: map.tenantId, storageKey: filename, originalFilename: sanitizeOriginalFilename(file.filename ?? filename),
       mimeType: validated.mimeType, width: dimensions.width, height: dimensions.height,
       fileSize: file.data.length, sha256: createHash('sha256').update(file.data).digest('hex'),
     } })

@@ -25,6 +25,12 @@ export default defineNuxtConfig({
     mailFrom: '',
     mailReplyTo: '',
     publicBaseUrl: 'http://localhost:3000',
+    trustedOrigins: '',
+    rateLimits: {
+      loginFailures: { limit: 5, windowSeconds: 15 * 60 },
+      passwordReset: { limit: 5, windowSeconds: 60 * 60 },
+      inviteAcceptance: { limit: 10, windowSeconds: 15 * 60 },
+    },
     auth: {
       invitationTtlHours: 72,
       passwordResetTtlMinutes: 60,
@@ -34,6 +40,12 @@ export default defineNuxtConfig({
     nominatimUserAgent: 'digital-map-platform/0.1 (self-hosted Nuxt application)',
     session: {
       maxAge: 60 * 60 * 24 * 7,
+      cookie: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/',
+      },
     },
   },
 })

@@ -24,7 +24,7 @@ export default defineEventHandler(async (event): Promise<ImageUploadResponse> =>
       data: {
         tenantId: session.user.tenantId,
         storageKey: filename,
-        originalFilename: file.filename ?? filename,
+        originalFilename: sanitizeOriginalFilename(file.filename ?? filename),
         mimeType: validated.mimeType,
         width: dimensions.width,
         height: dimensions.height,
