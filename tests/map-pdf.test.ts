@@ -3,7 +3,7 @@ import { dirname } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { PDFDocument } from 'pdf-lib'
 import type { PublicMap } from '../shared/types/public-map'
-import { generateMapPdf, pdfPageSize, publicMapQrPayload } from '../server/utils/map-pdf'
+import { generateMapPdf, normalizedImageToPage, pdfPageSize, publicMapQrPayload } from '../server/utils/map-pdf'
 
 const storage = { put: async () => undefined, get: async () => null }
 
@@ -12,7 +12,7 @@ function fixture(floorCount = 1, spotCount = 2): PublicMap {
     id: 'map-1', name: 'テスト地域マップ', slug: 'test-map', locale: 'ja', defaultLocale: 'ja', enabledLocales: ['ja'], seo: { title: 'テスト', description: '', imageUrl: null }, organizationName: '地域会', logoUrl: null, websiteUrl: null, snsUrl: null,
     floors: Array.from({ length: floorCount }, (_, floorIndex) => ({
       id: `floor-${floorIndex + 1}`, name: `${floorIndex + 1}階`, illustrationUrl: '/uploads/missing.png', imageWidth: 1000, imageHeight: 800, order: floorIndex, refAImageX: null, refAImageY: null, refALat: null, refALng: null, refBImageX: null, refBImageY: null, refBLat: null, refBLng: null, decorations: [],
-      spots: Array.from({ length: spotCount }, (_, spotIndex) => ({ id: `spot-${floorIndex}-${spotIndex}`, floorId: `floor-${floorIndex + 1}`, name: `スポット ${String(spotIndex + 1).padStart(2, '0')}`, categories: [{ id: 'category-1', name: '施設', order: 0, iconType: 'PRESET', iconPresetId: 'place', iconImageUrl: null, iconAssetId: null }], importance: 'NORMAL', description: null, x: 100 + spotIndex * 20, y: 120 + spotIndex * 10, photos: [], informationFields: [], websiteAction: null, pinIconType: 'PRESET', pinIconId: 'place', pinIconImageUrl: null, pinColor: '#c2412d', pinSize: 'MEDIUM',
+      spots: Array.from({ length: spotCount }, (_, spotIndex) => ({ id: `spot-${floorIndex}-${spotIndex}`, floorId: `floor-${floorIndex + 1}`, name: `スポット ${String(spotIndex + 1).padStart(2, '0')}`, categories: [{ id: 'category-1', name: '施設', order: 0, iconType: 'PRESET', iconPresetId: 'place', iconImageUrl: null, iconAssetId: null }], importance: 'NORMAL', description: null, x: 0.1 + spotIndex * 0.02, y: 0.15 + spotIndex * 0.01, photos: [], informationFields: [], websiteAction: null, pinIconType: 'PRESET', pinIconId: 'place', pinIconImageUrl: null, pinColor: '#c2412d', pinSize: 'MEDIUM',
       })),
     })),
   }
@@ -46,6 +46,12 @@ describe('paper map PDF', () => {
 
   it('builds the exact configured public QR payload', () => {
     expect(publicMapQrPayload('https://public.example.test/maps-root/', '駅 & 商店')).toBe('https://public.example.test/%E9%A7%85%20%26%20%E5%95%86%E5%BA%97')
+  })
+
+  it('places normalized IMAGE coordinates across the print extent without pixel re-division', () => {
+    expect(normalizedImageToPage(0, 100, 2000)).toBe(100)
+    expect(normalizedImageToPage(0.5, 100, 2000)).toBe(1100)
+    expect(normalizedImageToPage(1, 100, 2000)).toBe(2100)
   })
 
   it('keeps source-of-truth, authorization, map objects, and print layers explicit', async () => {

@@ -23,6 +23,10 @@ export function publicMapQrPayload(publicBaseUrl: string, slug: string) {
   return new URL(`/${encodeURIComponent(slug)}`, publicBaseUrl.endsWith('/') ? publicBaseUrl : `${publicBaseUrl}/`).toString()
 }
 
+export function normalizedImageToPage(value: number, offset: number, extent: number) {
+  return offset + value * extent
+}
+
 function escapeXml(value: string) {
   return value.replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' })[character]!)
 }
@@ -78,16 +82,16 @@ async function renderFloorPage(map: PublicMap, floor: PublicFloor, request: MapP
   for (const decoration of floor.decorations) {
     const bytes = await readMapAsset(decoration.imageUrl, options.uploadDirectory, options.storage)
     if (!bytes) continue
-    const width = Math.max(1, Math.round(decoration.width / floor.imageWidth * mapWidth))
+    const width = Math.max(1, Math.round(decoration.width * mapWidth))
     const image = await sharp(bytes).resize({ width, withoutEnlargement: true }).rotate(decoration.rotation, { background: { r: 0, g: 0, b: 0, alpha: 0 } }).png().toBuffer()
     const metadata = await sharp(image).metadata()
-    composites.push({ input: image, left: Math.max(margin, Math.round(margin + decoration.x / floor.imageWidth * mapWidth - (metadata.width ?? width) / 2)), top: Math.max(top, Math.round(top + decoration.y / floor.imageHeight * mapHeight - (metadata.height ?? width) / 2)) })
+    composites.push({ input: image, left: Math.max(margin, Math.round(normalizedImageToPage(decoration.x, margin, mapWidth) - (metadata.width ?? width) / 2)), top: Math.max(top, Math.round(normalizedImageToPage(decoration.y, top, mapHeight) - (metadata.height ?? width) / 2)) })
   }
   const spots = numberedSpots(floor)
   const categories = floorCategories(floor)
   const markerSvg = spots.map(spot => {
-    const x = margin + spot.x / floor.imageWidth * mapWidth
-    const y = top + spot.y / floor.imageHeight * mapHeight
+    const x = normalizedImageToPage(spot.x, margin, mapWidth)
+    const y = normalizedImageToPage(spot.y, top, mapHeight)
     return `<g><circle cx="${x}" cy="${y}" r="25" fill="${escapeXml(spot.pinColor || '#c2412d')}" stroke="#ffffff" stroke-width="6"/><text x="${x}" y="${y + 9}" text-anchor="middle" font-size="26" font-weight="700" fill="#ffffff">${spot.number}</text></g>`
   }).join('')
   const legendX = request.orientation === 'landscape' ? margin + mapWidth + Math.round(size.widthPx * 0.025) : margin
