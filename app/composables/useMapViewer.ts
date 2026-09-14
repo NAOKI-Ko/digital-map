@@ -1,5 +1,5 @@
 import { onBeforeUnmount, onMounted, readonly, ref, shallowRef, watch, type Ref } from 'vue'
-import type { GeolocateControl, IControl, Map as MapLibreMap, MapOptions, Marker, MarkerOptions, StyleSpecification } from 'maplibre-gl'
+import type { GeolocateControl, GeolocatePositionEvent, IControl, Map as MapLibreMap, MapOptions, Marker, MarkerOptions, StyleSpecification } from 'maplibre-gl'
 import { getFloorCorners, getGeoReferenceBounds, imageToRenderCoordinates, isGeoReferenced, isValidImagePosition, isWithinFloorArea, renderToImageCoordinates, toImageCoordinates, type FloorCorners, type ImagePosition, type LatLng } from '~~/lib/geo'
 import { getDecorationRenderCoordinates } from '~~/lib/decoration'
 import type { MapViewerCameraState, MapViewerDecoration, MapViewerFloor, MapViewerSpot } from '~~/shared/types/map-viewer'
@@ -255,7 +255,7 @@ export function useMapViewer(
   let spotMarkerElements: Array<{ element: HTMLElement, spot: MapViewerSpot }> = []
   let geolocateControl: GeolocateControl | null = null
   let mapControlGroup: HorizontalMapControlGroup | null = null
-  let geolocateHandler: ((position: GeolocationPosition) => void) | null = null
+  let geolocateHandler: ((position: GeolocatePositionEvent) => void) | null = null
   let currentLocationMarker: Marker | null = null
   let activeSourceId: string | null = null
   let activeLayerId: string | null = null

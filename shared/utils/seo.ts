@@ -4,8 +4,8 @@ export function buildPublicLocaleUrl(baseUrl: string, slug: string, locale: 'ja'
 
 export function buildLocaleLinks(baseUrl: string, slug: string, currentLocale: 'ja' | 'en', enabledLocales: Array<'ja' | 'en'>) {
   return [
-    { rel: 'canonical', href: buildPublicLocaleUrl(baseUrl, slug, currentLocale) },
-    ...enabledLocales.map(locale => ({ rel: 'alternate', hreflang: locale, href: buildPublicLocaleUrl(baseUrl, slug, locale) })),
-    { rel: 'alternate', hreflang: 'x-default', href: buildPublicLocaleUrl(baseUrl, slug, 'ja') },
+    { rel: 'canonical' as const, href: buildPublicLocaleUrl(baseUrl, slug, currentLocale) },
+    ...enabledLocales.map(locale => ({ rel: 'alternate' as const, hreflang: locale, href: buildPublicLocaleUrl(baseUrl, slug, locale) })),
+    { rel: 'alternate' as const, hreflang: 'x-default', href: buildPublicLocaleUrl(baseUrl, slug, 'ja') },
   ]
 }

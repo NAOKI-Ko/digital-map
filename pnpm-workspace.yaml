@@ -3,3 +3,5 @@ allowBuilds:
   '@prisma/engines': true
   esbuild: true
   prisma: true
+overrides:
+  mysql2@^3.0.0: 3.23.1
