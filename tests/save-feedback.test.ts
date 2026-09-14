@@ -22,6 +22,7 @@ describe('save feedback standard', () => {
     expect(mapCreate).toContain("saved: 'map-created'")
     expect(mapSetup).toContain("route.query.saved === 'map-created'")
     expect(spotCreate).toContain("saved: 'spot-created'")
+    expect(spotCreate).toContain('{ external: true }')
     expect(spotEdit).toContain("route.query.saved === 'spot-created'")
   })
 

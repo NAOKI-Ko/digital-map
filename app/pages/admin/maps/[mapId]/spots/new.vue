@@ -90,7 +90,7 @@ async function persistSpot(input: SpotFormInput) {
     const response = await $fetch<AdminSpotResponse>(`/api/maps/${mapId}/spots`, { method: 'POST', body: input })
     await navigateTo(editorReturnLocation.value
       ? { ...editorReturnLocation.value, query: { ...editorReturnLocation.value.query, saved: 'spot-created' } }
-      : { path: `/admin/maps/${mapId}/spots/${response.spot.id}`, query: { saved: 'spot-created' } })
+      : { path: `/admin/maps/${mapId}/spots/${response.spot.id}`, query: { saved: 'spot-created' } }, { external: true })
   }
   catch {
     submitError.value = 'スポットを登録できませんでした。入力内容を確認してください。'
