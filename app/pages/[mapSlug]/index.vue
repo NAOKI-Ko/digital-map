@@ -7,13 +7,17 @@ import SpotDetailCard from '~/components/map/SpotDetailCard.vue'
 import { collectSpotCategories, filterSpotsByCategoryIds } from '~/utils/category-filter'
 import type { MapViewerSpot } from '~~/shared/types/map-viewer'
 import type { PublicMapResponse } from '~~/shared/types/public-map'
+import { messages, normalizeLocale } from '~~/shared/i18n/messages'
 
 const LazyMapViewer = defineAsyncComponent(() => import('~/components/map/MapViewer.vue'))
 
 const route = useRoute()
 const mapSlug = computed(() => String(route.params.mapSlug ?? ''))
+const requestedLocale = computed(() => normalizeLocale(route.query.lang))
+const t = computed(() => messages[data.value?.map.locale ?? requestedLocale.value])
 const { data, error, status } = await useFetch<PublicMapResponse>(
   () => `/api/public/${encodeURIComponent(mapSlug.value)}`,
+  { query: computed(() => requestedLocale.value === 'en' ? { lang: 'en' } : {}) },
 )
 const selectedFloorId = ref('')
 const selectedSpotId = ref<string | null>(null)
@@ -62,16 +66,24 @@ useHead(() => ({
 function selectSpot(spot: MapViewerSpot) {
   selectedSpotId.value = spot.id
 }
+
+async function switchLocale(locale: 'ja' | 'en') {
+  await navigateTo({ path: route.path, query: locale === 'en' ? { ...route.query, lang: 'en' } : Object.fromEntries(Object.entries(route.query).filter(([key]) => key !== 'lang')) })
+}
+
+onMounted(() => {
+  if (!route.query.lang && data.value?.map.enabledLocales.includes('en') && navigator.language.toLowerCase().startsWith('en')) void switchLocale('en')
+})
 </script>
 
 <template>
   <main class="h-[100svh] overflow-hidden bg-stone-100 text-stone-900">
     <div v-if="status === 'pending'" class="grid h-full place-items-center px-6 text-sm text-stone-600">
-      マップを読み込んでいます…
+      {{ t.loading }}
     </div>
     <div v-else-if="error" class="grid h-full place-items-center px-6">
       <section class="max-w-md rounded-2xl bg-white p-8 text-center shadow-sm">
-        <p class="text-sm font-semibold text-red-700">公開マップを表示できません</p>
+        <p class="text-sm font-semibold text-red-700">{{ t.error }}</p>
         <p class="mt-3 text-sm leading-6 text-stone-600">URLが正しいか、マップが公開中かをご確認ください。</p>
       </section>
     </div>
@@ -90,8 +102,10 @@ function selectSpot(spot: MapViewerSpot) {
             <h1 class="mt-0.5 truncate text-lg font-bold tracking-tight sm:text-xl">{{ data.map.name }}</h1>
           </div>
         </div>
-        <nav v-if="data.map.websiteUrl || data.map.snsUrl" aria-label="団体リンク" class="flex shrink-0 items-center gap-1 sm:gap-2">
-          <a v-if="data.map.websiteUrl" :href="data.map.websiteUrl" target="_blank" rel="noopener noreferrer" class="rounded-full border border-stone-200 px-2.5 py-1.5 text-xs font-semibold text-stone-700 hover:bg-stone-50 sm:px-3">公式</a>
+        <nav aria-label="団体リンク" class="flex shrink-0 items-center gap-1 sm:gap-2">
+          <label v-if="data.map.enabledLocales.includes('en')" class="sr-only" for="public-locale">{{ t.language }}</label>
+          <select v-if="data.map.enabledLocales.includes('en')" id="public-locale" :value="data.map.locale" class="rounded-full border border-stone-200 px-2.5 py-1.5 text-xs" @change="switchLocale(($event.target as HTMLSelectElement).value as 'ja' | 'en')"><option value="ja">日本語</option><option value="en">English</option></select>
+          <a v-if="data.map.websiteUrl" :href="data.map.websiteUrl" target="_blank" rel="noopener noreferrer" class="rounded-full border border-stone-200 px-2.5 py-1.5 text-xs font-semibold text-stone-700 hover:bg-stone-50 sm:px-3">{{ t.official }}</a>
           <a v-if="data.map.snsUrl" :href="data.map.snsUrl" target="_blank" rel="noopener noreferrer" class="rounded-full border border-stone-200 px-2.5 py-1.5 text-xs font-semibold text-stone-700 hover:bg-stone-50 sm:px-3">SNS</a>
         </nav>
       </header>

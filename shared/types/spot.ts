@@ -41,6 +41,15 @@ export interface AdminSpotListResponse {
 }
 
 export interface AdminSpotDetail extends AdminSpotSummary {
+  englishTranslation?: {
+    name: string | null
+    description: string | null
+    address: string | null
+    hoursText: string | null
+    holidayText: string | null
+    customValues: Record<string, string>
+  } | null
+  enabledLocales?: Array<'ja' | 'en'>
   description: string | null
   address: string | null
   website: string | null

@@ -15,7 +15,7 @@ const publishedSpot = {
   floorId: 'floor-1',
   name: '公開スポット',
   importance: 'normal',
-  spotCategories: [{ category: { id: 'category-1', name: '観光', order: 0 } }],
+  spotCategories: [{ category: { id: 'category-1', name: '観光', order: 0, translations: [] } }],
   description: null,
   address: null,
   website: null,
@@ -26,6 +26,8 @@ const publishedSpot = {
   holidayText: null,
   phone: null,
   fieldValues: [],
+  translations: [],
+  fieldValueTranslations: [],
   pinIconType: 'preset',
   pinIconId: 'sightseeing',
   pinIconImageUrl: null,
@@ -47,6 +49,9 @@ function mapRecord(overrides: {
     websiteUrl: null,
     snsUrl: null,
     isPublished: overrides.isPublished ?? true,
+    defaultLocale: 'ja',
+    enabledLocales: ['ja'],
+    translations: [],
     spotFieldDefinitions: overrides.spotFieldDefinitions ?? [],
     floors: [{
       id: 'floor-1',
@@ -144,10 +149,10 @@ describe('GET /api/public/:mapSlug', () => {
   it('公開設定済みの項目だけを定義順で返し、内部・無効・空値を漏らさない', async () => {
     mocks.findFirst.mockResolvedValue(mapRecord({
       spotFieldDefinitions: [
-        { id: 'description', semanticKey: 'description', label: '紹介', type: 'multiline_text', order: 0 },
-        { id: 'address', semanticKey: 'address', label: '所在地', type: 'single_line_text', order: 1 },
-        { id: 'custom-public', semanticKey: null, label: '席数', type: 'number', order: 2 },
-        { id: 'website', semanticKey: 'website', label: '公式サイト', type: 'url', order: 3 },
+        { id: 'description', semanticKey: 'description', label: '紹介', type: 'multiline_text', order: 0, translations: [] },
+        { id: 'address', semanticKey: 'address', label: '所在地', type: 'single_line_text', order: 1, translations: [] },
+        { id: 'custom-public', semanticKey: null, label: '席数', type: 'number', order: 2, translations: [] },
+        { id: 'website', semanticKey: 'website', label: '公式サイト', type: 'url', order: 3, translations: [] },
       ],
       spots: [{
         ...publishedSpot,

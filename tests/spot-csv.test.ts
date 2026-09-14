@@ -42,6 +42,25 @@ describe('Spot CSV', () => {
     expect(result.preview.errors).toBe(1)
   })
 
+  it('英語有効時だけ安定ID付き[en]列を生成・取込し、旧形式も維持する', () => {
+    const textFields = [...fields, { id: 'custom-text', kind: 'custom', semanticKey: null, label: '備考', type: 'single_line_text', enabled: true, required: false, order: 3 }]
+    const template = createSpotCsvTemplate(textFields, ['ja', 'en'])
+    expect(template).toContain('spot:name[en]')
+    expect(template).toContain('field:standard:description[en]')
+    expect(template).toContain('field:custom:custom-text[en]')
+    expect(template).not.toContain('field:custom:custom-number[en]')
+    const csv = 'spot:name,field:standard:description,categories,spot:name[en],field:standard:description[en],field:custom:custom-text[en]\n店,紹介,観光,Shop,About,Note\n'
+    const result = previewSpotCsv(csv, textFields, categories, [], ['ja', 'en'])
+    expect(result.preview.errors).toBe(0)
+    expect(result.parsedRows[0]).toMatchObject({ englishName: 'Shop', englishStandardValues: { description: 'About' }, englishCustomValues: { 'custom-text': 'Note' } })
+    expect(previewSpotCsv('spot:name,categories\n店,観光\n', textFields, categories, [], ['ja', 'en']).preview.valid).toBe(1)
+  })
+
+  it('無効なlocale suffixを拒否する', () => {
+    expect(previewSpotCsv('spot:name,spot:name[fr]\n店,Boutique\n', fields, categories, [], ['ja', 'en']).preview.errors).toBeGreaterThan(0)
+    expect(previewSpotCsv('spot:name,spot:name[en]\n店,Shop\n', fields, categories, [], ['ja']).preview.errors).toBeGreaterThan(0)
+  })
+
   it('import handlerは全行検証後に単一transactionで未配置・非公開Spotを作る', () => {
     const source = readFileSync(new URL('../server/api/maps/[mapId]/spots/import/index.post.ts', import.meta.url), 'utf8')
     expect(source).toContain('await prisma.$transaction')

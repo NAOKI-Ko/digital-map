@@ -8,6 +8,7 @@ export interface CategorySummary {
   iconImageUrl: string | null
   iconAssetId?: string | null
   spotCount: number
+  englishName?: string | null
 }
 
 export interface SpotCategorySummary {

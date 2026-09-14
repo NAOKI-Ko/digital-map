@@ -8,11 +8,11 @@ export default defineEventHandler(async (event): Promise<SpotCsvImportResponse> 
 
   const createdCount = await prisma.$transaction(async (transaction) => {
     const context = await loadSpotCsvContext(transaction, map.id, body.floorId!)
-    const result = previewSpotCsv(body.csv!, context.fields, context.categories, context.existingNames)
+    const result = previewSpotCsv(body.csv!, context.fields, context.categories, context.existingNames, context.enabledLocales)
     if (result.preview.errors > 0) throw createError({ statusCode: 422, statusMessage: 'エラーのあるCSVは登録できません。' })
     for (const row of result.parsedRows) {
       const standard = row.standardValues
-      await transaction.spot.create({
+      const spot = await transaction.spot.create({
         data: {
           floorId: context.floor.id,
           name: row.name,
@@ -29,6 +29,19 @@ export default defineEventHandler(async (event): Promise<SpotCsvImportResponse> 
           fieldValues: { create: Object.entries(row.customValues).map(([fieldDefinitionId, valueJson]) => ({ fieldDefinitionId, valueJson })) },
         },
       })
+      const englishCore = row.englishStandardValues
+      if (row.englishName || Object.keys(englishCore).length) {
+        await transaction.spotTranslation.create({ data: {
+          spotId: spot.id,
+          locale: 'en',
+          name: row.englishName || null,
+          description: englishCore.description || null,
+          address: englishCore.address || null,
+          hoursText: englishCore.hours || null,
+          holidayText: englishCore.holiday || null,
+        } })
+      }
+      if (Object.keys(row.englishCustomValues).length) await transaction.spotFieldValueTranslation.createMany({ data: Object.entries(row.englishCustomValues).map(([fieldDefinitionId, value]) => ({ spotId: spot.id, fieldDefinitionId, locale: 'en', value })) })
     }
     return result.parsedRows.length
   })

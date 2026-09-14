@@ -11,6 +11,9 @@ export interface ParsedSpotCsvRow {
   name: string
   standardValues: Record<string, string>
   customValues: Record<string, string | number | boolean>
+  englishName: string
+  englishStandardValues: Record<string, string>
+  englishCustomValues: Record<string, string>
   categoryIds: string[]
   messages: SpotCsvMessage[]
 }
@@ -19,11 +22,21 @@ function fieldHeader(field: CsvField) {
   return field.kind === 'standard' ? `field:standard:${field.semanticKey}` : `field:custom:${field.id}`
 }
 
-export function createSpotCsvTemplate(fields: CsvField[]) {
+const translatableStandardKeys = new Set(['description', 'address', 'hours', 'holiday'])
+const translatableTextTypes = new Set(['single_line_text', 'multiline_text'])
+
+function isTranslatableField(field: CsvField) {
+  return field.kind === 'standard'
+    ? Boolean(field.semanticKey && translatableStandardKeys.has(field.semanticKey))
+    : translatableTextTypes.has(field.type)
+}
+
+export function createSpotCsvTemplate(fields: CsvField[], enabledLocales: string[] = ['ja']) {
   const enabled = fields.filter(field => field.enabled).toSorted((a, b) => a.order - b.order)
+  const english = enabledLocales.includes('en') ? ['spot:name[en]', ...enabled.filter(isTranslatableField).map(field => `${fieldHeader(field)}[en]`)] : []
   return encodeCsv([
-    ['spot:name', ...enabled.map(fieldHeader), 'categories'],
-    ['', ...enabled.map(() => ''), ''],
+    ['spot:name', ...enabled.map(fieldHeader), 'categories', ...english],
+    ['', ...enabled.map(() => ''), '', ...english.map(() => '')],
   ])
 }
 
@@ -47,10 +60,12 @@ export function previewSpotCsv(
   fields: CsvField[],
   categories: CsvCategory[],
   existingNames: string[],
+  enabledLocales: string[] = ['ja'],
 ): { preview: SpotCsvPreview, parsedRows: ParsedSpotCsvRow[] } {
   const parsed = parseCsv(source)
   const enabledFields = fields.filter(field => field.enabled)
   const allowedFields = new Map(enabledFields.map(field => [fieldHeader(field), field]))
+  const englishFields = new Map(enabledFields.filter(isTranslatableField).map(field => [`${fieldHeader(field)}[en]`, field]))
   const categoryByName = new Map(categories.map(category => [category.name, category.id]))
   if (parsed.error || parsed.rows.length === 0) {
     const message = parsed.error ?? 'ヘッダー行がありません。'
@@ -62,7 +77,9 @@ export function previewSpotCsv(
   if (headers[0] !== 'spot:name') headerErrors.push({ level: 'error', message: '先頭列はspot:nameである必要があります。' })
   if (new Set(headers).size !== headers.length) headerErrors.push({ level: 'error', message: '重複した列があります。' })
   for (const header of headers) {
-    if (header !== 'spot:name' && header !== 'categories' && !allowedFields.has(header)) headerErrors.push({ level: 'error', message: `未対応の列です: ${header}` })
+    const isEnglish = header === 'spot:name[en]' || englishFields.has(header)
+    if (isEnglish && !enabledLocales.includes('en')) headerErrors.push({ level: 'error', message: `無効なlocale列です: ${header}` })
+    else if (header !== 'spot:name' && header !== 'categories' && !allowedFields.has(header) && !isEnglish) headerErrors.push({ level: 'error', message: `未対応の列です: ${header}` })
   }
   if (headerErrors.length) {
     return { preview: { total: 0, valid: 0, warnings: 0, errors: headerErrors.length, rows: [{ rowNumber: 1, name: '', messages: headerErrors }] }, parsedRows: [] }
@@ -80,6 +97,9 @@ export function previewSpotCsv(
     const name = cells[0]?.trim() ?? ''
     const standardValues: Record<string, string> = {}
     const customValues: Record<string, string | number | boolean> = {}
+    const englishStandardValues: Record<string, string> = {}
+    const englishCustomValues: Record<string, string> = {}
+    let englishName = ''
     const categoryIds: string[] = []
     if (cells.length !== headers.length) messages.push({ level: 'error', message: `列数が不正です（${cells.length}/${headers.length}）。` })
     if (!name) messages.push({ level: 'error', message: 'Spot名は必須です。' })
@@ -89,6 +109,7 @@ export function previewSpotCsv(
     headers.forEach((header, columnIndex) => {
       const raw = (cells[columnIndex] ?? '').trim()
       const field = allowedFields.get(header)
+      const englishField = englishFields.get(header)
       if (field) {
         if (field.required && raw === '') messages.push({ level: 'error', message: `${field.label}は必須です。` })
         const typed = parseTypedValue(field, raw)
@@ -98,6 +119,11 @@ export function previewSpotCsv(
           else customValues[field.id] = typed.value as string | number | boolean
         }
       }
+      if (header === 'spot:name[en]') englishName = raw
+      if (englishField && raw) {
+        if (englishField.kind === 'standard' && englishField.semanticKey) englishStandardValues[englishField.semanticKey] = raw
+        else englishCustomValues[englishField.id] = raw
+      }
       if (header === 'categories' && raw) {
         for (const categoryName of raw.split('|').map(value => value.trim()).filter(Boolean)) {
           const categoryId = categoryByName.get(categoryName)
@@ -106,7 +132,7 @@ export function previewSpotCsv(
         }
       }
     })
-    return { rowNumber, name, standardValues, customValues, categoryIds: [...new Set(categoryIds)], messages }
+    return { rowNumber, name, standardValues, customValues, englishName, englishStandardValues, englishCustomValues, categoryIds: [...new Set(categoryIds)], messages }
   })
   const rows = parsedRows.map(row => ({ rowNumber: row.rowNumber, name: row.name, messages: row.messages }))
   const errors = rows.reduce((count, row) => count + row.messages.filter(message => message.level === 'error').length, 0)
@@ -115,12 +141,13 @@ export function previewSpotCsv(
 }
 
 export async function loadSpotCsvContext(client: Prisma.TransactionClient | typeof prisma, mapId: string, floorId: string) {
-  const [floor, fields, categories, spots] = await Promise.all([
+  const [map, floor, fields, categories, spots] = await Promise.all([
+    client.map.findUnique({ where: { id: mapId }, select: { enabledLocales: true } }),
     client.mapFloor.findFirst({ where: { id: floorId, mapId }, select: { id: true } }),
     client.spotFieldDefinition.findMany({ where: { mapId }, orderBy: [{ order: 'asc' }, { createdAt: 'asc' }] }),
     client.category.findMany({ where: { mapId }, select: { id: true, name: true } }),
     client.spot.findMany({ where: { floor: { mapId } }, select: { name: true } }),
   ])
   if (!floor) throw createError({ statusCode: 422, statusMessage: '対象フロアが見つかりません。' })
-  return { floor, fields, categories, existingNames: spots.map(spot => spot.name) }
+  return { floor, fields, categories, existingNames: spots.map(spot => spot.name), enabledLocales: map?.enabledLocales ?? ['ja'] }
 }

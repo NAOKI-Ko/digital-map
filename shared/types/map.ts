@@ -13,6 +13,9 @@ export interface AdminMapListResponse {
 }
 
 export interface AdminMapDetail extends AdminMapSummary {
+  defaultLocale: 'ja'
+  enabledLocales: Array<'ja' | 'en'>
+  englishTranslation: { name: string | null, description: string | null } | null
   organizationName: string | null
   logoUrl: string | null
   logoAssetId?: string | null

@@ -7,6 +7,8 @@ export const adminSpotInclude = {
   spotCategories: { select: spotCategorySelect },
   photos: { include: { asset: true }, orderBy: { order: 'asc' as const } },
   fieldValues: true,
+  translations: { where: { locale: 'en' as const } },
+  fieldValueTranslations: { where: { locale: 'en' as const } },
 } satisfies Prisma.SpotInclude
 
 type SpotWithFloor = Prisma.SpotGetPayload<{ include: typeof adminSpotInclude }>
@@ -26,6 +28,16 @@ export function toAdminSpotDetail(spot: SpotWithFloor) {
     floorId: spot.floorId,
     floorName: spot.floor.name,
     name: spot.name,
+    englishTranslation: spot.translations[0]
+      ? {
+          name: spot.translations[0].name,
+          description: spot.translations[0].description,
+          address: spot.translations[0].address,
+          hoursText: spot.translations[0].hoursText,
+          holidayText: spot.translations[0].holidayText,
+          customValues: Object.fromEntries(spot.fieldValueTranslations.map(value => [value.fieldDefinitionId, value.value])),
+        }
+      : null,
     categories: sortSpotCategories(spot.spotCategories.map(relation => relation.category)),
     importance: normalizeSpotImportance(spot.importance),
     description: spot.description,

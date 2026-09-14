@@ -52,6 +52,9 @@ export interface PublicMap {
   id: string
   name: string
   slug: string
+  locale: 'ja' | 'en'
+  defaultLocale: 'ja'
+  enabledLocales: Array<'ja' | 'en'>
   organizationName: string | null
   logoUrl: string | null
   websiteUrl: string | null

@@ -59,6 +59,16 @@ async function remove(field: SpotFieldDefinitionItem) {
     saveState.value = 'error'
   }
 }
+
+async function saveEnglishLabel(field: SpotFieldDefinitionItem) {
+  saveState.value = 'saving'
+  try {
+    await $fetch(`/api/maps/${mapId}/spot-fields/${field.id}/translations`, { method: 'PATCH', body: { label: field.englishLabel || null } })
+    message.value = '英語ラベルを保存しました。'
+    saveState.value = 'success'
+  }
+  catch { message.value = '英語ラベルを保存できませんでした。'; saveState.value = 'error' }
+}
 </script>
 
 <template>
@@ -70,6 +80,7 @@ async function remove(field: SpotFieldDefinitionItem) {
       <li v-for="field in data?.fields" :key="field.id" class="grid gap-3 rounded-xl border bg-white p-4 md:grid-cols-[1fr_auto]">
         <div class="grid gap-3 sm:grid-cols-2">
           <label class="text-xs font-semibold">表示名<input v-model="field.label" class="mt-1 w-full rounded border px-3 py-2 text-sm"></label>
+          <label class="text-xs font-semibold">English label（任意）<span class="mt-1 flex gap-2"><input v-model="field.englishLabel" class="w-full rounded border px-3 py-2 text-sm"><button type="button" class="rounded bg-stone-700 px-2 text-white" @click="saveEnglishLabel(field)">保存</button></span></label>
           <label class="text-xs font-semibold">順序<input v-model.number="field.order" type="number" min="0" class="mt-1 w-full rounded border px-3 py-2 text-sm"></label>
           <label><input v-model="field.enabled" type="checkbox"> 有効</label>
           <label><input v-model="field.publicVisible" :disabled="!field.enabled" type="checkbox"> 公開</label>

@@ -11,6 +11,7 @@ export interface SpotFieldDefinitionItem {
   required: boolean
   order: number
   valueCount: number
+  englishLabel?: string | null
 }
 
 export interface SpotFieldDefinitionListResponse {

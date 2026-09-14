@@ -7,7 +7,7 @@ export default defineEventHandler(async (event): Promise<PublicMapResponse> => {
     throw createError({ statusCode: 400, statusMessage: 'マップslugが必要です。' })
   }
 
-  const map = await getPublicMapBySlug(mapSlug)
+  const map = await getPublicMapBySlug(mapSlug, getQuery(event).lang)
   if (!map) {
     throw createError({ statusCode: 404, statusMessage: '公開マップが見つかりません。' })
   }

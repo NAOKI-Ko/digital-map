@@ -197,6 +197,9 @@ model Map {
   websiteUrl           String?
   snsUrl               String?
   isPublished          Boolean               @default(false)
+  defaultLocale        String                @default("ja")
+  enabledLocales       String[]              @default(["ja"])
+  translations         MapTranslation[]
   floors               MapFloor[]
   categories           Category[]
   spotFieldDefinitions SpotFieldDefinition[]
@@ -205,6 +208,20 @@ model Map {
   updatedAt            DateTime              @updatedAt
 
   @@index([tenantId])
+}
+
+model MapTranslation {
+  id          String   @id @default(cuid())
+  mapId       String
+  map         Map      @relation(fields: [mapId], references: [id], onDelete: Cascade)
+  locale      String
+  name        String?
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([mapId, locale])
+  @@index([locale])
 }
 
 model Category {
@@ -219,11 +236,25 @@ model Category {
   iconAssetId    String?
   iconAsset      MediaAsset?    @relation("CategoryIconAsset", fields: [iconAssetId], references: [id], onDelete: SetNull)
   spotCategories SpotCategory[]
+  translations   CategoryTranslation[]
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
 
   @@unique([mapId, name])
   @@index([mapId, order])
+}
+
+model CategoryTranslation {
+  id         String   @id @default(cuid())
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  locale     String
+  name       String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([categoryId, locale])
+  @@index([locale])
 }
 
 model MapFloor {
@@ -277,6 +308,8 @@ model Spot {
   fieldValues     SpotFieldValue[]
   editorAssignment SpotEditorAssignment?
   revisions       SpotRevision[]
+  translations    SpotTranslation[]
+  fieldValueTranslations SpotFieldValueTranslation[]
   targetedInvitations OrganizationInvitation[]
   liveVersion     Int              @default(1)
   pinColor        String           @default("#C7401F")
@@ -288,6 +321,23 @@ model Spot {
 
   @@index([floorId])
   @@index([floorId, isPublished])
+}
+
+model SpotTranslation {
+  id          String   @id @default(cuid())
+  spotId      String
+  spot        Spot     @relation(fields: [spotId], references: [id], onDelete: Cascade)
+  locale      String
+  name        String?
+  description String?
+  address     String?
+  hoursText   String?
+  holidayText String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([spotId, locale])
+  @@index([locale])
 }
 
 model SpotEditorAssignment {
@@ -374,11 +424,26 @@ model SpotFieldDefinition {
   required      Boolean          @default(false)
   order         Int              @default(0)
   values        SpotFieldValue[]
+  translations  SpotFieldDefinitionTranslation[]
+  valueTranslations SpotFieldValueTranslation[]
   createdAt     DateTime         @default(now())
   updatedAt     DateTime         @updatedAt
 
   @@unique([mapId, semanticKey])
   @@index([mapId, order])
+}
+
+model SpotFieldDefinitionTranslation {
+  id                String              @id @default(cuid())
+  fieldDefinitionId String
+  fieldDefinition   SpotFieldDefinition @relation(fields: [fieldDefinitionId], references: [id], onDelete: Cascade)
+  locale            String
+  label             String?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+
+  @@unique([fieldDefinitionId, locale])
+  @@index([locale])
 }
 
 model SpotFieldValue {
@@ -393,6 +458,21 @@ model SpotFieldValue {
 
   @@unique([spotId, fieldDefinitionId])
   @@index([fieldDefinitionId])
+}
+
+model SpotFieldValueTranslation {
+  id                String              @id @default(cuid())
+  spotId            String
+  spot              Spot                @relation(fields: [spotId], references: [id], onDelete: Cascade)
+  fieldDefinitionId String
+  fieldDefinition   SpotFieldDefinition @relation(fields: [fieldDefinitionId], references: [id], onDelete: Cascade)
+  locale            String
+  value              String
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+
+  @@unique([spotId, fieldDefinitionId, locale])
+  @@index([fieldDefinitionId, locale])
 }
 
 model MediaAsset {

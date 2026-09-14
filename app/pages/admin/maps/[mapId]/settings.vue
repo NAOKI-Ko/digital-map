@@ -21,6 +21,13 @@ const brandingMessage = ref('')
 const isBrandingSaving = ref(false)
 const deleteError = ref('')
 const deleteDialogOpen = ref(false)
+const translation = reactive({
+  englishEnabled: data.value?.map.enabledLocales.includes('en') ?? false,
+  name: data.value?.map.englishTranslation?.name ?? '',
+  description: data.value?.map.englishTranslation?.description ?? '',
+})
+const translationState = ref<'idle' | 'saving' | 'success' | 'error'>('idle')
+const translationMessage = ref('')
 const branding = reactive({
   organizationName: data.value?.map.organizationName ?? '',
   logoUrl: data.value?.map.logoUrl ?? '',
@@ -91,6 +98,20 @@ async function deleteMap() {
   }
   catch (error: any) { deleteError.value = error?.data?.statusMessage ?? 'マップを削除できませんでした。' }
 }
+
+async function saveTranslation() {
+  translationState.value = 'saving'
+  translationMessage.value = ''
+  try {
+    await $fetch(`/api/maps/${mapId}/translations`, { method: 'PATCH', body: translation })
+    translationState.value = 'success'
+    translationMessage.value = '言語設定と英語訳を保存しました。'
+  }
+  catch (error: any) {
+    translationState.value = 'error'
+    translationMessage.value = error?.data?.statusMessage ?? '英語訳を保存できませんでした。'
+  }
+}
 </script>
 
 <template>
@@ -141,6 +162,20 @@ async function deleteMap() {
           :is-submitting="isSubmitting"
           @submit="saveMap"
         />
+      </section>
+
+      <section class="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+        <h2 class="text-lg font-bold text-stone-900">公開言語</h2>
+        <p class="mt-1 text-sm text-stone-600">日本語は既定言語で、無効化できません。英語訳が空の項目は日本語を表示します。</p>
+        <form class="mt-5 space-y-4" @submit.prevent="saveTranslation">
+          <label class="flex items-center gap-2 text-sm font-semibold"><input v-model="translation.englishEnabled" type="checkbox"> 英語（en）を有効にする</label>
+          <template v-if="translation.englishEnabled">
+            <label class="block text-sm font-semibold">Map name (English)<input v-model="translation.name" maxlength="100" class="mt-1 w-full rounded-lg border border-stone-300 px-3 py-2.5"></label>
+            <label class="block text-sm font-semibold">Description (English)<textarea v-model="translation.description" maxlength="2000" rows="4" class="mt-1 w-full rounded-lg border border-stone-300 px-3 py-2.5" /></label>
+          </template>
+          <SaveFeedback :state="translationState" :message="translationMessage" />
+          <button class="rounded-lg bg-stone-900 px-5 py-2.5 text-sm font-semibold text-white" :disabled="translationState === 'saving'">言語設定を保存</button>
+        </form>
       </section>
 
       <section class="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">

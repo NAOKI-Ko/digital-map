@@ -146,6 +146,16 @@ async function deleteCategory() {
   }
   finally { isSaving.value = false }
 }
+
+async function saveEnglishName(category: CategorySummary) {
+  saveState.value = 'saving'
+  try {
+    await $fetch(`/api/maps/${mapId}/categories/${category.id}/translations`, { method: 'PATCH', body: { name: category.englishName || null } })
+    message.value = 'カテゴリーの英語名を保存しました。'
+    saveState.value = 'success'
+  }
+  catch { message.value = '英語名を保存できませんでした。'; saveState.value = 'error' }
+}
 </script>
 
 <template>
@@ -173,6 +183,7 @@ async function deleteCategory() {
             <button type="button" :disabled="category.spotCount > 0" class="rounded border border-red-200 px-3 py-1.5 text-red-700 disabled:opacity-40" @click="deleteTarget = category">削除</button>
           </div>
         </div>
+        <label class="mt-3 block text-xs font-semibold text-stone-600">English name（任意）<span class="mt-1 flex gap-2"><input v-model="category.englishName" class="w-full rounded border px-3 py-2 text-sm"><button type="button" class="rounded bg-stone-900 px-3 text-xs text-white" @click="saveEnglishName(category)">保存</button></span></label>
       </li>
     </ul>
 

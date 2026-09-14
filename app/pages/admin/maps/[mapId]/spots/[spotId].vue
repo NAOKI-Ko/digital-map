@@ -20,6 +20,16 @@ const submitError = ref('')
 const successMessage = ref(route.query.saved === 'spot-created' ? 'スポットを登録しました。' : '')
 const duplicateMatches = ref<SpotDuplicateMatch[]>([])
 const pendingInput = ref<SpotFormInput | null>(null)
+const english = reactive({
+  name: data.value?.spot.englishTranslation?.name ?? '',
+  description: data.value?.spot.englishTranslation?.description ?? '',
+  address: data.value?.spot.englishTranslation?.address ?? '',
+  hoursText: data.value?.spot.englishTranslation?.hoursText ?? '',
+  holidayText: data.value?.spot.englishTranslation?.holidayText ?? '',
+  customValues: { ...(data.value?.spot.englishTranslation?.customValues ?? {}) },
+})
+const englishState = ref<'idle' | 'saving' | 'success' | 'error'>('idle')
+const englishMessage = ref('')
 
 const initialValue = computed<SpotFormInput | undefined>(() => data.value
   ? {
@@ -90,6 +100,19 @@ function continueWithDuplicate() {
   cancelDuplicateWarning()
   if (input) void persistSpot(input)
 }
+
+async function saveEnglish() {
+  englishState.value = 'saving'
+  try {
+    await $fetch(`/api/maps/${mapId}/spots/${spotId}/translations`, { method: 'PATCH', body: english })
+    englishState.value = 'success'
+    englishMessage.value = '英語訳を保存しました。'
+  }
+  catch (error: any) {
+    englishState.value = 'error'
+    englishMessage.value = error?.data?.statusMessage ?? '英語訳を保存できませんでした。'
+  }
+}
 </script>
 
 <template>
@@ -113,6 +136,19 @@ function continueWithDuplicate() {
             <p class="text-sm text-stone-600">フォームを読み込んでいます…</p>
           </template>
         </ClientOnly>
+      </section>
+      <section v-if="data.spot.enabledLocales?.includes('en')" class="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+        <h2 class="text-lg font-bold">英語訳</h2>
+        <p class="mt-1 text-sm text-stone-600">未入力の項目は日本語へフォールバックします。電話番号とURLは共通です。</p>
+        <form class="mt-5 grid gap-4 sm:grid-cols-2" @submit.prevent="saveEnglish">
+          <label class="text-sm font-semibold">Name<input v-model="english.name" class="mt-1 w-full rounded border px-3 py-2"></label>
+          <label class="text-sm font-semibold">Address<input v-model="english.address" class="mt-1 w-full rounded border px-3 py-2"></label>
+          <label class="text-sm font-semibold sm:col-span-2">Description<textarea v-model="english.description" rows="3" class="mt-1 w-full rounded border px-3 py-2" /></label>
+          <label class="text-sm font-semibold">Hours<input v-model="english.hoursText" class="mt-1 w-full rounded border px-3 py-2"></label>
+          <label class="text-sm font-semibold">Holiday<input v-model="english.holidayText" class="mt-1 w-full rounded border px-3 py-2"></label>
+          <label v-for="field in data.fields.filter(field => field.kind === 'custom' && ['single_line_text', 'multiline_text'].includes(field.type))" :key="field.id" class="text-sm font-semibold">{{ field.label }} (English)<input v-model="english.customValues[field.id]" class="mt-1 w-full rounded border px-3 py-2"></label>
+          <div class="sm:col-span-2"><SaveFeedback :state="englishState" :message="englishMessage" /><button class="mt-3 rounded bg-stone-900 px-4 py-2 text-sm font-semibold text-white">英語訳を保存</button></div>
+        </form>
       </section>
       <section class="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
         <SpotPhotoManager

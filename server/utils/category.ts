@@ -7,7 +7,7 @@ export const categoryOrderBy = [
 
 export const spotCategorySelect = {
   category: {
-    select: { id: true, name: true, order: true, iconType: true, iconPresetId: true, iconImageUrl: true, iconAssetId: true },
+    select: { id: true, name: true, order: true, iconType: true, iconPresetId: true, iconImageUrl: true, iconAssetId: true, translations: { select: { locale: true, name: true } } },
   },
 } satisfies Prisma.SpotCategorySelect
 

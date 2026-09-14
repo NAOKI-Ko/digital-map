@@ -13,7 +13,8 @@
 | WU-26 | KAN-69 | `b6e72d3` | `6638d40` | `20260914040000_mail_delivery` | 3 files / 11 tests PASS | 47 files / 325 tests PASS | PASS | validate + generate PASS | PASS | Resend credentials pending; fake provider PASS | PASS |
 | WU-27 | KAN-66 | `6638d40` | `38be3d2` | `20260914050000_security_rate_limits` | 4 files / 20 tests PASS | 48 files / 330 tests PASS | PASS | validate + generate PASS | not required | npm advisory API unreachable | PASS |
 | WU-28 | KAN-67 | `38be3d2` | `1b0fd3c` | none | 2 files / 9 tests PASS | 49 files / 334 tests PASS | PASS | validate PASS | PASS | Alert webhook pending; logs active | PASS |
-| WU-29 | KAN-65 | `1b0fd3c` | this WU commit | none | 1 file / 3 tests PASS | 50 files / 337 tests PASS | PASS | validate PASS | not required | PostgreSQL restore drill pending (tools unavailable) | PASS |
+| WU-29 | KAN-65 | `1b0fd3c` | `c607b5d` | none | 1 file / 3 tests PASS | 50 files / 337 tests PASS | PASS | validate PASS | not required | PostgreSQL restore drill pending (tools unavailable) | PASS |
+| WU-30 | KAN-60 | `c607b5d` | this WU commit | `20260914060000_ja_en_translations` | 3 files / 20 tests PASS | 51 files / 343 tests PASS | PASS | validate + generate PASS | PASS | none | PASS |
 
 ## WU-23 notes
 
@@ -64,3 +65,10 @@
 - Managed media is archived with a sorted relative-path/size/SHA-256 manifest and archive checksum; restore verifies both archive and extracted files.
 - Retention is centralized at 7 daily / 4 weekly, marker-root constrained, filename constrained, and dry-run by default. PowerShell wrappers and an operator runbook are included.
 - This host has no `pg_dump`, `pg_restore`, `psql`, or Docker server. The disposable PostgreSQL restore drill is external verification pending; no QA/shared database was accessed.
+
+## WU-30 notes
+
+- Existing Map/Spot/Category/field base columns remain the canonical Japanese values. Optional `en` relations are uniquely keyed and always fall back to Japanese.
+- Public URLs remain unchanged; `?lang=en` selects English only when enabled, and the public UI exposes a locale selector with an English browser-language suggestion that never overrides an explicit query.
+- Only text custom-field values are translatable. Phone, URL, number, and boolean values stay locale-independent.
+- CSV remains backward compatible; English-enabled Maps add stable `[en]` columns keyed by semantic key or immutable custom-field ID, while unsupported locale suffixes are rejected.
