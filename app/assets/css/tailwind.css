@@ -3,6 +3,13 @@
 @tailwind utilities;
 
 @layer base {
+  :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+    outline: 3px solid #1c1917;
+    outline-offset: 3px;
+  }
+}
+
+@layer base {
   body {
     @apply bg-stone-50 text-stone-900 antialiased;
   }

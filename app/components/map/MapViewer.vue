@@ -71,6 +71,8 @@ const { floorError, geolocationAreaMessage, mapError } = useMapViewer(container,
         :class="mode === 'edit' ? 'cursor-crosshair' : 'cursor-grab'"
         :style="{ height }"
         :aria-label="label"
+        role="region"
+        tabindex="0"
       />
       <div
         v-if="mode === 'edit'"

@@ -5,11 +5,26 @@ const props = defineProps<{
   spot: PublicSpot
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
   close: []
 }>()
 
 const expanded = ref(false)
+const dialog = useTemplateRef<HTMLElement>('dialog')
+const closeButton = useTemplateRef<HTMLButtonElement>('closeButton')
+
+function handleKeydown(event: KeyboardEvent) {
+  if (event.key === 'Escape') { event.preventDefault(); emit('close'); return }
+  if (event.key !== 'Tab' || !dialog.value) return
+  const focusable = [...dialog.value.querySelectorAll<HTMLElement>('button:not([disabled]),a[href],input,select,textarea,[tabindex]:not([tabindex="-1"])')]
+  if (!focusable.length) return
+  const first = focusable[0]!
+  const last = focusable.at(-1)!
+  if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus() }
+  else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus() }
+}
+
+onMounted(() => nextTick(() => closeButton.value?.focus()))
 
 watch(() => props.spot.id, () => {
   expanded.value = false
@@ -19,10 +34,13 @@ watch(() => props.spot.id, () => {
 <template>
   <div class="pointer-events-none fixed inset-0 z-40 flex items-end p-0 sm:pointer-events-auto sm:items-center sm:justify-end sm:bg-stone-950/30 sm:p-5" @click.self="$emit('close')">
     <article
+      ref="dialog"
       role="dialog"
+      aria-modal="true"
       :aria-labelledby="`spot-detail-title-${spot.id}`"
       class="pointer-events-auto w-full rounded-t-3xl bg-white shadow-2xl transition-[max-height] sm:max-h-[calc(100svh-2.5rem)] sm:max-w-md sm:overflow-y-auto sm:rounded-3xl"
       :class="expanded ? 'max-h-[82svh] overflow-y-auto' : 'max-h-36 overflow-hidden'"
+      @keydown="handleKeydown"
     >
       <button
         type="button"
@@ -46,6 +64,7 @@ watch(() => props.spot.id, () => {
 
       <div class="relative px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-1 sm:p-6">
         <button
+          ref="closeButton"
           type="button"
           class="absolute right-4 top-4 grid size-10 place-items-center rounded-full bg-stone-100 text-xl leading-none text-stone-700 hover:bg-stone-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-900"
           aria-label="スポット詳細を閉じる"

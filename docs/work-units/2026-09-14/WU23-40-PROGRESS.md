@@ -19,7 +19,8 @@
 | WU-32 | KAN-57 | `e63d79a` | `6d383b0` | `20260914080000_public_releases` | 3 files / 16 tests PASS | 53 files / 353 tests PASS | PASS | validate + generate PASS | PASS | Cloudflare R2 credentials pending; local adapter PASS | PASS |
 | WU-33 | KAN-55 | `6d383b0` | `d05583a` | `20260914090000_public_analytics` | 3 files / 17 tests PASS | 54 files / 359 tests PASS | PASS | validate + generate PASS | not required | none | PASS |
 | WU-34 | KAN-62 | `d05583a` | `50ca8b7` | `20260914100000_map_seo` | 4 files / 24 tests PASS | 55 files / 364 tests PASS | PASS | validate + generate PASS | not required | none | PASS |
-| WU-35 | KAN-63 | `50ca8b7` | this WU commit | none | 3 files / 15 tests PASS | 56 files / 368 tests PASS | PASS | validate PASS | not required | Legal review pending | PASS |
+| WU-35 | KAN-63 | `50ca8b7` | `c051963` | none | 3 files / 15 tests PASS | 56 files / 368 tests PASS | PASS | validate PASS | not required | Legal review pending | PASS |
+| WU-36 | KAN-61 | `c051963` | this WU commit | none | 2 files / 21 tests PASS | 57 files / 373 tests PASS | PASS | validate PASS | PASS | none | PASS |
 
 ## WU-23 notes
 
@@ -112,3 +113,10 @@
 - Both expose version `2026-09-14-v1`, effective date `2026-09-14`, and an environment-configured contact point. Public Map and login surfaces link to both routes.
 - Privacy describes only implemented behavior: account/organization data, hash-only auth lifecycle tokens, transactional email, sanitized operational logs, aggregate Map/Spot analytics, session cookies, uploaded media, immutable releases, retention, and backups.
 - The wording is explicitly a product/legal draft. Formal legal approval remains external review and does not block implementation PASS.
+
+## WU-36 notes
+
+- Every published Spot is reachable through a keyboard and screen-reader-friendly list alternative, while DOM Map markers remain native buttons that support Enter/Space activation.
+- Floor tabs use roving focus and Arrow/Home/End keyboard navigation. The Spot detail dialog traps focus, closes with Escape, and restores focus to the invoking marker or list entry.
+- Icon controls expose accessible names, decoration remains assistive-technology hidden, and a global visible focus treatment covers keyboard-operable public controls.
+- Automated axe checks cover the public initial/category/list state, Spot dialog, legal page, and login form with no critical/serious violations. A deterministic palette audit separately verifies major text/control contrast at WCAG AA thresholds.

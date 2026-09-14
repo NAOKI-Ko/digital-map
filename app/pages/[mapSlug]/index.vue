@@ -4,6 +4,7 @@ import CategoryFilter from '~/components/map/CategoryFilter.vue'
 import FloorTabs from '~/components/map/FloorTabs.vue'
 import MapOperationHint from '~/components/map/MapOperationHint.vue'
 import SpotDetailCard from '~/components/map/SpotDetailCard.vue'
+import SpotAccessibleList from '~/components/map/SpotAccessibleList.vue'
 import { collectSpotCategories, filterSpotsByCategoryIds } from '~/utils/category-filter'
 import type { MapViewerSpot } from '~~/shared/types/map-viewer'
 import type { PublicMapResponse } from '~~/shared/types/public-map'
@@ -24,6 +25,7 @@ const { data, error, status } = await useFetch<PublicMapResponse>(
 const selectedFloorId = ref('')
 const selectedSpotId = ref<string | null>(null)
 const selectedCategoryIds = ref<string[]>([])
+let spotTrigger: HTMLElement | null = null
 
 const selectedFloor = computed(() => (
   data.value?.map.floors.find(floor => floor.id === selectedFloorId.value)
@@ -83,8 +85,14 @@ useHead(() => ({
 }))
 
 function selectSpot(spot: MapViewerSpot) {
+  if (document.activeElement instanceof HTMLElement) spotTrigger = document.activeElement
   selectedSpotId.value = spot.id
   if (data.value?.map.id) sendPublicAnalytics({ type: 'SPOT_VIEW', mapId: data.value.map.id, spotId: spot.id })
+}
+
+function closeSpot() {
+  selectedSpotId.value = null
+  nextTick(() => { spotTrigger?.focus(); spotTrigger = null })
 }
 
 async function switchLocale(locale: 'ja' | 'en') {
@@ -134,6 +142,7 @@ onMounted(() => {
       </header>
 
       <section class="relative min-h-0">
+        <SpotAccessibleList :spots="visibleSpots" :selected-spot-id="selectedSpotId" @select="selectSpot" />
         <div class="pointer-events-none absolute left-3 right-[3.75rem] top-3 z-20 sm:left-5 sm:right-20">
           <div class="pointer-events-auto">
             <FloorTabs
@@ -177,7 +186,7 @@ onMounted(() => {
       <SpotDetailCard
         v-if="selectedSpot"
         :spot="selectedSpot"
-        @close="selectedSpotId = null"
+        @close="closeSpot"
       />
     </template>
   </main>
