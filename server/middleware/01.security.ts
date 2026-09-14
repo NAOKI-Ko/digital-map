@@ -7,7 +7,8 @@ export default defineEventHandler(async (event) => {
     'X-Frame-Options': 'DENY',
   })
   const url = getRequestURL(event)
-  if (process.env.NODE_ENV === 'production') {
+  const config = useRuntimeConfig(event)
+  if (config.deploymentEnvironment === 'production') {
     const host = effectiveRequestHost(event)
     if (!configuredTrustedHosts(event).has(host)) throw createError({ statusCode: 421, statusMessage: '信頼されていないHostです。' })
     if (effectiveRequestProtocol(event) !== 'https:') {

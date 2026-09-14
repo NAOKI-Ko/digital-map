@@ -45,11 +45,14 @@ describe('WU-39 fixed URL/domain/TLS readiness', () => {
   })
 
   it('enforces trusted hosts, HTTPS redirect, Secure-cookie/HSTS policy in production source', async () => {
-    const [middleware, configSource] = await Promise.all([readFile('server/middleware/01.security.ts', 'utf8'), readFile('nuxt.config.ts', 'utf8')])
+    const [middleware, plugin, configSource] = await Promise.all([readFile('server/middleware/01.security.ts', 'utf8'), readFile('server/plugins/00.production-config.ts', 'utf8'), readFile('nuxt.config.ts', 'utf8')])
+    expect(middleware).toContain("config.deploymentEnvironment === 'production'")
     expect(middleware).toContain('configuredTrustedHosts(event)')
     expect(middleware).toContain('effectiveRequestProtocol(event)')
     expect(middleware).toContain('sendRedirect(event')
     expect(middleware).toContain("'Strict-Transport-Security'")
+    expect(plugin).toContain("config.deploymentEnvironment !== 'production'")
+    expect(configSource).toContain('process.env.DEPLOYMENT_ENV')
     expect(configSource).toContain("secure: process.env.NODE_ENV === 'production'")
   })
 

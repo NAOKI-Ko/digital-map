@@ -6,13 +6,14 @@
 
 本番では次を設定します。
 
+- `DEPLOYMENT_ENV=production`: 固定HTTPS URL、許可Host、HTTPS redirect、HSTSを必須化
 - `PUBLIC_BASE_URL=https://<public-host>`: 公開Map、QR、canonical、OGP、sitemapの基準URL
 - `ADMIN_BASE_URL=https://<admin-host>`: 管理画面、招待、reset、signup verificationの基準URL
 - `TRUSTED_HOSTS=<public-host>,<admin-host>`: 許可するHost（必要な場合はportを含む）
 - `NUXT_TRUSTED_ORIGINS=https://<admin-host>,https://<public-host>`: cookie認証mutationのOrigin許可
 - `TRUST_PROXY=true`: Cloudflare/cloudflaredの`X-Forwarded-Proto`と`X-Forwarded-Host`を採用
 
-本番起動時は両Base URLが絶対HTTPSであることを検証し、localhostと`*.trycloudflare.com`を拒否します。開発・QAでは明示的にlocalhostまたは既存Quick Tunnelを使用できます。
+本番起動時は両Base URLが絶対HTTPSであることを検証し、localhostと`*.trycloudflare.com`を拒否します。開発は`DEPLOYMENT_ENV=development`、Windows QAは`DEPLOYMENT_ENV=qa`を明示し、localhostまたは既存Quick Tunnelを使用できます。`NODE_ENV=production`の最適化buildをQAで使っても、本番Domain制約を偽装しません。
 
 ## named Tunnel
 
