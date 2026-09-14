@@ -36,6 +36,7 @@ export default defineEventHandler(async (event): Promise<AdminSpotResponse> => {
     const updated = await transaction.spot.update({
       where: { id: ownedSpot.id },
       data: {
+        liveVersion: { increment: 1 },
         ...spotData,
         description: spotData.description || null,
         address: spotData.address || null,

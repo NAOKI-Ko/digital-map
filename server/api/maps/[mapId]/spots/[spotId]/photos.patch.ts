@@ -22,7 +22,7 @@ export default defineEventHandler(async (event): Promise<SpotPhotosResponse> => 
   }
 
   await prisma.$transaction(async (transaction) => {
-    await transaction.spot.update({ where: { id: spot.id }, data: { photosJson: result.data.photos } })
+    await transaction.spot.update({ where: { id: spot.id }, data: { photosJson: result.data.photos, liveVersion: { increment: 1 } } })
     await transaction.spotPhoto.deleteMany({ where: { spotId: spot.id } })
     const managed = requestedIds.flatMap((assetId, order) => assetId ? [{ spotId: spot.id, assetId, order }] : [])
     if (managed.length) await transaction.spotPhoto.createMany({ data: managed })

@@ -20,6 +20,22 @@ export async function issueOrganizationInvitation(input: { tenantId: string, ema
   return { invitation, rawToken }
 }
 
+export async function issueSpotEditorInvitation(input: { tenantId: string, spotId: string, email: string, createdById: string }) {
+  const spot = await prisma.spot.findFirst({ where: { id: input.spotId, floor: { map: { tenantId: input.tenantId } } }, select: { id: true } })
+  if (!spot) throw createError({ statusCode: 404, statusMessage: 'スポットが見つかりません。' })
+  const email = normalizeAuthEmail(input.email)
+  const { rawToken, tokenHash } = createAuthToken()
+  const { invitationTtlMs } = authLifecycleConfig()
+  const invitation = await prisma.organizationInvitation.create({
+    data: {
+      tenantId: input.tenantId, targetSpotId: spot.id, email, createdById: input.createdById,
+      purpose: 'SPOT_EDITOR', tokenHash, expiresAt: new Date(Date.now() + invitationTtlMs),
+    },
+    select: { id: true, tenantId: true, targetSpotId: true, email: true, purpose: true, status: true, expiresAt: true, createdAt: true },
+  })
+  return { invitation, rawToken }
+}
+
 export async function acceptOrganizationInvitation(input: {
   rawToken: string
   password?: string
@@ -68,6 +84,19 @@ export async function acceptOrganizationInvitation(input: {
       create: { tenantId: invitation.tenantId, userId: user.id, role: 'MEMBER' },
       update: {},
     })
+    if (invitation.purpose === 'SPOT_EDITOR') {
+      if (!invitation.targetSpotId) throw invalidInvite()
+      const target = await tx.spot.findFirst({
+        where: { id: invitation.targetSpotId, floor: { map: { tenantId: invitation.tenantId } } },
+        select: { id: true },
+      })
+      if (!target) throw invalidInvite()
+      await tx.spotEditorAssignment.upsert({
+        where: { spotId: target.id },
+        create: { spotId: target.id, userId: user.id, assignedById: invitation.createdById },
+        update: { userId: user.id, assignedById: invitation.createdById },
+      })
+    }
     await tx.organizationInvitation.update({
       where: { id: invitation.id },
       data: { acceptedById: user.id },

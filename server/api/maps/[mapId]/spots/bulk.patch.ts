@@ -24,7 +24,7 @@ export default defineEventHandler(async (event): Promise<SpotBulkResponse> => {
       return
     }
     if (input.action === 'publish' || input.action === 'unpublish') {
-      await transaction.spot.updateMany({ where: { id: { in: spotIds }, floor: { mapId: map.id } }, data: { isPublished: input.action === 'publish' } })
+      await transaction.spot.updateMany({ where: { id: { in: spotIds }, floor: { mapId: map.id } }, data: { isPublished: input.action === 'publish', liveVersion: { increment: 1 } } })
       return
     }
     if (categoryId === null) return
@@ -37,6 +37,7 @@ export default defineEventHandler(async (event): Promise<SpotBulkResponse> => {
       })
     }
     else await transaction.spotCategory.deleteMany({ where: { spotId: { in: spotIds }, categoryId: category.id } })
+    await transaction.spot.updateMany({ where: { id: { in: spotIds } }, data: { liveVersion: { increment: 1 } } })
   })
 
   return { updatedCount: spotIds.length }

@@ -4,7 +4,7 @@ export default defineEventHandler(async (event): Promise<SpotPositionResponse> =
   const { spot } = await requireOwnedSpot(event)
   await prisma.spot.update({
     where: { id: spot.id },
-    data: { x: null, y: null, isPublished: false },
+    data: { x: null, y: null, isPublished: false, liveVersion: { increment: 1 } },
   })
 
   return { position: { x: null, y: null } }

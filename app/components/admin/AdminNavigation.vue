@@ -12,6 +12,7 @@ const activeOrganization = computed(() => organizations.value.find(item => item.
 
 const navigation = computed(() => [
   { label: 'ダッシュボード', to: '/admin/dashboard' },
+  { label: '担当Spot', to: '/admin/spot-editor' },
   ...(activeOrganization.value?.role === 'OWNER' ? [{ label: '組織設定・メンバー', to: '/admin/organization' }] : []),
 ])
 

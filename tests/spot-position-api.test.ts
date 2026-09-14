@@ -51,7 +51,7 @@ describe('PATCH Spot IMAGE position', () => {
     await expect(handler({})).resolves.toEqual({ position: { x: 0.25, y: 0.75 } })
     expect(mocks.update).toHaveBeenCalledWith({
       where: { id: 'spot-1' },
-      data: { x: 0.25, y: 0.75 },
+      data: { x: 0.25, y: 0.75, liveVersion: { increment: 1 } },
     })
   })
 
@@ -59,7 +59,7 @@ describe('PATCH Spot IMAGE position', () => {
     await expect(removeHandler({})).resolves.toEqual({ position: { x: null, y: null } })
     expect(mocks.update).toHaveBeenCalledWith({
       where: { id: 'spot-1' },
-      data: { x: null, y: null, isPublished: false },
+      data: { x: null, y: null, isPublished: false, liveVersion: { increment: 1 } },
     })
   })
 })

@@ -18,6 +18,7 @@ export default defineEventHandler(async (event): Promise<SpotPinDesignResponse> 
   const updatedSpot = await prisma.spot.update({
     where: { id: spot.id },
     data: {
+      liveVersion: { increment: 1 },
       pinIconType: result.data.pinIconType,
       pinIconId: result.data.pinIconType === 'preset' ? result.data.pinIconId : null,
       pinIconImageUrl: result.data.pinIconType === 'preset' ? null : (asset?.url ?? result.data.pinIconImageUrl),

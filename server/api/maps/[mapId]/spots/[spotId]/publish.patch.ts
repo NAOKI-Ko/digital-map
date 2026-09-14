@@ -21,7 +21,7 @@ export default defineEventHandler(async (event): Promise<SpotPublishResponse> =>
 
   const updatedSpot = await prisma.spot.update({
     where: { id: spot.id },
-    data: { isPublished: result.data.isPublished },
+    data: { isPublished: result.data.isPublished, liveVersion: { increment: 1 } },
     select: { isPublished: true, updatedAt: true },
   })
 

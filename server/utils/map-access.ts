@@ -61,7 +61,7 @@ export async function requireOwnedFloor(event: H3Event) {
 }
 
 export async function requireOwnedSpot(event: H3Event) {
-  const { session, map } = await requireOwnedMap(event)
+  const { session, map, isOwner } = await requireOwnedMap(event)
   const spotId = getRouterParam(event, 'spotId')
 
   if (!spotId) {
@@ -80,5 +80,5 @@ export async function requireOwnedSpot(event: H3Event) {
     throw createError({ statusCode: 404, statusMessage: 'スポットが見つかりません。' })
   }
 
-  return { session, map, spot }
+  return { session, map, spot, isOwner }
 }

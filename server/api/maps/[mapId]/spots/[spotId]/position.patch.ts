@@ -11,7 +11,7 @@ export default defineEventHandler(async (event): Promise<SpotPositionResponse> =
 
   await prisma.spot.update({
     where: { id: spot.id },
-    data: result.data,
+    data: { ...result.data, liveVersion: { increment: 1 } },
   })
 
   return { position: result.data }

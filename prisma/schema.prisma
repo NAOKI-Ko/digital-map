@@ -34,6 +34,10 @@ model User {
   createdInvitations OrganizationInvitation[] @relation("InvitationCreator")
   acceptedInvitations OrganizationInvitation[] @relation("InvitationAcceptor")
   passwordResetTokens PasswordResetToken[]
+  spotAssignments SpotEditorAssignment[] @relation("SpotEditorUser")
+  assignedSpotEditors SpotEditorAssignment[] @relation("SpotEditorAssigner")
+  authoredSpotRevisions SpotRevision[] @relation("SpotRevisionAuthor")
+  reviewedSpotRevisions SpotRevision[] @relation("SpotRevisionReviewer")
   isActive      Boolean        @default(true)
   authVersion   Int            @default(1)
   createdAt     DateTime       @default(now())
@@ -49,12 +53,15 @@ enum InvitationStatus {
 
 enum InvitationPurpose {
   ORGANIZATION_MEMBER
+  SPOT_EDITOR
 }
 
 model OrganizationInvitation {
   id           String            @id @default(cuid())
   tenantId     String
   tenant       Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  targetSpotId String?
+  targetSpot   Spot?             @relation(fields: [targetSpotId], references: [id], onDelete: Cascade)
   email        String
   tokenHash    String            @unique
   purpose      InvitationPurpose @default(ORGANIZATION_MEMBER)
@@ -71,6 +78,7 @@ model OrganizationInvitation {
 
   @@index([tenantId, createdAt])
   @@index([tenantId, email, status])
+  @@index([targetSpotId, status])
 }
 
 model PasswordResetToken {
@@ -214,6 +222,10 @@ model Spot {
   pinIconAsset    MediaAsset?      @relation("SpotPinAsset", fields: [pinIconAssetId], references: [id], onDelete: SetNull)
   photos          SpotPhoto[]
   fieldValues     SpotFieldValue[]
+  editorAssignment SpotEditorAssignment?
+  revisions       SpotRevision[]
+  targetedInvitations OrganizationInvitation[]
+  liveVersion     Int              @default(1)
   pinColor        String           @default("#C7401F")
   pinSize         String           @default("medium")
   importance      String           @default("normal")
@@ -223,6 +235,59 @@ model Spot {
 
   @@index([floorId])
   @@index([floorId, isPublished])
+}
+
+model SpotEditorAssignment {
+  spotId       String   @id
+  spot         Spot     @relation(fields: [spotId], references: [id], onDelete: Cascade)
+  userId       String
+  user         User     @relation("SpotEditorUser", fields: [userId], references: [id], onDelete: Cascade)
+  assignedById String
+  assignedBy   User     @relation("SpotEditorAssigner", fields: [assignedById], references: [id], onDelete: Restrict)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([userId])
+}
+
+enum SpotRevisionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model SpotRevision {
+  id           String             @id @default(cuid())
+  spotId       String
+  spot         Spot               @relation(fields: [spotId], references: [id], onDelete: Cascade)
+  authorId     String
+  author       User               @relation("SpotRevisionAuthor", fields: [authorId], references: [id], onDelete: Restrict)
+  reviewerId   String?
+  reviewer     User?              @relation("SpotRevisionReviewer", fields: [reviewerId], references: [id], onDelete: SetNull)
+  status       SpotRevisionStatus @default(PENDING)
+  payload      Json
+  baseVersion  Int
+  rejectReason String?
+  reviewedAt   DateTime?
+  photos       SpotRevisionPhoto[]
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
+  @@index([spotId, status, createdAt])
+  @@index([authorId, status])
+}
+
+model SpotRevisionPhoto {
+  revisionId String
+  revision   SpotRevision @relation(fields: [revisionId], references: [id], onDelete: Cascade)
+  assetId    String
+  asset      MediaAsset   @relation(fields: [assetId], references: [id], onDelete: Restrict)
+  order      Int          @default(0)
+  createdAt  DateTime     @default(now())
+
+  @@id([revisionId, assetId])
+  @@index([revisionId, order])
+  @@index([assetId])
 }
 
 model FloorDecoration {
@@ -293,6 +358,7 @@ model MediaAsset {
   categoryIcons      Category[]        @relation("CategoryIconAsset")
   spotPins           Spot[]            @relation("SpotPinAsset")
   spotPhotos         SpotPhoto[]
+  revisionPhotos     SpotRevisionPhoto[]
   decorations        FloorDecoration[]
   tenantLogos        Tenant[]          @relation("TenantLogoAsset")
   createdAt          DateTime          @default(now())
