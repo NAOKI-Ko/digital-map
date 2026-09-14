@@ -9,6 +9,7 @@ definePageMeta({ layout: 'admin', middleware: 'auth' })
 const route = useRoute()
 const mapId = route.params.mapId as string
 const { data, error, status } = await useFetch<AdminMapResponse>(`/api/maps/${mapId}`)
+const { data: releaseData, refresh: refreshReleases } = await useFetch<{ currentReleaseId: string | null, releases: Array<{ id: string, createdAt: string, readyAt: string | null }> }>(`/api/maps/${mapId}/releases`)
 const isSaving = ref(false)
 const errorMessage = ref('')
 const successMessage = ref('')
@@ -44,6 +45,7 @@ async function togglePublication() {
     successMessage.value = response.publication.isPublished
       ? 'マップを公開しました。公開URLから閲覧できます。'
       : 'マップを非公開にしました。公開URLからは閲覧できません。'
+    await refreshReleases()
   }
   catch {
     errorMessage.value = '公開状態を変更できませんでした。もう一度お試しください。'
@@ -51,6 +53,19 @@ async function togglePublication() {
   finally {
     isSaving.value = false
   }
+}
+
+async function rollbackRelease(releaseId: string) {
+  isSaving.value = true
+  errorMessage.value = ''
+  try {
+    await $fetch(`/api/maps/${mapId}/releases/${releaseId}/rollback`, { method: 'POST' })
+    await refreshReleases()
+    if (data.value) data.value.map.isPublished = true
+    successMessage.value = '選択した過去リリースへ公開ポインターを戻しました。'
+  }
+  catch { errorMessage.value = 'リリースを切り戻せませんでした。' }
+  finally { isSaving.value = false }
 }
 </script>
 
@@ -104,6 +119,18 @@ async function togglePublication() {
 
         <p v-if="errorMessage" role="alert" class="mt-5 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{{ errorMessage }}</p>
         <p v-if="successMessage" role="status" class="mt-5 rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{{ successMessage }}</p>
+      </section>
+
+      <section v-if="releaseData?.releases.length" class="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+        <h2 class="text-lg font-bold">公開リリース履歴</h2>
+        <p class="mt-1 text-sm text-stone-600">READY済みの内容は変更されません。以前のリリースへ安全に切り戻せます。</p>
+        <ul class="mt-4 space-y-2">
+          <li v-for="release in releaseData.releases" :key="release.id" class="flex items-center justify-between gap-3 rounded-lg border p-3 text-sm">
+            <span><strong>{{ release.id }}</strong><br><span class="text-xs text-stone-500">{{ release.readyAt }}</span></span>
+            <span v-if="release.id === releaseData.currentReleaseId" class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">現在</span>
+            <button v-else type="button" class="rounded border px-3 py-2 text-xs font-semibold" :disabled="isSaving" @click="rollbackRelease(release.id)">この版へ戻す</button>
+          </li>
+        </ul>
       </section>
 
       <div class="mt-6">

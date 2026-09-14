@@ -4,6 +4,7 @@ export interface MapPublication {
   slug: string
   isPublished: boolean
   updatedAt: string
+  releaseId?: string | null
 }
 
 export interface MapPublicationResponse {

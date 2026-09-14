@@ -15,7 +15,8 @@
 | WU-28 | KAN-67 | `38be3d2` | `1b0fd3c` | none | 2 files / 9 tests PASS | 49 files / 334 tests PASS | PASS | validate PASS | PASS | Alert webhook pending; logs active | PASS |
 | WU-29 | KAN-65 | `1b0fd3c` | `c607b5d` | none | 1 file / 3 tests PASS | 50 files / 337 tests PASS | PASS | validate PASS | not required | PostgreSQL restore drill pending (tools unavailable) | PASS |
 | WU-30 | KAN-60 | `c607b5d` | `3529701` | `20260914060000_ja_en_translations` | 3 files / 20 tests PASS | 51 files / 343 tests PASS | PASS | validate + generate PASS | PASS | none | PASS |
-| WU-31 | KAN-64 | `3529701` | this WU commit | `20260914070000_media_variants` | 3 files / 14 tests PASS | 52 files / 347 tests PASS | PASS | validate + generate PASS | phase boundary pending | none | PASS |
+| WU-31 | KAN-64 | `3529701` | `e63d79a` | `20260914070000_media_variants` | 3 files / 14 tests PASS | 52 files / 347 tests PASS | PASS | validate + generate PASS | phase boundary pending | none | PASS |
+| WU-32 | KAN-57 | `e63d79a` | this WU commit | `20260914080000_public_releases` | 3 files / 16 tests PASS | 53 files / 353 tests PASS | PASS | validate + generate PASS | PASS | Cloudflare R2 credentials pending; local adapter PASS | PASS |
 
 ## WU-23 notes
 
@@ -80,3 +81,10 @@
 - Transparent images use lossless WebP; photographic images use quality 82. A processing failure leaves the original valid and records only the sanitized `VARIANT_GENERATION_FAILED` state.
 - `media:backfill` fills missing variants without replacing originals. Consumers select a smallest-sufficient variant, while Floor imagery prefers xlarge/large and falls back to the original.
 - `media:gc` is dry-run by default; `--delete` is explicit, the grace period defaults to seven days, paths are basename constrained, and every live relation including pending revision media protects an asset.
+
+## WU-32 notes
+
+- Publish builds a repeatable-read, public-only ja/en Snapshot, copies referenced optimized bytes into a release-specific content-hash path, writes an immutable manifest, marks the release READY, and only then advances `current.json` and the DB current-release relation.
+- Pointer/DB divergence uses deterministic restoration of the previous pointer and emits a sanitized operations failure. A failed build marks only the new release FAILED and never changes the prior public release.
+- Public rendering reads object storage only and has no normal Prisma/live-DB fallback. READY releases are immutable and retained for authorized OWNER/Map EDITOR rollback.
+- Local filesystem storage and Cloudflare R2/S3-compatible storage share the same release semantics. R2 credentials are unavailable here, so R2 activation is **EXTERNAL ACTIVATION PENDING**; the local adapter, cache policies, and copied-asset independence are verified.

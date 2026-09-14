@@ -72,6 +72,7 @@ model User {
   assignedSpotEditors SpotEditorAssignment[] @relation("SpotEditorAssigner")
   authoredSpotRevisions SpotRevision[] @relation("SpotRevisionAuthor")
   reviewedSpotRevisions SpotRevision[] @relation("SpotRevisionReviewer")
+  publicReleases PublicRelease[]
   auditEvents AuditEvent[]
   isActive      Boolean        @default(true)
   authVersion   Int            @default(1)
@@ -200,6 +201,9 @@ model Map {
   defaultLocale        String                @default("ja")
   enabledLocales       String[]              @default(["ja"])
   translations         MapTranslation[]
+  releases             PublicRelease[]       @relation("MapReleases")
+  currentReleaseId     String?               @unique
+  currentRelease       PublicRelease?        @relation("MapCurrentRelease", fields: [currentReleaseId], references: [id], onDelete: SetNull)
   floors               MapFloor[]
   categories           Category[]
   spotFieldDefinitions SpotFieldDefinition[]
@@ -208,6 +212,23 @@ model Map {
   updatedAt            DateTime              @updatedAt
 
   @@index([tenantId])
+}
+
+model PublicRelease {
+  id              String   @id @default(cuid())
+  mapId           String
+  map             Map      @relation("MapReleases", fields: [mapId], references: [id], onDelete: Cascade)
+  currentForMap   Map?     @relation("MapCurrentRelease")
+  createdBy       String
+  creator         User     @relation(fields: [createdBy], references: [id], onDelete: Restrict)
+  status          String   @default("BUILDING")
+  manifestKey     String?
+  failureMetadata Json?
+  createdAt       DateTime @default(now())
+  readyAt         DateTime?
+
+  @@index([mapId, createdAt])
+  @@index([mapId, status])
 }
 
 model MapTranslation {

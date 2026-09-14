@@ -4,7 +4,7 @@ import { basename, resolve } from 'node:path'
 import { planMediaGc } from '../server/utils/media-gc'
 import { prisma } from '../server/utils/prisma'
 
-const uploadDirectory = resolve(process.env.UPLOAD_DIR || './storage/uploads')
+const uploadDirectory = resolve(process.env.NUXT_UPLOAD_DIR || './public/uploads')
 const apply = process.argv.includes('--delete')
 const assets = await prisma.mediaAsset.findMany({ include: {
   variants: true,
