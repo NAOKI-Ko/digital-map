@@ -15,7 +15,7 @@ function isCurrent(to: string) {
 </script>
 
 <template>
-  <nav class="mb-6 overflow-x-auto border-b border-stone-200" :aria-label="area === 'map-edit' ? 'MAP編集メニュー' : 'Spot管理メニュー'">
+  <nav class="mb-6 overflow-x-auto border-b border-stone-200" :aria-label="area === 'map-edit' ? 'マップ編集メニュー' : 'スポット管理メニュー'">
     <div class="flex min-w-max gap-1">
       <NuxtLink
         v-for="item in items"

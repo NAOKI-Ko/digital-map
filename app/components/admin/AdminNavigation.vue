@@ -94,47 +94,47 @@ function handleNavigate() {
 </script>
 
 <template>
-  <div class="flex h-full flex-col overflow-hidden bg-stone-950 text-white">
-    <div class="flex min-h-[4.5rem] items-center border-b border-white/10" :class="showLabels ? 'px-4' : 'justify-center px-2'">
-      <NuxtLink to="/admin/dashboard" class="group relative flex min-h-11 items-center rounded-lg focus-visible:outline-white" :class="showLabels ? 'gap-3' : 'justify-center px-3'" aria-label="Digital Map マップ一覧" @click="handleNavigate">
-        <span class="grid size-9 shrink-0 place-items-center rounded-lg bg-terracotta-600 text-sm font-black shadow-sm">D</span>
+  <div class="flex h-full flex-col overflow-visible border-r border-stone-200 bg-stone-100 text-stone-800">
+    <div class="flex min-h-[4.5rem] items-center border-b border-stone-200" :class="showLabels ? 'px-4' : 'justify-center px-2'">
+      <NuxtLink to="/admin/dashboard" class="group relative flex min-h-11 items-center rounded-lg focus-visible:outline-stone-700" :class="showLabels ? 'gap-3' : 'justify-center px-3'" aria-label="Digital Map マップ一覧" @click="handleNavigate">
+        <span class="grid size-9 shrink-0 place-items-center rounded-lg bg-terracotta-600 text-sm font-black text-white">D</span>
         <span v-if="showLabels" class="min-w-0">
-          <span class="block text-[0.65rem] font-semibold tracking-[0.2em] text-stone-400">DIGITAL MAP</span>
+          <span class="block text-[0.65rem] font-semibold tracking-[0.2em] text-stone-600">DIGITAL MAP</span>
           <span class="mt-0.5 block truncate text-sm font-bold">マップ管理</span>
         </span>
         <span v-else class="admin-nav-tooltip">マップ一覧</span>
       </NuxtLink>
     </div>
 
-    <div class="relative border-b border-white/10 p-2">
-      <div v-if="showLabels" class="space-y-3 rounded-xl bg-white/[0.06] p-3">
-        <label class="block text-[0.65rem] font-semibold uppercase tracking-wider text-stone-400">
-          Organization
-          <select :value="organizationData?.activeOrganizationId" class="mt-1.5 min-h-11 w-full rounded-lg border border-white/10 bg-stone-900 px-3 text-sm font-semibold text-white" aria-label="Organizationを切り替える" @change="switchOrganization">
+    <div class="relative border-b border-stone-200 p-2">
+      <div v-if="showLabels" class="space-y-3 rounded-xl bg-transparent p-3">
+        <label class="block text-[0.65rem] font-semibold uppercase tracking-wider text-stone-600">
+          組織
+          <select :value="organizationData?.activeOrganizationId" class="mt-1.5 min-h-11 w-full rounded-lg border border-stone-200 bg-white px-3 text-sm font-semibold text-stone-800" aria-label="Organizationを切り替える" @change="switchOrganization">
             <option v-for="organization in organizations" :key="organization.id" :value="organization.id">{{ organization.name }}</option>
           </select>
         </label>
-        <label v-if="maps.length" class="block text-[0.65rem] font-semibold uppercase tracking-wider text-stone-400">
-          Current Map
-          <select :value="currentMap?.id ?? ''" class="mt-1.5 min-h-11 w-full rounded-lg border border-white/10 bg-stone-900 px-3 text-sm font-semibold text-white" aria-label="Mapを切り替える" @change="switchMap">
-            <option value="" disabled>Mapを選択</option>
+        <label v-if="maps.length" class="block text-[0.65rem] font-semibold uppercase tracking-wider text-stone-600">
+          現在のマップ
+          <select :value="currentMap?.id ?? ''" class="mt-1.5 min-h-11 w-full rounded-lg border border-stone-200 bg-white px-3 text-sm font-semibold text-stone-800" aria-label="Mapを切り替える" @change="switchMap">
+            <option value="" disabled>マップを選択</option>
             <option v-for="map in maps" :key="map.id" :value="map.id">{{ map.name }}</option>
           </select>
         </label>
       </div>
-      <button v-else type="button" class="group relative flex min-h-11 w-full items-center justify-center rounded-lg text-stone-300 transition-colors hover:bg-white/10 hover:text-white motion-reduce:transition-none" :aria-expanded="isContextOpen" aria-controls="admin-context-popover" :aria-label="contextLabel" :title="contextLabel" @click="isContextOpen = !isContextOpen">
+      <button v-else type="button" class="group relative flex min-h-11 w-full items-center justify-center rounded-lg text-stone-600 transition-colors hover:bg-stone-200/60 hover:text-stone-950 motion-reduce:transition-none" :aria-expanded="isContextOpen" aria-controls="admin-context-popover" :aria-label="contextLabel" :title="contextLabel" @click="isContextOpen = !isContextOpen">
         <AdminIcon name="switch" />
         <span class="admin-nav-tooltip">{{ contextLabel }}</span>
       </button>
       <div v-if="!showLabels && isContextOpen" id="admin-context-popover" class="absolute left-[4.25rem] top-2 z-50 w-72 rounded-xl border border-stone-200 bg-white p-4 text-stone-900 shadow-xl">
-        <p class="text-xs font-semibold text-stone-500">Organization</p>
+        <p class="text-xs font-semibold text-stone-500">組織</p>
         <select :value="organizationData?.activeOrganizationId" class="mt-1 min-h-11 w-full rounded-lg border border-stone-300 bg-white px-3 text-sm" aria-label="Organizationを切り替える" @change="switchOrganization">
           <option v-for="organization in organizations" :key="organization.id" :value="organization.id">{{ organization.name }}</option>
         </select>
         <template v-if="maps.length">
-          <p class="mt-4 text-xs font-semibold text-stone-500">Current Map</p>
+          <p class="mt-4 text-xs font-semibold text-stone-500">現在のマップ</p>
           <select :value="currentMap?.id ?? ''" class="mt-1 min-h-11 w-full rounded-lg border border-stone-300 bg-white px-3 text-sm" aria-label="Mapを切り替える" @change="switchMap">
-            <option value="" disabled>Mapを選択</option>
+            <option value="" disabled>マップを選択</option>
             <option v-for="map in maps" :key="map.id" :value="map.id">{{ map.name }}</option>
           </select>
         </template>
@@ -146,30 +146,32 @@ function handleNavigate() {
         <section v-for="group in groupedNavigation" :key="group.id" class="mb-4">
           <h2 class="px-3 pb-1.5 text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-stone-500">{{ group.label }}</h2>
           <div class="space-y-0.5">
-            <NuxtLink v-for="item in group.items" :key="item.id" :to="item.to" class="flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-semibold transition-colors motion-reduce:transition-none" :class="isActive(item) ? 'bg-white text-stone-950 shadow-sm' : 'text-stone-300 hover:bg-white/[0.08] hover:text-white'" :aria-current="isActive(item) ? 'page' : undefined" @click="handleNavigate">
+            <NuxtLink v-for="item in group.items" :key="item.id" :to="item.to" class="flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-semibold transition-colors motion-reduce:transition-none" :class="isActive(item) ? 'bg-terracotta-50 text-terracotta-800 ring-1 ring-inset ring-terracotta-200' : 'text-stone-600 hover:bg-stone-200/60 hover:text-stone-950'" :aria-current="isActive(item) ? 'page' : undefined" @click="handleNavigate">
               <AdminIcon :name="item.icon" class="shrink-0" /><span class="truncate">{{ item.label }}</span>
             </NuxtLink>
           </div>
         </section>
       </template>
       <div v-else class="space-y-1">
-        <NuxtLink v-for="item in railNavigation" :key="item.id" :to="item.to" class="group relative flex min-h-11 items-center justify-center rounded-lg transition-colors motion-reduce:transition-none" :class="isActive(item) ? 'bg-white text-stone-950 shadow-sm' : 'text-stone-400 hover:bg-white/10 hover:text-white'" :aria-current="isActive(item) ? 'page' : undefined" :aria-label="item.shortLabel" :title="item.shortLabel" @click="handleNavigate">
+        <NuxtLink v-for="item in railNavigation" :key="item.id" :to="item.to" class="group relative flex min-h-11 items-center justify-center rounded-lg transition-colors motion-reduce:transition-none" :class="isActive(item) ? 'bg-terracotta-50 text-terracotta-800 ring-1 ring-inset ring-terracotta-200' : 'text-stone-600 hover:bg-stone-200/60 hover:text-stone-950'" :aria-current="isActive(item) ? 'page' : undefined" :aria-label="item.shortLabel" :title="item.shortLabel" @click="handleNavigate">
           <AdminIcon :name="item.icon" /><span class="admin-nav-tooltip">{{ item.shortLabel }}</span>
         </NuxtLink>
       </div>
     </nav>
 
-    <div class="border-t border-white/10 p-2">
+    <div class="border-t border-stone-200 p-2">
       <template v-if="showLabels">
-        <div class="px-3 py-2"><p class="truncate text-xs text-stone-500">ログイン中</p><p class="mt-1 truncate text-sm font-medium text-stone-200">{{ user?.displayName || user?.email }}</p></div>
-        <NuxtLink to="/admin/account/password" class="flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-semibold text-stone-300 hover:bg-white/[0.08] hover:text-white" @click="handleNavigate"><AdminIcon name="settings" /> パスワード変更</NuxtLink>
-        <button type="button" :disabled="isLoggingOut" class="flex min-h-11 w-full items-center gap-3 rounded-lg px-3 text-sm font-semibold text-stone-300 hover:bg-white/[0.08] hover:text-white disabled:opacity-50" @click="handleLogout"><AdminIcon name="logout" /> {{ isLoggingOut ? 'ログアウト中…' : 'ログアウト' }}</button>
+        <details class="group/account"><summary class="cursor-pointer px-3 py-3 text-sm font-medium text-stone-600">アカウント</summary>
+        <div class="px-3 py-2"><p class="truncate text-xs text-stone-500">ログイン中</p><p class="mt-1 truncate text-sm font-medium text-stone-700">{{ user?.displayName || user?.email }}</p></div>
+        <NuxtLink to="/admin/account/password" class="flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-semibold text-stone-600 hover:bg-stone-200/60 hover:text-stone-950" @click="handleNavigate"><AdminIcon name="settings" /> パスワード変更</NuxtLink>
+        <button type="button" :disabled="isLoggingOut" class="flex min-h-11 w-full items-center gap-3 rounded-lg px-3 text-sm font-semibold text-stone-600 hover:bg-stone-200/60 hover:text-stone-950 disabled:opacity-50" @click="handleLogout"><AdminIcon name="logout" /> {{ isLoggingOut ? 'ログアウト中…' : 'ログアウト' }}</button>
+        </details>
       </template>
       <template v-else>
-        <NuxtLink to="/admin/account/password" class="group relative flex min-h-11 items-center justify-center rounded-lg text-stone-400 hover:bg-white/10 hover:text-white" aria-label="パスワード変更" title="パスワード変更"><AdminIcon name="settings" /><span class="admin-nav-tooltip">パスワード変更</span></NuxtLink>
-        <button type="button" :disabled="isLoggingOut" class="group relative flex min-h-11 w-full items-center justify-center rounded-lg text-stone-400 hover:bg-white/10 hover:text-white disabled:opacity-50" aria-label="ログアウト" title="ログアウト" @click="handleLogout"><AdminIcon name="logout" /><span class="admin-nav-tooltip">ログアウト</span></button>
+        <NuxtLink to="/admin/account/password" class="group relative flex min-h-11 items-center justify-center rounded-lg text-stone-600 hover:bg-stone-200/60 hover:text-stone-950" aria-label="パスワード変更" title="パスワード変更"><AdminIcon name="settings" /><span class="admin-nav-tooltip">パスワード変更</span></NuxtLink>
+        <button type="button" :disabled="isLoggingOut" class="group relative flex min-h-11 w-full items-center justify-center rounded-lg text-stone-600 hover:bg-stone-200/60 hover:text-stone-950 disabled:opacity-50" aria-label="ログアウト" title="ログアウト" @click="handleLogout"><AdminIcon name="logout" /><span class="admin-nav-tooltip">ログアウト</span></button>
       </template>
-      <button v-if="!mobile" type="button" class="group relative mt-1 flex min-h-11 w-full items-center rounded-lg text-sm font-semibold text-stone-400 hover:bg-white/10 hover:text-white" :class="showLabels ? 'gap-3 px-3' : 'justify-center'" :aria-expanded="expanded" aria-label="サイドバーを開閉" :title="expanded ? 'サイドバーを閉じる' : 'サイドバーを開く'" @click="emit('toggle')">
+      <button v-if="!mobile" type="button" class="group relative mt-1 flex min-h-11 w-full items-center rounded-lg text-sm font-semibold text-stone-600 hover:bg-stone-200/60 hover:text-stone-950" :class="showLabels ? 'gap-3 px-3' : 'justify-center'" :aria-expanded="expanded" aria-label="サイドバーを開閉" :title="expanded ? 'サイドバーを閉じる' : 'サイドバーを開く'" @click="emit('toggle')">
         <AdminIcon :name="expanded ? 'collapse' : 'expand'" /><span v-if="showLabels">サイドバーを閉じる</span><span v-else class="admin-nav-tooltip">サイドバーを開く</span>
       </button>
     </div>

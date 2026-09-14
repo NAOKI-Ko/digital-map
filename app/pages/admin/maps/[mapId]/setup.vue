@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import SaveFeedback from '~/components/ui/SaveFeedback.vue'
 import type { AdminMapResponse } from '~~/shared/types/map'
 import type { MapFloorListResponse } from '~~/shared/types/floor'
 import type { CategoryListResponse } from '~~/shared/types/category'

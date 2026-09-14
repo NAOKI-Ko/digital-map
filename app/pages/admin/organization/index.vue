@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import ConfirmDialog from '~/components/ui/ConfirmDialog.vue'
+import ImageUploader from '~/components/admin/ImageUploader.vue'
+import SaveFeedback from '~/components/ui/SaveFeedback.vue'
 import type { OrganizationMembersResponse } from '~~/shared/types/organization'
 import type { UploadedImage } from '~~/shared/types/upload'
 
@@ -99,7 +102,7 @@ async function run(action: () => Promise<void>) {
 
     <section v-if="organizationError" class="mt-6 rounded-xl border border-red-200 bg-red-50 p-5 text-sm text-red-800">組織設定とメンバー管理は、組織オーナーだけが利用できます。</section>
 
-    <section v-if="organization" id="settings" class="mt-6 scroll-mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+    <section v-if="organization" id="settings" class="mt-6 scroll-mt-6 border-t border-stone-200 pt-5">
       <h2 class="text-lg font-bold">組織設定</h2>
       <form class="mt-5 grid gap-4" @submit.prevent="saveOrganization">
         <label class="text-sm font-semibold">組織名<input v-model="form.name" required maxlength="100" class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5"></label>
@@ -110,22 +113,22 @@ async function run(action: () => Promise<void>) {
         <div>
           <p class="text-sm font-semibold">組織ロゴ</p>
           <div v-if="form.logoUrl" class="mt-2 flex items-center gap-3"><img :src="form.logoUrl" alt="組織ロゴ" class="size-16 rounded-lg object-contain"><button type="button" class="text-sm font-semibold text-red-700" @click="form.logoUrl = ''; form.logoAssetId = null">外す</button></div>
-          <ImageUploader class="mt-3" label="組織ロゴ" @uploaded="useLogo" />
+          <details class="mt-3"><summary class="w-fit cursor-pointer text-sm text-stone-600">ロゴ画像を選択・変更</summary><ImageUploader class="mt-3" label="組織ロゴ" @uploaded="useLogo" /></details>
         </div>
         <button :disabled="saving" class="justify-self-end rounded-lg bg-stone-900 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">保存</button>
       </form>
     </section>
 
-    <section v-if="organization" id="members" class="mt-6 scroll-mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+    <section v-if="organization" id="members" class="mt-6 scroll-mt-6 border-t border-stone-200 pt-5">
       <h2 class="text-lg font-bold">組織メンバー招待</h2>
       <p class="mt-1 text-sm text-stone-600">招待を承認するまでメンバーには追加されません。招待リンクは発行時だけ表示されます。</p>
       <form class="mt-5 flex gap-3" @submit.prevent="addMember">
-        <input v-model="email" required type="email" autocomplete="off" placeholder="member@example.com" class="min-w-0 flex-1 rounded-lg border border-stone-300 px-3 py-2.5">
+        <input v-model="email" aria-label="招待先メールアドレス" required type="email" autocomplete="off" placeholder="member@example.com" class="min-w-0 flex-1 rounded-lg border border-stone-300 px-3 py-2.5">
         <button :disabled="saving" class="rounded-lg bg-terracotta-600 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50">招待を作成</button>
       </form>
       <div v-if="acceptanceUrl" class="mt-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-950">
         <p class="font-semibold">このリンクは今だけ表示されます</p>
-        <input readonly :value="acceptanceUrl" class="mt-2 w-full rounded border border-amber-200 bg-white px-2 py-1 font-mono text-xs">
+        <input readonly aria-label="招待リンク" :value="acceptanceUrl" class="mt-2 w-full rounded border border-amber-200 bg-white px-2 py-1 font-mono text-xs">
       </div>
       <div class="mt-5 space-y-2">
         <article v-for="invitation in invitationData?.invitations ?? []" :key="invitation.id" class="flex items-center justify-between rounded-lg border p-3 text-sm">

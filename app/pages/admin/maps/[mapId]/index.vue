@@ -7,7 +7,7 @@ const mapId = String(route.params.mapId)
 const { data, error, refresh, status } = await useFetch<MapHomeSummaryResponse>(`/api/maps/${mapId}/home-summary`, { query: { days: 30 } })
 const dateTimeFormatter = new Intl.DateTimeFormat('ja-JP', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Tokyo' })
 
-useHead(() => ({ title: `${data.value?.map.name ?? 'MAPホーム'} | デジタルマップ` }))
+useHead(() => ({ title: `${data.value?.map.name ?? 'マップホーム'} | デジタルマップ` }))
 
 function formatDateTime(value: string) {
   return dateTimeFormatter.format(new Date(value))
@@ -22,16 +22,16 @@ function formatDateTime(value: string) {
     </section>
 
     <section v-else-if="error || !data" class="rounded-xl border border-red-200 bg-red-50 p-6">
-      <h1 class="text-lg font-bold text-red-900">MAPホームを読み込めませんでした</h1>
+      <h1 class="text-lg font-bold text-red-900">マップホームを読み込めませんでした</h1>
       <p class="mt-2 text-sm text-red-700">アクセス権または通信状態を確認してください。</p>
       <button type="button" class="mt-4 min-h-11 rounded-lg border border-red-300 bg-white px-4 text-sm font-semibold text-red-800 hover:bg-red-100" @click="refresh()">再読み込み</button>
     </section>
 
     <template v-else>
-      <AdminPageHeader eyebrow="MAPホーム" :title="data.map.name" description="公開状態と、次に対応することをひと目で確認できます。">
+      <AdminPageHeader eyebrow="マップホーム" :title="data.map.name">
         <template #actions>
-          <NuxtLink :to="`/admin/maps/${mapId}/settings`" class="inline-flex min-h-11 items-center justify-center rounded-lg bg-terracotta-600 px-4 text-sm font-semibold text-white shadow-sm hover:bg-terracotta-700">MAPを編集</NuxtLink>
-          <a v-if="data.map.publicUrl" :href="data.map.publicUrl" target="_blank" rel="noopener noreferrer" class="inline-flex min-h-11 items-center justify-center rounded-lg border border-stone-300 bg-white px-4 text-sm font-semibold text-stone-800 hover:bg-stone-100">公開MAPを見る<span class="ml-1" aria-hidden="true">↗</span></a>
+          <NuxtLink :to="`/admin/maps/${mapId}/settings`" class="inline-flex min-h-11 items-center justify-center rounded-lg bg-terracotta-600 px-4 text-sm font-semibold text-white shadow-sm hover:bg-terracotta-700">マップを編集</NuxtLink>
+          <a v-if="data.map.publicUrl" :href="data.map.publicUrl" target="_blank" rel="noopener noreferrer" class="inline-flex min-h-11 items-center justify-center rounded-lg border border-stone-300 bg-white px-4 text-sm font-semibold text-stone-800 hover:bg-stone-100">公開マップを見る<span class="ml-1" aria-hidden="true">↗</span></a>
         </template>
       </AdminPageHeader>
 
@@ -41,16 +41,16 @@ function formatDateTime(value: string) {
         <span class="text-stone-500">{{ data.map.lastPublishedAt ? `最終公開 ${formatDateTime(data.map.lastPublishedAt)}` : 'まだ公開されていません' }}</span>
       </div>
 
-      <section class="mt-7 grid grid-cols-2 gap-3 lg:grid-cols-4" aria-label="MAPサマリー">
-        <AdminMetricCard label="Spot" :value="data.metrics.spotCount" hint="登録済み" />
-        <AdminMetricCard label="未配置" :value="data.metrics.unpositionedSpotCount" hint="位置設定が必要" :tone="data.metrics.unpositionedSpotCount ? 'warning' : 'neutral'" />
-        <AdminMetricCard label="承認待ち" :value="data.metrics.pendingRevisionCount" hint="確認が必要" :tone="data.metrics.pendingRevisionCount ? 'accent' : 'neutral'" />
-        <AdminMetricCard :label="`${data.metrics.analyticsDays}日間の閲覧`" :value="data.metrics.recentMapViews.toLocaleString('ja-JP')" hint="Map views" />
+      <section class="mt-6 grid grid-cols-2 divide-x divide-stone-200 border-y border-stone-200 py-2 lg:grid-cols-4" aria-label="MAPサマリー">
+        <AdminMetricCard label="スポット" :value="data.metrics.spotCount" hint="登録済み" />
+        <AdminMetricCard label="未配置" :value="data.metrics.unpositionedSpotCount" :hint="data.metrics.unpositionedSpotCount ? '位置設定が必要' : 'すべて配置済み'" :tone="data.metrics.unpositionedSpotCount ? 'warning' : 'neutral'" />
+        <AdminMetricCard label="承認待ち" :value="data.metrics.pendingRevisionCount" :hint="data.metrics.pendingRevisionCount ? '確認が必要' : '確認待ちはありません'" :tone="data.metrics.pendingRevisionCount ? 'accent' : 'neutral'" />
+        <AdminMetricCard :label="`${data.metrics.analyticsDays}日間の閲覧`" :value="data.metrics.recentMapViews.toLocaleString('ja-JP')" hint="マップの閲覧数" />
       </section>
 
-      <div class="mt-6 grid gap-6 xl:grid-cols-2">
-        <section class="rounded-xl border border-stone-200 bg-white p-5 shadow-sm sm:p-6">
-          <div class="flex items-center justify-between gap-4"><div><p class="text-xs font-semibold tracking-wide text-stone-500">NEXT ACTIONS</p><h2 class="mt-1 text-lg font-bold text-stone-950">次にすること</h2></div></div>
+      <div class="mt-8 grid gap-8 lg:grid-cols-2">
+        <section class="min-w-0 border-t border-stone-200 pt-5">
+          <div class="flex items-center justify-between gap-4"><div><h2 class="mt-1 text-lg font-bold text-stone-950">次にすること</h2></div></div>
           <ul v-if="data.nextActions.length" class="mt-4 divide-y divide-stone-100">
             <li v-for="action in data.nextActions" :key="action.kind">
               <NuxtLink :to="action.to" class="group flex min-h-16 items-center justify-between gap-4 py-3">
@@ -62,8 +62,8 @@ function formatDateTime(value: string) {
           <div v-else class="mt-4 rounded-lg bg-emerald-50 px-4 py-5"><p class="text-sm font-semibold text-emerald-900">現在、対応が必要な項目はありません</p><p class="mt-1 text-xs text-emerald-800">MAPの状態は整っています。</p></div>
         </section>
 
-        <section class="rounded-xl border border-stone-200 bg-white p-5 shadow-sm sm:p-6">
-          <div><p class="text-xs font-semibold tracking-wide text-stone-500">RECENT ACTIVITY</p><h2 class="mt-1 text-lg font-bold text-stone-950">最近の重要な操作</h2></div>
+        <section class="min-w-0 border-t border-stone-200 pt-5">
+          <div><h2 class="mt-1 text-lg font-bold text-stone-950">最近の重要な操作</h2></div>
           <ol v-if="data.recentActivity.length" class="mt-4 divide-y divide-stone-100">
             <li v-for="activity in data.recentActivity" :key="activity.id" class="flex min-h-16 items-center justify-between gap-4 py-3">
               <div><p class="text-sm font-semibold text-stone-900">{{ activity.label }}</p><p class="mt-0.5 text-xs text-stone-500">{{ activity.actorLabel }}</p></div>
@@ -71,7 +71,7 @@ function formatDateTime(value: string) {
             </li>
           </ol>
           <p v-else class="mt-4 rounded-lg bg-stone-50 px-4 py-5 text-sm text-stone-600">表示できる最近の操作はありません。</p>
-          <p class="mt-4 text-xs leading-5 text-stone-400">公開・承認などの重要な操作のみを表示しています。完全な履歴ではありません。</p>
+          <p class="mt-4 text-xs leading-5 text-stone-500">公開・承認などの重要な操作のみを表示しています。完全な履歴ではありません。</p>
         </section>
       </div>
     </template>

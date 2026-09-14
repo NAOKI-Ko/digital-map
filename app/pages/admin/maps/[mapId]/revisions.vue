@@ -43,9 +43,9 @@ async function reject() {
 <template>
   <section class="max-w-4xl">
     <AdminSubnavigation :map-id="mapId" area="spot" />
-    <NuxtLink :to="`/admin/maps/${mapId}/spots`" class="text-sm underline">← Spot一覧へ</NuxtLink>
-    <h1 class="mt-5 text-2xl font-bold">承認待ちRevision</h1>
-    <p v-if="loadError" role="alert" class="mt-4 rounded bg-red-50 p-4 text-red-800">承認待ちRevisionを読み込めませんでした。</p>
+    <NuxtLink :to="`/admin/maps/${mapId}/spots`" class="text-sm underline">← スポット一覧へ</NuxtLink>
+    <h1 class="mt-5 text-2xl font-bold">承認待ちの変更</h1>
+    <p v-if="loadError" role="alert" class="mt-4 rounded bg-red-50 p-4 text-red-800">承認待ちの変更を読み込めませんでした。</p>
     <p v-if="operationError" role="alert" class="mt-4 rounded bg-red-50 p-4 text-red-800">{{ operationError }}</p>
     <div class="mt-6 space-y-4">
       <article v-for="revision in data?.revisions ?? []" :key="revision.id" class="rounded-xl bg-white p-6">

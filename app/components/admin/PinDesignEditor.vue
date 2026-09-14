@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import UnsavedChangesGuard from '~/components/admin/UnsavedChangesGuard.vue'
 import MediaPicker from '~/components/admin/MediaPicker.vue'
 import type { UploadedImage } from '~~/shared/types/upload'
 import {

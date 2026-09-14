@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import SaveFeedback from '~/components/ui/SaveFeedback.vue'
+import UnsavedChangesGuard from '~/components/admin/UnsavedChangesGuard.vue'
 import { mapCreateSchema, type MapCreateInput } from '~~/shared/schemas/map'
 import type { AdminMapResponse } from '~~/shared/types/map'
 

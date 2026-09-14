@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import SaveFeedback from '~/components/ui/SaveFeedback.vue'
 import { customSpotFieldTypes } from '~~/shared/constants/spot-fields'
 import type { SpotFieldDefinitionItem, SpotFieldDefinitionListResponse } from '~~/shared/types/spot-field'
 
@@ -75,13 +76,13 @@ async function saveEnglishLabel(field: SpotFieldDefinitionItem) {
   <div class="max-w-5xl">
     <AdminSubnavigation :map-id="mapId" area="map-edit" />
     <NuxtLink :to="`/admin/maps/${mapId}/settings`" class="text-sm font-medium text-stone-600">← マップ設定に戻る</NuxtLink>
-    <header class="mt-5"><h1 class="text-3xl font-bold">Spot情報項目</h1><p class="mt-2 text-sm text-stone-600">名称は常に必須です。標準項目の意味は変えず、表示名・有効・公開・必須・順序を設定します。</p></header>
+    <header class="mt-5"><h1 class="text-3xl font-bold">スポット情報項目</h1><p class="mt-2 text-sm text-stone-600">名称は常に必須です。標準項目の意味は変えず、表示名・有効・公開・必須・順序を設定します。</p></header>
     <SaveFeedback class="mt-4" :state="saveState" :message="message" />
     <ol class="mt-6 space-y-3">
       <li v-for="field in data?.fields" :key="field.id" class="grid gap-3 rounded-xl border bg-white p-4 md:grid-cols-[1fr_auto]">
         <div class="grid gap-3 sm:grid-cols-2">
           <label class="text-xs font-semibold">表示名<input v-model="field.label" class="mt-1 w-full rounded border px-3 py-2 text-sm"></label>
-          <label class="text-xs font-semibold">English label（任意）<span class="mt-1 flex gap-2"><input v-model="field.englishLabel" class="w-full rounded border px-3 py-2 text-sm"><button type="button" class="rounded bg-stone-700 px-2 text-white" @click="saveEnglishLabel(field)">保存</button></span></label>
+          <label class="text-xs font-semibold">英語の表示名（任意）<span class="mt-1 flex gap-2"><input v-model="field.englishLabel" class="w-full rounded border px-3 py-2 text-sm"><button type="button" class="rounded bg-stone-700 px-2 text-white" @click="saveEnglishLabel(field)">保存</button></span></label>
           <label class="text-xs font-semibold">順序<input v-model.number="field.order" type="number" min="0" class="mt-1 w-full rounded border px-3 py-2 text-sm"></label>
           <label><input v-model="field.enabled" type="checkbox"> 有効</label>
           <label><input v-model="field.publicVisible" :disabled="!field.enabled" type="checkbox"> 公開</label>
@@ -93,7 +94,7 @@ async function saveEnglishLabel(field: SpotFieldDefinitionItem) {
     </ol>
     <form class="mt-6 rounded-xl border bg-white p-5" @submit.prevent="createCustomField">
       <h2 class="font-bold">カスタム項目を追加</h2>
-      <div class="mt-3 flex flex-wrap gap-3"><input v-model="newField.label" required placeholder="項目名" class="rounded border px-3 py-2"><select v-model="newField.type" class="rounded border px-3 py-2"><option v-for="type in customSpotFieldTypes" :key="type" :value="type">{{ type }}</option></select><button :disabled="saveState === 'saving'" class="rounded bg-terracotta-600 px-4 py-2 font-semibold text-white disabled:opacity-50">{{ saveState === 'saving' ? '追加中…' : '追加' }}</button></div>
+      <div class="mt-3 flex flex-wrap gap-3"><input v-model="newField.label" aria-label="カスタム項目名" required placeholder="項目名" class="rounded border px-3 py-2"><select v-model="newField.type" aria-label="項目の種類" class="rounded border px-3 py-2"><option v-for="type in customSpotFieldTypes" :key="type" :value="type">{{ ({ single_line_text: '一行テキスト', multiline_text: '複数行テキスト', number: '数値', url: 'URL', boolean: 'はい／いいえ' })[type] }}</option></select><button :disabled="saveState === 'saving'" class="rounded bg-terracotta-600 px-4 py-2 font-semibold text-white disabled:opacity-50">{{ saveState === 'saving' ? '追加中…' : '追加' }}</button></div>
     </form>
   </div>
 </template>

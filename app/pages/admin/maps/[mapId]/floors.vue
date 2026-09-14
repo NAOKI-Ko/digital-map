@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import SaveFeedback from '~/components/ui/SaveFeedback.vue'
 import MediaPicker from '~/components/admin/MediaPicker.vue'
 import ConfirmDialog from '~/components/ui/ConfirmDialog.vue'
 import { isGeoReferenced } from '~~/lib/geo'
@@ -230,13 +231,13 @@ async function confirmDeleteFloor() {
 
     <header class="mt-5">
       <p class="text-sm font-medium text-terracotta-700">マップ設定</p>
-      <h1 class="mt-1 text-2xl font-bold tracking-tight text-stone-900 sm:text-3xl">フロア管理</h1>
+      <h1 class="mt-1 text-2xl font-bold tracking-tight text-stone-900 sm:text-2xl">フロア管理</h1>
       <p class="mt-2 text-sm text-stone-600">フロアごとのイラスト、名称、ジオリファレンス設定状況を管理します。</p>
     </header>
     <SaveFeedback class="mt-6" :state="saveState" :message="saveMessage" />
 
-    <section class="mt-8 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
-      <h2 class="text-lg font-bold text-stone-900">フロアを追加</h2>
+    <details class="mt-6 border-y border-stone-200 py-4" :open="!data?.floors.length">
+      <summary class="w-fit cursor-pointer text-sm font-semibold text-terracotta-700">＋ フロアを追加</summary>
       <div class="mt-6 grid gap-6 lg:grid-cols-2">
         <MediaPicker :key="createPickerRevision" :map-id="mapId" label="フロアイラスト" usage="floor" @selected="useUploadedImage" />
         <form class="space-y-5" @submit.prevent="createFloor">
@@ -252,7 +253,7 @@ async function confirmDeleteFloor() {
           </button>
         </form>
       </div>
-    </section>
+    </details>
 
     <section class="mt-6">
       <div class="flex items-end justify-between">
@@ -267,7 +268,7 @@ async function confirmDeleteFloor() {
       <div v-else-if="error" class="mt-4 rounded-xl bg-red-50 p-6 text-sm text-red-700">フロアを読み込めませんでした。</div>
       <div v-else-if="data?.floors.length === 0" class="mt-4 rounded-xl border-2 border-dashed border-stone-300 bg-white p-8 text-center text-sm text-stone-600">まだフロアはありません。</div>
       <ol v-else class="mt-4 space-y-4">
-        <li v-for="(floor, index) in data?.floors" :key="floor.id" class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+        <li v-for="(floor, index) in data?.floors" :key="floor.id" class="rounded-lg border border-stone-200 bg-white p-5 shadow-sm">
           <div class="grid gap-5 sm:grid-cols-[9rem_1fr]">
             <img :src="floor.illustrationUrl" :alt="`${floor.name}のイラスト`" class="h-32 w-full rounded-lg bg-stone-100 object-contain">
             <div>

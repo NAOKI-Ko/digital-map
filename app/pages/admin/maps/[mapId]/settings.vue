@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import ConfirmDialog from '~/components/ui/ConfirmDialog.vue'
+import SaveFeedback from '~/components/ui/SaveFeedback.vue'
 import MapNameForm from '~/components/admin/MapNameForm.vue'
 import MediaPicker from '~/components/admin/MediaPicker.vue'
 import type { MapNameInput } from '~~/shared/schemas/map'
@@ -12,6 +14,15 @@ definePageMeta({
 
 const route = useRoute()
 const mapId = route.params.mapId as string
+const settingSections = computed(() => [
+  { id: 'basic', label: '基本情報' },
+  { id: 'public', label: '公開ヘッダー' },
+  { id: 'language', label: '言語・翻訳' },
+  { id: 'seo', label: '検索・シェア表示' },
+  ...(data.value?.map.permissions?.canManageEditors ? [{ id: 'team', label: '編集者' }] : []),
+  ...(data.value?.map.permissions?.canDelete ? [{ id: 'danger', label: 'マップの削除' }] : []),
+])
+const activeSection = computed(() => settingSections.value.some(item => `#${item.id}` === route.hash) ? route.hash.slice(1) : 'basic')
 const { data, error, status } = await useFetch<AdminMapResponse>(`/api/maps/${mapId}`)
 const isSubmitting = ref(false)
 const submitError = ref('')
@@ -124,7 +135,7 @@ async function saveSeo() {
 </script>
 
 <template>
-  <div class="max-w-4xl">
+  <div class="max-w-6xl">
     <AdminSubnavigation :map-id="mapId" area="map-edit" />
     <NuxtLink to="/admin/dashboard" class="text-sm font-medium text-stone-600 hover:text-stone-900">
       ← マップ一覧に戻る
@@ -156,7 +167,12 @@ async function saveSeo() {
         </p>
       </header>
 
-      <section class="mt-8 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+      <div class="mt-7 grid items-start gap-6 md:grid-cols-[11rem_minmax(0,1fr)]">
+        <nav aria-label="設定項目" class="flex gap-1 overflow-x-auto border-b border-stone-200 pb-2 md:sticky md:top-6 md:flex-col md:border-b-0 md:border-r md:pb-0 md:pr-4">
+          <NuxtLink v-for="item in settingSections" :key="item.id" :to="{ path: route.path, query: route.query, hash: `#${item.id}` }" :aria-current="activeSection === item.id ? 'location' : undefined" class="flex min-h-11 shrink-0 items-center rounded-md px-3 text-sm font-medium" :class="activeSection === item.id ? 'bg-terracotta-50 text-terracotta-800' : 'text-stone-600 hover:bg-stone-100'">{{ item.label }}</NuxtLink>
+        </nav>
+        <div class="min-w-0 border-t border-stone-200 pt-5">
+      <section id="basic" v-show="activeSection === 'basic'" class="settings-section">
         <div class="mb-6">
           <h2 class="text-lg font-bold text-stone-900">
             基本情報
@@ -174,23 +190,23 @@ async function saveSeo() {
         />
       </section>
 
-      <section class="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+      <section id="language" v-show="activeSection === 'language'" class="settings-section">
         <h2 class="text-lg font-bold text-stone-900">公開言語</h2>
         <p class="mt-1 text-sm text-stone-600">日本語は既定言語で、無効化できません。英語訳が空の項目は日本語を表示します。</p>
         <form class="mt-5 space-y-4" @submit.prevent="saveTranslation">
           <label class="flex items-center gap-2 text-sm font-semibold"><input v-model="translation.englishEnabled" type="checkbox"> 英語（en）を有効にする</label>
           <template v-if="translation.englishEnabled">
-            <label class="block text-sm font-semibold">Map name (English)<input v-model="translation.name" maxlength="100" class="mt-1 w-full rounded-lg border border-stone-300 px-3 py-2.5"></label>
-            <label class="block text-sm font-semibold">Description (English)<textarea v-model="translation.description" maxlength="2000" rows="4" class="mt-1 w-full rounded-lg border border-stone-300 px-3 py-2.5" /></label>
+            <label class="block text-sm font-semibold">マップ名（英語）<input v-model="translation.name" maxlength="100" class="mt-1 w-full rounded-lg border border-stone-300 px-3 py-2.5"></label>
+            <label class="block text-sm font-semibold">説明文（英語）<textarea v-model="translation.description" maxlength="2000" rows="4" class="mt-1 w-full rounded-lg border border-stone-300 px-3 py-2.5" /></label>
           </template>
           <SaveFeedback :state="translationState" :message="translationMessage" />
           <button class="rounded-lg bg-stone-900 px-5 py-2.5 text-sm font-semibold text-white" :disabled="translationState === 'saving'">言語設定を保存</button>
         </form>
       </section>
 
-      <section class="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8"><h2 class="text-lg font-bold">SEO / シェア表示</h2><p class="mt-1 text-sm text-stone-600">空欄は公開言語のMap名・説明・画像へフォールバックします。</p><form class="mt-5 space-y-4" @submit.prevent="saveSeo"><label class="block text-sm font-semibold">SEO title<input v-model="seo.title" maxlength="100" class="mt-1 w-full rounded border px-3 py-2"></label><label class="block text-sm font-semibold">Description<textarea v-model="seo.description" maxlength="300" rows="3" class="mt-1 w-full rounded border px-3 py-2" /></label><MediaPicker :map-id="mapId" label="代表画像" usage="logo" @selected="seo.imageAssetId = $event.assetId" /><SaveFeedback :state="seoState" :message="seoMessage" /><button class="rounded bg-stone-900 px-4 py-2 text-sm font-semibold text-white">SEO設定を保存</button></form></section>
+      <section id="seo" v-show="activeSection === 'seo'" class="settings-section"><h2 class="text-lg font-bold">検索・シェア表示</h2><p class="mt-1 text-sm text-stone-600">空欄の場合は、公開言語のマップ名・説明・画像を使用します。</p><form class="mt-5 space-y-4" @submit.prevent="saveSeo"><label class="block text-sm font-semibold">検索結果のタイトル<input v-model="seo.title" maxlength="100" class="mt-1 w-full rounded border px-3 py-2"></label><label class="block text-sm font-semibold">説明文<textarea v-model="seo.description" maxlength="300" rows="3" class="mt-1 w-full rounded border px-3 py-2" /></label><details class="rounded-lg border border-stone-200 p-4"><summary class="cursor-pointer text-sm font-semibold">シェア画像を選択・変更</summary><MediaPicker class="mt-4" :map-id="mapId" label="代表画像" usage="logo" @selected="seo.imageAssetId = $event.assetId" /></details><SaveFeedback :state="seoState" :message="seoMessage" /><button class="rounded bg-stone-900 px-4 py-2 text-sm font-semibold text-white">SEO設定を保存</button></form></section>
 
-      <section class="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+      <section id="public" v-show="activeSection === 'public'" class="settings-section">
         <div>
           <h2 class="text-lg font-bold text-stone-900">公開ヘッダーの団体情報</h2>
           <p class="mt-1 text-sm leading-6 text-stone-600">必要な項目だけ設定できます。未設定の項目は公開画面に表示されません。</p>
@@ -206,9 +222,9 @@ async function saveSeo() {
               <img :src="branding.logoUrl" alt="現在の団体ロゴ" class="size-16 rounded-lg object-contain">
               <button type="button" class="text-sm font-semibold text-red-700" @click="branding.logoUrl = ''; branding.logoAssetId = null">ロゴを外す</button>
             </div>
-            <div class="mt-3">
+            <details class="mt-3 rounded-lg border border-stone-200 p-4"><summary class="cursor-pointer text-sm font-semibold">ロゴを選択・変更</summary>
               <MediaPicker :map-id="mapId" label="団体ロゴ" usage="logo" @selected="useUploadedLogo" />
-            </div>
+            </details>
           </div>
           <div class="grid gap-5 sm:grid-cols-2">
             <div>
@@ -227,13 +243,13 @@ async function saveSeo() {
         </form>
       </section>
 
-      <section v-if="data.map.permissions?.canManageEditors" class="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+      <section v-if="data.map.permissions?.canManageEditors" id="team" v-show="activeSection === 'team'" class="settings-section">
         <h2 class="text-lg font-bold text-stone-900">このマップの編集者</h2>
         <p class="mt-2 text-sm text-stone-600">組織メンバーへ、このマップだけの編集権限を割り当てます。組織オーナーはすべてのマップを編集できます。</p>
         <NuxtLink :to="`/admin/maps/${mapId}/editors`" class="mt-5 inline-flex rounded-lg bg-stone-900 px-4 py-2.5 text-sm font-semibold text-white">編集者を管理する</NuxtLink>
       </section>
 
-      <section v-if="data.map.permissions?.canDelete" class="mt-6 rounded-2xl border border-red-200 bg-white p-6 shadow-sm sm:p-8">
+      <section v-if="data.map.permissions?.canDelete" id="danger" v-show="activeSection === 'danger'" class="settings-section rounded-lg border border-red-200 p-5">
         <h2 class="text-lg font-bold text-red-900">マップの削除</h2>
         <p class="mt-2 text-sm text-stone-600">マップと配下のデータを削除します。編集者はこの操作を実行できません。</p>
         <p v-if="deleteError" class="mt-3 text-sm text-red-700">{{ deleteError }}</p>
@@ -241,48 +257,8 @@ async function saveSeo() {
       </section>
       <ConfirmDialog :open="deleteDialogOpen" title="マップを削除" message="このマップと配下のデータを削除します。この操作は取り消せません。" confirm-label="削除する" destructive @cancel="deleteDialogOpen = false" @confirm="deleteMap" />
 
-      <section class="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
-        <h2 class="text-lg font-bold text-stone-900">
-          イラスト画像とフロア
-        </h2>
-        <p class="mt-2 text-sm leading-6 text-stone-600">
-          フロアごとにイラスト画像を登録し、表示順やジオリファレンスを設定します。
-        </p>
-        <NuxtLink :to="`/admin/maps/${mapId}/floors`" class="mt-5 inline-flex rounded-lg bg-stone-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-stone-700">
-          フロアを管理する
-        </NuxtLink>
-      </section>
-
-      <section class="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
-        <h2 class="text-lg font-bold text-stone-900">カテゴリー</h2>
-        <p class="mt-2 text-sm leading-6 text-stone-600">スポットで使用するカテゴリーの名称と表示順を管理します。</p>
-        <NuxtLink :to="`/admin/maps/${mapId}/categories`" class="mt-5 inline-flex rounded-lg bg-stone-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-stone-700">カテゴリーを管理する</NuxtLink>
-        <NuxtLink :to="`/admin/maps/${mapId}/fields`" class="ml-3 mt-5 inline-flex rounded-lg bg-stone-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-stone-700">Spot情報項目を管理する</NuxtLink>
-      </section>
-
-      <section class="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8"><h2 class="text-lg font-bold">公開Analytics</h2><p class="mt-2 text-sm text-stone-600">MapとSpotのプライバシー配慮型日次集計を確認します。</p><NuxtLink :to="`/admin/maps/${mapId}/analytics`" class="mt-4 inline-flex rounded-lg bg-stone-900 px-4 py-2.5 text-sm font-semibold text-white">Analyticsを開く</NuxtLink></section>
-
-      <section class="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
-        <h2 class="text-lg font-bold text-stone-900">スポット</h2>
-        <p class="mt-2 text-sm leading-6 text-stone-600">登録済みスポットを検索し、情報や公開状態を管理します。</p>
-        <div class="mt-5 flex flex-wrap gap-3">
-          <NuxtLink :to="`/admin/maps/${mapId}/spots`" class="inline-flex rounded-lg bg-stone-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-stone-700">スポット一覧を開く</NuxtLink>
-          <NuxtLink :to="`/admin/maps/${mapId}/editor`" class="inline-flex rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-sm font-semibold text-stone-800 hover:bg-stone-100">地図からピンを置く</NuxtLink>
         </div>
-      </section>
-
-      <section class="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
-        <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <div class="flex items-center gap-3">
-              <h2 class="text-lg font-bold text-stone-900">公開設定</h2>
-              <span class="rounded-full px-2.5 py-1 text-xs font-semibold" :class="data.map.isPublished ? 'bg-emerald-100 text-emerald-800' : 'bg-stone-100 text-stone-700'">{{ data.map.isPublished ? '公開中' : '下書き' }}</span>
-            </div>
-            <p class="mt-2 text-sm leading-6 text-stone-600">マップの公開状態を切り替え、閲覧者向けURLを管理します。</p>
-          </div>
-          <NuxtLink :to="`/admin/maps/${mapId}/publish`" class="inline-flex shrink-0 justify-center rounded-lg bg-terracotta-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-terracotta-700">公開設定を開く</NuxtLink>
-        </div>
-      </section>
+      </div>
     </template>
   </div>
 </template>

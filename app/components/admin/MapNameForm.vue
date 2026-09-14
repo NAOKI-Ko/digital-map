@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import UnsavedChangesGuard from '~/components/admin/UnsavedChangesGuard.vue'
 import { useForm } from 'vee-validate'
 import { mapNameSchema, type MapNameInput } from '~~/shared/schemas/map'
 

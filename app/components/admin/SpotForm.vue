@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import CategoryIcon from '~/components/CategoryIcon.vue'
+import UnsavedChangesGuard from '~/components/admin/UnsavedChangesGuard.vue'
 import { useForm } from 'vee-validate'
 import { spotFormSchema, type SpotFormInput } from '~~/shared/schemas/spot'
 import type { SpotCategorySummary } from '~~/shared/types/category'
@@ -97,6 +99,12 @@ const submit = handleSubmit((values) => {
     <section>
       <h2 class="text-lg font-bold text-stone-900">基本情報</h2>
       <div class="mt-5 grid gap-5 sm:grid-cols-2">
+        <div class="sm:col-span-2">
+          <label for="spot-name" class="text-sm font-semibold text-stone-800">店名・スポット名 <span class="text-red-600">必須</span></label>
+          <input id="spot-name" v-model="name" v-bind="nameAttrs" maxlength="100" class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5" placeholder="例：まちかどカフェ">
+          <p v-if="errors.name" class="mt-1 text-sm text-red-600">{{ errors.name }}</p>
+        </div>
+
         <div>
           <label for="spot-floor" class="text-sm font-semibold text-stone-800">フロア <span class="text-red-600">必須</span></label>
           <select id="spot-floor" v-model="floorId" v-bind="floorIdAttrs" class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5">
@@ -124,11 +132,6 @@ const submit = handleSubmit((values) => {
           </select>
           <p class="mt-1 text-xs text-stone-500">PINの種類や画像とは独立した表示優先度です。</p>
         </div>
-        <div class="sm:col-span-2">
-          <label for="spot-name" class="text-sm font-semibold text-stone-800">店名・スポット名 <span class="text-red-600">必須</span></label>
-          <input id="spot-name" v-model="name" v-bind="nameAttrs" maxlength="100" class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5" placeholder="例：まちかどカフェ">
-          <p v-if="errors.name" class="mt-1 text-sm text-red-600">{{ errors.name }}</p>
-        </div>
         <div v-if="descriptionField" class="sm:col-span-2">
           <label for="spot-description" class="text-sm font-semibold text-stone-800">{{ descriptionField.label }} <span v-if="descriptionField.required" class="text-red-600">必須</span></label>
           <textarea id="spot-description" v-model="description" v-bind="descriptionAttrs" maxlength="2000" rows="6" class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5" placeholder="特徴やおすすめポイントを入力" />
@@ -137,13 +140,10 @@ const submit = handleSubmit((values) => {
       </div>
     </section>
 
-    <section class="border-t border-stone-200 pt-8">
-      <h2 class="text-lg font-bold text-stone-900">Media</h2>
-      <p class="mt-2 text-sm text-stone-600">写真はSpot作成後、専用のMedia欄で複数追加・並び替えできます。最初の画像が代表画像です。</p>
-    </section>
 
-    <section class="border-t border-stone-200 pt-8">
-      <h2 class="text-lg font-bold text-stone-900">Spot情報</h2>
+
+    <section class="border-t border-stone-200 pt-5">
+      <h2 class="text-lg font-bold text-stone-900">営業情報・詳細</h2>
       <div class="mt-5 grid gap-5 sm:grid-cols-2">
         <div v-for="field in informationFields" :key="field.id" :class="{ 'sm:col-span-2': field.type === 'multiline_text' }">
           <label :for="`spot-field-${field.id}`" class="text-sm font-semibold text-stone-800">{{ field.label }} <span v-if="field.required" class="text-red-600">必須</span></label>
@@ -159,16 +159,11 @@ const submit = handleSubmit((values) => {
       </div>
     </section>
 
-    <section class="border-t border-stone-200 pt-8">
-      <h2 class="text-lg font-bold text-stone-900">Category / PIN・地図表示</h2>
-      <p class="mt-2 text-sm text-stone-600">Categoryと重要度はSpot情報項目とは独立して管理されます。</p>
-    </section>
 
-    <section class="border-t border-stone-200 pt-8">
-      <h2 class="text-lg font-bold text-stone-900">公開</h2>
-      <p class="mt-2 text-sm text-stone-600">公開状態は保存後の公開設定から変更します。</p>
-    </section>
 
+
+
+    <p class="text-xs text-stone-500">写真・ピンの見た目・公開状態は、スポット保存後にそれぞれの欄で設定できます。</p>
     <div class="flex justify-end border-t border-stone-200 pt-6">
       <button type="submit" :disabled="isSubmitting || floors.length === 0" class="rounded-lg bg-terracotta-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60">
         {{ isSubmitting ? '保存中…' : submitLabel }}

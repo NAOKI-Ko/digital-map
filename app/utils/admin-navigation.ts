@@ -35,8 +35,8 @@ export interface AdminNavigationContext {
 }
 
 export const adminNavigationGroupLabels: Record<AdminNavigationGroupId, string> = {
-  organization: 'Organization',
-  map: 'MAP',
+  organization: '組織',
+  map: 'マップ',
   operations: '公開・運用',
   team: 'チーム',
   management: '管理',
@@ -62,8 +62,8 @@ export function buildAdminNavigation(context: AdminNavigationContext): AdminNavi
   if (context.hasAssignedSpots) {
     items.push({
       id: 'assigned-spots',
-      label: '担当Spot',
-      shortLabel: '担当Spot',
+      label: '担当スポット',
+      shortLabel: '担当スポット',
       icon: 'assignment',
       to: '/admin/spot-editor',
       group: 'organization',
@@ -80,7 +80,7 @@ export function buildAdminNavigation(context: AdminNavigationContext): AdminNavi
         group: 'map', rail: true, activePaths: [root], exact: true,
       },
       {
-        id: 'map-edit', label: 'MAP編集', shortLabel: 'MAP編集', icon: 'edit', to: mapPath(context.mapId, '/settings'),
+        id: 'map-edit', label: 'マップ編集', shortLabel: 'マップ編集', icon: 'edit', to: mapPath(context.mapId, '/settings'),
         group: 'map', rail: true,
         activePaths: [
           mapPath(context.mapId, '/settings'),
@@ -90,11 +90,11 @@ export function buildAdminNavigation(context: AdminNavigationContext): AdminNavi
         ],
       },
       {
-        id: 'spots', label: 'Spot', shortLabel: 'Spot', icon: 'spot', to: mapPath(context.mapId, '/spots'),
+        id: 'spots', label: 'スポット', shortLabel: 'スポット', icon: 'spot', to: mapPath(context.mapId, '/spots'),
         group: 'map', rail: true, activePaths: [mapPath(context.mapId, '/spots')],
       },
       {
-        id: 'categories', label: 'Category', shortLabel: 'Category', icon: 'category', to: mapPath(context.mapId, '/categories'),
+        id: 'categories', label: 'カテゴリー', shortLabel: 'カテゴリー', icon: 'category', to: mapPath(context.mapId, '/categories'),
         group: 'map', rail: false, activePaths: [mapPath(context.mapId, '/categories')],
       },
       {
@@ -102,7 +102,7 @@ export function buildAdminNavigation(context: AdminNavigationContext): AdminNavi
         group: 'operations', rail: true, activePaths: [mapPath(context.mapId, '/publish')],
       },
       {
-        id: 'analytics', label: 'Analytics', shortLabel: 'Analytics', icon: 'analytics', to: mapPath(context.mapId, '/analytics'),
+        id: 'analytics', label: 'アクセス解析', shortLabel: 'アクセス解析', icon: 'analytics', to: mapPath(context.mapId, '/analytics'),
         group: 'operations', rail: false, activePaths: [mapPath(context.mapId, '/analytics')],
       },
       {
@@ -113,7 +113,7 @@ export function buildAdminNavigation(context: AdminNavigationContext): AdminNavi
 
     if (context.isOwner) {
       items.push({
-        id: 'map-editors', label: 'Map編集者', shortLabel: 'Map編集者', icon: 'editors', to: mapPath(context.mapId, '/editors'),
+        id: 'map-editors', label: 'マップ編集者', shortLabel: 'マップ編集者', icon: 'editors', to: mapPath(context.mapId, '/editors'),
         group: 'team', rail: false, activePaths: [mapPath(context.mapId, '/editors')],
       })
     }
@@ -153,7 +153,7 @@ export function buildMapEditSubnavigation(mapId: string) {
     { label: '基本設定', to: mapPath(mapId, '/settings') },
     { label: 'フロア・イラスト', to: mapPath(mapId, '/floors') },
     { label: 'ピン配置', to: mapPath(mapId, '/editor') },
-    { label: 'Spot項目', to: mapPath(mapId, '/fields') },
+    { label: 'スポット項目', to: mapPath(mapId, '/fields') },
   ]
 }
 

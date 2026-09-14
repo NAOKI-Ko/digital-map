@@ -27,10 +27,15 @@ function handleDrawerKeydown(event: KeyboardEvent) {
     return
   }
   if (event.key !== 'Tab' || !drawer.value) return
-  const focusable = [...drawer.value.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), select:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])')]
+  const focusable = [...drawer.value.querySelectorAll<HTMLElement>('a[href], summary, button:not([disabled]), select:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])')]
   if (!focusable.length) return
-  const first = focusable[0]!
-  const last = focusable.at(-1)!
+  const visibleFocusable = focusable.filter((element) => {
+    const closedDetails = element.closest('details:not([open])')
+    return element.getClientRects().length > 0 && (!closedDetails || (element.tagName === 'SUMMARY' && element.parentElement === closedDetails))
+  })
+  if (!visibleFocusable.length) return
+  const first = visibleFocusable[0]!
+  const last = visibleFocusable.at(-1)!
   if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus() }
   else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus() }
 }
@@ -76,7 +81,7 @@ onBeforeUnmount(() => {
       <div v-if="isNavigationOpen" class="fixed inset-0 z-50 lg:hidden" @keydown="handleDrawerKeydown">
         <button type="button" class="absolute inset-0 bg-stone-950/55" aria-label="管理メニューを閉じる" tabindex="-1" @click="closeDrawer()" />
         <aside id="mobile-admin-navigation" ref="drawer" role="dialog" aria-modal="true" aria-label="管理メニュー" class="relative h-full w-72 max-w-[88vw] shadow-2xl">
-          <button type="button" class="absolute right-3 top-3 z-10 grid size-11 place-items-center rounded-lg text-stone-300 hover:bg-white/10 hover:text-white" aria-label="管理メニューを閉じる" @click="closeDrawer()">
+          <button type="button" class="absolute right-3 top-3 z-10 grid size-11 place-items-center rounded-lg text-stone-600 hover:bg-stone-200 hover:text-stone-950" aria-label="管理メニューを閉じる" @click="closeDrawer()">
             <svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" d="m6 6 12 12M18 6 6 18" /></svg>
           </button>
           <AdminNavigation mobile expanded @navigate="closeDrawer" />

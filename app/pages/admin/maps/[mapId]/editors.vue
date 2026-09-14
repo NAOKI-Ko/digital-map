@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import SaveFeedback from '~/components/ui/SaveFeedback.vue'
 import type { MapEditorsResponse } from '~~/shared/types/organization'
 import type { AdminMapResponse } from '~~/shared/types/map'
 
@@ -41,10 +42,10 @@ async function run(action: () => Promise<void>) {
     <NuxtLink :to="`/admin/maps/${mapId}/settings`" class="text-sm font-medium text-stone-600">← マップ設定に戻る</NuxtLink>
     <header class="mt-5"><p class="text-sm font-medium text-terracotta-700">マップ設定</p><h1 class="mt-1 text-3xl font-bold">このマップの編集者</h1><p class="mt-2 text-sm text-stone-600">{{ mapData?.map.name }}。組織オーナーはすべてのマップを編集できます。</p></header>
     <section v-if="error" class="mt-6 rounded-xl border border-red-200 bg-red-50 p-5 text-red-800">この設定は組織オーナーだけが利用できます。</section>
-    <section v-else class="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+    <section v-else class="mt-6 border-t border-stone-200 pt-5">
       <SaveFeedback :state="saving ? 'saving' : errorMessage ? 'error' : message ? 'success' : 'idle'" :message="errorMessage || message" />
       <form class="mt-5 flex gap-3" @submit.prevent="addEditor">
-        <select v-model="selectedUserId" class="min-w-0 flex-1 rounded-lg border border-stone-300 px-3 py-2.5"><option value="">組織メンバーを選択</option><option v-for="candidate in data?.candidates ?? []" :key="candidate.userId" :value="candidate.userId">{{ candidate.displayName || candidate.email }}</option></select>
+        <select aria-label="追加する組織メンバー" v-model="selectedUserId" class="min-w-0 flex-1 rounded-lg border border-stone-300 px-3 py-2.5"><option value="">組織メンバーを選択</option><option v-for="candidate in data?.candidates ?? []" :key="candidate.userId" :value="candidate.userId">{{ candidate.displayName || candidate.email }}</option></select>
         <button :disabled="saving || !selectedUserId" class="rounded-lg bg-terracotta-600 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50">追加</button>
       </form>
       <div class="mt-6 divide-y divide-stone-200">

@@ -17,7 +17,7 @@ function formatDate(value: string) { return dateFormatter.format(new Date(value)
 
 <template>
   <div class="mx-auto max-w-7xl">
-    <AdminPageHeader eyebrow="Organization" :title="activeOrganization?.name ?? 'マップ一覧'" description="アクセスできるマップを選択してください。">
+    <AdminPageHeader eyebrow="組織" :title="activeOrganization?.name ?? 'マップ一覧'" description="アクセスできるマップを選択してください。">
       <template v-if="canCreateMap" #actions>
         <NuxtLink to="/admin/maps/new" class="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-terracotta-600 px-4 text-sm font-semibold text-white shadow-sm hover:bg-terracotta-700"><span aria-hidden="true">＋</span>新しいマップ</NuxtLink>
       </template>
@@ -45,12 +45,12 @@ function formatDate(value: string) { return dateFormatter.format(new Date(value)
     </section>
 
     <section v-else class="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-      <article v-for="map in maps" :key="map.id" class="group flex min-h-44 flex-col rounded-xl border border-stone-200 bg-white p-5 shadow-sm transition-[border-color,box-shadow] duration-150 hover:border-stone-300 hover:shadow-md motion-reduce:transition-none">
+      <article v-for="map in maps" :key="map.id" class="group flex min-h-36 flex-col rounded-lg border border-stone-200 bg-white p-4 transition-[border-color,box-shadow] duration-150 hover:border-stone-300 hover:bg-stone-50 motion-reduce:transition-none">
         <div class="flex items-start justify-between gap-3">
           <div class="min-w-0"><h2 class="truncate text-base font-bold text-stone-950">{{ map.name }}</h2><p class="mt-1 truncate text-xs text-stone-500">/{{ map.slug }}</p></div>
           <span class="inline-flex shrink-0 items-center gap-1.5 text-xs font-semibold" :class="map.isPublished ? 'text-emerald-800' : 'text-stone-500'"><span class="size-1.5 rounded-full" :class="map.isPublished ? 'bg-emerald-500' : 'bg-stone-400'" />{{ map.isPublished ? '公開中' : '下書き' }}</span>
         </div>
-        <dl class="mt-5 flex gap-5 text-xs text-stone-500"><div><dt class="sr-only">フロア数</dt><dd>{{ map.floorCount }}フロア</dd></div><div><dt class="sr-only">最終更新</dt><dd>更新 {{ formatDate(map.updatedAt) }}</dd></div></dl>
+        <dl class="mt-3 flex gap-5 text-xs text-stone-500"><div><dt class="sr-only">フロア数</dt><dd>{{ map.floorCount }}フロア</dd></div><div><dt class="sr-only">最終更新</dt><dd>更新 {{ formatDate(map.updatedAt) }}</dd></div></dl>
         <NuxtLink :to="`/admin/maps/${map.id}`" class="mt-auto flex min-h-11 items-end justify-between pt-4 text-sm font-semibold text-terracotta-700"><span>マップを開く</span><span class="transition-transform group-hover:translate-x-0.5 motion-reduce:transform-none" aria-hidden="true">→</span></NuxtLink>
       </article>
     </section>

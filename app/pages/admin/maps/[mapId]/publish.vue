@@ -14,6 +14,7 @@ const { data, error, status } = await useFetch<AdminMapResponse>(`/api/maps/${ma
 const { data: floorData } = await useFetch<MapFloorListResponse>(`/api/maps/${mapId}/floors`)
 const { data: releaseData, refresh: refreshReleases } = await useFetch<{ currentReleaseId: string | null, releases: Array<{ id: string, createdAt: string, readyAt: string | null }> }>(`/api/maps/${mapId}/releases`)
 const isSaving = ref(false)
+const releaseDate = new Intl.DateTimeFormat('ja-JP', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Tokyo' })
 const errorMessage = ref('')
 const successMessage = ref('')
 const configuredPublicOrigin = useRuntimeConfig().public.publicBaseUrl as string
@@ -65,7 +66,7 @@ async function rollbackRelease(releaseId: string) {
     await $fetch(`/api/maps/${mapId}/releases/${releaseId}/rollback`, { method: 'POST' })
     await refreshReleases()
     if (data.value) data.value.map.isPublished = true
-    successMessage.value = '選択した過去リリースへ公開ポインターを戻しました。'
+    successMessage.value = '選択した過去リリースへ内容を戻しました。'
   }
   catch { errorMessage.value = 'リリースを切り戻せませんでした。' }
   finally { isSaving.value = false }
@@ -73,7 +74,7 @@ async function rollbackRelease(releaseId: string) {
 </script>
 
 <template>
-  <div class="max-w-4xl">
+  <div class="max-w-6xl">
     <NuxtLink :to="`/admin/maps/${mapId}/settings`" class="text-sm font-medium text-stone-600 hover:text-stone-900">
       ← マップ設定に戻る
     </NuxtLink>
@@ -91,7 +92,7 @@ async function rollbackRelease(releaseId: string) {
         <p class="mt-2 text-sm leading-6 text-stone-600">マップ全体を公開するか、下書きとして非公開にするかを切り替えます。</p>
       </header>
 
-      <section class="mt-8 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+      <section class="mt-6 border-y border-stone-200 py-5">
         <div class="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <div class="flex items-center gap-3">
@@ -124,19 +125,20 @@ async function rollbackRelease(releaseId: string) {
         <p v-if="successMessage" role="status" class="mt-5 rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{{ successMessage }}</p>
       </section>
 
-      <section v-if="releaseData?.releases.length" class="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+      <section v-if="releaseData?.releases.length" class="mt-7 border-t border-stone-200 pt-5">
         <h2 class="text-lg font-bold">公開リリース履歴</h2>
-        <p class="mt-1 text-sm text-stone-600">READY済みの内容は変更されません。以前のリリースへ安全に切り戻せます。</p>
-        <ul class="mt-4 space-y-2">
-          <li v-for="release in releaseData.releases" :key="release.id" class="flex items-center justify-between gap-3 rounded-lg border p-3 text-sm">
-            <span><strong>{{ release.id }}</strong><br><span class="text-xs text-stone-500">{{ release.readyAt }}</span></span>
-            <span v-if="release.id === releaseData.currentReleaseId" class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">現在</span>
+        <p class="mt-1 text-sm text-stone-600">各版の内容は保存されています。以前の版へ戻すと、その内容が公開されます。</p>
+        <ul class="mt-4 divide-y divide-stone-200">
+          <li v-for="release in releaseData.releases" :key="release.id" class="flex flex-wrap items-center justify-between gap-3 py-4 text-sm">
+            <div class="min-w-0"><time :datetime="release.readyAt || release.createdAt" class="font-semibold text-stone-900">{{ releaseDate.format(new Date(release.readyAt || release.createdAt)) }}</time><p class="mt-1 text-xs text-stone-500">公開用の内容を作成済み · 日本時間</p><details class="mt-2 text-xs text-stone-500"><summary class="cursor-pointer">技術情報</summary><p class="mt-2 break-all">リリースID: {{ release.id }}</p></details></div>
+            <span v-if="release.id === releaseData.currentReleaseId" class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">{{ data.map.isPublished ? '現在公開中の版' : '公開停止中の版' }}</span>
             <button v-else type="button" class="rounded border px-3 py-2 text-xs font-semibold" :disabled="isSaving" @click="rollbackRelease(release.id)">この版へ戻す</button>
           </li>
         </ul>
       </section>
 
-      <div class="mt-6">
+      <div class="mt-7 grid items-start gap-5 lg:grid-cols-2">
+      <div>
         <ClientOnly>
           <PublicSharePanel
             :map-name="data.map.name"
@@ -149,8 +151,9 @@ async function rollbackRelease(releaseId: string) {
           </template>
         </ClientOnly>
       </div>
-      <div class="mt-6">
+      <div>
         <PaperExportPanel :map-id="mapId" :floors="floorData?.floors ?? []" :is-published="data.map.isPublished" />
+      </div>
       </div>
     </template>
   </div>

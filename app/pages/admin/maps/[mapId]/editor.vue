@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import SaveFeedback from '~/components/ui/SaveFeedback.vue'
 import { defineAsyncComponent } from 'vue'
 import ConfirmDialog from '~/components/ui/ConfirmDialog.vue'
 import { createMapEditorReturnQuery, resolveMapEditorReturnContext } from '~/utils/map-editor-camera'
@@ -193,8 +194,7 @@ function updateCandidateFromDrag(value: { spotId: string, x: number, y: number }
     <AdminSubnavigation :map-id="mapId" area="map-edit" />
     <NuxtLink :to="`/admin/maps/${mapId}/spots`" class="text-sm font-medium text-stone-600 hover:text-stone-900">← スポット一覧に戻る</NuxtLink>
     <header class="mt-5">
-      <p class="text-sm font-medium text-terracotta-700">スポット管理</p>
-      <h1 class="mt-1 text-2xl font-bold tracking-tight text-stone-900 sm:text-3xl">ピン配置エディタ</h1>
+      <h1 class="mt-1 text-2xl font-bold tracking-tight text-stone-900 sm:text-2xl">ピン配置エディタ</h1>
       <p class="mt-2 text-sm text-stone-600">フロアを選び、地図上の登録位置をクリックしてください。</p>
     </header>
 

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import SaveFeedback from '~/components/ui/SaveFeedback.vue'
 import SpotForm from '~/components/admin/SpotForm.vue'
 import DuplicateSpotDialog from '~/components/admin/DuplicateSpotDialog.vue'
 import { createMapEditorReturnQuery, resolveMapEditorReturnContext } from '~/utils/map-editor-camera'

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import SaveFeedback from '~/components/ui/SaveFeedback.vue'
 import PinDesignEditor from '~/components/admin/PinDesignEditor.vue'
 import SpotPhotoManager from '~/components/admin/SpotPhotoManager.vue'
 import SpotPublishPanel from '~/components/admin/SpotPublishPanel.vue'
@@ -127,9 +128,9 @@ async function saveEnglish() {
         <p class="mt-2 text-sm text-stone-600">基本情報や営業情報を編集します。</p>
       </header>
       <NuxtLink :to="{ path: `/admin/maps/${mapId}/editor`, query: { floorId: data.spot.floorId, placeSpotId: data.spot.id } }" class="mt-5 inline-flex rounded-lg bg-terracotta-600 px-4 py-2.5 text-sm font-semibold text-white">{{ data.spot.x === null || data.spot.y === null ? '位置を設定' : '位置を再設定' }}</NuxtLink>
-      <NuxtLink :to="`/admin/maps/${mapId}/spots/${spotId}/assignee`" class="ml-2 mt-5 inline-flex rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-sm font-semibold">Spot担当者</NuxtLink>
+      <NuxtLink :to="`/admin/maps/${mapId}/spots/${spotId}/assignee`" class="ml-2 mt-5 inline-flex rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-sm font-semibold">スポット担当者</NuxtLink>
       <SaveFeedback class="mt-6" :state="isSubmitting ? 'saving' : submitError ? 'error' : successMessage ? 'success' : 'idle'" :message="submitError || successMessage" />
-      <section class="mt-8 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+      <section class="mt-6 border-t border-stone-200 pt-5">
         <ClientOnly>
           <SpotForm :floors="data.floors" :categories="data.categories" :fields="data.fields" :initial-value="initialValue" :is-submitting="isSubmitting" @submit="updateSpot" />
           <template #fallback>
@@ -137,7 +138,7 @@ async function saveEnglish() {
           </template>
         </ClientOnly>
       </section>
-      <section v-if="data.spot.enabledLocales?.includes('en')" class="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+      <section v-if="data.spot.enabledLocales?.includes('en')" class="mt-6 border-t border-stone-200 pt-5">
         <h2 class="text-lg font-bold">英語訳</h2>
         <p class="mt-1 text-sm text-stone-600">未入力の項目は日本語へフォールバックします。電話番号とURLは共通です。</p>
         <form class="mt-5 grid gap-4 sm:grid-cols-2" @submit.prevent="saveEnglish">
@@ -150,7 +151,7 @@ async function saveEnglish() {
           <div class="sm:col-span-2"><SaveFeedback :state="englishState" :message="englishMessage" /><button class="mt-3 rounded bg-stone-900 px-4 py-2 text-sm font-semibold text-white">英語訳を保存</button></div>
         </form>
       </section>
-      <section class="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+      <details class="mt-6 border-t border-stone-200 pt-5"><summary class="mb-4 w-fit cursor-pointer text-base font-semibold">写真を管理</summary>
         <SpotPhotoManager
           :map-id="mapId"
           :spot-id="spotId"
@@ -158,16 +159,16 @@ async function saveEnglish() {
           :initial-photo-asset-ids="data.spot.photoAssetIds"
           @updated="data.spot.photos = $event"
         />
-      </section>
-      <section class="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+      </details>
+      <details class="mt-6 border-t border-stone-200 pt-5"><summary class="mb-4 w-fit cursor-pointer text-base font-semibold">ピンデザインを編集</summary>
         <PinDesignEditor
           :map-id="mapId"
           :spot-id="spotId"
           :initial-value="data.spot"
           @updated="Object.assign(data.spot, $event)"
         />
-      </section>
-      <section class="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+      </details>
+      <section class="mt-6 border-t border-stone-200 pt-5">
         <SpotPublishPanel
           :map-id="mapId"
           :spot-id="spotId"

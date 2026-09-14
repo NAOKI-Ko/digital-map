@@ -55,13 +55,13 @@ watch(() => props.publicUrl, () => {
 </script>
 
 <template>
-  <section class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+  <section class="border-t border-stone-200 pt-5">
     <div>
       <h2 class="text-lg font-bold text-stone-900">公開URL・QRコード</h2>
       <p class="mt-2 text-sm leading-6 text-stone-600">現地の案内板やチラシでは、以下のURLまたはQRコードをご利用ください。</p>
     </div>
 
-    <div class="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-start">
+    <div class="mt-4 grid gap-4">
       <div class="min-w-0">
         <label for="public-map-url" class="text-sm font-semibold text-stone-800">公開URL</label>
         <div class="mt-2 flex flex-col gap-2 sm:flex-row">
@@ -70,7 +70,7 @@ watch(() => props.publicUrl, () => {
         </div>
         <p v-if="copyStatus" role="status" class="mt-2 text-sm text-stone-600">{{ copyStatus }}</p>
 
-        <div class="mt-5 flex flex-wrap gap-3">
+        <div class="mt-3 flex flex-wrap gap-2">
           <a :href="publicUrl" target="_blank" rel="noopener" class="inline-flex rounded-lg bg-stone-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-stone-700">公開ページを開く</a>
           <a
             v-if="qrDataUrl"
@@ -86,8 +86,8 @@ watch(() => props.publicUrl, () => {
         </p>
       </div>
 
-      <div class="rounded-2xl bg-stone-50 p-4 text-center">
-        <div class="mx-auto grid aspect-square w-full max-w-64 place-items-center rounded-xl bg-white p-3 shadow-sm">
+      <div class="w-36 text-center">
+        <div class="grid aspect-square w-32 place-items-center bg-white p-1">
           <img v-if="qrDataUrl" :src="qrDataUrl" :alt="`${mapName}の公開URL QRコード`" class="h-full w-full object-contain">
           <span v-else-if="!qrError" class="text-sm text-stone-500">QRコードを生成しています…</span>
           <span v-else class="text-sm leading-6 text-red-700">{{ qrError }}</span>

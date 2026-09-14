@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import CategoryIcon from '~/components/CategoryIcon.vue'
+import SaveFeedback from '~/components/ui/SaveFeedback.vue'
 import CategoryIconEditor from '~/components/admin/CategoryIconEditor.vue'
 import AppDialog from '~/components/ui/AppDialog.vue'
 import ConfirmDialog from '~/components/ui/ConfirmDialog.vue'
@@ -163,18 +165,18 @@ async function saveEnglishName(category: CategorySummary) {
     <NuxtLink :to="`/admin/maps/${mapId}/settings`" class="text-sm font-medium text-stone-600 hover:text-stone-900">← マップ設定に戻る</NuxtLink>
     <header class="mt-5"><p class="text-sm font-medium text-terracotta-700">マップ設定</p><h1 class="mt-1 text-3xl font-bold text-stone-900">カテゴリー管理</h1><p class="mt-2 text-sm text-stone-600">カテゴリー名・アイコン・並び順を一元管理します。カテゴリーアイコンはスポットのPINデザインには影響しません。</p></header>
     <SaveFeedback class="mt-6" :state="saveState" :message="message" />
-    <form class="mt-8 space-y-5 rounded-2xl border border-stone-200 bg-white p-5" @submit.prevent="createCategory">
+    <details class="mt-6 border-y border-stone-200 py-4" :open="!data?.categories.length"><summary class="w-fit cursor-pointer text-sm font-semibold text-terracotta-700">＋ カテゴリーを追加</summary><form class="mt-4 space-y-4" @submit.prevent="createCategory">
       <div><label for="new-category-name" class="text-sm font-semibold text-stone-800">新しいカテゴリー名</label><input id="new-category-name" v-model="newName" maxlength="50" required class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5" placeholder="カテゴリー名"></div>
       <CategoryIconEditor v-model="newIcon" :map-id="mapId" />
       <div class="flex justify-end"><button :disabled="isSaving" class="rounded-lg bg-terracotta-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">{{ isSaving ? '保存中…' : '追加' }}</button></div>
-    </form>
+    </form></details>
     <div v-if="error" class="mt-6 rounded-lg bg-red-50 p-5 text-sm text-red-700">カテゴリーを読み込めませんでした。</div>
-    <ul v-else class="mt-6 space-y-3">
-      <li v-for="(category, index) in data?.categories" :key="category.id" class="rounded-xl border border-stone-200 bg-white p-4">
+    <ul v-else class="mt-5 divide-y divide-stone-200">
+      <li v-for="(category, index) in data?.categories" :key="category.id" class="py-4">
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div class="flex min-w-0 items-center gap-3">
             <span class="grid size-10 shrink-0 place-items-center rounded-lg bg-stone-100 text-stone-700"><CategoryIcon :icon-type="category.iconType" :icon-preset-id="category.iconPresetId" :icon-image-url="category.iconImageUrl" size="lg" /><span v-if="!category.iconType" aria-hidden="true" class="text-xs text-stone-400">なし</span></span>
-            <div><strong>{{ category.name }}</strong><span class="ml-3 text-sm text-stone-500">{{ category.spotCount }}スポットで使用</span><NuxtLink v-if="category.spotCount" :to="{ path: `/admin/maps/${mapId}/spots`, query: { categoryId: category.id } }" class="ml-3 text-xs font-semibold text-terracotta-700">使用Spotを表示</NuxtLink></div>
+            <div><strong>{{ category.name }}</strong><span class="ml-3 text-sm text-stone-500">{{ category.spotCount }}スポットで使用</span><NuxtLink v-if="category.spotCount" :to="{ path: `/admin/maps/${mapId}/spots`, query: { categoryId: category.id } }" class="ml-3 text-xs font-semibold text-terracotta-700">使用スポットを表示</NuxtLink></div>
           </div>
           <div class="flex gap-2">
             <button type="button" :disabled="isSaving || index === 0" class="rounded border px-3 py-1.5 disabled:opacity-30" aria-label="上へ移動" @click="moveCategory(index, -1)">↑</button>
@@ -183,7 +185,7 @@ async function saveEnglishName(category: CategorySummary) {
             <button type="button" :disabled="category.spotCount > 0" class="rounded border border-red-200 px-3 py-1.5 text-red-700 disabled:opacity-40" @click="deleteTarget = category">削除</button>
           </div>
         </div>
-        <label class="mt-3 block text-xs font-semibold text-stone-600">English name（任意）<span class="mt-1 flex gap-2"><input v-model="category.englishName" class="w-full rounded border px-3 py-2 text-sm"><button type="button" class="rounded bg-stone-900 px-3 text-xs text-white" @click="saveEnglishName(category)">保存</button></span></label>
+        <details class="mt-3"><summary class="w-fit cursor-pointer text-xs text-stone-500">英語名を編集</summary><label class="mt-3 block text-xs font-semibold text-stone-600">英語名（任意）<span class="mt-1 flex gap-2"><input v-model="category.englishName" class="w-full rounded border px-3 py-2 text-sm"><button type="button" class="rounded bg-stone-900 px-3 text-xs text-white" @click="saveEnglishName(category)">保存</button></span></label></details>
       </li>
     </ul>
 
