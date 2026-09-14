@@ -20,6 +20,8 @@ describe('イラストマップ作成セットアップ', () => {
   })
 
   it('公開パスを明示指定し、Spot標準項目を自動初期化する', () => {
+    expect(newMapSource).toContain('mapType: selectedType.value')
+    expect(newMapSource).not.toContain('mapType: selectedType,')
     expect(createApiSource).toContain('slug: input.slug')
     expect(createApiSource).toContain('defaultSpotFieldDefinitions')
   })

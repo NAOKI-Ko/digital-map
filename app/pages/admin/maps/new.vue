@@ -17,7 +17,7 @@ function suggestSlug() {
 }
 
 async function createMap() {
-  const result = mapCreateSchema.safeParse({ mapType: selectedType, ...form })
+  const result = mapCreateSchema.safeParse({ mapType: selectedType.value, ...form })
   if (!result.success) {
     errorMessage.value = result.error.issues[0]?.message ?? '入力内容を確認してください。'
     return
