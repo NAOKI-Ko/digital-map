@@ -3,10 +3,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 const mocks = vi.hoisted(() => ({
   findFirst: vi.fn(),
   update: vi.fn(),
+  auditCreate: vi.fn(),
 }))
 
 vi.mock('../server/utils/prisma', () => ({
-  prisma: { map: { findFirst: mocks.findFirst, update: mocks.update } },
+  prisma: {
+    map: { findFirst: mocks.findFirst, update: mocks.update },
+    $transaction: (callback: (client: unknown) => unknown) => callback({ map: { update: mocks.update }, auditEvent: { create: mocks.auditCreate } }),
+  },
 }))
 
 import { setOwnedMapPublication } from '../server/utils/map-publication'
@@ -15,6 +19,7 @@ describe('マップの公開状態更新', () => {
   beforeEach(() => {
     mocks.findFirst.mockReset()
     mocks.update.mockReset()
+    mocks.auditCreate.mockReset().mockResolvedValue({})
   })
 
   it('同じテナントが所有するマップだけを公開する', async () => {

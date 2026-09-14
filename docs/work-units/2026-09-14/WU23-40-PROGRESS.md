@@ -8,7 +8,8 @@
 | WU | Jira | Start SHA | Commit SHA | Schema / migration | Focused tests | Full tests | Typecheck | Prisma | Build | External | Status |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | WU-23 | KAN-56 | `3f373e6` | `6ab5eb3` | `20260914010000_auth_lifecycle` | 2 files / 12 tests PASS | 44 files / 312 tests PASS | PASS | validate + generate PASS | phase boundary pending | Email delivery deferred to WU-26 | PASS |
-| WU-24 | KAN-53 | `6ab5eb3` | this WU commit | `20260914020000_spot_editor_revisions` | 4 files / 19 tests PASS | 45 files / 317 tests PASS | PASS | validate + generate PASS | PASS | Email delivery deferred to WU-26 | PASS |
+| WU-24 | KAN-53 | `6ab5eb3` | `1db0dc0` | `20260914020000_spot_editor_revisions` | 4 files / 19 tests PASS | 45 files / 317 tests PASS | PASS | validate + generate PASS | PASS | Email delivery deferred to WU-26 | PASS |
+| WU-25 | KAN-54 | `1db0dc0` | this WU commit | `20260914030000_audit_events` | 3 files / 14 tests PASS | 46 files / 321 tests PASS | PASS | validate + generate PASS | not required | none | PASS |
 
 ## WU-23 notes
 
@@ -23,3 +24,10 @@
 - A partial unique PostgreSQL index enforces at most one `PENDING` revision per Spot.
 - Revision media uses real `MediaAsset` references, and approval applies only the fixed editable field set after checking `baseVersion` against `Spot.liveVersion`.
 - Public endpoints remain backed by live Spot relations and never query `SpotRevision`, so pending content remains isolated.
+
+## WU-25 notes
+
+- `AuditEvent` is tenant indexed and database-trigger protected against update/delete.
+- The centralized writer recursively strips secret/token/password/header/body/hash metadata keys.
+- Membership, Map role, invitation, Spot Editor, revision, publication, and high-impact deletion events are inserted inside the protected mutation transaction where practical.
+- Audit reads are Owner-only, tenant constrained, newest first, and cursor paginated; no mutation route exists.

@@ -2,7 +2,7 @@ import { spotPublishSchema } from '~~/shared/schemas/spot'
 import type { SpotPublishResponse } from '~~/shared/types/spot'
 
 export default defineEventHandler(async (event): Promise<SpotPublishResponse> => {
-  const { spot } = await requireOwnedSpot(event)
+  const { spot, map, session } = await requireOwnedSpot(event)
   const result = spotPublishSchema.safeParse(await readBody(event))
 
   if (!result.success) {
@@ -19,10 +19,10 @@ export default defineEventHandler(async (event): Promise<SpotPublishResponse> =>
     })
   }
 
-  const updatedSpot = await prisma.spot.update({
-    where: { id: spot.id },
-    data: { isPublished: result.data.isPublished, liveVersion: { increment: 1 } },
-    select: { isPublished: true, updatedAt: true },
+  const updatedSpot = await prisma.$transaction(async (tx) => {
+    const updated = await tx.spot.update({ where: { id: spot.id }, data: { isPublished: result.data.isPublished, liveVersion: { increment: 1 } }, select: { isPublished: true, updatedAt: true } })
+    await appendAuditEvent(tx, { tenantId: map.tenantId, actorUserId: session.user.id, action: result.data.isPublished ? 'SPOT_PUBLISHED' : 'SPOT_UNPUBLISHED', targetType: 'Spot', targetId: spot.id, mapId: map.id, metadata: { isPublished: result.data.isPublished } })
+    return updated
   })
 
   return {

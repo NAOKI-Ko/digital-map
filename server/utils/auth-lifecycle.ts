@@ -1,5 +1,6 @@
 import { hash } from 'bcryptjs'
 import { authLifecycleConfig, createAuthToken, hashAuthToken, normalizeAuthEmail } from './auth-tokens'
+import { appendAuditEvent } from './audit'
 
 const invalidInvite = () => createError({ statusCode: 400, statusMessage: '招待リンクが無効か、有効期限が切れています。' })
 
@@ -7,15 +8,13 @@ export async function issueOrganizationInvitation(input: { tenantId: string, ema
   const email = normalizeAuthEmail(input.email)
   const { rawToken, tokenHash } = createAuthToken()
   const { invitationTtlMs } = authLifecycleConfig()
-  const invitation = await prisma.organizationInvitation.create({
-    data: {
-      tenantId: input.tenantId,
-      email,
-      createdById: input.createdById,
-      tokenHash,
+  const invitation = await prisma.$transaction(async (tx) => {
+    const created = await tx.organizationInvitation.create({ data: {
+      tenantId: input.tenantId, email, createdById: input.createdById, tokenHash,
       expiresAt: new Date(Date.now() + invitationTtlMs),
-    },
-    select: { id: true, tenantId: true, email: true, status: true, expiresAt: true, createdAt: true },
+    }, select: { id: true, tenantId: true, email: true, status: true, expiresAt: true, createdAt: true } })
+    await appendAuditEvent(tx, { tenantId: input.tenantId, actorUserId: input.createdById, action: 'ORG_INVITE_CREATED', targetType: 'OrganizationInvitation', targetId: created.id, metadata: { email } })
+    return created
   })
   return { invitation, rawToken }
 }
@@ -26,12 +25,13 @@ export async function issueSpotEditorInvitation(input: { tenantId: string, spotI
   const email = normalizeAuthEmail(input.email)
   const { rawToken, tokenHash } = createAuthToken()
   const { invitationTtlMs } = authLifecycleConfig()
-  const invitation = await prisma.organizationInvitation.create({
-    data: {
+  const invitation = await prisma.$transaction(async (tx) => {
+    const created = await tx.organizationInvitation.create({ data: {
       tenantId: input.tenantId, targetSpotId: spot.id, email, createdById: input.createdById,
       purpose: 'SPOT_EDITOR', tokenHash, expiresAt: new Date(Date.now() + invitationTtlMs),
-    },
-    select: { id: true, tenantId: true, targetSpotId: true, email: true, purpose: true, status: true, expiresAt: true, createdAt: true },
+    }, select: { id: true, tenantId: true, targetSpotId: true, email: true, purpose: true, status: true, expiresAt: true, createdAt: true } })
+    await appendAuditEvent(tx, { tenantId: input.tenantId, actorUserId: input.createdById, action: 'SPOT_INVITE_CREATED', targetType: 'OrganizationInvitation', targetId: created.id, mapId: null, metadata: { spotId: spot.id, email } })
+    return created
   })
   return { invitation, rawToken }
 }
@@ -91,15 +91,23 @@ export async function acceptOrganizationInvitation(input: {
         select: { id: true },
       })
       if (!target) throw invalidInvite()
+      const previous = await tx.spotEditorAssignment.findUnique({ where: { spotId: target.id } })
       await tx.spotEditorAssignment.upsert({
         where: { spotId: target.id },
         create: { spotId: target.id, userId: user.id, assignedById: invitation.createdById },
         update: { userId: user.id, assignedById: invitation.createdById },
       })
+      await appendAuditEvent(tx, { tenantId: invitation.tenantId, actorUserId: user.id, action: previous ? 'SPOT_EDITOR_REPLACED' : 'SPOT_EDITOR_ASSIGNED', targetType: 'SpotEditorAssignment', targetId: target.id, metadata: { oldAssigneeId: previous?.userId ?? null, newAssigneeId: user.id, invitationId: invitation.id } })
     }
     await tx.organizationInvitation.update({
       where: { id: invitation.id },
       data: { acceptedById: user.id },
+    })
+    await appendAuditEvent(tx, {
+      tenantId: invitation.tenantId, actorUserId: user.id,
+      action: invitation.purpose === 'SPOT_EDITOR' ? 'SPOT_INVITE_ACCEPTED' : 'ORG_INVITE_ACCEPTED',
+      targetType: 'OrganizationInvitation', targetId: invitation.id,
+      metadata: { purpose: invitation.purpose, spotId: invitation.targetSpotId, userId: user.id },
     })
     return { userId: user.id, tenantId: invitation.tenantId, invitationId: invitation.id }
   }, { isolationLevel: 'Serializable' })

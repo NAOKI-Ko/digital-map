@@ -4,7 +4,7 @@ import type { MediaAssetDeleteResponse } from '~~/shared/types/media'
 import { requireOwnedMediaAsset, summarizeMediaUsage } from '~~/server/utils/media'
 
 export default defineEventHandler(async (event): Promise<MediaAssetDeleteResponse> => {
-  const { asset } = await requireOwnedMediaAsset(event)
+  const { asset, session } = await requireOwnedMediaAsset(event)
   const usage = summarizeMediaUsage(asset._count)
   if (usage.total > 0) {
     throw createError({
@@ -14,7 +14,10 @@ export default defineEventHandler(async (event): Promise<MediaAssetDeleteRespons
     })
   }
 
-  await prisma.mediaAsset.delete({ where: { id: asset.id } })
+  await prisma.$transaction(async (tx) => {
+    await tx.mediaAsset.delete({ where: { id: asset.id } })
+    await appendAuditEvent(tx, { tenantId: asset.tenantId, actorUserId: session.user.id, action: 'MEDIA_ASSET_PHYSICALLY_DELETED', targetType: 'MediaAsset', targetId: asset.id, metadata: { usageCount: usage.total } })
+  })
   if (basename(asset.storageKey) === asset.storageKey) {
     await unlink(resolve(getUploadDirectory(event), asset.storageKey)).catch((error) => {
       console.error('MediaAsset bytes could not be removed after metadata deletion.', error)

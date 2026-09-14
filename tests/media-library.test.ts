@@ -7,6 +7,7 @@ const mocks = vi.hoisted(() => ({
   getRouterParam: vi.fn(),
   findFirst: vi.fn(),
   delete: vi.fn(),
+  auditCreate: vi.fn(),
 }))
 
 function testError(input: { statusCode: number, statusMessage: string, data?: unknown }) {
@@ -30,10 +31,12 @@ describe('Tenant Media Library', () => {
         findFirst: mocks.findFirst,
         delete: mocks.delete,
       },
+      $transaction: (callback: (client: unknown) => unknown) => callback({ mediaAsset: { delete: mocks.delete }, auditEvent: { create: mocks.auditCreate } }),
     })
     ;({ requireOwnedMediaAsset } = await import('../server/utils/media'))
     vi.stubGlobal('requireOwnedMediaAsset', requireOwnedMediaAsset)
     vi.stubGlobal('summarizeMediaUsage', summarizeMediaUsage)
+    vi.stubGlobal('appendAuditEvent', async (client: any, input: any) => client.auditEvent.create({ data: input }))
     ;({ default: deleteHandler } = await import('../server/api/media/[assetId].delete'))
   })
 
@@ -42,6 +45,7 @@ describe('Tenant Media Library', () => {
     mocks.getRouterParam.mockReset().mockReturnValue('asset-a')
     mocks.findFirst.mockReset()
     mocks.delete.mockReset().mockResolvedValue({})
+    mocks.auditCreate.mockReset().mockResolvedValue({})
   })
 
   afterAll(() => vi.unstubAllGlobals())
@@ -92,6 +96,7 @@ function emptyCounts() {
     categoryIcons: 0,
     spotPins: 0,
     spotPhotos: 0,
+    revisionPhotos: 0,
     decorations: 0,
     tenantLogos: 0,
   }

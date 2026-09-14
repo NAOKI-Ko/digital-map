@@ -2,7 +2,7 @@ import { spotBulkSchema } from '~~/shared/schemas/spot-bulk'
 import type { SpotBulkResponse } from '~~/shared/types/spot'
 
 export default defineEventHandler(async (event): Promise<SpotBulkResponse> => {
-  const { map } = await requireOwnedMap(event)
+  const { map, session } = await requireOwnedMap(event)
   const result = spotBulkSchema.safeParse(await readBody(event))
   if (!result.success) throw createError({ statusCode: 422, statusMessage: result.error.issues[0]?.message ?? '一括操作の内容を確認してください。' })
 
@@ -20,6 +20,7 @@ export default defineEventHandler(async (event): Promise<SpotBulkResponse> => {
 
   await prisma.$transaction(async (transaction) => {
     if (input.action === 'delete') {
+      for (const spot of spots) await appendAuditEvent(transaction, { tenantId: map.tenantId, actorUserId: session.user.id, action: 'SPOT_DELETED', targetType: 'Spot', targetId: spot.id, mapId: map.id })
       await transaction.spot.deleteMany({ where: { id: { in: spotIds }, floor: { mapId: map.id } } })
       return
     }

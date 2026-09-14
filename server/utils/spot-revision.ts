@@ -1,6 +1,7 @@
 import type { H3Event } from 'h3'
 import { Prisma } from '../../prisma/generated/client'
 import { spotRevisionPayloadSchema } from '../../shared/schemas/spot-revision'
+import { appendAuditEvent } from './audit'
 
 const notFound = () => createError({ statusCode: 404, statusMessage: 'スポットが見つかりません。' })
 
@@ -41,10 +42,12 @@ export async function saveSpotRevision(event: H3Event, spotId: string, input: un
     const revision = pending
       ? await tx.spotRevision.update({ where: { id: pending.id }, data: { payload: payload as Prisma.InputJsonValue } })
       : await tx.spotRevision.create({ data: { spotId, authorId: session.user.id, baseVersion: spot.liveVersion, payload: payload as Prisma.InputJsonValue } })
+    if (!pending) await appendAuditEvent(tx, { tenantId: map.tenantId, actorUserId: session.user.id, action: 'SPOT_REVISION_CREATED', targetType: 'SpotRevision', targetId: revision.id, mapId: map.id, metadata: { spotId } })
     await tx.spotRevisionPhoto.deleteMany({ where: { revisionId: revision.id } })
     if (payload.photoAssetIds.length) {
       await tx.spotRevisionPhoto.createMany({ data: payload.photoAssetIds.map((assetId, order) => ({ revisionId: revision.id, assetId, order })) })
     }
+    await appendAuditEvent(tx, { tenantId: map.tenantId, actorUserId: session.user.id, action: 'SPOT_REVISION_SUBMITTED', targetType: 'SpotRevision', targetId: revision.id, mapId: map.id, metadata: { spotId, baseVersion: spot.liveVersion, photoCount: payload.photoAssetIds.length } })
     return revision
   }, { isolationLevel: 'Serializable' })
 }
@@ -77,6 +80,7 @@ export async function approveSpotRevision(event: H3Event, revisionId: string) {
     if (revision.photos.length) {
       await tx.spotPhoto.createMany({ data: revision.photos.map(photo => ({ spotId: revision.spotId, assetId: photo.assetId, order: photo.order })) })
     }
+    await appendAuditEvent(tx, { tenantId: map.tenantId, actorUserId: session.user.id, action: 'SPOT_REVISION_APPROVED', targetType: 'SpotRevision', targetId: revision.id, mapId: map.id, metadata: { spotId: revision.spotId, baseVersion: revision.baseVersion, photoCount: revision.photos.length } })
     return tx.spotRevision.update({
       where: { id: revision.id },
       data: { status: 'APPROVED', reviewerId: session.user.id, reviewedAt: new Date() },
@@ -86,9 +90,10 @@ export async function approveSpotRevision(event: H3Event, revisionId: string) {
 
 export async function rejectSpotRevision(event: H3Event, revisionId: string, reason: string) {
   const { session, map } = await requireMapAccess(event)
-  const updated = await prisma.spotRevision.updateMany({
-    where: { id: revisionId, status: 'PENDING', spot: { floor: { mapId: map.id } } },
-    data: { status: 'REJECTED', reviewerId: session.user.id, reviewedAt: new Date(), rejectReason: reason },
+  const updated = await prisma.$transaction(async (tx) => {
+    const result = await tx.spotRevision.updateMany({ where: { id: revisionId, status: 'PENDING', spot: { floor: { mapId: map.id } } }, data: { status: 'REJECTED', reviewerId: session.user.id, reviewedAt: new Date(), rejectReason: reason } })
+    if (result.count === 1) await appendAuditEvent(tx, { tenantId: map.tenantId, actorUserId: session.user.id, action: 'SPOT_REVISION_REJECTED', targetType: 'SpotRevision', targetId: revisionId, mapId: map.id, metadata: { reasonProvided: true } })
+    return result
   })
   if (updated.count !== 1) throw createError({ statusCode: 404, statusMessage: '承認待ちRevisionが見つかりません。' })
   return { rejected: true }

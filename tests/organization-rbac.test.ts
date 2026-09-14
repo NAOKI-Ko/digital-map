@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
   userFindUnique: vi.fn(), userUpdate: vi.fn(),
   requireUserSession: vi.fn(),
   clearUserSession: vi.fn(),
+  auditCreate: vi.fn(),
 }))
 
 function testError(input: { statusCode: number, statusMessage: string }) {
@@ -23,8 +24,9 @@ describe('KAN-52 organization / map RBAC', () => {
   beforeAll(async () => {
     const tx = {
       tenantMember: { findUnique: mocks.memberFindUnique, count: mocks.memberCount, update: mocks.memberUpdate, delete: mocks.memberDelete },
-      mapMember: { deleteMany: mocks.mapMemberDeleteMany },
+      mapMember: { deleteMany: mocks.mapMemberDeleteMany, upsert: mocks.mapMemberUpsert },
       user: { update: mocks.userUpdate },
+      auditEvent: { create: mocks.auditCreate },
     }
     vi.stubGlobal('createError', testError)
     vi.stubGlobal('requireUserSession', mocks.requireUserSession)
@@ -50,6 +52,7 @@ describe('KAN-52 organization / map RBAC', () => {
     mocks.mapMemberFindFirst.mockResolvedValue({ id: 'mm-1' })
     mocks.userFindUnique.mockResolvedValue({ isActive: true, authVersion: 1 })
     mocks.userUpdate.mockResolvedValue({})
+    mocks.auditCreate.mockResolvedValue({})
     mocks.requireUserSession.mockResolvedValue({ user: { id: 'user-a', tenantId: 'tenant-a', authVersion: 1 } })
   })
 
@@ -58,6 +61,11 @@ describe('KAN-52 organization / map RBAC', () => {
   it('MEMBERをOWNERへ昇格できる', async () => {
     await expect(changeTenantMemberRole('tenant-a', 'user-a', 'OWNER')).resolves.toMatchObject({ role: 'OWNER' })
     expect(mocks.memberUpdate).toHaveBeenCalledWith({ where: { id: 'tm-1' }, data: { role: 'OWNER' } })
+  })
+
+  it('重要なrole変更は監査insert失敗時にtransactionを失敗させる', async () => {
+    mocks.auditCreate.mockRejectedValueOnce(new Error('audit unavailable'))
+    await expect(changeTenantMemberRole('tenant-a', 'user-a', 'OWNER', 'owner-1')).rejects.toThrow('audit unavailable')
   })
 
   it('複数Ownerなら降格でき、最後のOwnerは降格できない', async () => {

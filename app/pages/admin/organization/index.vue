@@ -93,6 +93,7 @@ async function run(action: () => Promise<void>) {
     <header>
       <p class="text-sm font-medium text-terracotta-700">組織</p>
       <h1 class="mt-1 text-3xl font-bold text-stone-900">組織設定・メンバー</h1>
+      <NuxtLink to="/admin/organization/audit" class="mt-3 inline-block text-sm font-semibold underline">監査ログを見る</NuxtLink>
     </header>
     <SaveFeedback class="mt-6" :state="saving ? 'saving' : errorMessage ? 'error' : message ? 'success' : 'idle'" :message="errorMessage || message" />
 

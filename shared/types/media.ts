@@ -4,6 +4,7 @@ export interface MediaAssetUsage {
   categoryIcons: number
   spotPins: number
   spotPhotos: number
+  revisionPhotos: number
   decorations: number
   tenantLogos: number
   total: number

@@ -12,6 +12,7 @@ export default defineEventHandler(async (event): Promise<MediaAssetListResponse>
       categoryIcons: { select: { mapId: true } },
       spotPins: { select: { floor: { select: { mapId: true } } } },
       spotPhotos: { select: { spot: { select: { floor: { select: { mapId: true } } } } } },
+      revisionPhotos: { select: { revision: { select: { spot: { select: { floor: { select: { mapId: true } } } } } } } },
       decorations: { select: { floor: { select: { mapId: true } } } },
       _count: {
         select: {
@@ -20,6 +21,7 @@ export default defineEventHandler(async (event): Promise<MediaAssetListResponse>
           categoryIcons: true,
           spotPins: true,
           spotPhotos: true,
+          revisionPhotos: true,
           decorations: true,
           tenantLogos: true,
         },
@@ -45,6 +47,7 @@ export default defineEventHandler(async (event): Promise<MediaAssetListResponse>
         ...asset.categoryIcons.map(category => category.mapId),
         ...asset.spotPins.map(spot => spot.floor.mapId),
         ...asset.spotPhotos.map(photo => photo.spot.floor.mapId),
+        ...asset.revisionPhotos.map(photo => photo.revision.spot.floor.mapId),
         ...asset.decorations.map(decoration => decoration.floor.mapId),
       ])],
     })),

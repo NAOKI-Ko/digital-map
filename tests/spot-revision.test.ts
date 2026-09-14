@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
   revisionFindFirst: vi.fn(), revisionCreate: vi.fn(), revisionUpdate: vi.fn(), revisionPhotoDeleteMany: vi.fn(), revisionPhotoCreateMany: vi.fn(),
   spotUpdate: vi.fn(), fieldDeleteMany: vi.fn(), fieldCreate: vi.fn(), photoDeleteMany: vi.fn(), photoCreateMany: vi.fn(),
   requireUser: vi.fn(), requireMapAccess: vi.fn(),
+  auditCreate: vi.fn(),
 }))
 
 const testError = (input: { statusCode: number, statusMessage: string }) => Object.assign(new Error(input.statusMessage), input)
@@ -21,6 +22,7 @@ describe('WU-24 Spot Editor revision', () => {
       spot: { update: mocks.spotUpdate },
       spotFieldValue: { deleteMany: mocks.fieldDeleteMany, create: mocks.fieldCreate },
       spotPhoto: { deleteMany: mocks.photoDeleteMany, createMany: mocks.photoCreateMany },
+      auditEvent: { create: mocks.auditCreate },
     }
     vi.stubGlobal('createError', testError)
     vi.stubGlobal('requireUser', mocks.requireUser)
@@ -51,6 +53,7 @@ describe('WU-24 Spot Editor revision', () => {
     mocks.photoCreateMany.mockResolvedValue({ count: 1 })
     mocks.spotUpdate.mockResolvedValue({})
     mocks.revisionUpdate.mockResolvedValue({ id: 'revision-1', status: 'APPROVED' })
+    mocks.auditCreate.mockResolvedValue({})
   })
 
   afterAll(() => vi.unstubAllGlobals())

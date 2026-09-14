@@ -1,4 +1,6 @@
-export async function changeTenantMemberRole(tenantId: string, userId: string, role: 'OWNER' | 'MEMBER') {
+import { appendAuditEvent } from './audit'
+
+export async function changeTenantMemberRole(tenantId: string, userId: string, role: 'OWNER' | 'MEMBER', actorUserId?: string) {
   return prisma.$transaction(async (tx) => {
     const current = await tx.tenantMember.findUnique({ where: { tenantId_userId: { tenantId, userId } } })
     if (!current) throw createError({ statusCode: 404, statusMessage: '組織メンバーが見つかりません。' })
@@ -9,12 +11,13 @@ export async function changeTenantMemberRole(tenantId: string, userId: string, r
     const updated = await tx.tenantMember.update({ where: { id: current.id }, data: { role } })
     if (current.role !== role) {
       await tx.user.update({ where: { id: userId }, data: { authVersion: { increment: 1 } } })
+      await appendAuditEvent(tx, { tenantId, actorUserId, action: 'TENANT_MEMBER_ROLE_CHANGED', targetType: 'TenantMember', targetId: current.id, metadata: { userId, oldRole: current.role, newRole: role } })
     }
     return updated
   }, { isolationLevel: 'Serializable' })
 }
 
-export async function removeTenantMember(tenantId: string, userId: string) {
+export async function removeTenantMember(tenantId: string, userId: string, actorUserId?: string) {
   return prisma.$transaction(async (tx) => {
     const current = await tx.tenantMember.findUnique({ where: { tenantId_userId: { tenantId, userId } } })
     if (!current) throw createError({ statusCode: 404, statusMessage: '組織メンバーが見つかりません。' })
@@ -25,6 +28,7 @@ export async function removeTenantMember(tenantId: string, userId: string) {
     await tx.mapMember.deleteMany({ where: { userId, map: { tenantId } } })
     await tx.tenantMember.delete({ where: { id: current.id } })
     await tx.user.update({ where: { id: userId }, data: { authVersion: { increment: 1 } } })
+    await appendAuditEvent(tx, { tenantId, actorUserId, action: 'TENANT_MEMBER_REMOVED', targetType: 'TenantMember', targetId: current.id, metadata: { userId, oldRole: current.role } })
     return { removedUserId: userId }
   }, { isolationLevel: 'Serializable' })
 }
@@ -36,12 +40,14 @@ export async function setUserActive(userId: string, isActive: boolean) {
   })
 }
 
-export async function assignMapEditor(mapId: string, tenantId: string, userId: string) {
+export async function assignMapEditor(mapId: string, tenantId: string, userId: string, actorUserId?: string) {
   const member = await prisma.tenantMember.findUnique({ where: { tenantId_userId: { tenantId, userId } } })
   if (!member) throw createError({ statusCode: 422, statusMessage: '同じ組織のメンバーだけを編集者に追加できます。' })
-  return prisma.mapMember.upsert({
-    where: { mapId_userId: { mapId, userId } },
-    create: { mapId, userId, role: 'EDITOR' },
-    update: {},
+  return prisma.$transaction(async (tx) => {
+    const assignment = await tx.mapMember.upsert({
+      where: { mapId_userId: { mapId, userId } }, create: { mapId, userId, role: 'EDITOR' }, update: {},
+    })
+    await appendAuditEvent(tx, { tenantId, actorUserId, action: 'MAP_EDITOR_ASSIGNED', targetType: 'MapMember', targetId: assignment.id, mapId, metadata: { userId } })
+    return assignment
   })
 }

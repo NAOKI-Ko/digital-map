@@ -4,6 +4,7 @@ const mocks = vi.hoisted(() => ({
   invitationCreate: vi.fn(), invitationFindUnique: vi.fn(), invitationUpdateMany: vi.fn(), invitationUpdate: vi.fn(),
   userFindUnique: vi.fn(), userCreate: vi.fn(), userUpdate: vi.fn(), memberUpsert: vi.fn(),
   resetCreate: vi.fn(), resetFindUnique: vi.fn(), resetUpdateMany: vi.fn(),
+  auditCreate: vi.fn(),
 }))
 
 const testError = (input: { statusCode: number, statusMessage: string }) => Object.assign(new Error(input.statusMessage), input)
@@ -17,10 +18,11 @@ describe('WU-23 auth lifecycle', () => {
 
   beforeAll(async () => {
     const tx = {
-      organizationInvitation: { findUnique: mocks.invitationFindUnique, updateMany: mocks.invitationUpdateMany, update: mocks.invitationUpdate },
+      organizationInvitation: { create: mocks.invitationCreate, findUnique: mocks.invitationFindUnique, updateMany: mocks.invitationUpdateMany, update: mocks.invitationUpdate },
       user: { findUnique: mocks.userFindUnique, create: mocks.userCreate, update: mocks.userUpdate },
       tenantMember: { upsert: mocks.memberUpsert },
       passwordResetToken: { findUnique: mocks.resetFindUnique, updateMany: mocks.resetUpdateMany },
+      auditEvent: { create: mocks.auditCreate },
     }
     vi.stubGlobal('createError', testError)
     vi.stubGlobal('useRuntimeConfig', () => ({ auth: { invitationTtlHours: 72, passwordResetTtlMinutes: 60 } }))
@@ -42,6 +44,7 @@ describe('WU-23 auth lifecycle', () => {
     mocks.memberUpsert.mockResolvedValue({})
     mocks.resetUpdateMany.mockResolvedValue({ count: 1 })
     mocks.userUpdate.mockResolvedValue({})
+    mocks.auditCreate.mockResolvedValue({})
   })
 
   afterAll(() => vi.unstubAllGlobals())
