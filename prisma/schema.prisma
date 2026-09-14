@@ -8,21 +8,23 @@ datasource db {
 }
 
 model Tenant {
-  id          String         @id @default(cuid())
-  name        String
-  slug        String         @unique
-  logoUrl     String?
-  logoAssetId String?
-  logoAsset   MediaAsset?    @relation("TenantLogoAsset", fields: [logoAssetId], references: [id], onDelete: SetNull)
-  websiteUrl  String?
-  snsUrl      String?
-  members     TenantMember[]
-  maps        Map[]
-  mediaAssets MediaAsset[]   @relation("TenantMediaAssets")
-  invitations OrganizationInvitation[]
-  auditEvents AuditEvent[]
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
+  id               String                   @id @default(cuid())
+  name             String
+  slug             String                   @unique
+  logoUrl          String?
+  logoAssetId      String?
+  logoAsset        MediaAsset?              @relation("TenantLogoAsset", fields: [logoAssetId], references: [id], onDelete: SetNull)
+  websiteUrl       String?
+  snsUrl           String?
+  members          TenantMember[]
+  maps             Map[]
+  mediaAssets      MediaAsset[]             @relation("TenantMediaAssets")
+  invitations      OrganizationInvitation[]
+  auditEvents      AuditEvent[]
+  legalAcceptances LegalAcceptance[]
+  onboardingState  TenantOnboardingState    @default(SETUP)
+  createdAt        DateTime                 @default(now())
+  updatedAt        DateTime                 @updatedAt
 }
 
 enum MailDeliveryStatus {
@@ -48,36 +50,78 @@ model MailDelivery {
 }
 
 model RateLimitBucket {
-  key         String   @id
-  namespace   String
-  count       Int      @default(1)
-  windowEnd   DateTime
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  key       String   @id
+  namespace String
+  count     Int      @default(1)
+  windowEnd DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([namespace, windowEnd])
 }
 
 model User {
-  id            String         @id @default(cuid())
-  email         String         @unique
-  displayName   String?
-  passwordHash  String
-  tenantMembers TenantMember[]
-  mapMembers    MapMember[]
-  createdInvitations OrganizationInvitation[] @relation("InvitationCreator")
-  acceptedInvitations OrganizationInvitation[] @relation("InvitationAcceptor")
-  passwordResetTokens PasswordResetToken[]
-  spotAssignments SpotEditorAssignment[] @relation("SpotEditorUser")
-  assignedSpotEditors SpotEditorAssignment[] @relation("SpotEditorAssigner")
-  authoredSpotRevisions SpotRevision[] @relation("SpotRevisionAuthor")
-  reviewedSpotRevisions SpotRevision[] @relation("SpotRevisionReviewer")
-  publicReleases PublicRelease[]
-  auditEvents AuditEvent[]
-  isActive      Boolean        @default(true)
-  authVersion   Int            @default(1)
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  id                    String                   @id @default(cuid())
+  email                 String                   @unique
+  displayName           String?
+  passwordHash          String
+  tenantMembers         TenantMember[]
+  mapMembers            MapMember[]
+  createdInvitations    OrganizationInvitation[] @relation("InvitationCreator")
+  acceptedInvitations   OrganizationInvitation[] @relation("InvitationAcceptor")
+  passwordResetTokens   PasswordResetToken[]
+  spotAssignments       SpotEditorAssignment[]   @relation("SpotEditorUser")
+  assignedSpotEditors   SpotEditorAssignment[]   @relation("SpotEditorAssigner")
+  authoredSpotRevisions SpotRevision[]           @relation("SpotRevisionAuthor")
+  reviewedSpotRevisions SpotRevision[]           @relation("SpotRevisionReviewer")
+  publicReleases        PublicRelease[]
+  auditEvents           AuditEvent[]
+  legalAcceptances      LegalAcceptance[]
+  signupIntents         SignupIntent[]
+  emailVerifiedAt       DateTime?
+  isActive              Boolean                  @default(true)
+  authVersion           Int                      @default(1)
+  createdAt             DateTime                 @default(now())
+  updatedAt             DateTime                 @updatedAt
+}
+
+enum TenantOnboardingState {
+  SETUP
+  ACTIVE
+}
+
+model SignupIntent {
+  id                    String    @id @default(cuid())
+  email                 String
+  passwordHash          String
+  organizationName      String
+  verificationTokenHash String    @unique
+  expiresAt             DateTime
+  verifiedAt            DateTime?
+  completedAt           DateTime?
+  termsVersion          String
+  privacyVersion        String
+  createdUserId         String?
+  createdUser           User?     @relation(fields: [createdUserId], references: [id], onDelete: SetNull)
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([email, createdAt])
+  @@index([expiresAt, completedAt])
+}
+
+model LegalAcceptance {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenantId       String
+  tenant         Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  termsVersion   String
+  privacyVersion String
+  acceptedAt     DateTime @default(now())
+
+  @@index([userId, acceptedAt])
+  @@index([tenantId, acceptedAt])
 }
 
 model AuditEvent {
@@ -136,13 +180,13 @@ model OrganizationInvitation {
 }
 
 model PasswordResetToken {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tokenHash String   @unique
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
   expiresAt DateTime
   usedAt    DateTime?
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
 
   @@index([userId, createdAt])
 }
@@ -222,16 +266,16 @@ model Map {
 }
 
 model PublicRelease {
-  id              String   @id @default(cuid())
+  id              String    @id @default(cuid())
   mapId           String
-  map             Map      @relation("MapReleases", fields: [mapId], references: [id], onDelete: Cascade)
-  currentForMap   Map?     @relation("MapCurrentRelease")
+  map             Map       @relation("MapReleases", fields: [mapId], references: [id], onDelete: Cascade)
+  currentForMap   Map?      @relation("MapCurrentRelease")
   createdBy       String
-  creator         User     @relation(fields: [createdBy], references: [id], onDelete: Restrict)
-  status          String   @default("BUILDING")
+  creator         User      @relation(fields: [createdBy], references: [id], onDelete: Restrict)
+  status          String    @default("BUILDING")
   manifestKey     String?
   failureMetadata Json?
-  createdAt       DateTime @default(now())
+  createdAt       DateTime  @default(now())
   readyAt         DateTime?
 
   @@index([mapId, createdAt])
@@ -281,20 +325,20 @@ model MapTranslation {
 }
 
 model Category {
-  id             String         @id @default(cuid())
+  id             String                @id @default(cuid())
   mapId          String
-  map            Map            @relation(fields: [mapId], references: [id], onDelete: Cascade)
+  map            Map                   @relation(fields: [mapId], references: [id], onDelete: Cascade)
   name           String
-  order          Int            @default(0)
+  order          Int                   @default(0)
   iconType       String?
   iconPresetId   String?
   iconImageUrl   String?
   iconAssetId    String?
-  iconAsset      MediaAsset?    @relation("CategoryIconAsset", fields: [iconAssetId], references: [id], onDelete: SetNull)
+  iconAsset      MediaAsset?           @relation("CategoryIconAsset", fields: [iconAssetId], references: [id], onDelete: SetNull)
   spotCategories SpotCategory[]
   translations   CategoryTranslation[]
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
 
   @@unique([mapId, name])
   @@index([mapId, order])
@@ -341,40 +385,40 @@ model MapFloor {
 }
 
 model Spot {
-  id              String           @id @default(cuid())
-  floorId         String
-  floor           MapFloor         @relation(fields: [floorId], references: [id], onDelete: Cascade)
-  name            String
-  spotCategories  SpotCategory[]
-  description     String?
-  address         String?
-  website         String?
-  x               Float?
-  y               Float?
-  photosJson      Json             @default("[]")
-  hoursText       String?
-  holidayText     String?
-  phone           String?
-  pinIconType     String           @default("preset")
-  pinIconId       String?
-  pinIconImageUrl String?
-  pinIconAssetId  String?
-  pinIconAsset    MediaAsset?      @relation("SpotPinAsset", fields: [pinIconAssetId], references: [id], onDelete: SetNull)
-  photos          SpotPhoto[]
-  fieldValues     SpotFieldValue[]
-  editorAssignment SpotEditorAssignment?
-  revisions       SpotRevision[]
-  translations    SpotTranslation[]
+  id                     String                      @id @default(cuid())
+  floorId                String
+  floor                  MapFloor                    @relation(fields: [floorId], references: [id], onDelete: Cascade)
+  name                   String
+  spotCategories         SpotCategory[]
+  description            String?
+  address                String?
+  website                String?
+  x                      Float?
+  y                      Float?
+  photosJson             Json                        @default("[]")
+  hoursText              String?
+  holidayText            String?
+  phone                  String?
+  pinIconType            String                      @default("preset")
+  pinIconId              String?
+  pinIconImageUrl        String?
+  pinIconAssetId         String?
+  pinIconAsset           MediaAsset?                 @relation("SpotPinAsset", fields: [pinIconAssetId], references: [id], onDelete: SetNull)
+  photos                 SpotPhoto[]
+  fieldValues            SpotFieldValue[]
+  editorAssignment       SpotEditorAssignment?
+  revisions              SpotRevision[]
+  translations           SpotTranslation[]
   fieldValueTranslations SpotFieldValueTranslation[]
-  dailyAnalytics SpotDailyAnalytics[]
-  targetedInvitations OrganizationInvitation[]
-  liveVersion     Int              @default(1)
-  pinColor        String           @default("#C7401F")
-  pinSize         String           @default("medium")
-  importance      String           @default("normal")
-  isPublished     Boolean          @default(false)
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
+  dailyAnalytics         SpotDailyAnalytics[]
+  targetedInvitations    OrganizationInvitation[]
+  liveVersion            Int                         @default(1)
+  pinColor               String                      @default("#C7401F")
+  pinSize                String                      @default("medium")
+  importance             String                      @default("normal")
+  isPublished            Boolean                     @default(false)
+  createdAt              DateTime                    @default(now())
+  updatedAt              DateTime                    @updatedAt
 
   @@index([floorId])
   @@index([floorId, isPublished])
@@ -417,21 +461,21 @@ enum SpotRevisionStatus {
 }
 
 model SpotRevision {
-  id           String             @id @default(cuid())
+  id           String              @id @default(cuid())
   spotId       String
-  spot         Spot               @relation(fields: [spotId], references: [id], onDelete: Cascade)
+  spot         Spot                @relation(fields: [spotId], references: [id], onDelete: Cascade)
   authorId     String
-  author       User               @relation("SpotRevisionAuthor", fields: [authorId], references: [id], onDelete: Restrict)
+  author       User                @relation("SpotRevisionAuthor", fields: [authorId], references: [id], onDelete: Restrict)
   reviewerId   String?
-  reviewer     User?              @relation("SpotRevisionReviewer", fields: [reviewerId], references: [id], onDelete: SetNull)
-  status       SpotRevisionStatus @default(PENDING)
+  reviewer     User?               @relation("SpotRevisionReviewer", fields: [reviewerId], references: [id], onDelete: SetNull)
+  status       SpotRevisionStatus  @default(PENDING)
   payload      Json
   baseVersion  Int
   rejectReason String?
   reviewedAt   DateTime?
   photos       SpotRevisionPhoto[]
-  createdAt    DateTime           @default(now())
-  updatedAt    DateTime           @updatedAt
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
 
   @@index([spotId, status, createdAt])
   @@index([authorId, status])
@@ -469,22 +513,22 @@ model FloorDecoration {
 }
 
 model SpotFieldDefinition {
-  id            String           @id @default(cuid())
-  mapId         String
-  map           Map              @relation(fields: [mapId], references: [id], onDelete: Cascade)
-  kind          String
-  semanticKey   String?
-  label         String
-  type          String
-  enabled       Boolean          @default(true)
-  publicVisible Boolean          @default(true)
-  required      Boolean          @default(false)
-  order         Int              @default(0)
-  values        SpotFieldValue[]
-  translations  SpotFieldDefinitionTranslation[]
+  id                String                           @id @default(cuid())
+  mapId             String
+  map               Map                              @relation(fields: [mapId], references: [id], onDelete: Cascade)
+  kind              String
+  semanticKey       String?
+  label             String
+  type              String
+  enabled           Boolean                          @default(true)
+  publicVisible     Boolean                          @default(true)
+  required          Boolean                          @default(false)
+  order             Int                              @default(0)
+  values            SpotFieldValue[]
+  translations      SpotFieldDefinitionTranslation[]
   valueTranslations SpotFieldValueTranslation[]
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
+  createdAt         DateTime                         @default(now())
+  updatedAt         DateTime                         @updatedAt
 
   @@unique([mapId, semanticKey])
   @@index([mapId, order])
@@ -524,39 +568,39 @@ model SpotFieldValueTranslation {
   fieldDefinitionId String
   fieldDefinition   SpotFieldDefinition @relation(fields: [fieldDefinitionId], references: [id], onDelete: Cascade)
   locale            String
-  value              String
-  createdAt          DateTime            @default(now())
-  updatedAt          DateTime            @updatedAt
+  value             String
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
 
   @@unique([spotId, fieldDefinitionId, locale])
   @@index([fieldDefinitionId, locale])
 }
 
 model MediaAsset {
-  id                 String            @id @default(cuid())
+  id                 String              @id @default(cuid())
   tenantId           String
-  tenant             Tenant            @relation("TenantMediaAssets", fields: [tenantId], references: [id], onDelete: Cascade)
-  storageKey         String            @unique
+  tenant             Tenant              @relation("TenantMediaAssets", fields: [tenantId], references: [id], onDelete: Cascade)
+  storageKey         String              @unique
   originalFilename   String
   mimeType           String
   width              Int
   height             Int
   fileSize           Int
   sha256             String?
-  mapLogos           Map[]             @relation("MapLogoAsset")
-  mapSeoImages       Map[]             @relation("MapSeoImageAsset")
-  floorIllustrations MapFloor[]        @relation("FloorIllustrationAsset")
-  categoryIcons      Category[]        @relation("CategoryIconAsset")
-  spotPins           Spot[]            @relation("SpotPinAsset")
+  mapLogos           Map[]               @relation("MapLogoAsset")
+  mapSeoImages       Map[]               @relation("MapSeoImageAsset")
+  floorIllustrations MapFloor[]          @relation("FloorIllustrationAsset")
+  categoryIcons      Category[]          @relation("CategoryIconAsset")
+  spotPins           Spot[]              @relation("SpotPinAsset")
   spotPhotos         SpotPhoto[]
   revisionPhotos     SpotRevisionPhoto[]
   decorations        FloorDecoration[]
-  tenantLogos        Tenant[]          @relation("TenantLogoAsset")
+  tenantLogos        Tenant[]            @relation("TenantLogoAsset")
   variants           MediaVariant[]
-  processingStatus   String            @default("PENDING")
+  processingStatus   String              @default("PENDING")
   processingError    String?
-  createdAt          DateTime          @default(now())
-  updatedAt          DateTime          @updatedAt
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
 
   @@index([tenantId, createdAt])
   @@index([tenantId, sha256])

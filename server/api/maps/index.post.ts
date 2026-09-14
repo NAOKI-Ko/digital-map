@@ -5,14 +5,13 @@ import { defaultSpotFieldDefinitions } from '~~/shared/constants/spot-fields'
 export default defineEventHandler(async (event): Promise<AdminMapResponse> => {
   const { session } = await requireTenantOwner(event)
   const input = await readValidatedBody(event, mapCreateSchema.parse)
-  const map = await prisma.map.create({
-    data: {
-      tenantId: session.user.tenantId,
-      name: input.name,
-      slug: input.slug,
-      spotFieldDefinitions: { create: defaultSpotFieldDefinitions.map(field => ({ ...field })) },
-    },
-    select: {
+  const map = await prisma.$transaction(async (transaction) => {
+    const created = await transaction.map.create({ data: {
+        tenantId: session.user.tenantId,
+        name: input.name,
+        slug: input.slug,
+        spotFieldDefinitions: { create: defaultSpotFieldDefinitions.map(field => ({ ...field })) },
+      }, select: {
       id: true,
       name: true,
       slug: true,
@@ -27,7 +26,9 @@ export default defineEventHandler(async (event): Promise<AdminMapResponse> => {
       _count: {
         select: { floors: true },
       },
-    },
+      } })
+    await transaction.tenant.update({ where: { id: session.user.tenantId }, data: { onboardingState: 'ACTIVE' } })
+    return created
   })
 
   setResponseStatus(event, 201)

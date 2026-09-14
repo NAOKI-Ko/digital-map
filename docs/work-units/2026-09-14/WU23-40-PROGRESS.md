@@ -21,7 +21,8 @@
 | WU-34 | KAN-62 | `d05583a` | `50ca8b7` | `20260914100000_map_seo` | 4 files / 24 tests PASS | 55 files / 364 tests PASS | PASS | validate + generate PASS | not required | none | PASS |
 | WU-35 | KAN-63 | `50ca8b7` | `c051963` | none | 3 files / 15 tests PASS | 56 files / 368 tests PASS | PASS | validate PASS | not required | Legal review pending | PASS |
 | WU-36 | KAN-61 | `c051963` | `9542996` | none | 2 files / 21 tests PASS | 57 files / 373 tests PASS | PASS | validate PASS | PASS | none | PASS |
-| WU-37 | KAN-59 | `9542996` | this WU commit | none | 2 files / 14 tests PASS | 58 files / 381 tests PASS | PASS | validate PASS | PASS | none | PASS |
+| WU-37 | KAN-59 | `9542996` | `7964dfb` | none | 2 files / 14 tests PASS | 58 files / 381 tests PASS | PASS | validate PASS | PASS | none | PASS |
+| WU-38 | KAN-70 | `7964dfb` | this WU commit | `20260914110000_self_service_onboarding` | 7 files / 33 tests PASS | 59 files / 388 tests PASS | PASS | validate + generate PASS | PASS | Live verification email pending; fake provider path PASS | PASS |
 
 ## WU-23 notes
 
@@ -128,3 +129,10 @@
 - A4/A3 portrait/landscape pages use 300-DPI Sharp composition and pdf-lib without a GUI browser dependency. Multi-floor export creates one or more pages per Floor, and long Spot legends flow onto continuation pages.
 - Every Floor page contains the background, Decorations, deterministic numbered PINs, Spot/Category legend, title, organization identity/logo when configured, and a fixed-URL QR for published Maps.
 - A generated two-page A4 landscape sample was parsed with Poppler/pdf-lib and rendered to PNG for visual inspection; margins, legend, markers, and QR were unclipped and legible.
+
+## WU-38 notes
+
+- Unauthenticated registration stores a normalized-email `SignupIntent`, bcrypt password state, organization name, current legal versions, and a 24-hour hash-only single-use verification token. It creates no Tenant before verification.
+- New-account verification atomically creates the User, SETUP Tenant, OWNER membership, legal acceptance, and completed intent, then establishes a session and routes into the existing Map setup flow. Creating the first Map advances the Tenant to ACTIVE without publishing it.
+- An existing account is never duplicated or password-overwritten. Email verification requires normal login before an explicitly reconfirmed legal acceptance can atomically create another OWNER Tenant.
+- Signup and resend use PostgreSQL-backed email+IP rate limits and generic acceptance responses. Existing organization invitations are neither queried nor consumed, so a later invitation acceptance remains independent.

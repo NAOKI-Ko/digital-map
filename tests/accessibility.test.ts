@@ -33,6 +33,10 @@ describe('WCAG 2.2 AA-oriented public baseline', () => {
     await expectNoSeriousViolations(`<main><article><h1>プライバシーポリシー</h1><h2>取り扱う情報</h2><p>説明</p><a href="mailto:support@example.test">お問い合わせ</a></article><form><h2>管理者ログイン</h2><label for="email">メール</label><input id="email" type="email"><label for="password">パスワード</label><input id="password" type="password"><button>ログイン</button></form></main>`)
   })
 
+  it('self-service onboarding formにcritical/serious違反がない', async () => {
+    await expectNoSeriousViolations(`<main><section><h1>組織アカウントを作成</h1><form><label>メールアドレス<input type="email" autocomplete="email"></label><label>パスワード（12文字以上）<input type="password" autocomplete="new-password"></label><label>組織名<input></label><label><input type="checkbox">利用規約に同意します</label><label><input type="checkbox">プライバシーポリシーに同意します</label><button>確認メールを送信</button></form></section></main>`)
+  })
+
   it('主要配色が通常文字AA 4.5:1を満たす', () => {
     expect(contrast('#c7401f', '#ffffff')).toBeGreaterThanOrEqual(4.5)
     expect(contrast('#44403c', '#ffffff')).toBeGreaterThanOrEqual(4.5)

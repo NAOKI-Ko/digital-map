@@ -31,7 +31,7 @@ export async function enforceRateLimit(event: H3Event, namespace: string, dimens
   return result
 }
 
-export function configuredRateLimit(name: 'loginFailures' | 'passwordReset' | 'inviteAcceptance'): RateLimitRule {
+export function configuredRateLimit(name: 'loginFailures' | 'passwordReset' | 'inviteAcceptance' | 'signup' | 'signupResend'): RateLimitRule {
   const rule = useRuntimeConfig().rateLimits[name]
   return { limit: Number(rule.limit), windowSeconds: Number(rule.windowSeconds) }
 }

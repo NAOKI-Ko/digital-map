@@ -31,10 +31,13 @@ export default defineNuxtConfig({
       loginFailures: { limit: 5, windowSeconds: 15 * 60 },
       passwordReset: { limit: 5, windowSeconds: 60 * 60 },
       inviteAcceptance: { limit: 10, windowSeconds: 15 * 60 },
+      signup: { limit: 5, windowSeconds: 60 * 60 },
+      signupResend: { limit: 5, windowSeconds: 60 * 60 },
     },
     auth: {
       invitationTtlHours: 72,
       passwordResetTtlMinutes: 60,
+      signupVerificationTtlHours: 24,
     },
     uploadDir: '',
     nominatimBaseUrl: 'https://nominatim.openstreetmap.org',
