@@ -1,5 +1,6 @@
 import type { MediaAssetUsage } from '~~/shared/types/media'
 import type { H3Event } from 'h3'
+import { selectMediaVariant } from './media-variants'
 
 export interface MediaUsageCounts {
   mapLogos: number
@@ -20,11 +21,12 @@ export function summarizeMediaUsage(counts: MediaUsageCounts): MediaAssetUsage {
   }
 }
 
-export async function resolveTenantMediaAsset(tenantId: string, assetId: string | null | undefined) {
+export async function resolveTenantMediaAsset(tenantId: string, assetId: string | null | undefined, usage: 'spot-photo' | 'icon' | 'logo' | 'decoration' | 'floor' = 'spot-photo') {
   if (!assetId) return null
-  const asset = await prisma.mediaAsset.findFirst({ where: { id: assetId, tenantId } })
+  const asset = await prisma.mediaAsset.findFirst({ where: { id: assetId, tenantId }, include: { variants: true } })
   if (!asset) throw createError({ statusCode: 422, statusMessage: '選択した登録画像が見つかりません。' })
-  return { id: asset.id, url: `/uploads/${asset.storageKey}`, width: asset.width, height: asset.height }
+  const variant = selectMediaVariant(asset.variants, usage)
+  return { id: asset.id, url: `/uploads/${variant?.storageKey ?? asset.storageKey}`, width: variant?.width ?? asset.width, height: variant?.height ?? asset.height }
 }
 
 export async function requireOwnedMediaAsset(event: H3Event) {
@@ -35,6 +37,7 @@ export async function requireOwnedMediaAsset(event: H3Event) {
   const asset = await prisma.mediaAsset.findFirst({
     where: { id: assetId, tenantId: session.user.tenantId },
     include: {
+      variants: true,
       _count: {
         select: {
           mapLogos: true,

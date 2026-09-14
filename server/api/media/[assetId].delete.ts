@@ -18,8 +18,8 @@ export default defineEventHandler(async (event): Promise<MediaAssetDeleteRespons
     await tx.mediaAsset.delete({ where: { id: asset.id } })
     await appendAuditEvent(tx, { tenantId: asset.tenantId, actorUserId: session.user.id, action: 'MEDIA_ASSET_PHYSICALLY_DELETED', targetType: 'MediaAsset', targetId: asset.id, metadata: { usageCount: usage.total } })
   })
-  if (basename(asset.storageKey) === asset.storageKey) {
-    await unlink(resolve(getUploadDirectory(event), asset.storageKey)).catch((error) => {
+  for (const storageKey of [asset.storageKey, ...(asset.variants ?? []).map(variant => variant.storageKey)]) if (basename(storageKey) === storageKey) {
+    await unlink(resolve(getUploadDirectory(event), storageKey)).catch((error) => {
       console.error('MediaAsset bytes could not be removed after metadata deletion.', error)
     })
   }

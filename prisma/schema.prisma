@@ -494,11 +494,30 @@ model MediaAsset {
   revisionPhotos     SpotRevisionPhoto[]
   decorations        FloorDecoration[]
   tenantLogos        Tenant[]          @relation("TenantLogoAsset")
+  variants           MediaVariant[]
+  processingStatus   String            @default("PENDING")
+  processingError    String?
   createdAt          DateTime          @default(now())
   updatedAt          DateTime          @updatedAt
 
   @@index([tenantId, createdAt])
   @@index([tenantId, sha256])
+}
+
+model MediaVariant {
+  id         String     @id @default(cuid())
+  assetId    String
+  asset      MediaAsset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  kind       String
+  format     String     @default("webp")
+  storageKey String     @unique
+  width      Int
+  height     Int
+  fileSize   Int
+  createdAt  DateTime   @default(now())
+
+  @@unique([assetId, kind, format])
+  @@index([assetId])
 }
 
 model SpotPhoto {

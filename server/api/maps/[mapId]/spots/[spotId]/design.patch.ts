@@ -14,7 +14,7 @@ export default defineEventHandler(async (event): Promise<SpotPinDesignResponse> 
     })
   }
 
-  const asset = await resolveTenantMediaAsset(session.user.tenantId, result.data.pinIconAssetId)
+  const asset = await resolveTenantMediaAsset(session.user.tenantId, result.data.pinIconAssetId, 'icon')
   const updatedSpot = await prisma.spot.update({
     where: { id: spot.id },
     data: {

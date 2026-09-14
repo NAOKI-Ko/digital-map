@@ -1,5 +1,6 @@
 import { createHash, randomUUID } from 'node:crypto'
 import { mkdir, unlink, writeFile } from 'node:fs/promises'
+import { processMediaAsset } from '~~/server/utils/media-variants'
 
 export default defineEventHandler(async (event) => {
   const spotId = getRouterParam(event, 'spotId')
@@ -20,7 +21,8 @@ export default defineEventHandler(async (event) => {
       mimeType: validated.mimeType, width: dimensions.width, height: dimensions.height,
       fileSize: file.data.length, sha256: createHash('sha256').update(file.data).digest('hex'),
     } })
-    return { image: { assetId: asset.id, url: `/uploads/${filename}`, ...dimensions, mimeType: validated.mimeType, size: file.data.length, filename } }
+    const processing = await processMediaAsset(prisma, asset, uploadDirectory)
+    return { image: { assetId: asset.id, url: `/uploads/${filename}`, ...dimensions, mimeType: validated.mimeType, size: file.data.length, filename, processingStatus: processing.status } }
   }
   catch (error) { await unlink(`${uploadDirectory}/${filename}`).catch(() => undefined); throw error }
 })

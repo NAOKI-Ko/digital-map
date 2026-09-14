@@ -148,5 +148,7 @@ export function mimeTypeForFilename(filename: string) {
     return 'image/jpeg'
   }
 
+  if (extension === '.webp') return 'image/webp'
+
   return null
 }

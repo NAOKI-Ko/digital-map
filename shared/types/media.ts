@@ -19,6 +19,8 @@ export interface MediaAssetItem {
   height: number
   fileSize: number
   sha256: string | null
+  processingStatus: string
+  variants: Array<{ kind: string, url: string, width: number, height: number, fileSize: number }>
   createdAt: string
   usage: MediaAssetUsage
   usedInMapIds: string[]

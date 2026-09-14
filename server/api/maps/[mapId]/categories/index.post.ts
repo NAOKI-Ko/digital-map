@@ -14,7 +14,7 @@ export default defineEventHandler(async (event): Promise<CategoryResponse> => {
   }))._max.order ?? -1) + 1
 
   try {
-    const asset = await resolveTenantMediaAsset(session.user.tenantId, result.data.iconAssetId)
+    const asset = await resolveTenantMediaAsset(session.user.tenantId, result.data.iconAssetId, 'icon')
     const category = await prisma.category.create({
       data: {
         mapId: map.id,

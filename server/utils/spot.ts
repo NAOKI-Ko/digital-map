@@ -5,7 +5,7 @@ import { sortSpotCategories, spotCategorySelect } from './category'
 export const adminSpotInclude = {
   floor: { select: { name: true } },
   spotCategories: { select: spotCategorySelect },
-  photos: { include: { asset: true }, orderBy: { order: 'asc' as const } },
+  photos: { include: { asset: { include: { variants: true } } }, orderBy: { order: 'asc' as const } },
   fieldValues: true,
   translations: { where: { locale: 'en' as const } },
   fieldValueTranslations: { where: { locale: 'en' as const } },
@@ -21,7 +21,10 @@ export function toAdminSpotDetail(spot: SpotWithFloor) {
   const photos = Array.isArray(spot.photosJson)
     ? spot.photosJson.filter((value): value is string => typeof value === 'string')
     : []
-  const assetIdByUrl = new Map(spot.photos.map(photo => [`/uploads/${photo.asset.storageKey}`, photo.assetId]))
+  const assetIdByUrl = new Map<string, string>(spot.photos.flatMap(photo => [
+    [`/uploads/${photo.asset.storageKey}`, photo.assetId] as const,
+    ...photo.asset.variants.map(variant => [`/uploads/${variant.storageKey}`, photo.assetId] as const),
+  ]))
 
   return {
     id: spot.id,

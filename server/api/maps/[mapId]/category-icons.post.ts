@@ -2,6 +2,7 @@ import { createHash, randomUUID } from 'node:crypto'
 import { mkdir, unlink, writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import type { ImageUploadResponse } from '~~/shared/types/upload'
+import { processMediaAsset } from '~~/server/utils/media-variants'
 
 export default defineEventHandler(async (event): Promise<ImageUploadResponse> => {
   const { map, session } = await requireOwnedMap(event)
@@ -30,6 +31,7 @@ export default defineEventHandler(async (event): Promise<ImageUploadResponse> =>
         sha256: createHash('sha256').update(file.data).digest('hex'),
       },
     })
+    const processing = await processMediaAsset(prisma, asset, uploadDirectory)
     return {
       image: {
         assetId: asset.id,
@@ -39,6 +41,7 @@ export default defineEventHandler(async (event): Promise<ImageUploadResponse> =>
         size: file.data.length,
         width: dimensions.width,
         height: dimensions.height,
+        processingStatus: processing.status,
       },
     }
   }

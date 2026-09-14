@@ -13,7 +13,7 @@ export default defineEventHandler(async (event): Promise<MapFloorResponse> => {
     })
   }
 
-  const asset = await resolveTenantMediaAsset(session.user.tenantId, result.data.illustrationAssetId)
+  const asset = await resolveTenantMediaAsset(session.user.tenantId, result.data.illustrationAssetId, 'floor')
   const { illustrationAssetId: _illustrationAssetId, ...input } = result.data
   const updatedFloor = await prisma.mapFloor.update({
     where: { id: floor.id },

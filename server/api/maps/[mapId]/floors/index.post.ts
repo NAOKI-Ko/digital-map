@@ -18,7 +18,7 @@ export default defineEventHandler(async (event): Promise<MapFloorResponse> => {
     orderBy: { order: 'desc' },
     select: { order: true },
   })
-  const asset = await resolveTenantMediaAsset(session.user.tenantId, result.data.illustrationAssetId)
+  const asset = await resolveTenantMediaAsset(session.user.tenantId, result.data.illustrationAssetId, 'floor')
   const floor = await prisma.mapFloor.create({
     data: {
       mapId: map.id,

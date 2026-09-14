@@ -6,6 +6,7 @@ export interface UploadedImage {
   size: number
   width: number
   height: number
+  processingStatus?: 'READY' | 'FAILED'
 }
 
 export interface ImageUploadResponse {

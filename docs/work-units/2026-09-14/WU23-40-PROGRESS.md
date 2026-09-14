@@ -14,7 +14,8 @@
 | WU-27 | KAN-66 | `6638d40` | `38be3d2` | `20260914050000_security_rate_limits` | 4 files / 20 tests PASS | 48 files / 330 tests PASS | PASS | validate + generate PASS | not required | npm advisory API unreachable | PASS |
 | WU-28 | KAN-67 | `38be3d2` | `1b0fd3c` | none | 2 files / 9 tests PASS | 49 files / 334 tests PASS | PASS | validate PASS | PASS | Alert webhook pending; logs active | PASS |
 | WU-29 | KAN-65 | `1b0fd3c` | `c607b5d` | none | 1 file / 3 tests PASS | 50 files / 337 tests PASS | PASS | validate PASS | not required | PostgreSQL restore drill pending (tools unavailable) | PASS |
-| WU-30 | KAN-60 | `c607b5d` | this WU commit | `20260914060000_ja_en_translations` | 3 files / 20 tests PASS | 51 files / 343 tests PASS | PASS | validate + generate PASS | PASS | none | PASS |
+| WU-30 | KAN-60 | `c607b5d` | `3529701` | `20260914060000_ja_en_translations` | 3 files / 20 tests PASS | 51 files / 343 tests PASS | PASS | validate + generate PASS | PASS | none | PASS |
+| WU-31 | KAN-64 | `3529701` | this WU commit | `20260914070000_media_variants` | 3 files / 14 tests PASS | 52 files / 347 tests PASS | PASS | validate + generate PASS | phase boundary pending | none | PASS |
 
 ## WU-23 notes
 
@@ -72,3 +73,10 @@
 - Public URLs remain unchanged; `?lang=en` selects English only when enabled, and the public UI exposes a locale selector with an English browser-language suggestion that never overrides an explicit query.
 - Only text custom-field values are translatable. Phone, URL, number, and boolean values stay locale-independent.
 - CSV remains backward compatible; English-enabled Maps add stable `[en]` columns keyed by semantic key or immutable custom-field ID, while unsupported locale suffixes are rejected.
+
+## WU-31 notes
+
+- Managed originals retain verified MIME, intrinsic dimensions, size, and SHA-256. Sharp creates idempotent WebP `thumb`/`display`/`large`/`xlarge` variants only when the target does not upscale the source.
+- Transparent images use lossless WebP; photographic images use quality 82. A processing failure leaves the original valid and records only the sanitized `VARIANT_GENERATION_FAILED` state.
+- `media:backfill` fills missing variants without replacing originals. Consumers select a smallest-sufficient variant, while Floor imagery prefers xlarge/large and falls back to the original.
+- `media:gc` is dry-run by default; `--delete` is explicit, the grace period defaults to seven days, paths are basename constrained, and every live relation including pending revision media protects an asset.

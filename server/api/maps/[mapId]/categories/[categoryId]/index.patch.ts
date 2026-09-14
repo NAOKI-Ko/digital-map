@@ -10,7 +10,7 @@ export default defineEventHandler(async (event): Promise<CategoryResponse> => {
   if (!result.success) throw createError({ statusCode: 422, statusMessage: result.error.issues[0]?.message ?? '入力内容を確認してください。' })
 
   try {
-    const asset = await resolveTenantMediaAsset(session.user.tenantId, result.data.iconAssetId)
+    const asset = await resolveTenantMediaAsset(session.user.tenantId, result.data.iconAssetId, 'icon')
     const category = await prisma.category.update({
       where: { id: ownedCategory.id },
       data: {

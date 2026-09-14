@@ -5,7 +5,7 @@ import { resolveTenantMediaAsset } from '~~/server/utils/media'
 export default defineEventHandler(async (event): Promise<MapBrandingResponse> => {
   const { map, session } = await requireOwnedMap(event)
   const input = await readValidatedBody(event, mapBrandingSchema.parse)
-  const asset = await resolveTenantMediaAsset(session.user.tenantId, input.logoAssetId)
+  const asset = await resolveTenantMediaAsset(session.user.tenantId, input.logoAssetId, 'logo')
   const branding = await prisma.map.update({
     where: { id: map.id },
     data: {

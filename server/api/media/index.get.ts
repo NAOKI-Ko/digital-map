@@ -1,5 +1,6 @@
 import type { MediaAssetListResponse } from '~~/shared/types/media'
 import { summarizeMediaUsage } from '~~/server/utils/media'
+import { selectMediaVariant } from '~~/server/utils/media-variants'
 
 export default defineEventHandler(async (event): Promise<MediaAssetListResponse> => {
   const { session } = await requireTenantMediaAccess(event)
@@ -26,19 +27,24 @@ export default defineEventHandler(async (event): Promise<MediaAssetListResponse>
           tenantLogos: true,
         },
       },
+      variants: { orderBy: { width: 'asc' } },
     },
   })
 
   return {
-    assets: assets.map(asset => ({
+    assets: assets.map((asset) => {
+      const displayVariant = selectMediaVariant(asset.variants, 'spot-photo')
+      return {
       id: asset.id,
-      url: `/uploads/${asset.storageKey}`,
+      url: `/uploads/${displayVariant?.storageKey ?? asset.storageKey}`,
       originalFilename: asset.originalFilename,
       mimeType: asset.mimeType,
       width: asset.width,
       height: asset.height,
       fileSize: asset.fileSize,
       sha256: asset.sha256,
+      processingStatus: asset.processingStatus,
+      variants: asset.variants.map(variant => ({ kind: variant.kind, url: `/uploads/${variant.storageKey}`, width: variant.width, height: variant.height, fileSize: variant.fileSize })),
       createdAt: asset.createdAt.toISOString(),
       usage: summarizeMediaUsage(asset._count),
       usedInMapIds: [...new Set([
@@ -50,6 +56,7 @@ export default defineEventHandler(async (event): Promise<MediaAssetListResponse>
         ...asset.revisionPhotos.map(photo => photo.revision.spot.floor.mapId),
         ...asset.decorations.map(decoration => decoration.floor.mapId),
       ])],
-    })),
+      }
+    }),
   }
 })
