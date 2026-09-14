@@ -49,9 +49,10 @@ describe('KAN-52 route authorization contract', () => {
   })
 
   it('Spot担当者UIはSpot詳細pageと衝突しない独立routeを使う', () => {
-    const spotPage = readFileSync(join(root, 'app/pages/admin/maps/[mapId]/spots/[spotId].vue'), 'utf8')
+    const spotPage = readFileSync(join(root, 'app/pages/admin/maps/[mapId]/spots/[spotId]/index.vue'), 'utf8')
     expect(spotPage).toContain('/assignee`')
     expect(spotPage).not.toContain('/spots/${spotId}/editor`')
     expect(() => readFileSync(join(root, 'app/pages/admin/maps/[mapId]/spots/[spotId]/assignee.vue'), 'utf8')).not.toThrow()
+    expect(() => readFileSync(join(root, 'app/pages/admin/maps/[mapId]/spots/[spotId].vue'), 'utf8')).toThrow()
   })
 })

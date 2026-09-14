@@ -116,7 +116,7 @@ async function saveEnglish() {
 </script>
 
 <template>
-  <div class="max-w-4xl">
+  <div class="max-w-4xl" data-page="spot-detail">
     <NuxtLink :to="returnTo" class="text-sm font-medium text-stone-600 hover:text-stone-900">← スポット一覧に戻る</NuxtLink>
     <div v-if="status === 'pending'" class="mt-8 rounded-xl bg-white p-8 text-sm text-stone-600">読み込んでいます…</div>
     <div v-else-if="error || !data || !initialValue" class="mt-8 rounded-xl bg-red-50 p-8 text-sm text-red-700">スポットが見つかりません。</div>
