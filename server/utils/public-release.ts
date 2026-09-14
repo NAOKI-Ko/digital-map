@@ -15,7 +15,7 @@ export function currentPointerKey(slug: string) { return `public/maps/${slug}/cu
 
 function parseJson<T>(bytes: Uint8Array): T { return JSON.parse(new TextDecoder().decode(bytes)) as T }
 
-export async function rewriteReleaseAssets(value: unknown, storage: PublicObjectStorage, root: string, uploadDirectory: string, copied = new Map<string, string>()): Promise<unknown> {
+export async function rewriteReleaseAssets(value: unknown, storage: PublicObjectStorage, root: string, uploadDirectory: string, copied = new Map<string, string>(), writes = new Map<string, Promise<void>>()): Promise<unknown> {
   if (typeof value === 'string' && value.startsWith('/uploads/')) {
     const cached = copied.get(value)
     if (cached) return cached
@@ -23,13 +23,19 @@ export async function rewriteReleaseAssets(value: unknown, storage: PublicObject
     const extension = extname(value).toLowerCase()
     const hash = createHash('sha256').update(source).digest('hex')
     const filename = `${hash}${extension}`
-    await storage.put(`${root}/assets/${filename}`, source, { contentType: extension === '.webp' ? 'image/webp' : extension === '.png' ? 'image/png' : 'image/jpeg', cacheControl: immutableCacheControl })
     const publicUrl = `/api/public-assets/${root.slice('public/maps/'.length)}/assets/${filename}`
     copied.set(value, publicUrl)
+    const objectKey = `${root}/assets/${filename}`
+    let write = writes.get(objectKey)
+    if (!write) {
+      write = storage.put(objectKey, source, { contentType: extension === '.webp' ? 'image/webp' : extension === '.png' ? 'image/png' : 'image/jpeg', cacheControl: immutableCacheControl })
+      writes.set(objectKey, write)
+    }
+    await write
     return publicUrl
   }
-  if (Array.isArray(value)) return Promise.all(value.map(item => rewriteReleaseAssets(item, storage, root, uploadDirectory, copied)))
-  if (value && typeof value === 'object') return Object.fromEntries(await Promise.all(Object.entries(value).map(async ([key, child]) => [key, await rewriteReleaseAssets(child, storage, root, uploadDirectory, copied)])))
+  if (Array.isArray(value)) return Promise.all(value.map(item => rewriteReleaseAssets(item, storage, root, uploadDirectory, copied, writes)))
+  if (value && typeof value === 'object') return Object.fromEntries(await Promise.all(Object.entries(value).map(async ([key, child]) => [key, await rewriteReleaseAssets(child, storage, root, uploadDirectory, copied, writes)])))
   return value
 }
 

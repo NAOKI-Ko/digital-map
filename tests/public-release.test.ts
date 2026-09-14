@@ -1,7 +1,7 @@
 import { mkdtemp, readFile, rm, unlink, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { loadCurrentPublicSnapshot, rewriteReleaseAssets, validatePublicSnapshot } from '../server/utils/public-release'
 import { immutableCacheControl, LocalPublicStorage, pointerCacheControl } from '../server/utils/public-storage'
 
@@ -37,6 +37,16 @@ describe('CDN-first public release', () => {
     expect(copied.photos[0]).toMatch(/^\/api\/public-assets\/map\/releases\/r1\/assets\/[a-f0-9]{64}\.jpg$/)
     const objectKey = `public/maps/${copied.photos[0]!.split('/api/public-assets/')[1]}`
     expect(new TextDecoder().decode((await storage.get(objectKey))?.bytes)).toBe('immutable-photo')
+  })
+
+  it('同じassetの複数参照をrelease内で一度だけ書き込む', async () => {
+    const uploadRoot = await mkdtemp(join(tmpdir(), 'release-duplicate-upload-')); roots.push(uploadRoot)
+    await writeFile(join(uploadRoot, 'floor.png'), 'shared-floor')
+    const put = vi.fn(async () => undefined)
+    const storage = { put, get: vi.fn(async () => null) }
+    const copied = await rewriteReleaseAssets({ ja: ['/uploads/floor.png'], en: { floor: '/uploads/floor.png' } }, storage, 'public/maps/map/releases/r1', uploadRoot)
+    expect(put).toHaveBeenCalledTimes(1)
+    expect((copied as any).ja[0]).toBe((copied as any).en.floor)
   })
 
   it('private/pending/admin fieldsをsnapshot検証で拒否する', () => {
