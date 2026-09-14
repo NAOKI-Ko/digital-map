@@ -23,7 +23,8 @@
 | WU-36 | KAN-61 | `c051963` | `9542996` | none | 2 files / 21 tests PASS | 57 files / 373 tests PASS | PASS | validate PASS | PASS | none | PASS |
 | WU-37 | KAN-59 | `9542996` | `7964dfb` | none | 2 files / 14 tests PASS | 58 files / 381 tests PASS | PASS | validate PASS | PASS | none | PASS |
 | WU-38 | KAN-70 | `7964dfb` | `8632d39` | `20260914110000_self_service_onboarding` | 7 files / 33 tests PASS | 59 files / 388 tests PASS | PASS | validate + generate PASS | PASS | Live verification email pending; fake provider path PASS | PASS |
-| WU-39 | KAN-68 | `8632d39` | this WU commit | none | 7 files / 35 tests PASS | 60 files / 393 tests PASS | PASS | validate PASS | PASS | Domain/DNS/TLS activation pending | PASS |
+| WU-39 | KAN-68 | `8632d39` | `8772e06` | none | 7 files / 35 tests PASS | 60 files / 393 tests PASS | PASS | validate PASS | PASS | Domain/DNS/TLS activation pending | PASS |
+| WU-40 | KAN-58 | `8772e06` | Stage A commits pending | none | release gate PASS | 60 files / 393 tests PASS | PASS | validate + generate PASS | PASS | Windows QA + Human UAT pending | STAGE A IN PROGRESS |
 
 ## WU-23 notes
 
@@ -144,3 +145,9 @@
 - Production startup rejects non-HTTPS, localhost, credential-bearing, and `*.trycloudflare.com` base URLs. Local/QA may still explicitly use localhost or the existing QA Quick Tunnel.
 - Production requests enforce the configured public/admin host allowlist, honor forwarded host/protocol only with `TRUST_PROXY=true`, redirect external HTTP to HTTPS, retain Secure cookies, and emit HSTS only for effective HTTPS.
 - Credential-free Cloudflare named Tunnel configuration and DNS/TLS/Windows service steps are documented. No domain, DNS record, Tunnel, or credential was created, so **DOMAIN/DNS/TLS ACTIVATION PENDING**.
+
+## WU-40 Stage A notes
+
+- Disposable PostgreSQL 17 verified all 28 migrations from empty and the exact baseline's 17 migrations followed by WU-23〜WU-39. Representative Tenant/OWNER/User/Map/Floor/Spot data, normalized coordinates, and existing-user email-verification backfill were preserved.
+- Production dependency audit initially found two Critical advisories. MapLibre, Nuxt DevTools, and Nuxt were upgraded to patched releases; existing semver ranges were refreshed and mysql2 was pinned to a safe same-major release. Final audit has zero Critical/Moderate/Low and one High in Prisma config's `deepmerge-ts`; its fix requires an unsafe major override and is recorded rather than forced.
+- The complete Human UAT checklist is `docs/qa/WU23-40-HUMAN-UAT-20260914.md`. Human UAT remains pending and main has not been merged.
