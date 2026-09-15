@@ -175,17 +175,14 @@ describe('Marker DOM生成', () => {
     expect(candidateRule).toMatch(/z-index:\s*30;/)
   })
 
-  it('管理画面のcustom previewも共通content classで内部領域を広げる', () => {
-    const pinDesignShapeWidth = remValue(cssRule(pinDesignEditorSource, '.pin-design-preview'), 'width')
-    const pinDesignContentWidth = remValue(cssRule(pinDesignEditorSource, '.pin-design-preview__content'), 'width')
+  it('独立した管理画面previewを撤去し、公開確認previewは維持する', () => {
     const publishShapeWidth = remValue(cssRule(spotPublishPanelSource, '.spot-preview-pin'), 'width')
     const publishContentWidth = remValue(cssRule(spotPublishPanelSource, '.spot-preview-pin__content'), 'width')
 
-    expect(pinDesignEditorSource).toContain('class="pin-design-preview__content pin-design-preview__content--custom"')
+    expect(pinDesignEditorSource).not.toContain('pin-design-preview')
+    expect(pinDesignEditorSource).not.toContain('>プレビュー</h3>')
     expect(spotPublishPanelSource).toContain('class="spot-preview-pin__content spot-preview-pin__content--custom"')
-    expect(pinDesignContentWidth / pinDesignShapeWidth).toBeGreaterThanOrEqual(0.75)
     expect(publishContentWidth / publishShapeWidth).toBeGreaterThanOrEqual(0.75)
-    expect(cssRule(pinDesignEditorSource, '.pin-design-preview__content--custom')).toMatch(/object-fit:\s*cover;/)
     expect(cssRule(spotPublishPanelSource, '.spot-preview-pin__content--custom')).toMatch(/object-fit:\s*cover;/)
   })
 

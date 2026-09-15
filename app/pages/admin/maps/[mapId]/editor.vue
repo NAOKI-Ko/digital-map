@@ -5,6 +5,7 @@ import PinDesignEditor from '~/components/admin/PinDesignEditor.vue'
 import { defineAsyncComponent } from 'vue'
 import ConfirmDialog from '~/components/ui/ConfirmDialog.vue'
 import { resolveMapEditorReturnContext } from '~/utils/map-editor-camera'
+import { applySelectedPinDesignDraft, isPositionEditing, needsPinEditorDiscardConfirmation, toPositionUpdatePayload, type PinEditorMode } from '~/utils/pin-editor-state'
 import { isGeoReferenced, type ImagePosition } from '~~/lib/geo'
 import { getAddressPlacementCandidate } from '~~/lib/address-placement'
 import type { GeocodeResponse, GeocodeResult } from '~~/shared/types/geocode'
@@ -17,6 +18,7 @@ definePageMeta({ layout: 'admin', middleware: 'auth' })
 const LazyMapViewer = defineAsyncComponent(() => import('~/components/map/MapViewer.vue'))
 const mapViewerRef = useTemplateRef<{ focusSpot: (spotId: string) => boolean }>('mapViewer')
 const pinDesignEditorRef = useTemplateRef<{
+  isDirty: () => boolean
   reset: () => void
   save: () => Promise<SpotPinDesignResponse['design'] | null>
 }>('pinDesignEditor')
@@ -41,10 +43,12 @@ const unpositionedFloorSpots = computed(() => selectedFloorSpots.value.filter(sp
 const placementSpotId = ref(requestedPlacementSpotId)
 const placementSpot = computed(() => selectedFloorSpots.value.find(spot => spot.id === placementSpotId.value) ?? null)
 const placementSpotIsPositioned = computed(() => Boolean(placementSpot.value && hasPosition(placementSpot.value)))
-const placementMode = ref<'idle' | 'placing' | 'moving'>('idle')
-const placementActive = computed(() => placementMode.value !== 'idle')
+const placementMode = ref<PinEditorMode>('idle')
+const placementActive = computed(() => isPositionEditing(placementMode.value))
+const designEditing = computed(() => placementMode.value === 'designing')
 const candidateKind = computed(() => placementMode.value === 'moving' ? 'move' : placementMode.value === 'placing' ? 'placement' : null)
 const pendingPinDesign = ref<SpotPinDesignResponse['design'] | null>(null)
+const mapSpots = computed(() => applySelectedPinDesignDraft(positionedFloorSpots.value, placementSpotId.value, placementMode.value, pendingPinDesign.value))
 const candidateSpot = computed<MapViewerSpot | null>(() => {
   const spot = placementSpot.value
   if (!spot || !placementActive.value) return null
@@ -63,6 +67,8 @@ const positionedSearchSpotId = computed({
 })
 const moveStatus = ref('')
 const unplaceConfirmOpen = ref(false)
+const discardConfirmOpen = ref(false)
+let pendingTransition: (() => void) | null = null
 const addressCandidates = ref<GeocodeResult[]>([])
 const addressSearchStatus = ref('')
 const isSearchingAddress = ref(false)
@@ -118,35 +124,99 @@ function startMoving() {
   moveStatus.value = '移動モードです。PINをドラッグするか、地図をクリックしてください。'
 }
 
+function startDesignEditing() {
+  if (!placementSpot.value) return
+  position.value = null
+  placementMode.value = 'designing'
+  moveStatus.value = 'PINデザインの変更は、保存するまでこの地図だけに表示されます。'
+}
+
+function hasPendingChanges() {
+  return needsPinEditorDiscardConfirmation(placementMode.value, position.value, pinDesignEditorRef.value?.isDirty() ?? false)
+}
+
+function requestTransition(action: () => void) {
+  if (!hasPendingChanges()) {
+    action()
+    return
+  }
+  pendingTransition = action
+  discardConfirmOpen.value = true
+}
+
+function keepEditing() {
+  pendingTransition = null
+  discardConfirmOpen.value = false
+}
+
+function discardAndContinue() {
+  pinDesignEditorRef.value?.reset()
+  position.value = null
+  placementMode.value = 'idle'
+  discardConfirmOpen.value = false
+  const action = pendingTransition
+  pendingTransition = null
+  action?.()
+}
+
+async function finishSuccessfulSave(message: string) {
+  await refreshSpots()
+  position.value = null
+  placementMode.value = 'idle'
+  pendingPinDesign.value = null
+  placementSpotId.value = ''
+  moveStatus.value = message
+  await navigateTo({ path: route.path, query: { floorId: selectedFloorId.value } }, { replace: true })
+}
+
 async function savePosition() {
   if (!placementSpot.value || !position.value) return
-  moveStatus.value = 'PINデザインと位置を保存しています…'
+  moveStatus.value = '位置を保存しています…'
   try {
-    const savedDesign = await pinDesignEditorRef.value?.save()
-    if (!savedDesign) {
-      moveStatus.value = 'PINデザインを保存できないため、位置は保存していません。入力内容を確認してください。'
-      return
-    }
-    pendingPinDesign.value = savedDesign
     await $fetch<SpotPositionResponse>(`/api/maps/${mapId}/spots/${placementSpot.value.id}/position`, {
       method: 'PATCH',
-      body: position.value,
+      body: toPositionUpdatePayload(position.value),
     })
-    await refreshSpots()
-    position.value = null
-    placementMode.value = 'idle'
-    moveStatus.value = 'スポットの位置を保存しました。'
+    await finishSuccessfulSave('スポットの位置を保存しました。')
   }
   catch {
     moveStatus.value = '位置を保存できませんでした。'
   }
 }
 
+async function saveDesign() {
+  if (!placementSpot.value || !designEditing.value) return
+  moveStatus.value = 'PINデザインを保存しています…'
+  const savedDesign = await pinDesignEditorRef.value?.save()
+  if (!savedDesign) {
+    moveStatus.value = 'PINデザインを保存できませんでした。入力内容を保持しています。'
+    return
+  }
+  pendingPinDesign.value = savedDesign
+  await finishSuccessfulSave('PINデザインを保存しました。')
+}
+
 function cancelPositionEditing() {
-  pinDesignEditorRef.value?.reset()
   position.value = null
   placementMode.value = 'idle'
   moveStatus.value = '位置の変更をキャンセルしました。保存済みの位置は変更していません。'
+}
+
+function cancelDesignEditing() {
+  pinDesignEditorRef.value?.reset()
+  pendingPinDesign.value = placementSpot.value
+    ? {
+        pinIconType: placementSpot.value.pinIconType,
+        pinIconId: placementSpot.value.pinIconId,
+        pinIconImageUrl: placementSpot.value.pinIconImageUrl,
+        pinIconAssetId: placementSpot.value.pinIconAssetId,
+        pinColor: placementSpot.value.pinColor,
+        pinSize: placementSpot.value.pinSize,
+        importance: placementSpot.value.importance,
+      }
+    : null
+  placementMode.value = 'idle'
+  moveStatus.value = 'PINデザインの変更をキャンセルしました。保存済みのデザインへ戻しました。'
 }
 
 async function unplaceSpot() {
@@ -155,11 +225,8 @@ async function unplaceSpot() {
   moveStatus.value = 'PIN配置を解除しています…'
   try {
     await $fetch<SpotPositionResponse>(`/api/maps/${mapId}/spots/${spot.id}/position`, { method: 'DELETE' })
-    await refreshSpots()
-    position.value = null
-    placementMode.value = 'idle'
     unplaceConfirmOpen.value = false
-    moveStatus.value = 'PIN配置を解除しました。公開中だった場合は下書きへ戻しました。'
+    await finishSuccessfulSave('PIN配置を解除しました。公開中だった場合は下書きへ戻しました。')
   }
   catch {
     moveStatus.value = 'PIN配置を解除できませんでした。'
@@ -216,17 +283,40 @@ function updateCandidateFromDrag(value: { spotId: string, x: number, y: number }
 }
 
 function selectExistingSpot(spot: { id: string }) {
-  placementSpotId.value = spot.id
-  position.value = null
-  placementMode.value = 'idle'
-  moveStatus.value = ''
+  if (spot.id === placementSpotId.value) return
+  requestTransition(() => {
+    placementSpotId.value = spot.id
+    position.value = null
+    placementMode.value = 'idle'
+    moveStatus.value = ''
+  })
 }
 
 function selectPositionedSpot(spotId: string) {
   const spot = positionedFloorSpots.value.find(item => item.id === spotId)
   if (!spot) return
-  selectExistingSpot(spot)
-  nextTick(() => mapViewerRef.value?.focusSpot(spotId))
+  requestTransition(() => {
+    placementSpotId.value = spot.id
+    position.value = null
+    placementMode.value = 'idle'
+    moveStatus.value = ''
+    nextTick(() => mapViewerRef.value?.focusSpot(spotId))
+  })
+}
+
+function selectUnpositionedSpot(spotId: string) {
+  if (!spotId) return
+  requestTransition(() => {
+    placementSpotId.value = spotId
+    position.value = null
+    placementMode.value = 'idle'
+    moveStatus.value = ''
+  })
+}
+
+function selectFloor(floorId: string) {
+  if (floorId === selectedFloorId.value) return
+  requestTransition(() => { selectedFloorId.value = floorId })
 }
 
 function handlePinDesignChanged(design: SpotPinDesignResponse['design']) {
@@ -243,7 +333,9 @@ function updatePinDesign(design: SpotPinDesignResponse['design']) {
 }
 
 function handleEscape(event: KeyboardEvent) {
-  if (event.key === 'Escape' && placementActive.value) cancelPositionEditing()
+  if (event.key !== 'Escape' || unplaceConfirmOpen.value || discardConfirmOpen.value) return
+  if (placementActive.value) requestTransition(cancelPositionEditing)
+  else if (designEditing.value) requestTransition(cancelDesignEditing)
 }
 
 onMounted(() => window.addEventListener('keydown', handleEscape))
@@ -254,90 +346,95 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEscape))
   <div class="max-w-7xl">
     <AdminSubnavigation :map-id="mapId" area="map-edit" />
     <NuxtLink :to="`/admin/maps/${mapId}/spots`" class="text-sm font-medium text-stone-600 hover:text-stone-900">← スポット一覧に戻る</NuxtLink>
-    <header class="mt-5 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-      <div>
-        <h1 class="mt-1 text-2xl font-bold tracking-tight text-stone-900 sm:text-2xl">PIN配置</h1>
-        <p class="mt-1 text-sm text-stone-600">フロアイラスト上でPINを選択・配置し、右側のInspectorで編集します。</p>
-      </div>
-      <div class="w-full lg:max-w-sm">
-        <SpotCombobox
-          v-model="positionedSearchSpotId"
-          :spots="positionedFloorSpots"
-          label="配置済みSpotを検索"
-          input-id="positioned-spot-search"
-          placeholder="Spot名・カテゴリー・フロアで検索"
-          empty-message="該当する配置済みSpotはありません。"
-        />
-      </div>
+    <header class="mt-5">
+      <h1 class="mt-1 text-2xl font-bold tracking-tight text-stone-900 sm:text-2xl">PIN配置</h1>
+      <p class="mt-1 text-sm text-stone-600">フロアイラスト上でPINを選択し、位置とデザインを分けて編集します。</p>
     </header>
 
     <div v-if="status === 'pending'" class="mt-8 rounded-xl bg-white p-8 text-sm text-stone-600">読み込んでいます…</div>
     <div v-else-if="error" class="mt-8 rounded-xl bg-red-50 p-8 text-sm text-red-700">フロアを読み込めませんでした。</div>
     <div v-else-if="!data?.floors.length" class="mt-8 rounded-xl bg-amber-50 p-8 text-sm text-amber-800">先にフロアを1件以上登録してください。</div>
     <template v-else-if="selectedFloor">
-      <div class="mt-6 flex flex-wrap gap-2" role="tablist" aria-label="編集フロア">
-        <button v-for="floor in data.floors" :key="floor.id" type="button" role="tab" :aria-selected="floor.id === selectedFloorId" class="rounded-full px-4 py-2 text-sm font-semibold" :class="floor.id === selectedFloorId ? 'bg-stone-900 text-white' : 'bg-white text-stone-700 shadow-sm'" @click="selectedFloorId = floor.id">{{ floor.name }}</button>
-      </div>
-
-      <div class="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1fr)_24rem]">
-        <ClientOnly>
-          <LazyMapViewer
-            ref="mapViewer"
-            v-model="position"
-            :floor="selectedFloor"
-            :spots="positionedFloorSpots"
-            mode="edit"
-            :selected-spot-id="placementSpotId || null"
-            :candidate-spot="candidateSpot"
-            :candidate-kind="candidateKind"
-            :placement-enabled="placementActive"
-            label="ピン配置地図"
-            :initial-camera="initialCamera"
-            @camera-changed="handleCameraChanged"
-            @spot-moved="updateCandidateFromDrag"
-            @spot-selected="selectExistingSpot"
-          />
-          <template #fallback><div class="h-[38rem] animate-pulse rounded-xl bg-stone-100" /></template>
-        </ClientOnly>
+      <div class="mt-6 grid items-start gap-5 lg:grid-cols-2">
+        <section class="min-w-0" aria-label="地図操作">
+          <div class="mb-3 flex flex-col gap-3 sm:flex-row sm:items-end">
+            <div class="min-w-0 flex-1">
+              <SpotCombobox
+                v-model="positionedSearchSpotId"
+                :spots="positionedFloorSpots"
+                label="配置済みSpotを検索"
+                input-id="positioned-spot-search"
+                placeholder="Spot名・カテゴリー・フロアで検索"
+                empty-message="該当する配置済みSpotはありません。"
+              />
+            </div>
+            <div class="shrink-0">
+              <p class="mb-1.5 text-xs font-semibold text-stone-600">フロア選択</p>
+              <div class="flex flex-wrap gap-2" role="tablist" aria-label="編集フロア">
+                <button v-for="floor in data.floors" :key="floor.id" type="button" role="tab" :aria-selected="floor.id === selectedFloorId" class="min-h-10 rounded-full px-3 py-2 text-sm font-semibold" :class="floor.id === selectedFloorId ? 'bg-stone-900 text-white' : 'bg-white text-stone-700 shadow-sm'" @click="selectFloor(floor.id)">{{ floor.name }}</button>
+              </div>
+            </div>
+          </div>
+          <ClientOnly>
+            <LazyMapViewer
+              ref="mapViewer"
+              v-model="position"
+              :floor="selectedFloor"
+              :spots="mapSpots"
+              mode="edit"
+              :selected-spot-id="placementSpotId || null"
+              :candidate-spot="candidateSpot"
+              :candidate-kind="candidateKind"
+              :placement-enabled="placementActive"
+              label="ピン配置地図"
+              :initial-camera="initialCamera"
+              @camera-changed="handleCameraChanged"
+              @spot-moved="updateCandidateFromDrag"
+              @spot-selected="selectExistingSpot"
+            />
+            <template #fallback><div class="h-[38rem] animate-pulse rounded-xl bg-stone-100" /></template>
+          </ClientOnly>
+        </section>
         <aside class="self-start rounded-xl border border-stone-200 bg-white p-5 shadow-sm xl:max-h-[calc(100vh-8rem)] xl:overflow-y-auto">
           <SaveFeedback v-if="route.query.saved === 'spot-created'" class="mt-3" state="success" message="スポットを登録しました。" />
-          <SpotCombobox v-model="placementSpotId" :spots="unpositionedFloorSpots" />
-          <button v-if="placementSpot && !placementSpotIsPositioned && placementMode === 'idle'" type="button" class="mt-3 w-full rounded-lg bg-terracotta-600 px-4 py-2.5 text-sm font-semibold text-white" @click="startPlacement">ピンを配置</button>
+          <SpotCombobox v-if="placementMode === 'idle'" :model-value="placementSpotIsPositioned ? '' : placementSpotId" :spots="unpositionedFloorSpots" @update:model-value="selectUnpositionedSpot" />
 
           <section class="mt-6 border-t border-stone-200 pt-5" aria-live="polite">
-            <h2 class="text-sm font-bold text-stone-900">選択中のスポット</h2>
+            <h2 class="text-sm font-bold text-stone-900">{{ designEditing ? 'PINデザインを編集' : placementActive ? 'PIN位置を編集' : '選択中のスポット' }}</h2>
             <p v-if="!placementSpot" class="mt-3 text-sm text-stone-600">地図上のPINを選択してください。</p>
             <template v-else>
               <h3 class="mt-3 text-lg font-bold text-stone-900">{{ placementSpot.name }}</h3>
               <p class="mt-1 text-xs text-stone-500">{{ placementSpot.floorName }}<span v-if="placementSpot.categories.length"> / {{ placementSpot.categories.map(category => category.name).join('・') }}</span></p>
-              <div class="mt-3 flex flex-wrap gap-2 text-xs font-semibold">
+              <div v-if="placementMode === 'idle'" class="mt-3 flex flex-wrap gap-2 text-xs font-semibold">
                 <span class="rounded-full bg-stone-100 px-2.5 py-1 text-stone-700">{{ placementSpotIsPositioned ? '配置済み' : '未配置' }}</span>
                 <span class="rounded-full px-2.5 py-1" :class="placementSpot.isPublished ? 'bg-emerald-100 text-emerald-800' : 'bg-stone-100 text-stone-600'">{{ placementSpot.isPublished ? '公開中' : '下書き' }}</span>
                 <span class="rounded-full bg-stone-100 px-2.5 py-1 text-stone-700">サイズ: {{ ({ small: '小', medium: '中', large: '大' })[placementSpot.pinSize] }}</span>
                 <span class="rounded-full bg-stone-100 px-2.5 py-1 text-stone-700">{{ placementSpot.importance === 'featured' ? '注目PIN' : '通常PIN' }}</span>
               </div>
-              <NuxtLink :to="`/admin/maps/${mapId}/spots/${placementSpot.id}`" class="mt-3 inline-flex text-sm font-semibold text-terracotta-700">スポット詳細を開く</NuxtLink>
-              <div v-if="placementSpotIsPositioned && placementMode === 'idle'" class="mt-4 grid grid-cols-2 gap-2">
-                <button type="button" class="rounded-lg bg-stone-900 px-4 py-2.5 text-sm font-semibold text-white" @click="startMoving">移動</button>
-                <button type="button" class="rounded-lg border border-red-200 px-4 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-50" @click="unplaceConfirmOpen = true">配置を解除</button>
-              </div>
-
-              <details open class="mt-5 border-t border-stone-200 pt-4">
-                <summary class="cursor-pointer text-sm font-bold text-stone-900">PINデザイン</summary>
-                <div class="mt-4">
-                  <PinDesignEditor
-                    ref="pinDesignEditor"
-                    :key="placementSpot.id"
-                    :map-id="mapId"
-                    :spot-id="placementSpot.id"
-                    :initial-value="placementSpot"
-                    compact
-                    :show-save="false"
-                    @changed="handlePinDesignChanged"
-                    @updated="updatePinDesign"
-                  />
+              <template v-if="placementMode === 'idle'">
+                <NuxtLink :to="`/admin/maps/${mapId}/spots/${placementSpot.id}`" class="mt-3 inline-flex text-sm font-semibold text-terracotta-700">スポット詳細を開く</NuxtLink>
+                <div class="mt-4 grid gap-2 sm:grid-cols-2">
+                  <button type="button" class="rounded-lg bg-stone-900 px-4 py-2.5 text-sm font-semibold text-white" @click="placementSpotIsPositioned ? startMoving() : startPlacement()">{{ placementSpotIsPositioned ? '位置を移動' : '位置を設定' }}</button>
+                  <button type="button" class="rounded-lg border border-stone-300 px-4 py-2.5 text-sm font-semibold text-stone-800 hover:bg-stone-50" @click="startDesignEditing">デザインを編集</button>
+                  <button v-if="placementSpotIsPositioned" type="button" class="rounded-lg border border-red-200 px-4 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-50 sm:col-span-2" @click="unplaceConfirmOpen = true">配置を解除</button>
                 </div>
-              </details>
+              </template>
+
+              <div v-else-if="designEditing" class="mt-5 border-t border-stone-200 pt-4">
+                <PinDesignEditor
+                  ref="pinDesignEditor"
+                  :key="placementSpot.id"
+                  :map-id="mapId"
+                  :spot-id="placementSpot.id"
+                  :initial-value="placementSpot"
+                  compact
+                  :show-save="false"
+                  @changed="handlePinDesignChanged"
+                  @updated="updatePinDesign"
+                />
+                <button type="button" class="mt-6 w-full rounded-lg bg-terracotta-600 px-4 py-2.5 text-sm font-semibold text-white" @click="saveDesign">デザインを保存</button>
+                <button type="button" class="mt-2 w-full rounded-lg border border-stone-300 px-4 py-2 text-sm font-semibold text-stone-700" @click="requestTransition(cancelDesignEditing)">キャンセル</button>
+              </div>
             </template>
           </section>
 
@@ -354,14 +451,15 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEscape))
           <div v-if="placementActive" class="mt-4 rounded-lg border border-terracotta-200 bg-terracotta-50 p-3 text-sm font-semibold text-terracotta-900">
             {{ placementMode === 'moving' ? (position ? '移動先を確認し、保存してください。' : '元のPINは薄く表示されています。地図をクリックして移動先を仮配置してください。') : (position ? '仮配置を確認し、保存してください。' : '地図をクリックして仮配置してください。') }}
           </div>
-          <button v-if="placementActive" type="button" :disabled="!position" class="mt-4 w-full rounded-lg bg-terracotta-600 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50" @click="savePosition">PINデザインと位置を保存</button>
+          <button v-if="placementActive" type="button" :disabled="!position" class="mt-4 w-full rounded-lg bg-terracotta-600 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50" @click="savePosition">この位置を保存</button>
           <div v-if="placementActive" class="mt-2 grid gap-2">
-            <button type="button" class="rounded-lg border border-stone-300 px-4 py-2 text-sm font-semibold text-stone-700" @click="cancelPositionEditing">キャンセル</button>
+            <button type="button" class="rounded-lg border border-stone-300 px-4 py-2 text-sm font-semibold text-stone-700" @click="requestTransition(cancelPositionEditing)">キャンセル</button>
           </div>
           <p v-if="moveStatus" role="status" class="mt-4 text-xs leading-5 text-stone-600">{{ moveStatus }}</p>
         </aside>
       </div>
       <ConfirmDialog :open="unplaceConfirmOpen" title="PIN配置を解除" message="Spot情報とカテゴリーは残したまま、イラスト上の配置を解除します。公開中の場合は下書きへ戻ります。" confirm-label="配置を解除する" destructive @cancel="unplaceConfirmOpen = false" @confirm="unplaceSpot" />
+      <ConfirmDialog :open="discardConfirmOpen" title="未保存の変更があります" message="保存していない位置またはPINデザインの変更を破棄して切り替えますか？" confirm-label="変更を破棄" cancel-label="編集を続ける" destructive @cancel="keepEditing" @confirm="discardAndContinue" />
     </template>
   </div>
 </template>

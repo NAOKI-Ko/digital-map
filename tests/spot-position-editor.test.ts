@@ -19,7 +19,8 @@ describe('PIN管理workspace', () => {
     )
     expect(candidateFunction).toContain('position.value = { x: value.x, y: value.y }')
     expect(candidateFunction).not.toContain('$fetch')
-    expect(editorSource).toContain('PINデザインと位置を保存')
+    expect(editorSource).toContain('この位置を保存')
+    expect(candidateFunction).not.toContain('/design')
   })
 
   it('キャンセルはcandidateを破棄し、APIを書かない', () => {
@@ -29,7 +30,6 @@ describe('PIN管理workspace', () => {
     )
     expect(cancelFunction).toContain("placementMode.value = 'idle'")
     expect(cancelFunction).toContain('position.value = null')
-    expect(cancelFunction).toContain('pinDesignEditorRef.value?.reset()')
     expect(cancelFunction).not.toContain('$fetch')
   })
 
@@ -41,7 +41,8 @@ describe('PIN管理workspace', () => {
   it('既存PINを地図から直接選択し、旧一覧とraw座標を表示しない', () => {
     expect(editorSource).toContain('@spot-selected="selectExistingSpot"')
     expect(editorSource).toContain('選択中のスポット')
-    expect(editorSource).toContain('>移動</button>')
+    expect(editorSource).toContain("'位置を移動' : '位置を設定'")
+    expect(editorSource).toContain('>デザインを編集</button>')
     expect(editorSource).toContain('>配置を解除</button>')
     expect(editorSource).not.toContain('<h2 class="font-bold text-stone-900">既存スポット</h2>')
     expect(editorSource).not.toContain('toFixed(4)')
@@ -51,7 +52,7 @@ describe('PIN管理workspace', () => {
   it('未配置Spotだけを検索Comboboxから明示配置modeへ入れる', () => {
     expect(editorSource).toContain('unpositionedFloorSpots')
     expect(editorSource).toContain('<SpotCombobox')
-    expect(editorSource).toContain('ピンを配置')
+    expect(editorSource).toContain('位置を設定')
     expect(editorSource).toContain(':placement-enabled="placementActive"')
   })
 
@@ -60,6 +61,7 @@ describe('PIN管理workspace', () => {
     expect(editorSource).toContain('PINデザイン')
     expect(editorSource).toContain(':show-save="false"')
     expect(editorSource).toContain('@changed="handlePinDesignChanged"')
+    expect(editorSource).not.toContain('<details')
   })
 
   it('配置済みSpot検索はfocusだけを行い移動modeへ入らない', () => {

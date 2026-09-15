@@ -59,6 +59,13 @@ describe('application dialog accessibility contract', () => {
     expect(uiAlertDialog).toContain('AlertDialogAction')
     expect(uiAlertDialog).toContain(':class="destructive')
   })
+
+  it('does not emit cancel after an explicit alert-dialog action', () => {
+    expect(uiAlertDialog).toContain('@click.capture="markCloseHandled"')
+    expect(uiAlertDialog).toContain("!closeHandledByButton) emit('cancel')")
+    expect(uiAlertDialog).toContain('@click="emitConfirmAction"')
+    expect(uiAlertDialog).toContain('@click="emitCancelAction"')
+  })
 })
 
 describe('category rename dialog contract', () => {

@@ -17,7 +17,6 @@ import {
 } from '~~/shared/constants/spot'
 import { pinDesignSchema, type PinDesignInput } from '~~/shared/schemas/pin-design'
 import type { SpotPinDesignResponse } from '~~/shared/types/spot'
-import { getPinColorVariants } from '~~/shared/utils/pin-style'
 
 const props = withDefaults(defineProps<{
   mapId: string
@@ -51,10 +50,10 @@ const successMessage = ref('')
 const normalizedInitialValue = computed(() => ({ ...props.initialValue, pinIconId: normalizePinIconId(props.initialValue.pinIconId), importance: props.initialValue.importance ?? 'normal' }))
 const isDirty = computed(() => JSON.stringify(design) !== JSON.stringify(normalizedInitialValue.value))
 const colorPresets = ['#C7401F', '#2563EB', '#047857', '#7C3AED', '#D97706', '#292524']
-const pinTypeOptions: Array<{ value: PinIconType, label: string, description: string }> = [
-  { value: 'preset', label: 'プリセット', description: '用意された記号をピンの中に表示' },
-  { value: 'custom', label: 'カスタムアイコン', description: 'ロゴや写真をピンの中に表示' },
-  { value: 'illustration', label: 'イラスト直置き', description: '画像を台座なしで地図へ配置' },
+const pinTypeOptions: Array<{ value: PinIconType, label: string }> = [
+  { value: 'preset', label: 'プリセット' },
+  { value: 'custom', label: 'カスタム' },
+  { value: 'illustration', label: 'イラスト' },
 ]
 const selectedPreset = computed(() => getPinIconPreset(design.pinIconId))
 const materialPresetGroups = computed(() => {
@@ -76,14 +75,6 @@ const lastMaterialIconId = ref<MaterialSymbolPresetId>(
 const usesUploadedImage = computed(() => design.pinIconType === 'custom' || design.pinIconType === 'illustration')
 const uploadHeading = computed(() => design.pinIconType === 'illustration' ? '直置きイラスト' : 'カスタム画像')
 const uploadLabel = computed(() => design.pinIconType === 'illustration' ? '直置きイラスト画像' : 'カスタムピン画像')
-const previewStyle = computed(() => {
-  const colors = getPinColorVariants(design.pinColor)
-  return {
-    '--pin-color': colors.base,
-    '--pin-color-light': colors.light,
-    '--pin-color-dark': colors.dark,
-  }
-})
 
 watch(() => props.initialValue, (value) => {
   Object.assign(design, value, { pinIconId: normalizePinIconId(value.pinIconId), importance: value.importance ?? 'normal' })
@@ -145,12 +136,12 @@ function reset() {
   successMessage.value = ''
 }
 
-defineExpose({ reset, save })
+defineExpose({ isDirty: () => isDirty.value, reset, save })
 </script>
 
 <template>
   <div>
-    <div class="grid gap-8" :class="compact ? 'grid-cols-1' : 'lg:grid-cols-[1fr_15rem]'">
+    <div>
       <div>
         <h2 class="text-lg font-bold text-stone-900">ピンデザイン</h2>
 
@@ -160,12 +151,11 @@ defineExpose({ reset, save })
             <label
               v-for="option in pinTypeOptions"
               :key="option.value"
-              class="cursor-pointer rounded-xl border p-4 transition"
+              class="flex min-h-12 cursor-pointer items-center justify-center rounded-xl border px-3 py-2.5 text-center transition"
               :class="design.pinIconType === option.value ? 'border-terracotta-500 bg-terracotta-50 ring-2 ring-terracotta-100' : 'border-stone-200 hover:border-stone-400'"
             >
               <input v-model="design.pinIconType" type="radio" name="pin-icon-type" :value="option.value" class="sr-only">
               <span class="block text-sm font-bold text-stone-900">{{ option.label }}</span>
-              <span class="mt-1 block text-xs leading-5 text-stone-500">{{ option.description }}</span>
             </label>
           </div>
         </fieldset>
@@ -194,18 +184,16 @@ defineExpose({ reset, save })
           </div>
 
           <div v-if="selectedIconFamily === 'kanji'" class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <button v-for="preset in pinIconPresets" :key="preset.id" type="button" class="rounded-xl border p-3 text-center transition" :class="design.pinIconId === preset.id ? 'border-terracotta-500 bg-terracotta-50 ring-2 ring-terracotta-100' : 'border-stone-200 hover:border-stone-400'" @click="design.pinIconId = preset.id">
-              <span class="mx-auto grid h-10 w-10 place-items-center rounded-full text-sm font-bold text-white" :style="{ backgroundColor: design.pinColor }">{{ preset.symbol }}</span>
-              <span class="mt-2 block text-xs font-semibold text-stone-700">{{ preset.label }}</span>
+            <button v-for="preset in pinIconPresets" :key="preset.id" type="button" :aria-label="preset.label" :aria-pressed="design.pinIconId === preset.id" class="grid min-h-12 place-items-center rounded-xl border p-2 text-center transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-900" :class="design.pinIconId === preset.id ? 'border-terracotta-500 bg-terracotta-50 ring-2 ring-terracotta-100' : 'border-stone-200 hover:border-stone-400'" @click="design.pinIconId = preset.id">
+              <span class="grid h-8 w-8 place-items-center rounded-full text-xs font-bold text-white" :style="{ backgroundColor: design.pinColor }" aria-hidden="true">{{ preset.symbol }}</span>
             </button>
           </div>
           <div v-else class="mt-3 space-y-5">
             <section v-for="[group, presets] in materialPresetGroups" :key="group">
               <h4 class="text-xs font-bold text-stone-500">{{ group }}</h4>
               <div class="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4">
-                <button v-for="preset in presets" :key="preset.id" type="button" class="rounded-xl border p-3 text-center transition" :class="design.pinIconId === preset.id ? 'border-terracotta-500 bg-terracotta-50 ring-2 ring-terracotta-100' : 'border-stone-200 hover:border-stone-400'" @click="design.pinIconId = preset.id">
-                  <span class="material-symbols-outlined mx-auto grid h-10 w-10 place-items-center rounded-full text-lg text-white" :style="{ backgroundColor: design.pinColor }" aria-hidden="true">{{ preset.name }}</span>
-                  <span class="mt-2 block text-xs font-semibold text-stone-700">{{ preset.label }}</span>
+                <button v-for="preset in presets" :key="preset.id" type="button" :aria-label="preset.label" :aria-pressed="design.pinIconId === preset.id" class="grid min-h-12 place-items-center rounded-xl border p-2 text-center transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-900" :class="design.pinIconId === preset.id ? 'border-terracotta-500 bg-terracotta-50 ring-2 ring-terracotta-100' : 'border-stone-200 hover:border-stone-400'" @click="design.pinIconId = preset.id">
+                  <span class="material-symbols-outlined grid h-8 w-8 place-items-center rounded-full text-base text-white" :style="{ backgroundColor: design.pinColor }" aria-hidden="true">{{ preset.name }}</span>
                 </button>
               </div>
             </section>
@@ -247,30 +235,6 @@ defineExpose({ reset, save })
         </div>
       </div>
 
-      <aside class="rounded-xl bg-stone-100 p-5 text-center">
-        <h3 class="text-sm font-semibold text-stone-700">プレビュー</h3>
-        <div class="mt-6 flex min-h-20 items-center justify-center">
-          <div v-if="design.pinIconType === 'illustration' && design.pinIconImageUrl" class="pin-design-marker pin-design-marker--illustration">
-            <span class="pin-design-preview-shadow" aria-hidden="true" />
-            <img :src="design.pinIconImageUrl" alt="直置きイラストのプレビュー" class="pin-design-illustration-preview">
-          </div>
-          <div v-else-if="design.pinIconType === 'illustration'" class="grid h-16 min-w-28 place-items-center rounded-lg border border-dashed border-stone-300 bg-white px-3 text-xs text-stone-400">
-            画像未設定
-          </div>
-          <div v-else class="pin-design-marker">
-            <span class="pin-design-preview-shadow" aria-hidden="true" />
-            <div class="pin-design-preview" :style="previewStyle">
-              <img v-if="design.pinIconType === 'custom' && design.pinIconImageUrl" :src="design.pinIconImageUrl" alt="カスタムピンのプレビュー" class="pin-design-preview__content pin-design-preview__content--custom">
-              <span
-                v-else
-                class="pin-design-preview__content"
-                :class="selectedPreset.family === 'material' ? 'material-symbols-outlined pin-design-preview__content--material' : 'pin-design-preview__content--kanji'"
-              >{{ selectedPreset.symbol }}</span>
-            </div>
-          </div>
-        </div>
-        <p class="mt-5 text-xs text-stone-500">地図上では常に正面を向いて表示されます。</p>
-      </aside>
     </div>
 
     <p v-if="errorMessage" role="alert" class="mt-5 text-sm text-red-600">{{ errorMessage }}</p>
@@ -279,96 +243,3 @@ defineExpose({ reset, save })
   </div>
   <UnsavedChangesGuard :dirty="isDirty && !isSaving" />
 </template>
-
-<style>
-.pin-design-marker {
-  position: relative;
-  display: inline-flex;
-  min-width: 4rem;
-  height: 4.75rem;
-  align-items: flex-start;
-  justify-content: center;
-}
-
-.pin-design-marker--illustration {
-  width: max-content;
-  min-width: 3rem;
-  height: 4rem;
-}
-
-.pin-design-preview-shadow {
-  position: absolute;
-  bottom: 0.1rem;
-  left: 50%;
-  width: 2.25rem;
-  height: 0.625rem;
-  border-radius: 50%;
-  background: rgb(37 48 58 / 28%);
-  filter: blur(2px);
-  transform: translateX(-50%);
-}
-
-.pin-design-preview {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  width: 4rem;
-  height: 4rem;
-  place-items: center;
-  border: 4px solid white;
-  border-radius: 9999px 9999px 9999px 0;
-  background-color: var(--pin-color);
-  background-image: radial-gradient(circle at 32% 28%, var(--pin-color-light), var(--pin-color) 55%, var(--pin-color-dark));
-  box-shadow:
-    0 7px 12px rgb(37 48 58 / 35%),
-    inset -3px -3px 6px rgb(0 0 0 / 25%),
-    inset 2px 2px 4px rgb(255 255 255 / 35%);
-  color: white;
-  font-size: 1.25rem;
-  font-weight: 800;
-  transform: rotate(-45deg);
-}
-
-.pin-design-preview > * {
-  transform: rotate(45deg);
-}
-
-.pin-design-preview__content {
-  display: grid;
-  width: 3rem;
-  height: 3rem;
-  place-items: center;
-  border-radius: 9999px;
-  background: white;
-  color: #292524;
-  line-height: 1;
-}
-
-.pin-design-preview__content--kanji {
-  font-size: 1.5rem;
-  font-weight: 800;
-}
-
-.pin-design-preview__content--material {
-  font-size: 1.75rem;
-  font-style: normal;
-  font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 20;
-  font-weight: 400;
-}
-
-.pin-design-preview__content--custom {
-  object-fit: cover;
-  object-position: center;
-}
-
-.pin-design-illustration-preview {
-  position: relative;
-  z-index: 1;
-  display: block;
-  width: auto;
-  height: 3rem;
-  max-width: 10rem;
-  object-fit: contain;
-  filter: drop-shadow(0 5px 5px rgb(37 48 58 / 32%));
-}
-</style>
