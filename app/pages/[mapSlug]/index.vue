@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { defineAsyncComponent } from 'vue'
 import CategoryFilter from '~/components/map/CategoryFilter.vue'
-import FloorTabs from '~/components/map/FloorTabs.vue'
 import MapOperationHint from '~/components/map/MapOperationHint.vue'
+import PublicFloorSelector from '~/components/map/PublicFloorSelector.vue'
+import PublicMapInfo from '~/components/map/PublicMapInfo.vue'
 import SpotDetailCard from '~/components/map/SpotDetailCard.vue'
-import SpotAccessibleList from '~/components/map/SpotAccessibleList.vue'
 import { collectSpotCategories, filterSpotsByCategoryIds } from '~/utils/category-filter'
+import { createFloorSwitchState, shouldShowFloorSelector } from '~/utils/public-map-ui'
 import type { MapViewerSpot } from '~~/shared/types/map-viewer'
 import type { PublicMapResponse } from '~~/shared/types/public-map'
 import { messages, normalizeLocale } from '~~/shared/i18n/messages'
@@ -25,6 +26,8 @@ const { data, error, status } = await useFetch<PublicMapResponse>(
 const selectedFloorId = ref('')
 const selectedSpotId = ref<string | null>(null)
 const selectedCategoryIds = ref<string[]>([])
+const floorSelectorOpen = ref(false)
+const infoOpen = ref(false)
 let spotTrigger: HTMLElement | null = null
 let spotTriggerId: string | null = null
 
@@ -40,6 +43,7 @@ const categories = computed(() => (
   collectSpotCategories(selectedFloor.value?.spots ?? [])
 ))
 const visibleSpots = computed(() => filterSpotsByCategoryIds(selectedFloor.value?.spots ?? [], selectedCategoryIds.value))
+const showFloorSelector = computed(() => shouldShowFloorSelector(data.value?.map.floors.length ?? 0))
 const publicBaseUrl = useRuntimeConfig().public.publicBaseUrl as string
 const localeUrl = (locale: 'ja' | 'en') => buildPublicLocaleUrl(publicBaseUrl, mapSlug.value, locale)
 const absoluteImage = computed(() => data.value?.map.seo.imageUrl ? new URL(data.value.map.seo.imageUrl, publicBaseUrl).toString() : undefined)
@@ -104,6 +108,15 @@ function closeSpot() {
   }))
 }
 
+function selectFloor(floorId: string) {
+  floorSelectorOpen.value = false
+  const state = createFloorSwitchState(selectedFloorId.value, floorId)
+  if (!state) return
+  selectedSpotId.value = state.selectedSpotId
+  selectedCategoryIds.value = state.selectedCategoryIds
+  selectedFloorId.value = state.floorId
+}
+
 async function switchLocale(locale: 'ja' | 'en') {
   await navigateTo({ path: route.path, query: locale === 'en' ? { ...route.query, lang: 'en' } : Object.fromEntries(Object.entries(route.query).filter(([key]) => key !== 'lang')) })
 }
@@ -132,33 +145,33 @@ onMounted(() => {
       </section>
     </div>
     <template v-else-if="selectedFloor">
-      <header class="flex h-16 items-center justify-between gap-3 border-b border-stone-200 bg-white px-4 sm:px-6">
+      <header class="hidden h-14 items-center justify-between gap-3 border-b border-white/60 bg-white/75 px-6 backdrop-blur sm:flex">
         <div class="flex min-w-0 items-center gap-3">
           <img v-if="data.map.logoUrl" :src="data.map.logoUrl" :alt="`${data.map.organizationName ?? data.map.name}のロゴ`" class="size-10 shrink-0 rounded-lg object-contain">
           <div class="min-w-0">
             <p class="truncate text-xs font-semibold tracking-widest text-terracotta-700">{{ data.map.organizationName ?? 'DIGITAL MAP' }}</p>
-            <h1 class="mt-0.5 truncate text-lg font-bold tracking-tight sm:text-xl">{{ data.map.name }}</h1>
+            <h1 class="mt-0.5 truncate text-lg font-bold tracking-tight">{{ data.map.name }}</h1>
           </div>
         </div>
-        <nav aria-label="団体リンク" class="flex shrink-0 items-center gap-1 sm:gap-2">
-          <NuxtLink to="/terms" class="text-xs text-stone-600 underline">規約</NuxtLink>
-          <NuxtLink to="/privacy" class="text-xs text-stone-600 underline">Privacy</NuxtLink>
+        <nav aria-label="公開マップ操作" class="flex shrink-0 items-center gap-2">
           <label v-if="data.map.enabledLocales.includes('en')" class="sr-only" for="public-locale">{{ t.language }}</label>
           <select v-if="data.map.enabledLocales.includes('en')" id="public-locale" :value="data.map.locale" class="rounded-full border border-stone-200 px-2.5 py-1.5 text-xs" @change="switchLocale(($event.target as HTMLSelectElement).value as 'ja' | 'en')"><option value="ja">日本語</option><option value="en">English</option></select>
-          <a v-if="data.map.websiteUrl" :href="data.map.websiteUrl" target="_blank" rel="noopener noreferrer" class="rounded-full border border-stone-200 px-2.5 py-1.5 text-xs font-semibold text-stone-700 hover:bg-stone-50 sm:px-3">{{ t.official }}</a>
-          <a v-if="data.map.snsUrl" :href="data.map.snsUrl" target="_blank" rel="noopener noreferrer" class="rounded-full border border-stone-200 px-2.5 py-1.5 text-xs font-semibold text-stone-700 hover:bg-stone-50 sm:px-3">SNS</a>
+          <button type="button" class="grid size-11 place-items-center rounded-full border border-stone-200 bg-white/80 text-sm font-bold" aria-label="マップ情報を開く" @click="infoOpen = true">i</button>
         </nav>
       </header>
 
-      <section class="relative min-h-0">
-        <SpotAccessibleList :spots="visibleSpots" :selected-spot-id="selectedSpotId" @select="selectSpot" />
-        <div class="pointer-events-none absolute left-3 right-[3.75rem] top-3 z-20 sm:left-5 sm:right-20">
-          <div class="pointer-events-auto">
-            <FloorTabs
-              v-model="selectedFloorId"
-              :floors="data.map.floors"
-            />
-          </div>
+      <section class="relative h-[100svh] min-h-0 sm:h-[calc(100svh-3.5rem)]">
+        <div v-if="showFloorSelector" class="absolute left-3 top-3 z-20 sm:left-5 sm:top-5">
+          <button type="button" class="flex min-h-11 items-center gap-2 rounded-full border border-white/70 bg-white/80 px-4 text-sm font-bold shadow-sm backdrop-blur" aria-haspopup="dialog" :aria-expanded="floorSelectorOpen" @click="floorSelectorOpen = true">
+            {{ selectedFloor.name }} <span aria-hidden="true">⌄</span>
+          </button>
+        </div>
+
+        <div class="absolute right-3 top-3 z-20 flex items-center gap-2 sm:hidden">
+          <label v-if="data.map.enabledLocales.includes('en')" class="sr-only" for="public-locale-mobile">{{ t.language }}</label>
+          <select v-if="data.map.enabledLocales.includes('en')" id="public-locale-mobile" :value="data.map.locale" class="min-h-11 rounded-full border border-white/70 bg-white/80 px-3 text-xs font-bold shadow-sm backdrop-blur" @change="switchLocale(($event.target as HTMLSelectElement).value as 'ja' | 'en')"><option value="ja">JA</option><option value="en">EN</option></select>
+          <span v-else class="grid size-11 place-items-center rounded-full border border-white/70 bg-white/80 text-xs font-bold shadow-sm backdrop-blur" aria-label="言語: 日本語">JA</span>
+          <button type="button" class="grid size-11 place-items-center rounded-full border border-white/70 bg-white/80 text-sm font-bold shadow-sm backdrop-blur" aria-label="マップ情報を開く" @click="infoOpen = true">i</button>
         </div>
 
         <div
@@ -172,18 +185,19 @@ onMounted(() => {
 
         <ClientOnly>
           <LazyMapViewer
+            class="h-full"
             :floor="selectedFloor"
             :spots="visibleSpots"
             :decorations="selectedFloor.decorations"
             mode="view"
             :selected-spot-id="selectedSpotId"
             :prioritize-visible-spots="selectedCategoryIds.length > 0"
-            height="calc(100svh - 4rem)"
+            height="100%"
             :label="`${data.map.name} ${selectedFloor.name}`"
             @spot-selected="selectSpot"
           />
           <template #fallback>
-            <div class="h-[calc(100svh-4rem)] animate-pulse bg-stone-200" />
+            <div class="h-full animate-pulse bg-stone-200" />
           </template>
         </ClientOnly>
 
@@ -197,6 +211,8 @@ onMounted(() => {
         :spot="selectedSpot"
         @close="closeSpot"
       />
+      <PublicFloorSelector v-if="floorSelectorOpen" :floors="data.map.floors" :model-value="selectedFloorId" @select="selectFloor" @close="floorSelectorOpen = false" />
+      <PublicMapInfo v-if="infoOpen" :map-name="data.map.name" :organization-name="data.map.organizationName" :logo-url="data.map.logoUrl" :website-url="data.map.websiteUrl" :sns-url="data.map.snsUrl" :official-label="t.official" @close="infoOpen = false" />
     </template>
   </main>
 </template>

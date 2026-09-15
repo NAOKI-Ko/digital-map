@@ -121,20 +121,20 @@ describe('画像ソースとPIN座標の描画方式', () => {
 })
 
 describe('フロアごとのズーム制約', () => {
-  it('フィット後のズームから縮小2.5・拡大6の範囲を作る', () => {
-    expect(createFloorZoomConstraints(17)).toEqual({ minZoom: 14.5, maxZoom: 23 })
-    expect(ZOOM_OUT_ALLOWANCE).toBe(2.5)
+  it('フィット後のズームを最小値とし、それ以上のzoom-outを禁止する', () => {
+    expect(createFloorZoomConstraints(17)).toEqual({ minZoom: 17, maxZoom: 23 })
+    expect(ZOOM_OUT_ALLOWANCE).toBe(0)
     expect(ZOOM_IN_ALLOWANCE).toBe(6)
   })
 
   it('MapLibreに設定可能な絶対範囲を越えない', () => {
     expect(createFloorZoomConstraints(-10)).toEqual({ minZoom: 0, maxZoom: 6 })
-    expect(createFloorZoomConstraints(30)).toEqual({ minZoom: 21.5, maxZoom: 24 })
+    expect(createFloorZoomConstraints(30)).toEqual({ minZoom: 24, maxZoom: 24 })
     expect(ABSOLUTE_ZOOM_LIMITS).toEqual({ minZoom: 0, maxZoom: 24 })
   })
 
   it('非有限値は安全な初期ズームとして扱う', () => {
-    expect(createFloorZoomConstraints(Number.NaN)).toEqual({ minZoom: 0, maxZoom: 7 })
+    expect(createFloorZoomConstraints(Number.NaN)).toEqual({ minZoom: 1, maxZoom: 7 })
   })
 })
 

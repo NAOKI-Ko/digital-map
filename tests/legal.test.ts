@@ -30,8 +30,8 @@ describe('Terms / Privacy publication', () => {
   })
 
   it('公開Mapとloginから両ページへ到達できる', () => {
-    for (const file of ['../app/pages/[mapSlug]/index.vue', '../app/pages/admin/login.vue']) {
-      const source = readFileSync(new URL(file, import.meta.url), 'utf8')
+    for (const files of [['../app/pages/[mapSlug]/index.vue', '../app/components/map/PublicMapInfo.vue'], ['../app/pages/admin/login.vue']]) {
+      const source = files.map(file => readFileSync(new URL(file, import.meta.url), 'utf8')).join('\n')
       expect(source).toContain('to="/terms"')
       expect(source).toContain('to="/privacy"')
     }

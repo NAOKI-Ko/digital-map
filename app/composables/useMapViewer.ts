@@ -33,7 +33,7 @@ export const ABSOLUTE_ZOOM_LIMITS = {
   minZoom: 0,
   maxZoom: 24,
 } as const
-export const ZOOM_OUT_ALLOWANCE = 2.5
+export const ZOOM_OUT_ALLOWANCE = 0
 export const ZOOM_IN_ALLOWANCE = 6
 export const GEOLOCATION_OUTSIDE_MESSAGE = '現在地はこのマップのエリアから離れているようです'
 export const GEOLOCATE_CONTROL_OPTIONS = {
@@ -188,21 +188,29 @@ function createControlButton(label: string, text: string, action: () => void) {
 export class MapNavigationControl implements IControl {
   private map: MapLibreMap | null = null
   private container: HTMLElement | null = null
+  private updateCompass: (() => void) | null = null
 
   onAdd(map: MapLibreMap) {
     this.map = map
     const container = document.createElement('div')
     container.className = 'map-viewer-navigation-control'
+    const compass = createControlButton('方位をリセット', 'N', () => this.map?.easeTo({ bearing: 0, pitch: 0 }))
+    compass.className = 'map-viewer-compass'
+    this.updateCompass = () => { compass.hidden = Math.abs(map.getBearing()) < 1 }
     container.append(
       createControlButton('拡大', '+', () => this.map?.zoomIn()),
       createControlButton('縮小', '−', () => this.map?.zoomOut()),
-      createControlButton('方位をリセット', 'N', () => this.map?.easeTo({ bearing: 0, pitch: 0 })),
+      compass,
     )
+    map.on('rotate', this.updateCompass)
+    this.updateCompass()
     this.container = container
     return container
   }
 
-  onRemove(_map: MapLibreMap) {
+  onRemove(map: MapLibreMap) {
+    if (this.updateCompass) map.off('rotate', this.updateCompass)
+    this.updateCompass = null
     this.container?.remove()
     this.container = null
     this.map = null
@@ -253,7 +261,11 @@ export function useMapViewer(
   let containerResizeObserver: ResizeObserver | null = null
 
   function resize() {
-    map.value?.resize()
+    const instance = map.value
+    if (!instance) return
+    instance.resize()
+    const corners = getFloorCorners(options.floor.value)
+    if (corners && isReady.value) updateFloorZoomConstraints(corners)
   }
 
   async function initialize() {
@@ -419,6 +431,17 @@ export function useMapViewer(
     syncMarkerDensity()
   }
 
+  function syncSpotMarkerSelection() {
+    const selectedId = options.selectedSpotId.value
+    const selectedIsPositioned = options.spots.value.some(spot => spot.id === selectedId)
+    spotMarkerElements.forEach(({ element, spot }) => {
+      const selected = spot.id === selectedId
+      element.classList.toggle('map-viewer-marker--selected', selected)
+      element.classList.toggle('map-viewer-marker--dimmed', selectedIsPositioned && !selected)
+    })
+    syncMarkerDensity()
+  }
+
   function syncMarkerDensity() {
     const instance = map.value
     if (!instance) return
@@ -530,27 +553,42 @@ export function useMapViewer(
     })
   }
 
-  function fitFloorBounds(corners: FloorCorners, animate: boolean) {
+  function getFloorCamera(corners: FloorCorners) {
     const instance = map.value
-    if (!instance) return
+    if (!instance) return null
 
     const bounds = getGeoReferenceBounds(corners)
     // 前のフロアの相対制約がカメラ計算へ影響しないよう、毎回いったん解除する。
     instance.setMinZoom(ABSOLUTE_ZOOM_LIMITS.minZoom)
     instance.setMaxZoom(ABSOLUTE_ZOOM_LIMITS.maxZoom)
     const camera = instance.cameraForBounds([bounds.southwest, bounds.northeast], {
-      padding: 64,
+      padding: container.value && container.value.clientWidth < 640 ? 24 : 48,
       maxZoom: 20,
     })
-    if (!camera) return
+    return camera
+  }
+
+  function updateFloorZoomConstraints(corners: FloorCorners) {
+    const instance = map.value
+    if (!instance) return null
+    const camera = getFloorCamera(corners)
+    if (!camera) return null
 
     const targetZoom = camera.zoom ?? instance.getZoom()
     const zoomConstraints = createFloorZoomConstraints(targetZoom)
     instance.setMinZoom(zoomConstraints.minZoom)
     instance.setMaxZoom(zoomConstraints.maxZoom)
+    return { camera, targetZoom }
+  }
+
+  function fitFloorBounds(corners: FloorCorners, animate: boolean) {
+    const instance = map.value
+    if (!instance) return
+    const result = updateFloorZoomConstraints(corners)
+    if (!result) return
     instance.easeTo({
-      center: camera.center,
-      zoom: targetZoom,
+      center: result.camera.center,
+      zoom: result.targetZoom,
       bearing: instance.getBearing(),
       pitch: instance.getPitch(),
       duration: animate ? 700 : 0,
@@ -609,7 +647,9 @@ export function useMapViewer(
   watch(() => options.spots.value, syncSpotMarkers, { deep: true })
   watch(() => options.decorations.value, syncDecorations, { deep: true })
   watch(() => options.position.value, syncDraftMarker, { deep: true })
-  watch(() => options.selectedSpotId.value, syncSpotMarkers)
+  // Recreating markers during their click handler can retarget the same click to an
+  // overlapping marker. Selection is presentation-only, so keep marker DOM stable.
+  watch(() => options.selectedSpotId.value, syncSpotMarkerSelection)
   if (options.candidateSpot) watch(() => options.candidateSpot?.value, () => syncDraftMarker(options.position.value), { deep: true })
   if (options.candidateKind) watch(() => options.candidateKind?.value, () => {
     syncSpotMarkers()

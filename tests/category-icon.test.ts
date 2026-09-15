@@ -65,7 +65,7 @@ describe('Category icon domain and public UI', () => {
     const spotForm = readFileSync(new URL('../app/components/admin/SpotForm.vue', import.meta.url), 'utf8')
     const filter = readFileSync(new URL('../app/components/map/CategoryFilter.vue', import.meta.url), 'utf8')
     expect(spotForm).toContain('<CategoryIcon')
-    expect(filter.match(/<CategoryIcon/g)).toHaveLength(3)
+    expect(filter.match(/<CategoryIcon/g)).toHaveLength(1)
     expect(filter).toContain(':aria-pressed="modelValue.includes(category.id)"')
   })
 })

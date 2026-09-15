@@ -68,7 +68,7 @@ const viewer = useMapViewer(container, {
   onSpotMoved: value => emit('spotMoved', value),
   onSpotSelected: spot => emit('spotSelected', spot),
 })
-const { floorError, geolocationAreaMessage, mapError } = viewer
+const { floorError, geolocationAreaMessage, isReady, mapError } = viewer
 
 defineExpose({
   focusSpot: viewer.focusSpot,
@@ -78,16 +78,17 @@ defineExpose({
 
 <template>
   <div>
-    <div class="relative overflow-hidden rounded-xl border border-stone-300 bg-stone-100">
+    <div class="relative overflow-hidden rounded-xl border border-stone-300 bg-stone-100" :aria-busy="!isReady">
       <div
         ref="container"
-        class="w-full"
-        :class="mode === 'edit' && placementEnabled ? 'cursor-crosshair' : 'cursor-grab'"
+        class="w-full transition-opacity duration-150"
+        :class="[mode === 'edit' && placementEnabled ? 'cursor-crosshair' : 'cursor-grab', isReady ? 'opacity-100' : 'opacity-0']"
         :style="{ height }"
         :aria-label="label"
         role="region"
         tabindex="0"
       />
+      <div v-if="!isReady && !mapError" class="pointer-events-none absolute inset-0 animate-pulse bg-stone-200" aria-hidden="true" />
       <div
         v-if="mode === 'edit' && placementEnabled"
         class="pointer-events-none absolute left-3 top-3 rounded-lg bg-white/95 px-4 py-3 text-sm font-semibold text-stone-800 shadow"
@@ -105,7 +106,7 @@ defineExpose({
       <p
         v-if="geolocationAreaMessage"
         role="status"
-        class="pointer-events-none absolute inset-x-4 top-4 mx-auto max-w-md rounded-lg bg-amber-50/95 px-4 py-3 text-center text-sm font-semibold text-amber-900 shadow"
+        class="pointer-events-none absolute left-1/2 top-16 max-w-[calc(100%-6rem)] -translate-x-1/2 rounded-full bg-amber-50/95 px-3 py-2 text-center text-xs font-semibold text-amber-900 shadow"
       >
         {{ geolocationAreaMessage }}
       </p>
@@ -296,7 +297,7 @@ defineExpose({
 
 .map-viewer-control-group {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.375rem;
   margin: 0.75rem 0.75rem 0 0;
 }
 
@@ -308,8 +309,10 @@ defineExpose({
   display: flex;
   overflow: hidden;
   border-radius: 0.75rem;
-  background: white;
-  box-shadow: 0 1px 4px rgb(0 0 0 / 30%);
+  border: 1px solid rgb(255 255 255 / 70%);
+  background: rgb(255 255 255 / 78%);
+  box-shadow: 0 2px 8px rgb(28 25 23 / 16%);
+  backdrop-filter: blur(8px);
 }
 
 .map-viewer-navigation-control button,
@@ -324,11 +327,32 @@ defineExpose({
   border-left: 1px solid #e7e5e4;
 }
 
+.map-viewer-navigation-control button[hidden] {
+  display: none;
+}
+
 .map-viewer-navigation-control button:focus-visible,
 .map-viewer-control-group .maplibregl-ctrl-geolocate:focus-visible {
   position: relative;
   z-index: 1;
   outline: 2px solid #1c1917;
   outline-offset: -2px;
+}
+
+@media (max-width: 639px) {
+  .map-viewer-control-group,
+  .map-viewer-navigation-control {
+    flex-direction: column;
+  }
+
+  .map-viewer-control-group {
+    gap: 0.375rem;
+    margin-top: 4.25rem;
+  }
+
+  .map-viewer-navigation-control button + button {
+    border-left: 0;
+    border-top: 1px solid #e7e5e4;
+  }
 }
 </style>
