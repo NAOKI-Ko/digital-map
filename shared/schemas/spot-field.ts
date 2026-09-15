@@ -27,6 +27,13 @@ export const spotFieldUpdateSchema = z.object({
     message: '無効な項目を公開にはできません。',
   })
 
+export const spotFieldReorderSchema = z.object({
+  orderedIds: z.array(z.string().min(1)).min(1),
+}).refine(value => new Set(value.orderedIds).size === value.orderedIds.length, {
+  path: ['orderedIds'],
+  message: '項目IDが重複しています。',
+})
+
 export const customSpotValuesSchema = z.record(z.string(), z.union([
   z.string(),
   z.number().finite(),

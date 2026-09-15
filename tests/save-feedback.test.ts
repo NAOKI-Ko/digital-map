@@ -39,6 +39,7 @@ describe('save feedback standard', () => {
     expect(spotEdit).toContain(':is-submitting="isSubmitting"')
     expect(floors).toContain(':disabled="isCreating"')
     expect(categories).toContain(':disabled="isSaving"')
-    expect(fields).toContain(':disabled="saveState === \'saving\'"')
+    expect(fields).toContain("const isBusy = computed(() => saveState.value === 'saving')")
+    expect(fields).toContain(':disabled="isBusy || !isDirty"')
   })
 })

@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { customSpotFieldTypes, defaultSpotFieldDefinitions } from '../shared/constants/spot-fields'
-import { customSpotFieldCreateSchema, spotFieldUpdateSchema, validateCustomFieldValue } from '../shared/schemas/spot-field'
+import { customSpotFieldCreateSchema, spotFieldReorderSchema, spotFieldUpdateSchema, validateCustomFieldValue } from '../shared/schemas/spot-field'
 
 const updateSource = readFileSync(new URL('../server/api/maps/[mapId]/spot-fields/[fieldId].patch.ts', import.meta.url), 'utf8')
 const deleteSource = readFileSync(new URL('../server/api/maps/[mapId]/spot-fields/[fieldId].delete.ts', import.meta.url), 'utf8')
@@ -23,6 +23,12 @@ describe('Spot Field Definition', () => {
 
   it('disabledかつpublicVisibleを拒否する', () => {
     expect(spotFieldUpdateSchema.safeParse({ enabled: false, publicVisible: true }).success).toBe(false)
+  })
+
+  it('並べ替えは空配列と重複IDを拒否する', () => {
+    expect(spotFieldReorderSchema.safeParse({ orderedIds: [] }).success).toBe(false)
+    expect(spotFieldReorderSchema.safeParse({ orderedIds: ['field-a', 'field-a'] }).success).toBe(false)
+    expect(spotFieldReorderSchema.safeParse({ orderedIds: ['field-b', 'field-a'] }).success).toBe(true)
   })
 
   it('custom value typeを検証する', () => {
