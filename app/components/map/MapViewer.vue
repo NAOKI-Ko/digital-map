@@ -10,7 +10,8 @@ const props = withDefaults(defineProps<{
   mode?: MapViewerMode
   modelValue?: ImagePosition | null
   selectedSpotId?: string | null
-  draggableSpotId?: string | null
+  candidateSpot?: MapViewerSpot | null
+  candidateKind?: 'placement' | 'move' | null
   placementEnabled?: boolean
   height?: string
   label?: string
@@ -23,7 +24,8 @@ const props = withDefaults(defineProps<{
   mode: 'view',
   modelValue: null,
   selectedSpotId: null,
-  draggableSpotId: null,
+  candidateSpot: null,
+  candidateKind: null,
   placementEnabled: false,
   height: '38rem',
   label: 'デジタルマップ',
@@ -45,16 +47,18 @@ const spots = toRef(props, 'spots')
 const decorations = toRef(props, 'decorations')
 const position = toRef(props, 'modelValue')
 const selectedSpotId = toRef(props, 'selectedSpotId')
-const draggableSpotId = toRef(props, 'draggableSpotId')
+const candidateSpot = toRef(props, 'candidateSpot')
+const candidateKind = toRef(props, 'candidateKind')
 const placementEnabled = toRef(props, 'placementEnabled')
 const prioritizeVisibleSpots = toRef(props, 'prioritizeVisibleSpots')
-const { floorError, geolocationAreaMessage, mapError } = useMapViewer(container, {
+const viewer = useMapViewer(container, {
   floor,
   spots,
   decorations,
   position,
   selectedSpotId,
-  draggableSpotId,
+  candidateSpot,
+  candidateKind,
   placementEnabled,
   prioritizeVisibleSpots,
   mode: props.mode,
@@ -63,6 +67,12 @@ const { floorError, geolocationAreaMessage, mapError } = useMapViewer(container,
   onPositionChanged: value => emit('update:modelValue', value),
   onSpotMoved: value => emit('spotMoved', value),
   onSpotSelected: spot => emit('spotSelected', spot),
+})
+const { floorError, geolocationAreaMessage, mapError } = viewer
+
+defineExpose({
+  focusSpot: viewer.focusSpot,
+  resize: viewer.resize,
 })
 </script>
 
@@ -119,6 +129,43 @@ const { floorError, geolocationAreaMessage, mapError } = useMapViewer(container,
   cursor: pointer;
   padding: 0;
   transition: opacity 120ms linear;
+}
+
+.map-viewer-marker--dimmed {
+  opacity: 0.36;
+}
+
+.map-viewer-marker--strongly-dimmed {
+  opacity: 0.24;
+}
+
+.map-viewer-marker--ghost {
+  opacity: 0.42;
+  pointer-events: none;
+}
+
+.maplibregl-marker.map-viewer-marker--candidate {
+  z-index: 30;
+  opacity: 1;
+  cursor: grab;
+}
+
+.map-viewer-marker__candidate-badge {
+  position: absolute;
+  top: -0.35rem;
+  left: 50%;
+  z-index: 3;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  border: 2px solid white;
+  border-radius: 9999px;
+  background: #1c1917;
+  padding: 0.15rem 0.5rem;
+  color: white;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  line-height: 1.2;
+  box-shadow: 0 2px 5px rgb(28 25 23 / 35%);
 }
 
 .map-viewer-marker--illustration {
@@ -219,6 +266,7 @@ const { floorError, geolocationAreaMessage, mapError } = useMapViewer(container,
 }
 
 .map-viewer-marker--selected .map-viewer-marker__shape,
+.map-viewer-marker--candidate .map-viewer-marker__shape,
 .map-viewer-marker:focus-visible .map-viewer-marker__shape {
   box-shadow:
     0 0 0 4px rgb(255 255 255 / 80%),
@@ -229,47 +277,12 @@ const { floorError, geolocationAreaMessage, mapError } = useMapViewer(container,
 }
 
 .map-viewer-marker--selected .map-viewer-marker__illustration,
+.map-viewer-marker--candidate .map-viewer-marker__illustration,
 .map-viewer-marker:focus-visible .map-viewer-marker__illustration {
   filter:
     drop-shadow(0 0 3px rgb(255 255 255 / 95%))
     drop-shadow(0 6px 6px rgb(37 48 58 / 42%));
   scale: calc(var(--marker-size-scale, 1) * 1.12);
-}
-
-.maplibregl-marker.map-viewer-draft-marker {
-  position: absolute;
-  z-index: 20;
-  display: flex;
-  width: 5.5rem;
-  height: 4.75rem;
-  align-items: flex-end;
-  justify-content: center;
-  filter: drop-shadow(0 4px 5px rgb(37 48 58 / 30%));
-}
-
-.map-viewer-draft-marker__badge {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  z-index: 2;
-  transform: translateX(-50%);
-  white-space: nowrap;
-  border-radius: 9999px;
-  background: #1c1917;
-  padding: 0.2rem 0.55rem;
-  color: white;
-  font-size: 0.6875rem;
-  font-weight: 700;
-}
-
-.map-viewer-draft-marker__pin {
-  width: 2.75rem;
-  height: 2.75rem;
-  border: 4px solid white;
-  border-radius: 9999px 9999px 9999px 0;
-  background: #c7401f;
-  box-shadow: 0 0 0 4px rgb(28 25 23 / 72%);
-  transform: rotate(-45deg);
 }
 
 .map-viewer-current-location-marker {

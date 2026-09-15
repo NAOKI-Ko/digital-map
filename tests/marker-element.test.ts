@@ -136,6 +136,25 @@ describe('Marker DOM生成', () => {
     expect(draggable.attributes.get('aria-label')).toBe('テストスポットをドラッグして位置調整')
   })
 
+  it('移動候補は実PINデザインを維持し、候補badgeと専用labelを持つ', () => {
+    const candidate = createSpotMarkerElement(baseSpot, { mode: 'edit', selected: true, draggable: true, candidate: 'move' }, fakeDocument as unknown as Pick<Document, 'createElement'>) as unknown as FakeElement
+
+    expect(candidate.classList.contains('map-viewer-marker--candidate')).toBe(true)
+    expect(candidate.classList.contains('map-viewer-marker--move-candidate')).toBe(true)
+    expect(candidate.attributes.get('aria-label')).toBe('テストスポットの移動先PINをドラッグして位置調整')
+    expect(candidate.children[0]).toMatchObject({ className: 'map-viewer-marker__candidate-badge', textContent: '移動先' })
+    expect(candidate.children[2]?.className).toBe('map-viewer-marker__shape')
+  })
+
+  it('元位置ghostと非選択PINに視覚状態を付与する', () => {
+    const ghost = createSpotMarkerElement(baseSpot, { mode: 'edit', selected: true, ghost: true }, fakeDocument as unknown as Pick<Document, 'createElement'>) as unknown as FakeElement
+    const dimmed = createSpotMarkerElement(baseSpot, { mode: 'edit', selected: false, stronglyDimmed: true }, fakeDocument as unknown as Pick<Document, 'createElement'>) as unknown as FakeElement
+
+    expect(ghost.classList.contains('map-viewer-marker--ghost')).toBe(true)
+    expect(ghost.attributes.get('aria-label')).toBe('テストスポットの元の位置')
+    expect(dimmed.classList.contains('map-viewer-marker--strongly-dimmed')).toBe(true)
+  })
+
   it('presetとcustomは外形を広げず内部contentが本体幅の75%以上を使う', () => {
     const shapeRule = cssRule(mapViewerSource, '.map-viewer-marker__shape')
     const contentRule = cssRule(mapViewerSource, '.map-viewer-marker__content')
@@ -148,13 +167,12 @@ describe('Marker DOM生成', () => {
     expect(contentRule).toMatch(/object-position:\s*center;/)
   })
 
-  it('既存PINと仮PINをMapLibreの絶対配置から外さず、仮PINを最前面に保つ', () => {
+  it('既存PINと候補PINをMapLibreの絶対配置から外さず、候補PINを最前面に保つ', () => {
     const markerRule = cssRule(mapViewerSource, '.maplibregl-marker.map-viewer-marker')
-    const draftRule = cssRule(mapViewerSource, '.maplibregl-marker.map-viewer-draft-marker')
+    const candidateRule = cssRule(mapViewerSource, '.maplibregl-marker.map-viewer-marker--candidate')
 
     expect(markerRule).toMatch(/position:\s*absolute;/)
-    expect(draftRule).toMatch(/position:\s*absolute;/)
-    expect(draftRule).toMatch(/z-index:\s*20;/)
+    expect(candidateRule).toMatch(/z-index:\s*30;/)
   })
 
   it('管理画面のcustom previewも共通content classで内部領域を広げる', () => {

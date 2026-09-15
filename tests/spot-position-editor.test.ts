@@ -19,7 +19,7 @@ describe('PIN管理workspace', () => {
     )
     expect(candidateFunction).toContain('position.value = { x: value.x, y: value.y }')
     expect(candidateFunction).not.toContain('$fetch')
-    expect(editorSource).toContain('この位置を保存')
+    expect(editorSource).toContain('PINデザインと位置を保存')
   })
 
   it('キャンセルはcandidateを破棄し、APIを書かない', () => {
@@ -56,6 +56,29 @@ describe('PIN管理workspace', () => {
 
   it('PIN design controlsをeditorへ集約する', () => {
     expect(editorSource).toContain('<PinDesignEditor')
-    expect(editorSource).toContain('PINデザインを編集')
+    expect(editorSource).toContain('PINデザイン')
+    expect(editorSource).toContain(':show-save="false"')
+    expect(editorSource).toContain('@changed="handlePinDesignChanged"')
+  })
+
+  it('配置済みSpot検索はfocusだけを行い移動modeへ入らない', () => {
+    expect(editorSource).toContain('label="配置済みSpotを検索"')
+    expect(editorSource).toContain('mapViewerRef.value?.focusSpot(spotId)')
+    const selectionFunction = editorSource.slice(
+      editorSource.indexOf('function selectPositionedSpot'),
+      editorSource.indexOf('function handlePinDesignChanged'),
+    )
+    expect(selectionFunction).not.toContain('startMoving')
+  })
+
+  it('PIN workspaceにジオリファレンスCTAや実地図導線を出さない', () => {
+    expect(editorSource).not.toContain('ジオリファレンスを設定')
+    expect(editorSource).not.toContain('geoReferenceEditorPath')
+  })
+
+  it('移動元ghostと実デザイン候補をMapViewerへ渡す', () => {
+    expect(editorSource).toContain(':candidate-spot="candidateSpot"')
+    expect(editorSource).toContain(':candidate-kind="candidateKind"')
+    expect(editorSource).toContain("placementMode.value === 'moving' ? 'move'")
   })
 })

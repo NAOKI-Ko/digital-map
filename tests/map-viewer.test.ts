@@ -2,8 +2,8 @@ import { describe, expect, it, vi } from 'vitest'
 import {
   ABSOLUTE_ZOOM_LIMITS,
   addMarkerAtPosition,
-  createDraftMarkerOptions,
   createFloorZoomConstraints,
+  createMapViewerStyle,
   createMapViewerOptions,
   createSpotMarkerOptions,
   constrainImagePlacementCandidate,
@@ -54,6 +54,12 @@ const geoReferencedFloor: MapViewerFloor = {
 }
 
 describe('MapViewerのカメラ制約', () => {
+  it('PIN編集workspaceは実地図sourceを持たずイラスト専用背景にする', () => {
+    const style = createMapViewerStyle('edit')
+    expect(style.sources).toEqual({})
+    expect(JSON.stringify(style)).not.toContain('openstreetmap')
+  })
+
   it('閲覧モードへdesign.md 4.2のpitch/bearing制約を渡す', () => {
     const options = createMapViewerOptions('map', 'view')
 
@@ -248,12 +254,6 @@ describe('Markerの表示内容', () => {
     expect(createSpotMarkerOptions({} as HTMLElement, 'edit', true).draggable).toBe(true)
   })
 
-  it('仮Markerもzoom時に投影座標を整数pixelへ丸めない', () => {
-    expect(createDraftMarkerOptions()).toEqual({
-      anchor: 'bottom',
-      subpixelPositioning: true,
-    })
-  })
 })
 
 describe('IMAGE placement interaction', () => {

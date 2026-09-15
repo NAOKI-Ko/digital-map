@@ -19,9 +19,11 @@ import { pinDesignSchema, type PinDesignInput } from '~~/shared/schemas/pin-desi
 import type { SpotPinDesignResponse } from '~~/shared/types/spot'
 import { getPinColorVariants } from '~~/shared/utils/pin-style'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   mapId: string
   spotId: string
+  compact?: boolean
+  showSave?: boolean
   initialValue: {
     pinIconType: PinIconType
     pinIconId: string | null
@@ -31,10 +33,11 @@ const props = defineProps<{
     pinSize: PinSize
     importance?: 'normal' | 'featured'
   }
-}>()
+}>(), { compact: false, showSave: true })
 
 const emit = defineEmits<{
   updated: [design: SpotPinDesignResponse['design']]
+  changed: [design: SpotPinDesignResponse['design']]
 }>()
 
 const design = reactive<PinDesignInput>({
@@ -92,6 +95,8 @@ watch(() => design.pinIconId, (pinIconId) => {
   else lastKanjiIconId.value = preset.id
 })
 
+watch(design, value => emit('changed', { ...value, importance: value.importance ?? 'normal' }), { deep: true })
+
 function selectIconFamily(family: PinIconFamily) {
   design.pinIconId = family === 'material'
     ? lastMaterialIconId.value
@@ -105,11 +110,11 @@ function useCustomImage(image: UploadedImage) {
   errorMessage.value = ''
 }
 
-async function save() {
+async function save(): Promise<SpotPinDesignResponse['design'] | null> {
   const result = pinDesignSchema.safeParse(design)
   if (!result.success) {
     errorMessage.value = result.error.issues[0]?.message ?? 'ピンデザインを確認してください。'
-    return
+    return null
   }
 
   isSaving.value = true
@@ -123,19 +128,23 @@ async function save() {
     Object.assign(design, response.design)
     emit('updated', response.design)
     successMessage.value = 'ピンデザインを保存しました。'
+    return response.design
   }
   catch {
     errorMessage.value = 'ピンデザインを保存できませんでした。もう一度お試しください。'
+    return null
   }
   finally {
     isSaving.value = false
   }
 }
+
+defineExpose({ save })
 </script>
 
 <template>
   <div>
-    <div class="grid gap-8 lg:grid-cols-[1fr_15rem]">
+    <div class="grid gap-8" :class="compact ? 'grid-cols-1' : 'lg:grid-cols-[1fr_15rem]'">
       <div>
         <h2 class="text-lg font-bold text-stone-900">ピンデザイン</h2>
 
@@ -260,7 +269,7 @@ async function save() {
 
     <p v-if="errorMessage" role="alert" class="mt-5 text-sm text-red-600">{{ errorMessage }}</p>
     <p v-if="successMessage" role="status" class="mt-5 text-sm text-emerald-700">{{ successMessage }}</p>
-    <div class="mt-6 flex justify-end"><button type="button" :disabled="isSaving" class="rounded-lg bg-terracotta-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60" @click="save">{{ isSaving ? '保存中…' : 'ピンデザインを保存' }}</button></div>
+    <div v-if="showSave" class="mt-6 flex justify-end"><button type="button" :disabled="isSaving" class="rounded-lg bg-terracotta-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60" @click="save">{{ isSaving ? '保存中…' : 'ピンデザインを保存' }}</button></div>
   </div>
   <UnsavedChangesGuard :dirty="isDirty && !isSaving" />
 </template>

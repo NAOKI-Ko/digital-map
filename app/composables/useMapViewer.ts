@@ -3,7 +3,7 @@ import type { GeolocateControl, GeolocatePositionEvent, IControl, Map as MapLibr
 import { getFloorCorners, getGeoReferenceBounds, imageToRenderCoordinates, isGeoReferenced, isValidImagePosition, isWithinFloorArea, renderToImageCoordinates, toImageCoordinates, type FloorCorners, type ImagePosition, type LatLng } from '~~/lib/geo'
 import { getDecorationRenderCoordinates } from '~~/lib/decoration'
 import type { MapViewerCameraState, MapViewerDecoration, MapViewerFloor, MapViewerSpot } from '~~/shared/types/map-viewer'
-import { createDraftMarkerElement, createSpotMarkerElement } from '~/utils/marker-element'
+import { createSpotMarkerElement } from '~/utils/marker-element'
 import { applyMarkerDensityPresentation, getMarkerDensityPresentation } from '~/utils/marker-density'
 
 export type MapViewerMode = 'view' | 'edit'
@@ -50,7 +50,8 @@ export interface UseMapViewerOptions {
   position: Readonly<Ref<ImagePosition | null>>
   selectedSpotId: Readonly<Ref<string | null>>
   placementEnabled?: Readonly<Ref<boolean>>
-  draggableSpotId?: Readonly<Ref<string | null>>
+  candidateSpot?: Readonly<Ref<MapViewerSpot | null>>
+  candidateKind?: Readonly<Ref<'placement' | 'move' | null>>
   prioritizeVisibleSpots?: Readonly<Ref<boolean>>
   initialCamera?: MapViewerCameraState | null
   onReady?: (map: MapLibreMap) => void
@@ -72,22 +73,7 @@ export function shouldEnableGeolocate(floor: MapViewerFloor) {
   return isGeoReferenced(floor)
 }
 
-export function createMapViewerStyle(mode: MapViewerMode): StyleSpecification {
-  if (mode === 'edit') {
-    return {
-      version: 8,
-      sources: {
-        osm: {
-          type: 'raster',
-          tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
-          tileSize: 256,
-          attribution: '&copy; OpenStreetMap contributors',
-        },
-      },
-      layers: [{ id: 'osm', type: 'raster', source: 'osm' }],
-    }
-  }
-
+export function createMapViewerStyle(_mode: MapViewerMode): StyleSpecification {
   return {
     version: 8,
     sources: {},
@@ -160,14 +146,6 @@ export function createSpotMarkerOptions(element: HTMLElement, mode: MapViewerMod
     element,
     anchor: 'bottom',
     draggable,
-    subpixelPositioning: true,
-  }
-}
-
-export function createDraftMarkerOptions(): MarkerOptions {
-  return {
-    ...(typeof document === 'undefined' ? {} : { element: createDraftMarkerElement() }),
-    anchor: 'bottom',
     subpixelPositioning: true,
   }
 }
@@ -362,7 +340,7 @@ export function useMapViewer(
     if (!instance || !currentMaplibre) return
 
     const controls: IControl[] = [new MapNavigationControl()]
-    if (!shouldEnableGeolocate(floor)) {
+    if (options.mode === 'edit' || !shouldEnableGeolocate(floor)) {
       mapControlGroup = new HorizontalMapControlGroup(controls)
       instance.addControl(mapControlGroup, 'top-right')
       return
@@ -415,32 +393,26 @@ export function useMapViewer(
     const currentMaplibre = maplibre.value
     if (!instance || !currentMaplibre || !isReady.value) return
 
+    const selectedIsPositioned = options.spots.value.some(spot => spot.id === options.selectedSpotId.value)
+    const candidateKind = options.candidateKind?.value ?? null
     spotMarkers = options.spots.value.flatMap((spot) => {
       const renderPosition = imageToRenderCoordinates(options.floor.value, spot)
       if (!renderPosition) return []
-      const isDraggable = options.mode === 'edit' && options.draggableSpotId?.value === spot.id
+      const selected = spot.id === options.selectedSpotId.value
+      const ghost = candidateKind === 'move' && selected
       const element = createSpotMarkerElement(spot, {
         mode: options.mode,
-        selected: spot.id === options.selectedSpotId.value,
-        draggable: isDraggable,
+        selected: selected && !ghost,
+        ghost,
+        dimmed: selectedIsPositioned && !selected,
+        stronglyDimmed: Boolean(candidateKind) && !selected,
         onSelected: () => options.onSpotSelected?.(spot),
       })
       spotMarkerElements.push({ element, spot })
 
-      const marker = new currentMaplibre.Marker(createSpotMarkerOptions(element, options.mode, isDraggable))
+      const marker = new currentMaplibre.Marker(createSpotMarkerOptions(element, options.mode, false))
         .setLngLat([renderPosition.lng, renderPosition.lat])
         .addTo(instance)
-
-      if (isDraggable) {
-        marker.on('dragend', () => {
-          const lngLat = marker.getLngLat()
-          const position = constrainImagePlacementCandidate(options.floor.value, lngLat)
-          if (!position) return
-          const constrainedRenderPosition = imageToRenderCoordinates(options.floor.value, position)
-          if (constrainedRenderPosition) marker.setLngLat([constrainedRenderPosition.lng, constrainedRenderPosition.lat])
-          options.onSpotMoved?.({ spotId: spot.id, ...position })
-        })
-      }
 
       return marker
     })
@@ -470,24 +442,53 @@ export function useMapViewer(
     const currentMaplibre = maplibre.value
     if (!instance || !currentMaplibre || !isReady.value) return
 
-    const renderPosition = position
-      ? imageToRenderCoordinates(options.floor.value, position)
+    const candidateSpot = options.candidateSpot?.value
+    const candidateKind = options.candidateKind?.value
+    const candidatePosition = position ?? (candidateKind === 'move' ? candidateSpot : null)
+    const renderPosition = candidatePosition
+      ? imageToRenderCoordinates(options.floor.value, candidatePosition)
       : null
-    if (!renderPosition) {
-      draftMarker?.remove()
-      draftMarker = null
+    draftMarker?.remove()
+    draftMarker = null
+    if (!renderPosition || !candidateSpot || !candidateKind) {
       return
     }
 
-    if (!draftMarker) {
-      draftMarker = addMarkerAtPosition(
-        new currentMaplibre.Marker(createDraftMarkerOptions()),
-        instance,
-        renderPosition,
-      )
-      return
-    }
-    draftMarker.setLngLat([renderPosition.lng, renderPosition.lat])
+    const element = createSpotMarkerElement(candidateSpot, {
+      mode: 'edit',
+      selected: false,
+      draggable: true,
+      candidate: candidateKind,
+    })
+    const marker = addMarkerAtPosition(
+      new currentMaplibre.Marker(createSpotMarkerOptions(element, 'edit', true)),
+      instance,
+      renderPosition,
+    )
+    marker.on('dragend', () => {
+      const lngLat = marker.getLngLat()
+      const candidate = constrainImagePlacementCandidate(options.floor.value, lngLat)
+      if (!candidate) return
+      const constrainedRenderPosition = imageToRenderCoordinates(options.floor.value, candidate)
+      if (constrainedRenderPosition) marker.setLngLat([constrainedRenderPosition.lng, constrainedRenderPosition.lat])
+      options.onPositionChanged?.(candidate)
+      options.onSpotMoved?.({ spotId: candidateSpot.id, ...candidate })
+    })
+    draftMarker = marker
+  }
+
+  function focusSpot(spotId: string) {
+    const instance = map.value
+    const spot = options.spots.value.find(item => item.id === spotId)
+    const renderPosition = spot && imageToRenderCoordinates(options.floor.value, spot)
+    if (!instance || !renderPosition) return false
+
+    const zoom = Math.min(instance.getMaxZoom(), Math.max(instance.getZoom(), instance.getMinZoom() + 2))
+    instance.easeTo({ center: [renderPosition.lng, renderPosition.lat], zoom, duration: 600 })
+    window.setTimeout(() => {
+      spotMarkerElements.find(item => item.spot.id === spotId)?.element.focus()
+    }, 650)
+    return true
   }
 
   function removeFloorImage() {
@@ -580,7 +581,7 @@ export function useMapViewer(
       id: layerId,
       type: 'raster',
       source: sourceId,
-      paint: { 'raster-opacity': options.mode === 'edit' ? 0.82 : 1 },
+      paint: { 'raster-opacity': 1 },
     })
     activeSourceId = sourceId
     activeLayerId = layerId
@@ -609,7 +610,11 @@ export function useMapViewer(
   watch(() => options.decorations.value, syncDecorations, { deep: true })
   watch(() => options.position.value, syncDraftMarker, { deep: true })
   watch(() => options.selectedSpotId.value, syncSpotMarkers)
-  if (options.draggableSpotId) watch(() => options.draggableSpotId?.value, syncSpotMarkers)
+  if (options.candidateSpot) watch(() => options.candidateSpot?.value, () => syncDraftMarker(options.position.value), { deep: true })
+  if (options.candidateKind) watch(() => options.candidateKind?.value, () => {
+    syncSpotMarkers()
+    syncDraftMarker(options.position.value)
+  })
   if (options.prioritizeVisibleSpots) watch(() => options.prioritizeVisibleSpots?.value, syncMarkerDensity)
   watch(() => options.floor.value.id, () => {
     if (!isReady.value) return
@@ -636,5 +641,6 @@ export function useMapViewer(
     syncSpotMarkers,
     syncMarkerDensity,
     syncDraftMarker,
+    focusSpot,
   }
 }

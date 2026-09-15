@@ -9,12 +9,14 @@ import { isGeoReferenced, type ImagePosition } from '~~/lib/geo'
 import { getAddressPlacementCandidate } from '~~/lib/address-placement'
 import type { GeocodeResponse, GeocodeResult } from '~~/shared/types/geocode'
 import type { MapFloorListResponse } from '~~/shared/types/floor'
-import type { MapViewerCameraState } from '~~/shared/types/map-viewer'
+import type { MapViewerCameraState, MapViewerSpot } from '~~/shared/types/map-viewer'
 import type { AdminSpotListResponse, AdminSpotSummary, PositionedAdminSpotSummary, SpotPinDesignResponse, SpotPositionResponse } from '~~/shared/types/spot'
 
 definePageMeta({ layout: 'admin', middleware: 'auth' })
 
 const LazyMapViewer = defineAsyncComponent(() => import('~/components/map/MapViewer.vue'))
+const mapViewerRef = useTemplateRef<{ focusSpot: (spotId: string) => boolean }>('mapViewer')
+const pinDesignEditorRef = useTemplateRef<{ save: () => Promise<SpotPinDesignResponse['design'] | null> }>('pinDesignEditor')
 
 const route = useRoute()
 const mapId = route.params.mapId as string
@@ -38,18 +40,29 @@ const placementSpot = computed(() => selectedFloorSpots.value.find(spot => spot.
 const placementSpotIsPositioned = computed(() => Boolean(placementSpot.value && hasPosition(placementSpot.value)))
 const placementMode = ref<'idle' | 'placing' | 'moving'>('idle')
 const placementActive = computed(() => placementMode.value !== 'idle')
+const candidateKind = computed(() => placementMode.value === 'moving' ? 'move' : placementMode.value === 'placing' ? 'placement' : null)
+const pendingPinDesign = ref<SpotPinDesignResponse['design'] | null>(null)
+const candidateSpot = computed<MapViewerSpot | null>(() => {
+  const spot = placementSpot.value
+  if (!spot || !placementActive.value) return null
+  const candidatePosition = position.value ?? (hasPosition(spot) ? { x: spot.x, y: spot.y } : null)
+  if (!candidatePosition) return null
+  return {
+    ...spot,
+    ...pendingPinDesign.value,
+    x: candidatePosition.x,
+    y: candidatePosition.y,
+  }
+})
+const positionedSearchSpotId = computed({
+  get: () => placementSpotIsPositioned.value ? placementSpotId.value : '',
+  set: (spotId: string) => selectPositionedSpot(spotId),
+})
 const moveStatus = ref('')
 const unplaceConfirmOpen = ref(false)
 const addressCandidates = ref<GeocodeResult[]>([])
 const addressSearchStatus = ref('')
 const isSearchingAddress = ref(false)
-const geoReferenceEditorPath = computed(() => selectedFloor.value
-  ? `/admin/maps/${mapId}/floors/${selectedFloor.value.id}/georeference?from=editor`
-  : '')
-const shouldShowGeoReferenceWarning = computed(() => {
-  const floor = selectedFloor.value
-  return Boolean(floor && !isGeoReferenced(floor))
-})
 
 watch(() => data.value?.floors, (floors) => {
   if (floors?.length && !floors.some(floor => floor.id === selectedFloorId.value)) {
@@ -63,11 +76,23 @@ watch(selectedFloorId, () => {
   if (!selectedFloorSpots.value.some(spot => spot.id === placementSpotId.value)) placementSpotId.value = ''
 })
 
-watch(placementSpot, (spot) => {
+watch(placementSpotId, () => {
   position.value = null
   placementMode.value = 'idle'
   addressCandidates.value = []
   addressSearchStatus.value = ''
+  const spot = placementSpot.value
+  pendingPinDesign.value = spot
+    ? {
+        pinIconType: spot.pinIconType,
+        pinIconId: spot.pinIconId,
+        pinIconImageUrl: spot.pinIconImageUrl,
+        pinIconAssetId: spot.pinIconAssetId,
+        pinColor: spot.pinColor,
+        pinSize: spot.pinSize,
+        importance: spot.importance,
+      }
+    : null
 }, { immediate: true })
 
 useHead({ title: 'ピン配置エディタ | デジタルマップ' })
@@ -92,8 +117,14 @@ function startMoving() {
 
 async function savePosition() {
   if (!placementSpot.value || !position.value) return
-  moveStatus.value = '位置を保存しています…'
+  moveStatus.value = 'PINデザインと位置を保存しています…'
   try {
+    const savedDesign = await pinDesignEditorRef.value?.save()
+    if (!savedDesign) {
+      moveStatus.value = 'PINデザインを保存できないため、位置は保存していません。入力内容を確認してください。'
+      return
+    }
+    pendingPinDesign.value = savedDesign
     await $fetch<SpotPositionResponse>(`/api/maps/${mapId}/spots/${placementSpot.value.id}/position`, {
       method: 'PATCH',
       body: position.value,
@@ -187,12 +218,24 @@ function selectExistingSpot(spot: { id: string }) {
   moveStatus.value = ''
 }
 
+function selectPositionedSpot(spotId: string) {
+  const spot = positionedFloorSpots.value.find(item => item.id === spotId)
+  if (!spot) return
+  selectExistingSpot(spot)
+  nextTick(() => mapViewerRef.value?.focusSpot(spotId))
+}
+
+function handlePinDesignChanged(design: SpotPinDesignResponse['design']) {
+  pendingPinDesign.value = design
+}
+
 function updatePinDesign(design: SpotPinDesignResponse['design']) {
   if (!spotData.value || !placementSpot.value) return
   spotData.value = {
     ...spotData.value,
     spots: spotData.value.spots.map(spot => spot.id === placementSpot.value?.id ? { ...spot, ...design } : spot),
   }
+  pendingPinDesign.value = design
 }
 
 function handleEscape(event: KeyboardEvent) {
@@ -207,8 +250,21 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEscape))
   <div class="max-w-7xl">
     <AdminSubnavigation :map-id="mapId" area="map-edit" />
     <NuxtLink :to="`/admin/maps/${mapId}/spots`" class="text-sm font-medium text-stone-600 hover:text-stone-900">← スポット一覧に戻る</NuxtLink>
-    <header class="mt-5">
-      <h1 class="mt-1 text-2xl font-bold tracking-tight text-stone-900 sm:text-2xl">PIN管理</h1>
+    <header class="mt-5 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+      <div>
+        <h1 class="mt-1 text-2xl font-bold tracking-tight text-stone-900 sm:text-2xl">PIN配置</h1>
+        <p class="mt-1 text-sm text-stone-600">フロアイラスト上でPINを選択・配置し、右側のInspectorで編集します。</p>
+      </div>
+      <div class="w-full lg:max-w-sm">
+        <SpotCombobox
+          v-model="positionedSearchSpotId"
+          :spots="positionedFloorSpots"
+          label="配置済みSpotを検索"
+          input-id="positioned-spot-search"
+          placeholder="Spot名・カテゴリー・フロアで検索"
+          empty-message="該当する配置済みSpotはありません。"
+        />
+      </div>
     </header>
 
     <div v-if="status === 'pending'" class="mt-8 rounded-xl bg-white p-8 text-sm text-stone-600">読み込んでいます…</div>
@@ -219,23 +275,19 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEscape))
         <button v-for="floor in data.floors" :key="floor.id" type="button" role="tab" :aria-selected="floor.id === selectedFloorId" class="rounded-full px-4 py-2 text-sm font-semibold" :class="floor.id === selectedFloorId ? 'bg-stone-900 text-white' : 'bg-white text-stone-700 shadow-sm'" @click="selectedFloorId = floor.id">{{ floor.name }}</button>
       </div>
 
-      <div v-if="shouldShowGeoReferenceWarning" class="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-800">
-        <span>ジオリファレンスを設定すると現在地機能が使えます。</span>
-        <NuxtLink :to="geoReferenceEditorPath" class="shrink-0 rounded-lg bg-amber-800 px-4 py-2 font-semibold text-white hover:bg-amber-900">ジオリファレンスを設定</NuxtLink>
-      </div>
-
-      <div class="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1fr)_22rem]">
+      <div class="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1fr)_24rem]">
         <ClientOnly>
           <LazyMapViewer
+            ref="mapViewer"
             v-model="position"
             :floor="selectedFloor"
             :spots="positionedFloorSpots"
             mode="edit"
             :selected-spot-id="placementSpotId || null"
-            :draggable-spot-id="placementMode === 'moving' ? placementSpotId : null"
+            :candidate-spot="candidateSpot"
+            :candidate-kind="candidateKind"
             :placement-enabled="placementActive"
             label="ピン配置地図"
-            :floor-error-action-to="geoReferenceEditorPath || null"
             :initial-camera="initialCamera"
             @camera-changed="handleCameraChanged"
             @spot-moved="updateCandidateFromDrag"
@@ -243,7 +295,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEscape))
           />
           <template #fallback><div class="h-[38rem] animate-pulse rounded-xl bg-stone-100" /></template>
         </ClientOnly>
-        <aside class="rounded-xl border border-stone-200 bg-white p-5 shadow-sm">
+        <aside class="self-start rounded-xl border border-stone-200 bg-white p-5 shadow-sm xl:max-h-[calc(100vh-8rem)] xl:overflow-y-auto">
           <SaveFeedback v-if="route.query.saved === 'spot-created'" class="mt-3" state="success" message="スポットを登録しました。" />
           <SpotCombobox v-model="placementSpotId" :spots="unpositionedFloorSpots" />
           <button v-if="placementSpot && !placementSpotIsPositioned && placementMode === 'idle'" type="button" class="mt-3 w-full rounded-lg bg-terracotta-600 px-4 py-2.5 text-sm font-semibold text-white" @click="startPlacement">ピンを配置</button>
@@ -265,6 +317,23 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEscape))
                 <button type="button" class="rounded-lg bg-stone-900 px-4 py-2.5 text-sm font-semibold text-white" @click="startMoving">移動</button>
                 <button type="button" class="rounded-lg border border-red-200 px-4 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-50" @click="unplaceConfirmOpen = true">配置を解除</button>
               </div>
+
+              <details open class="mt-5 border-t border-stone-200 pt-4">
+                <summary class="cursor-pointer text-sm font-bold text-stone-900">PINデザイン</summary>
+                <div class="mt-4">
+                  <PinDesignEditor
+                    ref="pinDesignEditor"
+                    :key="placementSpot.id"
+                    :map-id="mapId"
+                    :spot-id="placementSpot.id"
+                    :initial-value="placementSpot"
+                    compact
+                    :show-save="false"
+                    @changed="handlePinDesignChanged"
+                    @updated="updatePinDesign"
+                  />
+                </div>
+              </details>
             </template>
           </section>
 
@@ -279,21 +348,15 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEscape))
             <p v-if="addressSearchStatus" role="status" class="mt-2 text-xs leading-5 text-stone-600">{{ addressSearchStatus }}</p>
           </div>
           <div v-if="placementActive" class="mt-4 rounded-lg border border-terracotta-200 bg-terracotta-50 p-3 text-sm font-semibold text-terracotta-900">
-            {{ position ? '仮配置を確認し、保存してください。' : '地図をクリックして仮配置してください。' }}
+            {{ placementMode === 'moving' ? (position ? '移動先を確認し、保存してください。' : '元のPINは薄く表示されています。地図をクリックして移動先を仮配置してください。') : (position ? '仮配置を確認し、保存してください。' : '地図をクリックして仮配置してください。') }}
           </div>
-          <button v-if="placementActive" type="button" :disabled="!position" class="mt-4 w-full rounded-lg bg-terracotta-600 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50" @click="savePosition">この位置を保存</button>
+          <button v-if="placementActive" type="button" :disabled="!position" class="mt-4 w-full rounded-lg bg-terracotta-600 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50" @click="savePosition">PINデザインと位置を保存</button>
           <div v-if="placementActive" class="mt-2 grid gap-2">
             <button type="button" class="rounded-lg border border-stone-300 px-4 py-2 text-sm font-semibold text-stone-700" @click="cancelPositionEditing">キャンセル</button>
           </div>
           <p v-if="moveStatus" role="status" class="mt-4 text-xs leading-5 text-stone-600">{{ moveStatus }}</p>
         </aside>
       </div>
-      <details v-if="placementSpot" class="mt-5 rounded-xl border border-stone-200 bg-white p-5">
-        <summary class="cursor-pointer text-sm font-bold text-stone-900">PINデザインを編集</summary>
-        <div class="mt-5 border-t border-stone-200 pt-5">
-          <PinDesignEditor :key="placementSpot.id" :map-id="mapId" :spot-id="placementSpot.id" :initial-value="placementSpot" @updated="updatePinDesign" />
-        </div>
-      </details>
       <ConfirmDialog :open="unplaceConfirmOpen" title="PIN配置を解除" message="Spot情報とカテゴリーは残したまま、イラスト上の配置を解除します。公開中の場合は下書きへ戻ります。" confirm-label="配置を解除する" destructive @cancel="unplaceConfirmOpen = false" @confirm="unplaceSpot" />
     </template>
   </div>

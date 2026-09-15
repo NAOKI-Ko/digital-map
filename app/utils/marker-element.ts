@@ -29,25 +29,14 @@ export interface CreateSpotMarkerElementOptions {
   mode: 'view' | 'edit'
   selected: boolean
   draggable?: boolean
+  dimmed?: boolean
+  stronglyDimmed?: boolean
+  ghost?: boolean
+  candidate?: 'placement' | 'move' | null
   onSelected?: () => void
 }
 
 type MarkerDocument = Pick<Document, 'createElement'>
-
-export function createDraftMarkerElement(ownerDocument: MarkerDocument = document) {
-  const element = ownerDocument.createElement('div')
-  element.className = 'map-viewer-draft-marker'
-  element.setAttribute('role', 'img')
-  element.setAttribute('aria-label', '仮配置したピン')
-  const badge = ownerDocument.createElement('span')
-  badge.className = 'map-viewer-draft-marker__badge'
-  badge.textContent = '仮配置'
-  const pin = ownerDocument.createElement('span')
-  pin.className = 'map-viewer-draft-marker__pin'
-  pin.setAttribute('aria-hidden', 'true')
-  element.append(badge, pin)
-  return element
-}
 
 export function createSpotMarkerElement(
   spot: MapViewerSpot,
@@ -61,18 +50,35 @@ export function createSpotMarkerElement(
   element.classList.toggle('map-viewer-marker--illustration', presentation.type === 'illustration')
   element.classList.toggle('map-viewer-marker--selected', options.selected)
   element.classList.toggle('map-viewer-marker--featured', spot.importance === 'featured')
+  element.classList.toggle('map-viewer-marker--dimmed', options.dimmed)
+  element.classList.toggle('map-viewer-marker--strongly-dimmed', options.stronglyDimmed)
+  element.classList.toggle('map-viewer-marker--ghost', options.ghost)
+  element.classList.toggle('map-viewer-marker--candidate', Boolean(options.candidate))
+  element.classList.toggle('map-viewer-marker--move-candidate', options.candidate === 'move')
   element.setAttribute('data-spot-importance', spot.importance)
   element.setAttribute('data-spot-id', spot.id)
   element.setAttribute('data-marker-contact', 'bottom-center')
   element.style.setProperty('--pin-color', presentation.color)
   element.style.setProperty('--pin-color-light', presentation.lightColor)
   element.style.setProperty('--pin-color-dark', presentation.darkColor)
-  element.setAttribute('aria-label', options.mode === 'edit'
-    ? options.draggable
-      ? `${spot.name}をドラッグして位置調整`
-      : `${spot.name}を選択`
-    : `${spot.name}の詳細を表示`)
+  const candidateLabel = options.candidate === 'move' ? '移動先' : '仮配置'
+  element.setAttribute('aria-label', options.candidate
+    ? `${spot.name}の${candidateLabel}PINをドラッグして位置調整`
+    : options.ghost
+      ? `${spot.name}の元の位置`
+      : options.mode === 'edit'
+        ? options.draggable
+          ? `${spot.name}をドラッグして位置調整`
+          : `${spot.name}を選択`
+        : `${spot.name}の詳細を表示`)
   element.title = spot.name
+
+  if (options.candidate) {
+    const badge = ownerDocument.createElement('span')
+    badge.className = 'map-viewer-marker__candidate-badge'
+    badge.textContent = candidateLabel
+    element.append(badge)
+  }
 
   const groundShadow = ownerDocument.createElement('span')
   groundShadow.className = 'map-viewer-marker__ground-shadow'
