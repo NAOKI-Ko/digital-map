@@ -78,12 +78,11 @@ defineExpose({
 
 <template>
   <div>
-    <div class="relative overflow-hidden rounded-xl border border-stone-300 bg-stone-100" :aria-busy="!isReady">
+    <div class="relative overflow-hidden rounded-xl border border-stone-300 bg-stone-100" :style="{ height }" :aria-busy="!isReady">
       <div
         ref="container"
-        class="w-full transition-opacity duration-150"
+        class="h-full w-full transition-opacity duration-150"
         :class="[mode === 'edit' && placementEnabled ? 'cursor-crosshair' : 'cursor-grab', isReady ? 'opacity-100' : 'opacity-0']"
-        :style="{ height }"
         :aria-label="label"
         role="region"
         tabindex="0"

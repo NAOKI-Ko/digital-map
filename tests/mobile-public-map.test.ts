@@ -45,9 +45,12 @@ describe('公開Mapのモバイル契約', () => {
 
   it('モバイルはheaderなしでMapが100svhを使いCategoryを1行scrollする', () => {
     const category = readFileSync(new URL('../app/components/map/CategoryFilter.vue', import.meta.url), 'utf8')
+    const mapViewer = readFileSync(new URL('../app/components/map/MapViewer.vue', import.meta.url), 'utf8')
     expect(publicPage).toContain('hidden h-14')
     expect(publicPage).toContain('h-[100svh]')
     expect(category).toContain('overflow-x-auto')
     expect(category).not.toContain('overflowCategories')
+    expect(mapViewer).toContain(':style="{ height }"')
+    expect(mapViewer).toContain('class="h-full w-full transition-opacity duration-150"')
   })
 })
