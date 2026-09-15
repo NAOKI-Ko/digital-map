@@ -357,8 +357,8 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEscape))
     <template v-else-if="selectedFloor">
       <div class="mt-6 grid items-start gap-5 lg:grid-cols-2">
         <section class="min-w-0" aria-label="地図操作">
-          <div class="mb-3 flex flex-col gap-3 sm:flex-row sm:items-end">
-            <div class="min-w-0 flex-1">
+          <div class="mb-3 grid gap-3 sm:grid-cols-[minmax(12rem,1fr)_minmax(0,2fr)] sm:items-end">
+            <div class="min-w-0">
               <SpotCombobox
                 v-model="positionedSearchSpotId"
                 :spots="positionedFloorSpots"
@@ -368,7 +368,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEscape))
                 empty-message="該当する配置済みSpotはありません。"
               />
             </div>
-            <div class="shrink-0">
+            <div class="min-w-0">
               <p class="mb-1.5 text-xs font-semibold text-stone-600">フロア選択</p>
               <div class="flex flex-wrap gap-2" role="tablist" aria-label="編集フロア">
                 <button v-for="floor in data.floors" :key="floor.id" type="button" role="tab" :aria-selected="floor.id === selectedFloorId" class="min-h-10 rounded-full px-3 py-2 text-sm font-semibold" :class="floor.id === selectedFloorId ? 'bg-stone-900 text-white' : 'bg-white text-stone-700 shadow-sm'" @click="selectFloor(floor.id)">{{ floor.name }}</button>

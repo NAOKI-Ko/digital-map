@@ -64,6 +64,7 @@ describe('WU-45 PIN editor modes', () => {
   it('検索とFloorはMap直上、desktopは等幅、狭幅は縦積み', () => {
     expect(editorSource.indexOf('input-id="positioned-spot-search"')).toBeLessThan(editorSource.indexOf('フロア選択'))
     expect(editorSource).toContain('lg:grid-cols-2')
+    expect(editorSource).toContain('sm:grid-cols-[minmax(12rem,1fr)_minmax(0,2fr)]')
     expect(editorSource).toContain('<section class="min-w-0" aria-label="地図操作">')
   })
 
