@@ -2,6 +2,7 @@ import type { SpotFieldDefinitionItem } from '~~/shared/types/spot-field'
 import type { StandardSpotFieldKey, SpotFieldType } from '~~/shared/constants/spot-fields'
 import type { Prisma } from '~~/prisma/generated/client'
 import { validateCustomFieldValue } from '~~/shared/schemas/spot-field'
+import { isMapLocale } from '~~/shared/constants/map-languages'
 
 export function toSpotFieldDefinition(field: {
   id: string
@@ -14,6 +15,7 @@ export function toSpotFieldDefinition(field: {
   required: boolean
   order: number
   _count: { values: number }
+  translations?: Array<{ locale: string, label: string | null }>
 }): SpotFieldDefinitionItem {
   return {
     ...field,
@@ -21,6 +23,10 @@ export function toSpotFieldDefinition(field: {
     semanticKey: field.semanticKey as StandardSpotFieldKey | null,
     type: field.type as SpotFieldType,
     valueCount: field._count.values,
+    translations: (field.translations ?? []).filter(translation => isMapLocale(translation.locale)).map(translation => ({
+      locale: translation.locale as SpotFieldDefinitionItem['translations'][number]['locale'],
+      label: translation.label,
+    })),
   }
 }
 

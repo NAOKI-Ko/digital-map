@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import ConfirmDialog from '~/components/ui/ConfirmDialog.vue'
 import SaveFeedback from '~/components/ui/SaveFeedback.vue'
+import UiDialog from '~/components/ui/UiDialog.vue'
+import UiSelect from '~/components/ui/UiSelect.vue'
 import MapNameForm from '~/components/admin/MapNameForm.vue'
 import MediaPicker from '~/components/admin/MediaPicker.vue'
+import { mapLanguageLabel, mapLanguageOptions } from '~~/shared/constants/map-languages'
+import type { MapLocale } from '~~/shared/constants/map-languages'
 import type { MapNameInput } from '~~/shared/schemas/map'
 import type { AdminMapResponse, MapBrandingResponse } from '~~/shared/types/map'
 import type { UploadedImage } from '~~/shared/types/upload'
@@ -33,10 +37,16 @@ const isBrandingSaving = ref(false)
 const deleteError = ref('')
 const deleteDialogOpen = ref(false)
 const translation = reactive({
-  englishEnabled: data.value?.map.enabledLocales.includes('en') ?? false,
   name: data.value?.map.englishTranslation?.name ?? '',
   description: data.value?.map.englishTranslation?.description ?? '',
 })
+const enabledLocales = ref<MapLocale[]>([...(data.value?.map.enabledLocales ?? ['ja'])])
+const defaultLocale = computed<MapLocale>(() => data.value?.map.defaultLocale ?? 'ja')
+const languageDialogOpen = ref(false)
+const selectedLocale = ref('')
+const languageState = ref<'idle' | 'saving' | 'success' | 'error'>('idle')
+const languageMessage = ref('')
+const availableLanguageOptions = computed(() => mapLanguageOptions.filter(option => !enabledLocales.value.includes(option.value)))
 const translationState = ref<'idle' | 'saving' | 'success' | 'error'>('idle')
 const translationMessage = ref('')
 const seo = reactive({ title: data.value?.map.seoTitle ?? '', description: data.value?.map.seoDescription ?? '', imageAssetId: data.value?.map.seoImageAssetId ?? null as string | null })
@@ -117,14 +127,53 @@ async function saveTranslation() {
   translationState.value = 'saving'
   translationMessage.value = ''
   try {
-    await $fetch(`/api/maps/${mapId}/translations`, { method: 'PATCH', body: translation })
+    await $fetch(`/api/maps/${mapId}/translations`, {
+      method: 'PATCH',
+      body: { ...translation, englishEnabled: enabledLocales.value.includes('en') },
+    })
     translationState.value = 'success'
-    translationMessage.value = '言語設定と英語訳を保存しました。'
+    translationMessage.value = '英語訳を保存しました。'
   }
   catch (error: any) {
     translationState.value = 'error'
     translationMessage.value = error?.data?.statusMessage ?? '英語訳を保存できませんでした。'
   }
+}
+
+async function persistLanguages(nextLocales: MapLocale[], success: string) {
+  languageState.value = 'saving'
+  languageMessage.value = ''
+  try {
+    const response = await $fetch<{ defaultLocale: MapLocale, enabledLocales: MapLocale[] }>(`/api/maps/${mapId}/languages`, {
+      method: 'PATCH',
+      body: { enabledLocales: nextLocales },
+    })
+    enabledLocales.value = response.enabledLocales
+    data.value!.map.defaultLocale = response.defaultLocale
+    data.value!.map.enabledLocales = response.enabledLocales
+    languageState.value = 'success'
+    languageMessage.value = success
+    return true
+  }
+  catch (error: any) {
+    languageState.value = 'error'
+    languageMessage.value = error?.data?.statusMessage ?? '言語設定を保存できませんでした。'
+    return false
+  }
+}
+
+async function addLanguage() {
+  if (!selectedLocale.value || enabledLocales.value.includes(selectedLocale.value as MapLocale)) return
+  const locale = selectedLocale.value as MapLocale
+  if (await persistLanguages([...enabledLocales.value, locale], `${mapLanguageLabel(locale)}を追加しました。`)) {
+    selectedLocale.value = ''
+    languageDialogOpen.value = false
+  }
+}
+
+async function removeLanguage(locale: MapLocale) {
+  if (locale === defaultLocale.value) return
+  await persistLanguages(enabledLocales.value.filter(item => item !== locale), `${mapLanguageLabel(locale)}を無効にしました。翻訳データは保持されます。`)
 }
 
 async function saveSeo() {
@@ -191,17 +240,44 @@ async function saveSeo() {
       </section>
 
       <section id="language" v-show="activeSection === 'language'" class="settings-section">
-        <h2 class="text-lg font-bold text-stone-900">公開言語</h2>
-        <p class="mt-1 text-sm text-stone-600">日本語は既定言語で、無効化できません。英語訳が空の項目は日本語を表示します。</p>
-        <form class="mt-5 space-y-4" @submit.prevent="saveTranslation">
-          <label class="flex items-center gap-2 text-sm font-semibold"><input v-model="translation.englishEnabled" type="checkbox"> 英語（en）を有効にする</label>
-          <template v-if="translation.englishEnabled">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h2 class="text-lg font-bold text-stone-900">マップの言語</h2>
+            <p class="mt-1 text-sm text-stone-600">既定言語は削除できません。無効にした言語の翻訳は保持され、再追加すると復元されます。</p>
+          </div>
+          <button type="button" :disabled="languageState === 'saving' || availableLanguageOptions.length === 0" class="min-h-11 shrink-0 rounded-lg bg-terracotta-600 px-4 text-sm font-semibold text-white disabled:opacity-50" @click="languageDialogOpen = true">＋ 言語を追加</button>
+        </div>
+        <ol class="mt-5 divide-y divide-stone-200 rounded-xl border border-stone-200 bg-white">
+          <li v-for="locale in enabledLocales" :key="locale" class="flex min-h-14 items-center justify-between gap-3 px-4 py-2">
+            <div>
+              <span class="font-semibold text-stone-900">{{ mapLanguageLabel(locale) }}</span>
+              <span class="ml-2 text-xs text-stone-500">{{ locale }}</span>
+              <span v-if="locale === defaultLocale" class="ml-2 rounded-full bg-terracotta-100 px-2 py-1 text-xs font-semibold text-terracotta-800">既定</span>
+            </div>
+            <button v-if="locale !== defaultLocale" type="button" :disabled="languageState === 'saving'" class="min-h-10 px-2 text-sm font-semibold text-red-700 disabled:opacity-40" @click="removeLanguage(locale)">無効にする</button>
+            <span v-else class="text-xs text-stone-500">削除できません</span>
+          </li>
+        </ol>
+        <SaveFeedback class="mt-4" :state="languageState" :message="languageMessage" />
+
+        <form v-if="enabledLocales.includes('en')" class="mt-8 space-y-4 border-t border-stone-200 pt-6" @submit.prevent="saveTranslation">
+          <h3 class="font-bold text-stone-900">マップ情報の英語訳</h3>
+          <p class="text-sm text-stone-600">既存機能の英語向けマップ名・説明を編集します。</p>
             <label class="block text-sm font-semibold">マップ名（英語）<input v-model="translation.name" maxlength="100" class="mt-1 w-full rounded-lg border border-stone-300 px-3 py-2.5"></label>
             <label class="block text-sm font-semibold">説明文（英語）<textarea v-model="translation.description" maxlength="2000" rows="4" class="mt-1 w-full rounded-lg border border-stone-300 px-3 py-2.5" /></label>
-          </template>
           <SaveFeedback :state="translationState" :message="translationMessage" />
-          <button class="rounded-lg bg-stone-900 px-5 py-2.5 text-sm font-semibold text-white" :disabled="translationState === 'saving'">言語設定を保存</button>
+          <button class="rounded-lg bg-stone-900 px-5 py-2.5 text-sm font-semibold text-white" :disabled="translationState === 'saving'">英語訳を保存</button>
         </form>
+
+        <UiDialog :open="languageDialogOpen" title="言語を追加" description="このマップのField表示名で使用する言語を選択します。" max-width="sm" @close="languageDialogOpen = false">
+          <form class="space-y-5" @submit.prevent="addLanguage">
+            <UiSelect v-model="selectedLocale" :options="availableLanguageOptions" label="追加する言語" placeholder="言語を選択" />
+            <div class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+              <button type="button" class="min-h-11 rounded-lg border border-stone-300 px-4 text-sm font-semibold" @click="languageDialogOpen = false">キャンセル</button>
+              <button :disabled="!selectedLocale || languageState === 'saving'" class="min-h-11 rounded-lg bg-terracotta-600 px-4 text-sm font-semibold text-white disabled:opacity-50">追加</button>
+            </div>
+          </form>
+        </UiDialog>
       </section>
 
       <section id="seo" v-show="activeSection === 'seo'" class="settings-section"><h2 class="text-lg font-bold">検索・シェア表示</h2><p class="mt-1 text-sm text-stone-600">空欄の場合は公開中のマップ情報を使用します。</p><form class="mt-5 space-y-4" @submit.prevent="saveSeo"><label class="block text-sm font-semibold">検索結果のタイトル<input v-model="seo.title" maxlength="100" class="mt-1 w-full rounded border px-3 py-2"></label><label class="block text-sm font-semibold">説明文<textarea v-model="seo.description" maxlength="300" rows="3" class="mt-1 w-full rounded border px-3 py-2" /></label><details class="rounded-lg border border-stone-200 p-4"><summary class="cursor-pointer text-sm font-semibold">シェア画像を選択・変更</summary><MediaPicker class="mt-4" :map-id="mapId" label="代表画像" usage="seo" @selected="seo.imageAssetId = $event.assetId" /></details><SaveFeedback :state="seoState" :message="seoMessage" /><button class="rounded bg-stone-900 px-4 py-2 text-sm font-semibold text-white">SEO設定を保存</button></form></section>

@@ -2,12 +2,13 @@ import { createHash } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
 import { extname, resolve } from 'node:path'
 import type { PublicMap } from '~~/shared/types/public-map'
+import { isMapLocale, mapLocales } from '~~/shared/constants/map-languages'
 import { appendAuditEvent } from './audit'
 import { notifyOperations, operationalLog } from './observability'
 import { getLivePublicMapById } from './public-map'
 import { getPublicStorage, immutableCacheControl, pointerCacheControl, type PublicObjectStorage } from './public-storage'
 
-type ReleaseLocales = { ja: PublicMap, en?: PublicMap }
+type ReleaseLocales = { ja: PublicMap } & Record<string, PublicMap>
 type CurrentPointer = { releaseId: string | null, manifestKey: string | null, published: boolean, updatedAt: string }
 
 export function releaseRoot(slug: string, releaseId: string) { return `public/maps/${slug}/releases/${releaseId}` }
@@ -55,7 +56,9 @@ export async function buildPublicRelease(mapId: string, actorUserId: string, upl
       const ja = await getLivePublicMapById(mapId, 'ja', transaction)
       if (!ja) throw new Error('SNAPSHOT_SOURCE_NOT_FOUND')
       const result: ReleaseLocales = { ja }
-      if (mapRecord.enabledLocales.includes('en')) result.en = (await getLivePublicMapById(mapId, 'en', transaction)) ?? ja
+      for (const locale of mapLocales.filter(item => item !== 'ja' && mapRecord.enabledLocales.includes(item))) {
+        result[locale] = (await getLivePublicMapById(mapId, locale, transaction)) ?? ja
+      }
       return result
     }, { isolationLevel: 'RepeatableRead' })
     validatePublicSnapshot(locales)
@@ -123,6 +126,6 @@ export async function loadCurrentPublicSnapshot(slug: string, locale: unknown, s
   const manifest = await storage.get(pointer.manifestKey)
   if (!manifest) throw new Error('CURRENT_RELEASE_MANIFEST_MISSING')
   const release = parseJson<{ locales: ReleaseLocales }>(manifest.bytes)
-  const map = locale === 'en' && release.locales.en ? release.locales.en : release.locales.ja
+  const map = isMapLocale(locale) && release.locales[locale] ? release.locales[locale] : release.locales.ja
   return { ...map, releaseId: pointer.releaseId ?? undefined }
 }

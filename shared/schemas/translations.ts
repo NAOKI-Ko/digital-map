@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { mapLocaleSchema } from './map-languages'
 
 const optionalText = (max: number) => z.string().trim().max(max).optional().nullable()
 
@@ -18,4 +19,4 @@ export const spotTranslationSchema = z.object({
 }).strict()
 
 export const nameTranslationSchema = z.object({ name: optionalText(100) }).strict()
-export const labelTranslationSchema = z.object({ label: optionalText(100) }).strict()
+export const labelTranslationSchema = z.object({ locale: mapLocaleSchema, label: optionalText(50) }).strict()

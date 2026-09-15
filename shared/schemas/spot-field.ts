@@ -1,5 +1,8 @@
 import { z } from 'zod'
 import { customSpotFieldTypes, standardSpotFieldKeys } from '../constants/spot-fields'
+import { mapLocaleSchema } from './map-languages'
+
+const labelTranslations = z.partialRecord(mapLocaleSchema, z.string().trim().max(50).nullable()).default({})
 
 const settings = {
   label: z.string().trim().min(1, '項目名を入力してください。').max(50),
@@ -12,6 +15,7 @@ const settings = {
 export const customSpotFieldCreateSchema = z.object({
   ...settings,
   type: z.enum(customSpotFieldTypes),
+  translations: labelTranslations,
 })
 
 export const spotFieldUpdateSchema = z.object({
@@ -21,6 +25,7 @@ export const spotFieldUpdateSchema = z.object({
   required: settings.required.optional(),
   order: settings.order.optional(),
   type: z.enum(customSpotFieldTypes).optional(),
+  translations: labelTranslations.optional(),
 }).refine(value => Object.keys(value).length > 0, '変更内容を指定してください。')
   .refine(value => value.enabled !== false || value.publicVisible !== true, {
     path: ['publicVisible'],

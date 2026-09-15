@@ -37,6 +37,8 @@ const publishedSpot = {
 
 function mapRecord(overrides: {
   isPublished?: boolean
+  defaultLocale?: string
+  enabledLocales?: string[]
   spots?: PublicMapRecord['floors'][number]['spots']
   spotFieldDefinitions?: PublicMapRecord['spotFieldDefinitions']
 } = {}): PublicMapRecord {
@@ -49,8 +51,8 @@ function mapRecord(overrides: {
     websiteUrl: null,
     snsUrl: null,
     isPublished: overrides.isPublished ?? true,
-    defaultLocale: 'ja',
-    enabledLocales: ['ja'],
+    defaultLocale: overrides.defaultLocale ?? 'ja',
+    enabledLocales: overrides.enabledLocales ?? ['ja'],
     translations: [],
     spotFieldDefinitions: overrides.spotFieldDefinitions ?? [],
     floors: [{
@@ -184,5 +186,34 @@ describe('GET /api/public/:mapSlug', () => {
       spots: [{ ...publishedSpot, description: '内部紹介' }],
     }))
     expect((await getPublicMapBySlug('test-map'))?.floors[0]?.spots[0]?.description).toBeNull()
+  })
+
+  it('Mapで有効なlocaleのField labelを返し、空なら既定labelへfallbackする', async () => {
+    const definitions = [
+      { id: 'custom-public', semanticKey: null, label: '席数', type: 'number', order: 0, translations: [{ locale: 'zh-CN', label: '座位数' }, { locale: 'ko', label: '' }] },
+      { id: 'website', semanticKey: 'website', label: '公式サイト', type: 'url', order: 1, translations: [{ locale: 'zh-CN', label: '官方网站' }] },
+    ] satisfies PublicMapRecord['spotFieldDefinitions']
+    mocks.findFirst.mockResolvedValue(mapRecord({
+      enabledLocales: ['ja', 'zh-CN', 'ko'],
+      spotFieldDefinitions: definitions,
+      spots: [{ ...publishedSpot, website: 'https://example.com', fieldValues: [{ fieldDefinitionId: 'custom-public', valueJson: 4 }] }],
+    }))
+
+    const chinese = await getPublicMapBySlug('test-map', 'zh-CN')
+    expect(chinese?.floors[0]?.spots[0]).toMatchObject({
+      informationFields: [{ label: '座位数' }],
+      websiteAction: { label: '官方网站' },
+    })
+
+    mocks.findFirst.mockResolvedValue(mapRecord({
+      enabledLocales: ['ja', 'zh-CN', 'ko'],
+      spotFieldDefinitions: definitions,
+      spots: [{ ...publishedSpot, website: 'https://example.com', fieldValues: [{ fieldDefinitionId: 'custom-public', valueJson: 4 }] }],
+    }))
+    const korean = await getPublicMapBySlug('test-map', 'ko')
+    expect(korean?.floors[0]?.spots[0]).toMatchObject({
+      informationFields: [{ label: '席数' }],
+      websiteAction: { label: '公式サイト' },
+    })
   })
 })

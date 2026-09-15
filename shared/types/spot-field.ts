@@ -1,4 +1,10 @@
 import type { SpotFieldType, StandardSpotFieldKey } from '../constants/spot-fields'
+import type { MapLocale } from '../constants/map-languages'
+
+export interface SpotFieldLabelTranslation {
+  locale: MapLocale
+  label: string | null
+}
 
 export interface SpotFieldDefinitionItem {
   id: string
@@ -11,10 +17,12 @@ export interface SpotFieldDefinitionItem {
   required: boolean
   order: number
   valueCount: number
-  englishLabel?: string | null
+  translations: SpotFieldLabelTranslation[]
 }
 
 export interface SpotFieldDefinitionListResponse {
+  defaultLocale: MapLocale
+  enabledLocales: MapLocale[]
   fields: SpotFieldDefinitionItem[]
 }
 

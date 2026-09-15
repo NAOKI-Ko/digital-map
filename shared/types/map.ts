@@ -1,3 +1,5 @@
+import type { MapLocale } from '../constants/map-languages'
+
 export interface AdminMapSummary {
   id: string
   name: string
@@ -13,8 +15,8 @@ export interface AdminMapListResponse {
 }
 
 export interface AdminMapDetail extends AdminMapSummary {
-  defaultLocale: 'ja'
-  enabledLocales: Array<'ja' | 'en'>
+  defaultLocale: MapLocale
+  enabledLocales: MapLocale[]
   englishTranslation: { name: string | null, description: string | null } | null
   seoTitle?: string | null
   seoDescription?: string | null

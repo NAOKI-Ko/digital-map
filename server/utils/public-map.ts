@@ -4,6 +4,7 @@ import { normalizePinIconType, normalizePinSize, normalizeSpotImportance } from 
 import { prisma } from './prisma'
 import { categoryOrderBy, sortSpotCategories, spotCategorySelect } from './category'
 import { normalizeLocale, translatedValue, type AppLocale } from '../../shared/i18n/messages'
+import { isMapLocale, orderedMapLocales, resolveFieldLabel } from '../../shared/constants/map-languages'
 import { selectMediaVariant } from './media-variants'
 
 function optimizedUrl(asset: { storageKey: string, variants?: Array<{ kind: string, storageKey: string }> } | null | undefined, usage: 'spot-photo' | 'icon' | 'logo' | 'decoration' | 'floor', fallback: string | null) {
@@ -110,8 +111,10 @@ export function serializePublicMap(record: PublicMapRecord | null, requestedLoca
   if (!record?.isPublished) return null
 
   const publicFields = record.spotFieldDefinitions
-  const enabledLocales = record.enabledLocales?.length ? record.enabledLocales : ['ja']
+  const defaultLocale = isMapLocale(record.defaultLocale) ? record.defaultLocale : 'ja'
+  const enabledLocales = orderedMapLocales(defaultLocale, record.enabledLocales?.length ? record.enabledLocales : [defaultLocale])
   const locale = normalizeLocale(requestedLocale, enabledLocales)
+  const fieldLocale = isMapLocale(requestedLocale) && enabledLocales.includes(requestedLocale) ? requestedLocale : defaultLocale
   const localizedName = translatedValue(record.name, record.translations ?? [], locale, 'name') ?? record.name
   const localizedDescription = translatedValue(null, record.translations ?? [], locale, 'description') ?? ''
 
@@ -172,7 +175,7 @@ export function serializePublicMap(record: PublicMapRecord | null, requestedLoca
           ? spotDescription
           : null
         const websiteAction = websiteField && typeof spot.website === 'string' && spot.website.trim()
-          ? { label: websiteField.label, url: spot.website }
+          ? { label: resolveFieldLabel(websiteField.label, websiteField.translations ?? [], fieldLocale, defaultLocale), url: spot.website }
           : null
         const informationFields = publicFields.flatMap((field) => {
           if (field.semanticKey === 'description' || field.semanticKey === 'website') return []
@@ -185,7 +188,7 @@ export function serializePublicMap(record: PublicMapRecord | null, requestedLoca
             : field.type === 'url' && /^https?:\/\//i.test(renderedValue) ? renderedValue : null
           return [{
             id: field.id,
-            label: translatedValue(field.label, field.translations ?? [], locale, 'label') ?? field.label,
+            label: resolveFieldLabel(field.label, field.translations ?? [], fieldLocale, defaultLocale),
             type: field.type as PublicMap['floors'][number]['spots'][number]['informationFields'][number]['type'],
             value: renderedValue,
             href,

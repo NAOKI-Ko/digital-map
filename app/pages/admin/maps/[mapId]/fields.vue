@@ -4,6 +4,8 @@ import UiAlertDialog from '~/components/ui/UiAlertDialog.vue'
 import UiDialog from '~/components/ui/UiDialog.vue'
 import UiSelect from '~/components/ui/UiSelect.vue'
 import UiSwitch from '~/components/ui/UiSwitch.vue'
+import { mapLanguageLabel } from '~~/shared/constants/map-languages'
+import type { MapLocale } from '~~/shared/constants/map-languages'
 import { customSpotFieldTypes } from '~~/shared/constants/spot-fields'
 import type { SpotFieldType } from '~~/shared/constants/spot-fields'
 import type { SpotFieldDefinitionItem, SpotFieldDefinitionListResponse } from '~~/shared/types/spot-field'
@@ -23,7 +25,14 @@ const deleteTarget = ref<SpotFieldDefinitionItem | null>(null)
 const pendingAction = ref<{ type: 'edit', id: string } | { type: 'add' } | null>(null)
 const draggedId = ref<string | null>(null)
 const dragOverId = ref<string | null>(null)
-const newField = reactive({ label: '', type: 'single_line_text' as SpotFieldType, enabled: true, publicVisible: true, required: false })
+const newField = reactive({
+  label: '',
+  translations: {} as Partial<Record<MapLocale, string>>,
+  type: 'single_line_text' as SpotFieldType,
+  enabled: true,
+  publicVisible: true,
+  required: false,
+})
 
 const fieldTypeLabels: Record<string, string> = {
   single_line_text: '一行テキスト',
@@ -34,11 +43,30 @@ const fieldTypeLabels: Record<string, string> = {
 }
 const typeOptions = customSpotFieldTypes.map(type => ({ value: type, label: fieldTypeLabels[type] ?? type }))
 const fields = computed(() => data.value?.fields ?? [])
+const defaultLocale = computed<MapLocale>(() => data.value?.defaultLocale ?? 'ja')
+const enabledLocales = computed<MapLocale[]>(() => data.value?.enabledLocales ?? ['ja'])
 const isBusy = computed(() => saveState.value === 'saving')
 const isDirty = computed(() => !!draft.value && !!originalDraft.value && JSON.stringify(draft.value) !== JSON.stringify(originalDraft.value))
 
 function cloneField(field: SpotFieldDefinitionItem) {
-  return { ...field }
+  return { ...field, translations: field.translations.map(item => ({ ...item })) }
+}
+
+function translatedLabel(field: SpotFieldDefinitionItem, locale: MapLocale) {
+  return field.translations.find(item => item.locale === locale)?.label ?? ''
+}
+
+function setDraftTranslation(locale: MapLocale, value: string) {
+  if (!draft.value) return
+  const existing = draft.value.translations.find(item => item.locale === locale)
+  if (existing) existing.label = value
+  else draft.value.translations.push({ locale, label: value })
+}
+
+function translationPayload(field: SpotFieldDefinitionItem) {
+  return Object.fromEntries(enabledLocales.value
+    .filter(locale => locale !== defaultLocale.value)
+    .map(locale => [locale, translatedLabel(field, locale)]))
 }
 
 function openEditor(field: SpotFieldDefinitionItem) {
@@ -108,7 +136,6 @@ async function saveActive(continuePending = false) {
   message.value = ''
   saveState.value = 'saving'
   const current = draft.value
-  const original = originalDraft.value
   try {
     await $fetch(`/api/maps/${mapId}/spot-fields/${current.id}`, {
       method: 'PATCH',
@@ -118,14 +145,9 @@ async function saveActive(continuePending = false) {
         enabled: current.enabled,
         publicVisible: current.enabled && current.publicVisible,
         required: current.required,
+        translations: translationPayload(current),
       },
     })
-    if ((current.englishLabel ?? '') !== (original.englishLabel ?? '')) {
-      await $fetch(`/api/maps/${mapId}/spot-fields/${current.id}/translations`, {
-        method: 'PATCH',
-        body: { label: current.englishLabel || null },
-      })
-    }
     await refresh()
     message.value = '項目設定を保存しました。'
     saveState.value = 'success'
@@ -147,8 +169,17 @@ async function createCustomField() {
   saveState.value = 'saving'
   try {
     const nextOrder = fields.value.reduce((maximum, field) => Math.max(maximum, field.order), -1) + 1
-    await $fetch(`/api/maps/${mapId}/spot-fields`, { method: 'POST', body: { ...newField, order: nextOrder } })
-    Object.assign(newField, { label: '', type: 'single_line_text', enabled: true, publicVisible: true, required: false })
+    await $fetch(`/api/maps/${mapId}/spot-fields`, {
+      method: 'POST',
+      body: {
+        ...newField,
+        translations: Object.fromEntries(enabledLocales.value
+          .filter(locale => locale !== defaultLocale.value)
+          .map(locale => [locale, newField.translations[locale] ?? ''])),
+        order: nextOrder,
+      },
+    })
+    Object.assign(newField, { label: '', translations: {}, type: 'single_line_text', enabled: true, publicVisible: true, required: false })
     await refresh()
     addDialogOpen.value = false
     message.value = 'カスタム項目を追加しました。'
@@ -288,8 +319,16 @@ function dropOn(targetId: string) {
 
         <form v-if="activeId === field.id && draft" class="border-t border-stone-200 bg-stone-50 px-4 py-5 sm:px-6" @submit.prevent="saveActive()">
           <div class="grid gap-4 md:grid-cols-2">
-            <label class="text-sm font-semibold text-stone-700">表示名<input :id="`field-label-${field.id}`" v-model="draft.label" required maxlength="50" class="mt-1.5 min-h-11 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm"></label>
-            <label class="text-sm font-semibold text-stone-700">英語名（任意）<input v-model="draft.englishLabel" maxlength="50" class="mt-1.5 min-h-11 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm"></label>
+            <div class="space-y-3 md:col-span-2">
+              <label class="block text-sm font-semibold text-stone-700">
+                {{ mapLanguageLabel(defaultLocale) }}（{{ defaultLocale }}・既定、必須）
+                <input :id="`field-label-${field.id}`" v-model="draft.label" required maxlength="50" class="mt-1.5 min-h-11 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm">
+              </label>
+              <label v-for="locale in enabledLocales.filter(item => item !== defaultLocale)" :key="locale" class="block text-sm font-semibold text-stone-700">
+                {{ mapLanguageLabel(locale) }}（{{ locale }}・任意）
+                <input :value="translatedLabel(draft, locale)" maxlength="50" class="mt-1.5 min-h-11 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm" :placeholder="`${draft.label || '既定言語の表示名'}を使用`" @input="setDraftTranslation(locale, ($event.target as HTMLInputElement).value)">
+              </label>
+            </div>
             <label class="text-sm font-semibold text-stone-700">
               項目の種類
               <UiSelect v-if="draft.kind === 'custom'" v-model="draft.type" class="mt-1.5" :options="typeOptions" label="項目の種類" :disabled="draft.valueCount > 0" />
@@ -321,7 +360,16 @@ function dropOn(targetId: string) {
 
     <UiDialog :open="addDialogOpen" title="カスタム項目を追加" description="Spotで入力する新しい情報項目を作成します。" max-width="sm" @close="addDialogOpen = false">
       <form class="space-y-4" @submit.prevent="createCustomField">
-        <label class="block text-sm font-semibold text-stone-700">項目名<input v-model="newField.label" autofocus required maxlength="50" class="mt-1.5 min-h-11 w-full rounded-lg border border-stone-300 px-3 py-2" placeholder="例：座席数"></label>
+        <div class="max-h-72 space-y-3 overflow-y-auto pr-1">
+          <label class="block text-sm font-semibold text-stone-700">
+            項目名・{{ mapLanguageLabel(defaultLocale) }}（{{ defaultLocale }}・既定、必須）
+            <input v-model="newField.label" autofocus required maxlength="50" class="mt-1.5 min-h-11 w-full rounded-lg border border-stone-300 px-3 py-2" placeholder="例：座席数">
+          </label>
+          <label v-for="locale in enabledLocales.filter(item => item !== defaultLocale)" :key="locale" class="block text-sm font-semibold text-stone-700">
+            {{ mapLanguageLabel(locale) }}（{{ locale }}・任意）
+            <input v-model="newField.translations[locale]" maxlength="50" class="mt-1.5 min-h-11 w-full rounded-lg border border-stone-300 px-3 py-2" :placeholder="`${newField.label || '既定言語の表示名'}を使用`">
+          </label>
+        </div>
         <label class="block text-sm font-semibold text-stone-700">項目の種類<UiSelect v-model="newField.type" class="mt-1.5" :options="typeOptions" label="追加する項目の種類" /></label>
         <div class="flex flex-wrap gap-x-5 gap-y-1">
           <UiSwitch :model-value="newField.enabled" label="使用する" @update:model-value="setNewFieldEnabled" />

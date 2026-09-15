@@ -7,7 +7,12 @@ export default defineEventHandler(async (event) => {
   if (!field) throw createError({ statusCode: 404, statusMessage: '項目が見つかりません。' })
   const result = labelTranslationSchema.safeParse(await readBody(event))
   if (!result.success) throw createError({ statusCode: 422, statusMessage: result.error.issues[0]?.message ?? '翻訳を確認してください。' })
-  if (!result.data.label) await prisma.spotFieldDefinitionTranslation.deleteMany({ where: { fieldDefinitionId: field.id, locale: 'en' } })
-  else await prisma.spotFieldDefinitionTranslation.upsert({ where: { fieldDefinitionId_locale: { fieldDefinitionId: field.id, locale: 'en' } }, create: { fieldDefinitionId: field.id, locale: 'en', label: result.data.label }, update: { label: result.data.label } })
-  return { locale: 'en', label: result.data.label || null }
+  const config = await prisma.map.findUniqueOrThrow({ where: { id: map.id }, select: { defaultLocale: true, enabledLocales: true } })
+  if (result.data.locale === config.defaultLocale || !config.enabledLocales.includes(result.data.locale)) {
+    throw createError({ statusCode: 422, statusMessage: '有効な追加言語を指定してください。' })
+  }
+  const locale = result.data.locale
+  if (!result.data.label) await prisma.spotFieldDefinitionTranslation.deleteMany({ where: { fieldDefinitionId: field.id, locale } })
+  else await prisma.spotFieldDefinitionTranslation.upsert({ where: { fieldDefinitionId_locale: { fieldDefinitionId: field.id, locale } }, create: { fieldDefinitionId: field.id, locale, label: result.data.label }, update: { label: result.data.label } })
+  return { locale, label: result.data.label || null }
 })

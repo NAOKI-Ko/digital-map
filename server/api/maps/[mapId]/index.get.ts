@@ -1,4 +1,5 @@
 import type { AdminMapResponse } from '~~/shared/types/map'
+import { isMapLocale, orderedMapLocales } from '~~/shared/constants/map-languages'
 
 export default defineEventHandler(async (event): Promise<AdminMapResponse> => {
   const { map: accessibleMap, isOwner } = await requireMapAccess(event)
@@ -46,8 +47,8 @@ export default defineEventHandler(async (event): Promise<AdminMapResponse> => {
       websiteUrl: map.websiteUrl,
       snsUrl: map.snsUrl,
       isPublished: map.isPublished,
-      defaultLocale: 'ja',
-      enabledLocales: map.enabledLocales.filter((locale): locale is 'ja' | 'en' => locale === 'ja' || locale === 'en'),
+      defaultLocale: isMapLocale(map.defaultLocale) ? map.defaultLocale : 'ja',
+      enabledLocales: orderedMapLocales(isMapLocale(map.defaultLocale) ? map.defaultLocale : 'ja', map.enabledLocales),
       englishTranslation: map.translations[0] ?? null,
       seoTitle: map.seoTitle,
       seoDescription: map.seoDescription,
