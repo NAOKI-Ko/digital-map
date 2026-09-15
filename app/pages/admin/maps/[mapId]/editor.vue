@@ -16,7 +16,10 @@ definePageMeta({ layout: 'admin', middleware: 'auth' })
 
 const LazyMapViewer = defineAsyncComponent(() => import('~/components/map/MapViewer.vue'))
 const mapViewerRef = useTemplateRef<{ focusSpot: (spotId: string) => boolean }>('mapViewer')
-const pinDesignEditorRef = useTemplateRef<{ save: () => Promise<SpotPinDesignResponse['design'] | null> }>('pinDesignEditor')
+const pinDesignEditorRef = useTemplateRef<{
+  reset: () => void
+  save: () => Promise<SpotPinDesignResponse['design'] | null>
+}>('pinDesignEditor')
 
 const route = useRoute()
 const mapId = route.params.mapId as string
@@ -140,6 +143,7 @@ async function savePosition() {
 }
 
 function cancelPositionEditing() {
+  pinDesignEditorRef.value?.reset()
   position.value = null
   placementMode.value = 'idle'
   moveStatus.value = '位置の変更をキャンセルしました。保存済みの位置は変更していません。'

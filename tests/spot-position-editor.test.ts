@@ -29,6 +29,7 @@ describe('PIN管理workspace', () => {
     )
     expect(cancelFunction).toContain("placementMode.value = 'idle'")
     expect(cancelFunction).toContain('position.value = null')
+    expect(cancelFunction).toContain('pinDesignEditorRef.value?.reset()')
     expect(cancelFunction).not.toContain('$fetch')
   })
 

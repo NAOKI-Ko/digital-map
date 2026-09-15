@@ -139,7 +139,13 @@ async function save(): Promise<SpotPinDesignResponse['design'] | null> {
   }
 }
 
-defineExpose({ save })
+function reset() {
+  Object.assign(design, normalizedInitialValue.value)
+  errorMessage.value = ''
+  successMessage.value = ''
+}
+
+defineExpose({ reset, save })
 </script>
 
 <template>
