@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import AppDialog from './AppDialog.vue'
+import UiAlertDialog from './UiAlertDialog.vue'
 
 const props = withDefaults(defineProps<{
   open: boolean
@@ -24,10 +24,5 @@ function cancel() {
 </script>
 
 <template>
-  <AppDialog :open="open" :title="title" :description="message" max-width="sm" @close="cancel">
-    <div class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-      <button type="button" :disabled="busy" class="rounded-lg border border-stone-300 px-4 py-2.5 text-sm font-semibold text-stone-700 hover:bg-stone-50 disabled:opacity-50" @click="cancel">{{ cancelLabel }}</button>
-      <button type="button" :disabled="busy" class="rounded-lg px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50" :class="destructive ? 'bg-red-700 hover:bg-red-800' : 'bg-terracotta-600 hover:bg-terracotta-700'" @click="emit('confirm')">{{ busy ? '処理中…' : confirmLabel }}</button>
-    </div>
-  </AppDialog>
+  <UiAlertDialog :open="open" :title="title" :message="message" :confirm-label="confirmLabel" :cancel-label="cancelLabel" :destructive="destructive" :busy="busy" @cancel="cancel" @confirm="emit('confirm')" />
 </template>

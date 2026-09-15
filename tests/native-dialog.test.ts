@@ -36,23 +36,28 @@ describe('native browser dialog regression', () => {
 describe('application dialog accessibility contract', () => {
   const appDialog = source('/app/components/ui/AppDialog.vue')
   const confirmDialog = source('/app/components/ui/ConfirmDialog.vue')
+  const uiDialog = source('/app/components/ui/UiDialog.vue')
+  const uiAlertDialog = source('/app/components/ui/UiAlertDialog.vue')
 
-  it('labels the modal, traps focus, supports Escape, and returns focus', () => {
-    expect(appDialog).toContain('role="dialog"')
-    expect(appDialog).toContain('aria-modal="true"')
-    expect(appDialog).toContain(':aria-labelledby="titleId"')
-    expect(appDialog).toContain("event.key === 'Escape'")
-    expect(appDialog).toContain("event.key !== 'Tab'")
-    expect(appDialog).toContain("querySelector<HTMLElement>('[autofocus]')")
-    expect(appDialog).toContain('returnFocus?.focus()')
-    expect(appDialog).toContain('@click.self="emit(\'close\')"')
+  it('delegates modal semantics, focus trapping, Escape, and focus return to Reka UI', () => {
+    expect(appDialog).toContain("import UiDialog from './UiDialog.vue'")
+    expect(uiDialog).toContain("from 'reka-ui'")
+    expect(uiDialog).toContain('DialogRoot')
+    expect(uiDialog).toContain('DialogPortal')
+    expect(uiDialog).toContain('DialogOverlay')
+    expect(uiDialog).toContain('DialogContent')
+    expect(uiDialog).toContain('DialogTitle')
+    expect(uiDialog).toContain('DialogDescription')
   })
 
   it('provides explicit cancel and destructive confirmation actions', () => {
     expect(confirmDialog).toContain("cancelLabel: 'キャンセル'")
-    expect(confirmDialog).toContain(':class="destructive')
     expect(confirmDialog).toContain("emit('confirm')")
     expect(confirmDialog).toContain("if (!props.busy) emit('cancel')")
+    expect(confirmDialog).toContain('UiAlertDialog')
+    expect(uiAlertDialog).toContain('AlertDialogCancel')
+    expect(uiAlertDialog).toContain('AlertDialogAction')
+    expect(uiAlertDialog).toContain(':class="destructive')
   })
 })
 
