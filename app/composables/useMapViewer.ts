@@ -5,6 +5,7 @@ import { getDecorationRenderCoordinates } from '~~/lib/decoration'
 import type { MapViewerCameraState, MapViewerDecoration, MapViewerFloor, MapViewerSpot } from '~~/shared/types/map-viewer'
 import { createSpotMarkerElement } from '~/utils/marker-element'
 import { applyMarkerDensityPresentation, getMarkerDensityPresentation } from '~/utils/marker-density'
+import { getViewportOrientation, interpolateMapCenter, isViewportCoveredByPolygon, type MapCenter } from '~/utils/public-map-camera'
 
 export type MapViewerMode = 'view' | 'edit'
 
@@ -73,6 +74,7 @@ export interface UseMapViewerOptions {
   candidateSpot?: Readonly<Ref<MapViewerSpot | null>>
   candidateKind?: Readonly<Ref<'placement' | 'move' | null>>
   prioritizeVisibleSpots?: Readonly<Ref<boolean>>
+  mobileCover?: Readonly<Ref<boolean>>
   initialCamera?: MapViewerCameraState | null
   onReady?: (map: MapLibreMap) => void
   onCameraChanged?: (camera: MapViewerCameraState) => void
@@ -287,6 +289,13 @@ export function useMapViewer(
   let activeLayerId: string | null = null
   let decorationLayers: Array<{ sourceId: string, layerId: string }> = []
   let containerResizeObserver: ResizeObserver | null = null
+  let applyingCameraConstraint = false
+  let coverLayoutKey = ''
+  let coverCameraKey = ''
+  let coverZoom: number = ABSOLUTE_ZOOM_LIMITS.minZoom
+  let largeViewportHeight = 0
+  let largeViewportOrientation = ''
+  let geolocationRequestCamera: MapViewerCameraState | null = null
 
   function resize() {
     const instance = map.value
@@ -294,7 +303,17 @@ export function useMapViewer(
     const camera = getMapViewerCameraState(instance)
     instance.resize()
     const corners = getFloorCorners(options.floor.value)
-    if (corners && isReady.value) updateFloorZoomConstraints(corners, true)
+    if (!corners || !isReady.value) return
+    if (usesMobileCover()) {
+      const nextLayoutKey = getCoverLayoutKey()
+      if (nextLayoutKey !== coverLayoutKey) {
+        coverLayoutKey = nextLayoutKey
+        coverCameraKey = ''
+        constrainMobileCamera(corners, camera)
+      }
+      return
+    }
+    updateFloorZoomConstraints(corners, true)
     restoreMapViewerCamera(instance, camera)
   }
 
@@ -335,6 +354,9 @@ export function useMapViewer(
         syncGeolocateControl(options.floor.value)
         options.onCameraChanged?.(getMapViewerCameraState(instance))
         instance.on('moveend', () => {
+          if (applyingCameraConstraint) return
+          const corners = getFloorCorners(options.floor.value)
+          if (corners && usesMobileCover()) constrainMobileCamera(corners)
           options.onCameraChanged?.(getMapViewerCameraState(instance))
         })
         options.onReady?.(instance)
@@ -389,6 +411,7 @@ export function useMapViewer(
     geolocateControl = null
     mapControlGroup = null
     geolocateHandler = null
+    geolocationRequestCamera = null
     geolocationNoticeState = { requestId: 0, notifiedRequestId: null }
     geolocationAvailable.value = false
     clearGeolocationToast()
@@ -418,6 +441,7 @@ export function useMapViewer(
       if (!isInside) {
         currentLocationMarker?.remove()
         currentLocationMarker = null
+        if (geolocationRequestCamera) restoreMapViewerCamera(instance, geolocationRequestCamera)
         const result = consumeOutsideGeolocation(geolocationNoticeState)
         geolocationNoticeState = result.state
         if (result.notify) showGeolocationToast()
@@ -445,6 +469,7 @@ export function useMapViewer(
     geolocateButton = mapControlGroup.getElement()?.querySelector<HTMLButtonElement>('.maplibregl-ctrl-geolocate') ?? null
     geolocateButtonHandler = () => {
       geolocationNoticeState = beginGeolocationRequest(geolocationNoticeState)
+      geolocationRequestCamera = getMapViewerCameraState(instance)
       clearGeolocationToast()
     }
     geolocateButton?.addEventListener('click', geolocateButtonHandler)
@@ -608,6 +633,117 @@ export function useMapViewer(
     })
   }
 
+  function usesMobileCover() {
+    return options.mode === 'view'
+      && (options.mobileCover?.value ?? false)
+      && Boolean(container.value && container.value.clientWidth < 768)
+  }
+
+  function measureLargeViewportHeight() {
+    if (typeof document === 'undefined') return container.value?.clientHeight ?? 0
+    const probe = document.createElement('div')
+    probe.style.cssText = 'position:fixed;left:-9999px;top:0;width:1px;height:100lvh;pointer-events:none;visibility:hidden'
+    document.body.appendChild(probe)
+    const height = probe.getBoundingClientRect().height
+    probe.remove()
+    return Math.max(height, container.value?.clientHeight ?? 0)
+  }
+
+  function getCoverViewport() {
+    const width = container.value?.clientWidth ?? 0
+    const height = container.value?.clientHeight ?? 0
+    const orientation = getViewportOrientation(width, window.innerHeight)
+    if (orientation !== largeViewportOrientation || largeViewportHeight <= 0) {
+      largeViewportOrientation = orientation
+      largeViewportHeight = measureLargeViewportHeight()
+    }
+    return { width, height, coverHeight: largeViewportHeight }
+  }
+
+  function getCoverLayoutKey() {
+    const viewport = getCoverViewport()
+    return `${Math.round(viewport.width)}:${getViewportOrientation(viewport.width, viewport.coverHeight)}:${Math.round(viewport.coverHeight)}`
+  }
+
+  function getFloorCenter(corners: FloorCorners): MapCenter {
+    const bounds = getGeoReferenceBounds(corners)
+    return {
+      lat: (bounds.southwest[1] + bounds.northeast[1]) / 2,
+      lng: (bounds.southwest[0] + bounds.northeast[0]) / 2,
+    }
+  }
+
+  function isFloorCoveringViewport(corners: FloorCorners) {
+    const instance = map.value
+    if (!instance) return false
+    const viewport = getCoverViewport()
+    const polygon = toImageCoordinates(corners).map(coordinate => instance.project(coordinate))
+    return isViewportCoveredByPolygon(polygon, viewport.width, viewport.height, viewport.coverHeight)
+  }
+
+  function jumpWithoutConstraintEvents(center: MapCenter, zoom: number) {
+    const instance = map.value
+    if (!instance) return
+    applyingCameraConstraint = true
+    instance.jumpTo({ center: [center.lng, center.lat], zoom })
+    applyingCameraConstraint = false
+  }
+
+  function findMobileCoverZoom(corners: FloorCorners, center: MapCenter, startZoom: number) {
+    let low = Math.max(ABSOLUTE_ZOOM_LIMITS.minZoom, Math.min(ABSOLUTE_ZOOM_LIMITS.maxZoom, startZoom))
+    let high = low
+    jumpWithoutConstraintEvents(center, high)
+    while (!isFloorCoveringViewport(corners) && high < ABSOLUTE_ZOOM_LIMITS.maxZoom) {
+      low = high
+      high = Math.min(ABSOLUTE_ZOOM_LIMITS.maxZoom, high + 0.5)
+      jumpWithoutConstraintEvents(center, high)
+    }
+    for (let index = 0; index < 18 && high - low > 0.001; index += 1) {
+      const candidate = (low + high) / 2
+      jumpWithoutConstraintEvents(center, candidate)
+      if (isFloorCoveringViewport(corners)) high = candidate
+      else low = candidate
+    }
+    jumpWithoutConstraintEvents(center, high)
+    return high
+  }
+
+  function getRequiredMobileCoverZoom(corners: FloorCorners, fitZoom: number) {
+    const instance = map.value
+    if (!instance) return fitZoom
+    const cameraKey = `${options.floor.value.id}:${getCoverLayoutKey()}:${instance.getBearing().toFixed(2)}:${instance.getPitch().toFixed(2)}`
+    if (cameraKey === coverCameraKey) return coverZoom
+    coverZoom = findMobileCoverZoom(corners, getFloorCenter(corners), fitZoom)
+    coverCameraKey = cameraKey
+    return coverZoom
+  }
+
+  function constrainMobileCamera(corners: FloorCorners, requestedCamera?: MapViewerCameraState) {
+    const instance = map.value
+    if (!instance || applyingCameraConstraint) return
+    const camera = requestedCamera ?? getMapViewerCameraState(instance)
+    const floorCamera = getFloorCamera(corners)
+    const requiredZoom = getRequiredMobileCoverZoom(corners, floorCamera?.zoom ?? camera.zoom)
+    const targetZoom = Math.max(camera.zoom, requiredZoom)
+    const floorCenter = getFloorCenter(corners)
+
+    instance.setMinZoom(requiredZoom)
+    instance.setMaxZoom(Math.max(requiredZoom, Math.min(ABSOLUTE_ZOOM_LIMITS.maxZoom, requiredZoom + ZOOM_IN_ALLOWANCE)))
+    jumpWithoutConstraintEvents(camera.center, targetZoom)
+    if (isFloorCoveringViewport(corners)) return
+
+    let invalid = 0
+    let valid = 1
+    for (let index = 0; index < 18; index += 1) {
+      const amount = (invalid + valid) / 2
+      const center = interpolateMapCenter(camera.center, floorCenter, amount)
+      jumpWithoutConstraintEvents(center, targetZoom)
+      if (isFloorCoveringViewport(corners)) valid = amount
+      else invalid = amount
+    }
+    jumpWithoutConstraintEvents(interpolateMapCenter(camera.center, floorCenter, valid), targetZoom)
+  }
+
   function getFloorCamera(corners: FloorCorners) {
     const instance = map.value
     if (!instance) return null
@@ -617,7 +753,7 @@ export function useMapViewer(
     instance.setMinZoom(ABSOLUTE_ZOOM_LIMITS.minZoom)
     instance.setMaxZoom(ABSOLUTE_ZOOM_LIMITS.maxZoom)
     const camera = instance.cameraForBounds([bounds.southwest, bounds.northeast], {
-      padding: container.value && container.value.clientWidth < 640 ? 24 : 48,
+      padding: usesMobileCover() ? 0 : (container.value && container.value.clientWidth < 768 ? 24 : 48),
       maxZoom: 20,
     })
     return camera
@@ -642,6 +778,18 @@ export function useMapViewer(
   function fitFloorBounds(corners: FloorCorners, animate: boolean) {
     const instance = map.value
     if (!instance) return
+    if (usesMobileCover()) {
+      const camera = getFloorCamera(corners)
+      if (!camera) return
+      coverLayoutKey = getCoverLayoutKey()
+      coverCameraKey = ''
+      const center = getFloorCenter(corners)
+      const requiredZoom = getRequiredMobileCoverZoom(corners, camera.zoom ?? instance.getZoom())
+      instance.setMinZoom(requiredZoom)
+      instance.setMaxZoom(Math.max(requiredZoom, Math.min(ABSOLUTE_ZOOM_LIMITS.maxZoom, requiredZoom + ZOOM_IN_ALLOWANCE)))
+      jumpWithoutConstraintEvents(center, requiredZoom)
+      return
+    }
     const result = updateFloorZoomConstraints(corners)
     if (!result) return
     instance.easeTo({
@@ -659,6 +807,8 @@ export function useMapViewer(
     if (!instance || !isReady.value) return false
 
     removeFloorImage()
+    coverCameraKey = ''
+    coverLayoutKey = ''
 
     if (!corners) {
       floorError.value = 'このフロアは2点合わせが未設定、または正しくありません。'

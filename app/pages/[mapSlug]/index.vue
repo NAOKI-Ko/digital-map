@@ -28,7 +28,6 @@ const selectedSpotId = ref<string | null>(null)
 const selectedCategoryIds = ref<string[]>([])
 const floorSelectorOpen = ref(false)
 const infoOpen = ref(false)
-const detailExpanded = ref(false)
 let spotTrigger: HTMLElement | null = null
 let spotTriggerId: string | null = null
 
@@ -45,6 +44,7 @@ const categories = computed(() => (
 ))
 const visibleSpots = computed(() => filterSpotsByCategoryIds(selectedFloor.value?.spots ?? [], selectedCategoryIds.value))
 const showFloorSelector = computed(() => shouldShowFloorSelector(data.value?.map.floors.length ?? 0))
+const appModalOpen = computed(() => Boolean(selectedSpot.value || floorSelectorOpen.value || infoOpen.value))
 const publicBaseUrl = useRuntimeConfig().public.publicBaseUrl as string
 const localeUrl = (locale: 'ja' | 'en') => buildPublicLocaleUrl(publicBaseUrl, mapSlug.value, locale)
 const absoluteImage = computed(() => data.value?.map.seo.imageUrl ? new URL(data.value.map.seo.imageUrl, publicBaseUrl).toString() : undefined)
@@ -91,24 +91,65 @@ useHead(() => ({
 }))
 
 function selectSpot(spot: MapViewerSpot) {
-  if (document.activeElement instanceof HTMLElement) spotTrigger = document.activeElement
+  spotTrigger = [...document.querySelectorAll<HTMLElement>('.map-viewer-marker[data-spot-id]')]
+    .find(element => element.dataset.spotId === spot.id) ?? null
   spotTriggerId = spot.id
+  floorSelectorOpen.value = false
+  infoOpen.value = false
   selectedSpotId.value = spot.id
-  detailExpanded.value = false
   if (data.value?.map.id) sendPublicAnalytics({ type: 'SPOT_VIEW', mapId: data.value.map.id, spotId: spot.id })
 }
 
-function closeSpot() {
+function closeSpot(source: 'pointer' | 'other' = 'other') {
+  if (!selectedSpotId.value) return
+  const closingSpotId = selectedSpotId.value
+  const closingTrigger = spotTrigger
   selectedSpotId.value = null
-  detailExpanded.value = false
-  nextTick(() => requestAnimationFrame(() => {
-    const fallback = spotTriggerId
-      ? [...document.querySelectorAll<HTMLElement>('.map-viewer-marker[data-spot-id]')].find(element => element.dataset.spotId === spotTriggerId)
-      : null
-    ;(spotTrigger?.isConnected ? spotTrigger : fallback)?.focus()
-    spotTrigger = null
-    spotTriggerId = null
-  }))
+  const restoreFocus = () => {
+    const fallbackMarker = [...document.querySelectorAll<HTMLElement>('.map-viewer-marker[data-spot-id]')]
+      .find(element => element.dataset.spotId === closingSpotId)
+    const mapEntry = document.querySelector<HTMLElement>('.map-viewer-frame [role="region"]')
+    ;(closingTrigger?.isConnected ? closingTrigger : fallbackMarker ?? mapEntry)?.focus({ preventScroll: true })
+    if (spotTriggerId === closingSpotId) {
+      spotTrigger = null
+      spotTriggerId = null
+    }
+  }
+  if (source !== 'pointer') {
+    nextTick(() => window.setTimeout(restoreFocus, 50))
+    return
+  }
+  let finished = false
+  const finishPointerGesture = () => {
+    if (finished) return
+    finished = true
+    window.removeEventListener('pointerup', finishPointerGesture, true)
+    window.removeEventListener('mouseup', finishPointerGesture, true)
+    const blockSameGestureClick = (event: MouseEvent) => {
+      event.preventDefault()
+      event.stopImmediatePropagation()
+    }
+    window.addEventListener('click', blockSameGestureClick, { capture: true, once: true })
+    nextTick(() => window.setTimeout(() => {
+      window.removeEventListener('click', blockSameGestureClick, true)
+      restoreFocus()
+    }))
+  }
+  window.addEventListener('pointerup', finishPointerGesture, true)
+  window.addEventListener('mouseup', finishPointerGesture, true)
+  window.setTimeout(finishPointerGesture, 1000)
+}
+
+function openFloorSelector() {
+  selectedSpotId.value = null
+  infoOpen.value = false
+  floorSelectorOpen.value = true
+}
+
+function openInfo() {
+  selectedSpotId.value = null
+  floorSelectorOpen.value = false
+  infoOpen.value = true
 }
 
 function selectFloor(floorId: string) {
@@ -131,7 +172,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <main class="h-[100svh] overflow-hidden bg-stone-100 text-stone-900">
+  <main class="fixed inset-0 h-[100dvh] w-screen overflow-hidden bg-stone-100 text-stone-900 md:static md:w-auto">
     <div v-if="status === 'pending'" class="grid h-full place-items-center px-6 text-sm text-stone-600">
       {{ t.loading }}
     </div>
@@ -148,7 +189,7 @@ onMounted(() => {
       </section>
     </div>
     <template v-else-if="selectedFloor">
-      <header class="hidden h-14 items-center justify-between gap-3 border-b border-white/60 bg-white/75 px-6 backdrop-blur sm:flex">
+      <header class="hidden h-14 items-center justify-between gap-3 border-b border-white/60 bg-white/75 px-6 backdrop-blur md:flex">
         <div class="flex min-w-0 items-center gap-3">
           <img v-if="data.map.logoUrl" :src="data.map.logoUrl" :alt="`${data.map.organizationName ?? data.map.name}のロゴ`" class="size-10 shrink-0 rounded-lg object-contain">
           <div class="min-w-0">
@@ -156,31 +197,36 @@ onMounted(() => {
             <h1 class="mt-0.5 truncate text-lg font-bold tracking-tight">{{ data.map.name }}</h1>
           </div>
         </div>
-        <nav aria-label="公開マップ操作" class="flex shrink-0 items-center gap-2">
+        <nav v-show="!appModalOpen" aria-label="公開マップ操作" class="flex shrink-0 items-center gap-2">
           <label v-if="data.map.enabledLocales.includes('en')" class="sr-only" for="public-locale">{{ t.language }}</label>
           <select v-if="data.map.enabledLocales.includes('en')" id="public-locale" :value="data.map.locale" class="rounded-full border border-stone-200 px-2.5 py-1.5 text-xs" @change="switchLocale(($event.target as HTMLSelectElement).value as 'ja' | 'en')"><option value="ja">日本語</option><option value="en">English</option></select>
-          <button type="button" class="grid size-11 place-items-center rounded-full border border-stone-200 bg-white/80 text-sm font-bold" aria-label="マップ情報を開く" @click="infoOpen = true">i</button>
+          <button type="button" class="grid size-11 place-items-center rounded-full border border-stone-200 bg-white/80 text-sm font-bold" aria-label="マップ情報を開く" @click="openInfo">i</button>
         </nav>
       </header>
 
-      <section class="relative h-[100svh] min-h-0 sm:h-[calc(100svh-3.5rem)]">
-        <div v-if="showFloorSelector" class="absolute left-3 top-3 z-20 max-w-[calc(100%-8.5rem)] sm:left-5 sm:top-5 sm:max-w-none">
-          <button type="button" class="flex min-h-11 max-w-full items-center gap-2 rounded-full border border-white/70 bg-white/80 px-4 text-sm font-bold shadow-sm backdrop-blur" aria-haspopup="dialog" :aria-expanded="floorSelectorOpen" @click="floorSelectorOpen = true">
+      <section class="public-map-stage relative h-[100dvh] min-h-0 md:h-[calc(100dvh-3.5rem)]" :class="{ 'public-map-locked': appModalOpen }">
+        <div v-show="!appModalOpen" class="pointer-events-none absolute inset-0 z-20 md:hidden" aria-label="公開マップ操作">
+          <div v-if="showFloorSelector" class="pointer-events-auto absolute left-[calc(env(safe-area-inset-left)+0.75rem)] top-[calc(env(safe-area-inset-top)+0.75rem)] max-w-[40vw]">
+          <button type="button" class="flex h-11 max-w-full items-center gap-2 rounded-full border border-white/70 bg-white/85 px-4 text-sm font-bold shadow-sm backdrop-blur" aria-haspopup="dialog" :aria-expanded="floorSelectorOpen" @click="openFloorSelector">
             <span class="truncate">{{ selectedFloor.name }}</span> <span class="shrink-0" aria-hidden="true">⌄</span>
           </button>
+          </div>
+
+        <div class="pointer-events-auto absolute right-[calc(env(safe-area-inset-right)+0.75rem)] top-[calc(env(safe-area-inset-top)+0.75rem)] flex items-center gap-2">
+          <label v-if="data.map.enabledLocales.includes('en')" class="sr-only" for="public-locale-mobile">{{ t.language }}</label>
+          <select v-if="data.map.enabledLocales.includes('en')" id="public-locale-mobile" :value="data.map.locale" class="h-11 w-16 rounded-full border border-white/70 bg-white/85 px-3 text-xs font-bold shadow-sm backdrop-blur" @change="switchLocale(($event.target as HTMLSelectElement).value as 'ja' | 'en')"><option value="ja">JA</option><option value="en">EN</option></select>
+          <span v-else class="grid h-11 w-16 place-items-center rounded-full border border-white/70 bg-white/85 text-xs font-bold shadow-sm backdrop-blur" aria-label="言語: 日本語">JA</span>
+          <button type="button" class="grid size-11 place-items-center rounded-full border border-white/70 bg-white/85 text-sm font-bold shadow-sm backdrop-blur" aria-label="マップ情報を開く" @click="openInfo">i</button>
+        </div>
         </div>
 
-        <div class="absolute right-3 top-3 z-20 flex items-center gap-2 sm:hidden">
-          <label v-if="data.map.enabledLocales.includes('en')" class="sr-only" for="public-locale-mobile">{{ t.language }}</label>
-          <select v-if="data.map.enabledLocales.includes('en')" id="public-locale-mobile" :value="data.map.locale" class="min-h-11 rounded-full border border-white/70 bg-white/80 px-3 text-xs font-bold shadow-sm backdrop-blur" @change="switchLocale(($event.target as HTMLSelectElement).value as 'ja' | 'en')"><option value="ja">JA</option><option value="en">EN</option></select>
-          <span v-else class="grid size-11 place-items-center rounded-full border border-white/70 bg-white/80 text-xs font-bold shadow-sm backdrop-blur" aria-label="言語: 日本語">JA</span>
-          <button type="button" class="grid size-11 place-items-center rounded-full border border-white/70 bg-white/80 text-sm font-bold shadow-sm backdrop-blur" aria-label="マップ情報を開く" @click="infoOpen = true">i</button>
+        <div v-if="showFloorSelector && !appModalOpen" class="absolute left-5 top-5 z-20 hidden md:block">
+          <button type="button" class="flex min-h-11 max-w-full items-center gap-2 rounded-full border border-white/70 bg-white/80 px-4 text-sm font-bold shadow-sm backdrop-blur" aria-haspopup="dialog" :aria-expanded="floorSelectorOpen" @click="openFloorSelector"><span class="truncate">{{ selectedFloor.name }}</span><span aria-hidden="true">⌄</span></button>
         </div>
 
         <div
-          v-show="!detailExpanded"
-          class="pointer-events-none absolute left-1/2 z-20 w-[min(50vw,44rem)] -translate-x-1/2 transition-[bottom] max-sm:w-[calc(100vw-1.5rem)]"
-          :class="selectedSpot ? 'bottom-[calc(12rem+env(safe-area-inset-bottom))] sm:bottom-[max(1rem,env(safe-area-inset-bottom))]' : 'bottom-[calc(2.5rem+env(safe-area-inset-bottom))] sm:bottom-[max(1rem,env(safe-area-inset-bottom))]'"
+          v-show="!appModalOpen"
+          class="pointer-events-none absolute bottom-[calc(env(safe-area-inset-bottom)+2rem)] left-[calc(env(safe-area-inset-left)+0.75rem)] right-[calc(env(safe-area-inset-right)+0.75rem)] z-20 md:left-1/2 md:right-auto md:w-[min(50vw,44rem)] md:-translate-x-1/2"
         >
           <div class="pointer-events-auto">
             <CategoryFilter v-model="selectedCategoryIds" :categories="categories" />
@@ -196,6 +242,7 @@ onMounted(() => {
             mode="view"
             :selected-spot-id="selectedSpotId"
             :prioritize-visible-spots="selectedCategoryIds.length > 0"
+            mobile-cover
             height="100%"
             :label="`${data.map.name} ${selectedFloor.name}`"
             @spot-selected="selectSpot"
@@ -206,7 +253,7 @@ onMounted(() => {
         </ClientOnly>
 
         <ClientOnly>
-          <MapOperationHint :storage-key="`digital-map:operation-hint:${data.map.slug}`" />
+          <MapOperationHint v-if="!appModalOpen" :storage-key="`digital-map:operation-hint:${data.map.slug}`" />
         </ClientOnly>
       </section>
 
@@ -214,7 +261,6 @@ onMounted(() => {
         v-if="selectedSpot"
         :spot="selectedSpot"
         @close="closeSpot"
-        @expanded-change="detailExpanded = $event"
       />
       <PublicFloorSelector v-if="floorSelectorOpen" :floors="data.map.floors" :model-value="selectedFloorId" @select="selectFloor" @close="floorSelectorOpen = false" />
       <PublicMapInfo v-if="infoOpen" :map-name="data.map.name" :organization-name="data.map.organizationName" :logo-url="data.map.logoUrl" :website-url="data.map.websiteUrl" :sns-url="data.map.snsUrl" :official-label="t.official" @close="infoOpen = false" />

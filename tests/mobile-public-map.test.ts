@@ -32,15 +32,15 @@ describe('公開Mapのモバイル契約', () => {
     expect(publicPage).not.toContain('<NuxtLink to="/terms"')
   })
 
-  it('Spot詳細はcollapsedからexpandedへ展開できる', () => {
-    expect(detail).toContain('const expanded = ref(false)')
-    expect(detail).toContain('@click="expanded = !expanded"')
-    expect(detail).toContain('詳細を見る')
-    expect(detail).toContain('@click.stop="expanded = true"')
-    expect(detail).toContain('100dvh-4.5rem-env(safe-area-inset-top)')
-    expect(publicPage).toContain('@expanded-change="detailExpanded = $event"')
-    expect(publicPage).toContain('v-show="!detailExpanded"')
-    expect(detail).toContain('sticky top-4')
+  it('PINからsummaryを挟まずdetail/expandedの本文Dialogを直接開く', () => {
+    expect(detail).toContain("const sheetState = ref<BottomSheetState>('detail')")
+    expect(detail).toContain("sheetState.value === 'expanded' ? 0.92 : 0.6")
+    expect(detail).toContain('<DialogContent')
+    expect(detail).toContain('spot-detail-sheet__body min-h-0 flex-1 overflow-y-auto')
+    expect(detail).not.toContain('詳細を見る')
+    expect(detail).not.toContain('summary')
+    expect(publicPage).toContain('v-if="selectedSpot"')
+    expect(publicPage).toContain('v-show="!appModalOpen"')
   })
 
   it('選択時にmarker DOMを作り直さず重なりPINへclickが移らない', () => {
@@ -49,13 +49,14 @@ describe('公開Mapのモバイル契約', () => {
     expect(viewer).not.toContain('watch(() => options.selectedSpotId.value, syncSpotMarkers)')
   })
 
-  it('モバイルはheaderなしでMapが100svhを使いCategoryを1行scrollする', () => {
+  it('モバイルはheaderなしでMapが100dvhを使いCategoryを1行scrollする', () => {
     const category = readFileSync(new URL('../app/components/map/CategoryFilter.vue', import.meta.url), 'utf8')
     expect(publicPage).toContain('hidden h-14')
-    expect(publicPage).toContain('h-[100svh]')
+    expect(publicPage).toContain('h-[100dvh]')
+    expect(publicPage).toContain('mobile-cover')
     expect(category).toContain('overflow-x-auto')
-    expect(category).toContain('text-[13px]')
-    expect(category).toContain('h-9')
+    expect(category).toContain('text-sm')
+    expect(category).toContain('h-8')
     expect(category).toContain('min-h-11')
     expect(category).not.toContain('overflowCategories')
     expect(mapViewer).toContain(':style="{ height }"')
@@ -63,8 +64,10 @@ describe('公開Mapのモバイル契約', () => {
   })
 
   it('top controls、Map controls、Category、attributionへ独立した配置zoneを持つ', () => {
-    expect(publicPage).toContain('max-w-[calc(100%-8.5rem)]')
-    expect(publicPage).toContain('bottom-[calc(2.5rem+env(safe-area-inset-bottom))]')
-    expect(mapViewer).toContain('margin-top: 4.25rem !important;')
+    expect(publicPage).toContain('max-w-[40vw]')
+    expect(publicPage).toContain('bottom-[calc(env(safe-area-inset-bottom)+2rem)]')
+    expect(publicPage).toContain('right-[calc(env(safe-area-inset-right)+0.75rem)]')
+    expect(mapViewer).toContain('margin-top: calc(env(safe-area-inset-top) + 4.5rem) !important;')
+    expect(mapViewer).toContain('.public-map-locked .map-viewer-control-group')
   })
 })

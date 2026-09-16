@@ -18,6 +18,7 @@ const props = withDefaults(defineProps<{
   floorErrorActionTo?: string | null
   initialCamera?: MapViewerCameraState | null
   prioritizeVisibleSpots?: boolean
+  mobileCover?: boolean
 }>(), {
   spots: () => [],
   decorations: () => [],
@@ -32,6 +33,7 @@ const props = withDefaults(defineProps<{
   floorErrorActionTo: null,
   initialCamera: null,
   prioritizeVisibleSpots: false,
+  mobileCover: false,
 })
 
 const emit = defineEmits<{
@@ -51,6 +53,7 @@ const candidateSpot = toRef(props, 'candidateSpot')
 const candidateKind = toRef(props, 'candidateKind')
 const placementEnabled = toRef(props, 'placementEnabled')
 const prioritizeVisibleSpots = toRef(props, 'prioritizeVisibleSpots')
+const mobileCover = toRef(props, 'mobileCover')
 const viewer = useMapViewer(container, {
   floor,
   spots,
@@ -61,6 +64,7 @@ const viewer = useMapViewer(container, {
   candidateKind,
   placementEnabled,
   prioritizeVisibleSpots,
+  mobileCover,
   mode: props.mode,
   initialCamera: props.initialCamera,
   onCameraChanged: camera => emit('cameraChanged', camera),
@@ -77,8 +81,8 @@ defineExpose({
 </script>
 
 <template>
-  <div>
-    <div class="relative overflow-hidden rounded-xl border border-stone-300 bg-stone-100" :style="{ height }" :aria-busy="!isReady">
+  <div :class="{ 'public-map-viewer h-full': mode === 'view' }">
+    <div class="map-viewer-frame relative overflow-hidden rounded-xl border border-stone-300 bg-stone-100" :style="{ height }" :aria-busy="!isReady">
       <div
         ref="container"
         class="h-full w-full transition-opacity duration-150"
@@ -338,20 +342,35 @@ defineExpose({
   outline-offset: -2px;
 }
 
-@media (max-width: 639px) {
+@media (max-width: 767px) {
+  .public-map-viewer .map-viewer-frame {
+    border: 0;
+    border-radius: 0;
+  }
+
   .map-viewer-control-group,
   .map-viewer-navigation-control {
     flex-direction: column;
   }
 
   .map-viewer-control-group {
-    gap: 0.375rem;
-    margin-top: 4.25rem !important;
+    gap: 0.5rem;
+    margin-top: calc(env(safe-area-inset-top) + 4.5rem) !important;
+    margin-right: calc(env(safe-area-inset-right) + 0.75rem) !important;
   }
 
   .map-viewer-navigation-control button + button {
     border-left: 0;
     border-top: 1px solid #e7e5e4;
   }
+}
+
+.public-map-locked .map-viewer-control-group {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.public-map-locked .maplibregl-canvas-container {
+  pointer-events: none;
 }
 </style>

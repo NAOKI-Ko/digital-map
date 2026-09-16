@@ -1,0 +1,653 @@
+{
+  "390x844": {
+    "page": {
+      "viewport": [
+        390,
+        844
+      ],
+      "mobileMedia": true,
+      "desktopMedia": false,
+      "stage": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 844,
+        "display": "block",
+        "visibility": "visible",
+        "overflowY": "visible"
+      },
+      "map": null,
+      "canvas": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 844,
+        "display": "block",
+        "visibility": "visible",
+        "overflowY": "clip"
+      },
+      "controls": [
+        {
+          "display": "flex",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          }
+        },
+        {
+          "display": "block",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 390,
+            "height": 844,
+            "top": 0,
+            "right": 390,
+            "bottom": 844,
+            "left": 0
+          }
+        }
+      ],
+      "floorButton": {
+        "x": 12,
+        "y": 12,
+        "width": 148.4375,
+        "height": 44,
+        "display": "flex",
+        "visibility": "visible",
+        "overflowY": "visible"
+      },
+      "infoButton": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "grid",
+        "visibility": "visible",
+        "overflowY": "visible"
+      },
+      "category": null,
+      "desktopHeaderVisible": false,
+      "markerCount": 10,
+      "bodyText": "有松（チーム内デモ） | デジタルマップ\n有松町（デモ）\n⌄\nJA\ni\nすべて\nカフェ\nカフェ・パン\n観光・史跡\n食事処\n神社・史跡\n土産物\n買\n食\n食\n観\nlocal_cafe\n買\nstorefront\n+\n−\nMapLibre\n\nマップを自由に動かせます\n\nドラッグで移動、2本指で回転・傾き、ピンチで拡大縮小できます。"
+    },
+    "detail": {
+      "sheet": {
+        "x": 0,
+        "y": 338,
+        "width": 390,
+        "height": 506,
+        "display": "flex",
+        "overflowY": "hidden",
+        "fontSize": "16px"
+      },
+      "ariaModal": "true",
+      "title": {
+        "x": 16,
+        "y": 394,
+        "width": 254,
+        "height": 27.5,
+        "display": "block",
+        "overflowY": "visible",
+        "fontSize": "22px"
+      },
+      "body": {
+        "x": 0,
+        "y": 434.5,
+        "width": 390,
+        "height": 409.5,
+        "display": "block",
+        "overflowY": "auto",
+        "fontSize": "16px"
+      },
+      "header": {
+        "x": 0,
+        "y": 338,
+        "width": 390,
+        "height": 96.5,
+        "display": "block",
+        "overflowY": "visible",
+        "fontSize": "16px"
+      },
+      "buttons": [
+        {
+          "label": "スポット詳細を大きく表示",
+          "x": 278,
+          "y": 366,
+          "width": 44,
+          "height": 44,
+          "display": "grid",
+          "overflowY": "visible",
+          "fontSize": "18px"
+        },
+        {
+          "label": "スポット詳細を閉じる",
+          "x": 330,
+          "y": 366,
+          "width": 44,
+          "height": 44,
+          "display": "grid",
+          "overflowY": "visible",
+          "fontSize": "20px"
+        }
+      ],
+      "text": "カフェ\nカフェ 庄九郎\n⌃\n×\n\n説明は登録されていません。",
+      "activeElement": "spot-detail-title-demo-arimatsu-05",
+      "controlsHidden": true,
+      "canvasPointerEvents": "none",
+      "markerTransforms": [
+        "matrix(1, 0, 0, 1, -241.569, 94.489)",
+        "matrix(1, 0, 0, 1, 73.9483, 204.919)",
+        "matrix(1, 0, 0, 1, -45.3909, 153.088)",
+        "matrix(1, 0, 0, 1, 657.873, 548.123)",
+        "matrix(1, 0, 0, 1, -486.459, 35.2877)",
+        "matrix(1, 0, 0, 1, 858.043, 683.482)",
+        "matrix(1, 0, 0, 1, 489.157, 434.034)",
+        "matrix(1, 0, 0, 1, 198.068, 267.036)",
+        "matrix(1, 0, 0, 1, -368.719, 65.6949)",
+        "matrix(1, 0, 0, 1, 336.918, 336.526)"
+      ],
+      "cameraStable": true
+    },
+    "expanded": {
+      "sheet": {
+        "x": 0,
+        "y": 68,
+        "width": 390,
+        "height": 776,
+        "display": "flex",
+        "overflowY": "hidden",
+        "fontSize": "16px"
+      },
+      "ariaModal": "true",
+      "title": {
+        "x": 16,
+        "y": 124,
+        "width": 254,
+        "height": 27.5,
+        "display": "block",
+        "overflowY": "visible",
+        "fontSize": "22px"
+      },
+      "body": {
+        "x": 0,
+        "y": 164.5,
+        "width": 390,
+        "height": 679.5,
+        "display": "block",
+        "overflowY": "auto",
+        "fontSize": "16px"
+      },
+      "header": {
+        "x": 0,
+        "y": 68,
+        "width": 390,
+        "height": 96.5,
+        "display": "block",
+        "overflowY": "visible",
+        "fontSize": "16px"
+      },
+      "buttons": [
+        {
+          "label": "スポット詳細の高さを戻す",
+          "x": 278,
+          "y": 96,
+          "width": 44,
+          "height": 44,
+          "display": "grid",
+          "overflowY": "visible",
+          "fontSize": "18px"
+        },
+        {
+          "label": "スポット詳細を閉じる",
+          "x": 330,
+          "y": 96,
+          "width": 44,
+          "height": 44,
+          "display": "grid",
+          "overflowY": "visible",
+          "fontSize": "20px"
+        }
+      ],
+      "text": "カフェ\nカフェ 庄九郎\n⌄\n×\n\n説明は登録されていません。",
+      "activeElement": "spot-detail-title-demo-arimatsu-05",
+      "controlsHidden": true,
+      "canvasPointerEvents": "none",
+      "markerTransforms": [
+        "matrix(1, 0, 0, 1, -241.569, 94.489)",
+        "matrix(1, 0, 0, 1, 73.9483, 204.919)",
+        "matrix(1, 0, 0, 1, -45.3909, 153.088)",
+        "matrix(1, 0, 0, 1, 657.873, 548.123)",
+        "matrix(1, 0, 0, 1, -486.459, 35.2877)",
+        "matrix(1, 0, 0, 1, 858.043, 683.482)",
+        "matrix(1, 0, 0, 1, 489.157, 434.034)",
+        "matrix(1, 0, 0, 1, 198.068, 267.036)",
+        "matrix(1, 0, 0, 1, -368.719, 65.6949)",
+        "matrix(1, 0, 0, 1, 336.918, 336.526)"
+      ]
+    },
+    "closedAfterOneDownSwipe": true,
+    "escapeClose": {
+      "dialog": false,
+      "activeId": "demo-arimatsu-05",
+      "expectedId": "demo-arimatsu-05"
+    },
+    "backdropClose": {
+      "afterPress": false,
+      "dialog": false,
+      "activeId": "demo-arimatsu-05",
+      "activeTag": "BUTTON",
+      "activeRole": null,
+      "activeLabel": "カフェ 庄九郎の詳細を表示"
+    }
+  },
+  "430x932": {
+    "page": {
+      "viewport": [
+        430,
+        932
+      ],
+      "mobileMedia": true,
+      "desktopMedia": false,
+      "stage": {
+        "x": 0,
+        "y": 0,
+        "width": 430,
+        "height": 932,
+        "display": "block",
+        "visibility": "visible",
+        "overflowY": "visible"
+      },
+      "map": null,
+      "canvas": {
+        "x": 0,
+        "y": 0,
+        "width": 430,
+        "height": 932,
+        "display": "block",
+        "visibility": "visible",
+        "overflowY": "clip"
+      },
+      "controls": [
+        {
+          "display": "flex",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          }
+        },
+        {
+          "display": "block",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 430,
+            "height": 932,
+            "top": 0,
+            "right": 430,
+            "bottom": 932,
+            "left": 0
+          }
+        }
+      ],
+      "floorButton": {
+        "x": 12,
+        "y": 12,
+        "width": 148.4375,
+        "height": 44,
+        "display": "flex",
+        "visibility": "visible",
+        "overflowY": "visible"
+      },
+      "infoButton": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "grid",
+        "visibility": "visible",
+        "overflowY": "visible"
+      },
+      "category": null,
+      "desktopHeaderVisible": false,
+      "markerCount": 10,
+      "bodyText": "有松（チーム内デモ） | デジタルマップ\n有松町（デモ）\n⌄\nJA\ni\nすべて\nカフェ\nカフェ・パン\n観光・史跡\n食事処\n神社・史跡\n土産物\n買\n食\n食\n観\nlocal_cafe\n買\nstorefront\n+\n−\nMapLibre"
+    },
+    "detail": {
+      "sheet": {
+        "x": 0,
+        "y": 373,
+        "width": 430,
+        "height": 559,
+        "display": "flex",
+        "overflowY": "hidden",
+        "fontSize": "16px"
+      },
+      "ariaModal": "true",
+      "title": {
+        "x": 16,
+        "y": 429,
+        "width": 294,
+        "height": 27.5,
+        "display": "block",
+        "overflowY": "visible",
+        "fontSize": "22px"
+      },
+      "body": {
+        "x": 0,
+        "y": 469.5,
+        "width": 430,
+        "height": 462.5,
+        "display": "block",
+        "overflowY": "auto",
+        "fontSize": "16px"
+      },
+      "header": {
+        "x": 0,
+        "y": 373,
+        "width": 430,
+        "height": 96.5,
+        "display": "block",
+        "overflowY": "visible",
+        "fontSize": "16px"
+      },
+      "buttons": [
+        {
+          "label": "スポット詳細を大きく表示",
+          "x": 318,
+          "y": 401,
+          "width": 44,
+          "height": 44,
+          "display": "grid",
+          "overflowY": "visible",
+          "fontSize": "18px"
+        },
+        {
+          "label": "スポット詳細を閉じる",
+          "x": 370,
+          "y": 401,
+          "width": 44,
+          "height": 44,
+          "display": "grid",
+          "overflowY": "visible",
+          "fontSize": "20px"
+        }
+      ],
+      "text": "カフェ\nカフェ 庄九郎\n⌃\n×\n\n説明は登録されていません。",
+      "activeElement": "spot-detail-title-demo-arimatsu-05",
+      "controlsHidden": true,
+      "canvasPointerEvents": "none",
+      "markerTransforms": [
+        "matrix(1, 0, 0, 1, -264.133, 110.483)",
+        "matrix(1, 0, 0, 1, 84.4117, 232.466)",
+        "matrix(1, 0, 0, 1, -47.4222, 175.212)",
+        "matrix(1, 0, 0, 1, 729.568, 611.644)",
+        "matrix(1, 0, 0, 1, -534.645, 45.092)",
+        "matrix(1, 0, 0, 1, 950.773, 761.219)",
+        "matrix(1, 0, 0, 1, 543.14, 485.585)",
+        "matrix(1, 0, 0, 1, 221.532, 301.087)",
+        "matrix(1, 0, 0, 1, -404.588, 78.678)",
+        "matrix(1, 0, 0, 1, 374.934, 377.856)"
+      ],
+      "cameraStable": true
+    },
+    "expanded": {
+      "sheet": {
+        "x": 0,
+        "y": 75,
+        "width": 430,
+        "height": 857,
+        "display": "flex",
+        "overflowY": "hidden",
+        "fontSize": "16px"
+      },
+      "ariaModal": "true",
+      "title": {
+        "x": 16,
+        "y": 131,
+        "width": 294,
+        "height": 27.5,
+        "display": "block",
+        "overflowY": "visible",
+        "fontSize": "22px"
+      },
+      "body": {
+        "x": 0,
+        "y": 171.5,
+        "width": 430,
+        "height": 760.5,
+        "display": "block",
+        "overflowY": "auto",
+        "fontSize": "16px"
+      },
+      "header": {
+        "x": 0,
+        "y": 75,
+        "width": 430,
+        "height": 96.5,
+        "display": "block",
+        "overflowY": "visible",
+        "fontSize": "16px"
+      },
+      "buttons": [
+        {
+          "label": "スポット詳細の高さを戻す",
+          "x": 318,
+          "y": 103,
+          "width": 44,
+          "height": 44,
+          "display": "grid",
+          "overflowY": "visible",
+          "fontSize": "18px"
+        },
+        {
+          "label": "スポット詳細を閉じる",
+          "x": 370,
+          "y": 103,
+          "width": 44,
+          "height": 44,
+          "display": "grid",
+          "overflowY": "visible",
+          "fontSize": "20px"
+        }
+      ],
+      "text": "カフェ\nカフェ 庄九郎\n⌄\n×\n\n説明は登録されていません。",
+      "activeElement": "spot-detail-title-demo-arimatsu-05",
+      "controlsHidden": true,
+      "canvasPointerEvents": "none",
+      "markerTransforms": [
+        "matrix(1, 0, 0, 1, -264.133, 110.483)",
+        "matrix(1, 0, 0, 1, 84.4117, 232.466)",
+        "matrix(1, 0, 0, 1, -47.4222, 175.212)",
+        "matrix(1, 0, 0, 1, 729.568, 611.644)",
+        "matrix(1, 0, 0, 1, -534.645, 45.092)",
+        "matrix(1, 0, 0, 1, 950.773, 761.219)",
+        "matrix(1, 0, 0, 1, 543.14, 485.585)",
+        "matrix(1, 0, 0, 1, 221.532, 301.087)",
+        "matrix(1, 0, 0, 1, -404.588, 78.678)",
+        "matrix(1, 0, 0, 1, 374.934, 377.856)"
+      ]
+    },
+    "closedAfterOneDownSwipe": true,
+    "escapeClose": {
+      "dialog": false,
+      "activeId": "demo-arimatsu-05",
+      "expectedId": "demo-arimatsu-05"
+    },
+    "backdropClose": {
+      "afterPress": false,
+      "dialog": false,
+      "activeId": "demo-arimatsu-05",
+      "activeTag": "BUTTON",
+      "activeRole": null,
+      "activeLabel": "カフェ 庄九郎の詳細を表示"
+    }
+  },
+  "breakpoint-767": {
+    "viewport": [
+      767,
+      844
+    ],
+    "mobileMedia": true,
+    "desktopMedia": false,
+    "stage": {
+      "x": 0,
+      "y": 0,
+      "width": 767,
+      "height": 844,
+      "display": "block",
+      "visibility": "visible",
+      "overflowY": "visible"
+    },
+    "map": null,
+    "canvas": {
+      "x": 0,
+      "y": 0,
+      "width": 767,
+      "height": 844,
+      "display": "block",
+      "visibility": "visible",
+      "overflowY": "clip"
+    },
+    "controls": [
+      {
+        "display": "flex",
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      {
+        "display": "block",
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 767,
+          "height": 844,
+          "top": 0,
+          "right": 767,
+          "bottom": 844,
+          "left": 0
+        }
+      }
+    ],
+    "floorButton": {
+      "x": 12,
+      "y": 12,
+      "width": 148.4375,
+      "height": 44,
+      "display": "flex",
+      "visibility": "visible",
+      "overflowY": "visible"
+    },
+    "infoButton": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0,
+      "display": "grid",
+      "visibility": "visible",
+      "overflowY": "visible"
+    },
+    "category": null,
+    "desktopHeaderVisible": false,
+    "markerCount": 10,
+    "bodyText": "有松（チーム内デモ） | デジタルマップ\n有松町（デモ）\n⌄\nJA\ni\nすべて\nカフェ\nカフェ・パン\n観光・史跡\n食事処\n神社・史跡\n土産物\n買\n食\n食\n観\nlocal_cafe\n買\nstorefront\n+\n−\nMapLibre"
+  },
+  "breakpoint-768": {
+    "viewport": [
+      768,
+      844
+    ],
+    "mobileMedia": false,
+    "desktopMedia": true,
+    "stage": {
+      "x": 0,
+      "y": 56,
+      "width": 768,
+      "height": 788,
+      "display": "block",
+      "visibility": "visible",
+      "overflowY": "visible"
+    },
+    "map": null,
+    "canvas": {
+      "x": 1,
+      "y": 57,
+      "width": 766,
+      "height": 786,
+      "display": "block",
+      "visibility": "visible",
+      "overflowY": "clip"
+    },
+    "controls": [
+      {
+        "display": "flex",
+        "rect": {
+          "x": 700,
+          "y": 5.5,
+          "width": 44,
+          "height": 44,
+          "top": 5.5,
+          "right": 744,
+          "bottom": 49.5,
+          "left": 700
+        }
+      },
+      {
+        "display": "none",
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      }
+    ],
+    "floorButton": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0,
+      "display": "flex",
+      "visibility": "visible",
+      "overflowY": "visible"
+    },
+    "infoButton": {
+      "x": 700,
+      "y": 5.5,
+      "width": 44,
+      "height": 44,
+      "display": "grid",
+      "visibility": "visible",
+      "overflowY": "visible"
+    },
+    "category": null,
+    "desktopHeaderVisible": true,
+    "markerCount": 10,
+    "bodyText": "有松（チーム内デモ） | デジタルマップ\n\nDIGITAL MAP\n\n有松（チーム内デモ）\ni\n有松町（デモ）\n⌄\nすべて\nカフェ\nカフェ・パン\n観光・史跡\n食事処\n神社・史跡\n土産物\n買\n食\n食\n観\nlocal_cafe\n買\nstorefront\n+\n−\nMapLibre"
+  },
+  "browserErrors": []
+}

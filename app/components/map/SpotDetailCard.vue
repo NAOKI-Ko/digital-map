@@ -1,113 +1,196 @@
 <script setup lang="ts">
+import { DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle } from 'reka-ui'
+import { useBottomSheetGesture, type BottomSheetState } from '~/composables/useBottomSheetGesture'
 import type { PublicSpot } from '~~/shared/types/public-map'
 
-const props = defineProps<{
-  spot: PublicSpot
-}>()
+const props = defineProps<{ spot: PublicSpot }>()
+const emit = defineEmits<{ close: [source?: 'pointer' | 'other'], expandedChange: [expanded: boolean] }>()
 
-const emit = defineEmits<{
-  close: []
-  expandedChange: [expanded: boolean]
-}>()
+const sheetState = ref<BottomSheetState>('detail')
+const scrollBody = useTemplateRef<HTMLElement>('scrollBody')
+const visibleHeight = ref(0)
+const visibleBottom = ref(0)
 
-const expanded = ref(false)
-const dialog = useTemplateRef<HTMLElement>('dialog')
-const closeButton = useTemplateRef<HTMLButtonElement>('closeButton')
+const sheetHeight = computed(() => {
+  const height = visibleHeight.value || (import.meta.client ? window.innerHeight : 800)
+  return Math.round(height * (sheetState.value === 'expanded' ? 0.92 : 0.6))
+})
+const viewportStyle = computed(() => ({
+  '--spot-sheet-height': `${sheetHeight.value}px`,
+  '--spot-sheet-visible-bottom': `${visibleBottom.value}px`,
+}))
 
-function handleKeydown(event: KeyboardEvent) {
-  if (event.key === 'Escape') { event.preventDefault(); emit('close'); return }
-  if (event.key !== 'Tab' || !dialog.value) return
-  const focusable = [...dialog.value.querySelectorAll<HTMLElement>('button:not([disabled]),a[href],input,select,textarea,[tabindex]:not([tabindex="-1"])')]
-  if (!focusable.length) return
-  const first = focusable[0]!
-  const last = focusable.at(-1)!
-  if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus() }
-  else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus() }
+function updateViewport() {
+  const viewport = window.visualViewport
+  const height = viewport?.height ?? window.innerHeight
+  const offsetTop = viewport?.offsetTop ?? 0
+  visibleHeight.value = height
+  visibleBottom.value = Math.max(0, window.innerHeight - offsetTop - height)
+  if (height < 500) sheetState.value = 'expanded'
 }
 
-onMounted(() => nextTick(() => closeButton.value?.focus()))
+function setExpanded(expanded: boolean) {
+  sheetState.value = expanded ? 'expanded' : 'detail'
+}
+
+function requestClose(source: 'pointer' | 'other' = 'other') {
+  emit('close', source)
+}
+
+const gesture = useBottomSheetGesture({
+  state: readonly(sheetState),
+  onClose: () => requestClose('other'),
+  onExpand: () => setExpanded(true),
+})
+const sheetMotionStyle = gesture.style
+
+function focusHeading(event: Event) {
+  event.preventDefault()
+  document.getElementById(`spot-detail-title-${props.spot.id}`)?.focus({ preventScroll: true })
+}
+
+function preventAutomaticCloseFocus(event: Event) {
+  event.preventDefault()
+}
+
+function handlePointerDismiss(event: Event) {
+  event.preventDefault()
+  requestClose('pointer')
+}
+
+function handleKeyboardDismiss(event: Event) {
+  event.preventDefault()
+  requestClose('other')
+}
+
+function addBodyTouchMoveListener() {
+  scrollBody.value?.addEventListener('touchmove', gesture.onBodyTouchMove, { passive: false })
+}
+
+function removeBodyTouchMoveListener() {
+  scrollBody.value?.removeEventListener('touchmove', gesture.onBodyTouchMove)
+}
 
 watch(() => props.spot.id, () => {
-  expanded.value = false
+  sheetState.value = visibleHeight.value < 500 ? 'expanded' : 'detail'
+  nextTick(() => scrollBody.value?.scrollTo({ top: 0 }))
 })
+watch(sheetState, state => emit('expandedChange', state === 'expanded'), { immediate: true })
 
-watch(expanded, value => emit('expandedChange', value), { immediate: true })
+onMounted(() => {
+  updateViewport()
+  addBodyTouchMoveListener()
+  window.addEventListener('resize', updateViewport)
+  window.visualViewport?.addEventListener('resize', updateViewport)
+  window.visualViewport?.addEventListener('scroll', updateViewport)
+})
+onBeforeUnmount(() => {
+  removeBodyTouchMoveListener()
+  window.removeEventListener('resize', updateViewport)
+  window.visualViewport?.removeEventListener('resize', updateViewport)
+  window.visualViewport?.removeEventListener('scroll', updateViewport)
+})
 </script>
 
 <template>
-  <div class="pointer-events-none fixed inset-0 z-40 flex items-end p-0 sm:pointer-events-auto sm:items-center sm:justify-end sm:bg-stone-950/30 sm:p-5" @click.self="$emit('close')">
-    <article
-      ref="dialog"
-      role="dialog"
-      aria-modal="true"
-      :aria-labelledby="`spot-detail-title-${spot.id}`"
-      class="pointer-events-auto w-full rounded-t-3xl bg-white shadow-2xl transition-[max-height] sm:max-h-[calc(100svh-2.5rem)] sm:max-w-md sm:overflow-y-auto sm:rounded-3xl"
-      :class="expanded ? 'max-h-[calc(100dvh-4.5rem-env(safe-area-inset-top))] overflow-y-auto overscroll-contain' : 'max-h-48 overflow-hidden'"
-      @keydown="handleKeydown"
-    >
-      <button
-        type="button"
-        class="flex h-8 w-full items-center justify-center sm:hidden"
-        :aria-expanded="expanded"
-        :aria-label="expanded ? 'スポット詳細を折りたたむ' : 'スポット詳細を展開する'"
-        @click="expanded = !expanded"
+  <DialogRoot :open="true">
+    <DialogPortal>
+      <DialogOverlay class="fixed inset-0 z-40 bg-black/[0.14]" />
+      <DialogContent
+        class="spot-detail-sheet fixed inset-x-0 z-50 flex min-h-0 w-full flex-col overflow-hidden rounded-t-[20px] bg-white shadow-xl outline-none transition-transform ease-out"
+        :style="[viewportStyle, sheetMotionStyle]"
+        :aria-describedby="undefined"
+        aria-modal="true"
+        @open-auto-focus="focusHeading"
+        @close-auto-focus="preventAutomaticCloseFocus"
+        @escape-key-down="handleKeyboardDismiss"
+        @pointer-down-outside="handlePointerDismiss"
       >
-        <span class="h-1.5 w-12 rounded-full bg-stone-300" />
-      </button>
-
-      <div v-if="spot.photos.length" class="snap-x snap-mandatory overflow-x-auto bg-stone-100" :class="expanded ? 'flex' : 'hidden sm:flex'">
-        <img
-          v-for="(photo, index) in spot.photos"
-          :key="photo"
-          :src="photo"
-          :alt="`${spot.name}の写真${index + 1}`"
-          class="h-52 w-full shrink-0 snap-center object-cover sm:h-64"
+        <header
+          class="spot-detail-sheet__drag-region shrink-0 border-b border-stone-100 px-4"
+          @pointerdown="gesture.onHeaderPointerDown"
+          @pointermove="gesture.onHeaderPointerMove"
+          @pointerup="gesture.onHeaderPointerUp"
+          @pointercancel="gesture.onHeaderPointerCancel"
         >
-      </div>
-
-      <div class="relative px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-1 sm:p-6">
-        <button
-          ref="closeButton"
-          type="button"
-          class="sticky top-4 z-10 float-right grid size-10 place-items-center rounded-full bg-stone-100 text-xl leading-none text-stone-700 shadow-sm hover:bg-stone-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-900"
-          aria-label="スポット詳細を閉じる"
-          @click="$emit('close')"
-        >
-          ×
-        </button>
-
-        <div v-if="spot.categories.length" class="flex flex-wrap gap-1.5 pr-12">
-          <span v-for="category in spot.categories" :key="category.id" class="rounded-full bg-terracotta-50 px-2 py-1 text-xs font-semibold text-terracotta-700">{{ category.name }}</span>
-        </div>
-        <h2 :id="`spot-detail-title-${spot.id}`" class="mt-1 pr-12 text-2xl font-bold tracking-tight text-stone-900">
-          {{ spot.name }}
-        </h2>
-        <button
-          v-if="!expanded"
-          type="button"
-          class="mt-3 inline-flex min-h-11 items-center rounded-full bg-stone-900 px-5 text-sm font-bold text-white sm:hidden"
-          aria-label="スポットの詳細をすべて表示"
-          @click.stop="expanded = true"
-        >
-          詳細を見る
-        </button>
-        <div :class="expanded ? 'block' : 'hidden sm:block'">
-          <p v-if="spot.description" class="mt-4 whitespace-pre-line text-sm leading-7 text-stone-700">
-            {{ spot.description }}
-          </p>
-
-          <dl v-if="spot.informationFields.length" class="mt-6 divide-y divide-stone-200 border-y border-stone-200 text-sm">
-            <div v-for="field in spot.informationFields" :key="field.id" class="grid grid-cols-[5.5rem_1fr] gap-3 py-3">
-              <dt class="font-semibold text-stone-500">{{ field.label }}</dt>
-              <dd class="whitespace-pre-line text-stone-800">
-                <a v-if="field.href" :href="field.href" class="font-semibold text-terracotta-700 underline decoration-terracotta-300 underline-offset-4" :target="field.type === 'url' ? '_blank' : undefined" :rel="field.type === 'url' ? 'noopener noreferrer' : undefined">{{ field.value }}</a>
-                <template v-else>{{ field.value }}</template>
-              </dd>
+          <div class="flex h-7 items-center justify-center" aria-hidden="true"><span class="h-1 w-9 rounded-full bg-stone-300" /></div>
+          <div class="flex min-h-14 items-start gap-2 pb-3">
+            <div class="min-w-0 flex-1">
+              <div v-if="spot.categories.length" class="flex flex-wrap gap-1.5">
+                <span v-for="category in spot.categories" :key="category.id" class="rounded-full bg-terracotta-50 px-2 py-1 text-xs font-semibold text-terracotta-700">{{ category.name }}</span>
+              </div>
+              <DialogTitle :id="`spot-detail-title-${spot.id}`" tabindex="-1" class="mt-1 text-[22px] font-bold leading-tight tracking-tight text-stone-900 outline-none">
+                {{ spot.name }}
+              </DialogTitle>
             </div>
-          </dl>
-          <a v-if="spot.websiteAction" :href="spot.websiteAction.url" target="_blank" rel="noopener noreferrer" class="mt-5 inline-flex rounded-lg bg-terracotta-600 px-4 py-2.5 text-sm font-semibold text-white">{{ spot.websiteAction.label }}を見る</a>
+            <button type="button" class="grid size-11 shrink-0 place-items-center rounded-full text-lg text-stone-700 hover:bg-stone-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-900 md:hidden" :aria-label="sheetState === 'expanded' ? 'スポット詳細の高さを戻す' : 'スポット詳細を大きく表示'" @click="setExpanded(sheetState !== 'expanded')">
+              <span aria-hidden="true">{{ sheetState === 'expanded' ? '⌄' : '⌃' }}</span>
+            </button>
+            <button type="button" class="grid size-11 shrink-0 place-items-center rounded-full bg-stone-100 text-xl leading-none text-stone-700 hover:bg-stone-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-900" aria-label="スポット詳細を閉じる" @click="requestClose('other')">×</button>
+          </div>
+        </header>
+
+        <div ref="scrollBody" class="spot-detail-sheet__body min-h-0 flex-1 overflow-y-auto overscroll-contain" @touchstart="gesture.onBodyTouchStart" @touchend="gesture.onBodyTouchEnd" @touchcancel="gesture.onBodyTouchCancel">
+          <div v-if="spot.photos.length" class="flex snap-x snap-mandatory overflow-x-auto bg-stone-100" data-sheet-no-drag>
+            <img v-for="(photo, index) in spot.photos" :key="photo" :src="photo" :alt="`${spot.name}の写真${index + 1}`" class="h-52 w-full shrink-0 snap-center object-cover md:h-64">
+          </div>
+          <div class="px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-4 md:p-6">
+            <p v-if="spot.description" class="whitespace-pre-line text-sm leading-7 text-stone-700">{{ spot.description }}</p>
+            <p v-else class="text-sm text-stone-500">説明は登録されていません。</p>
+            <dl v-if="spot.informationFields.length" class="mt-6 divide-y divide-stone-200 border-y border-stone-200 text-sm">
+              <div v-for="field in spot.informationFields" :key="field.id" class="grid grid-cols-[5.5rem_1fr] gap-3 py-3">
+                <dt class="font-semibold text-stone-500">{{ field.label }}</dt>
+                <dd class="min-w-0 whitespace-pre-line text-stone-800">
+                  <a v-if="field.href" :href="field.href" class="break-words font-semibold text-terracotta-700 underline decoration-terracotta-300 underline-offset-4" :target="field.type === 'url' ? '_blank' : undefined" :rel="field.type === 'url' ? 'noopener noreferrer' : undefined">{{ field.value }}</a>
+                  <template v-else>{{ field.value }}</template>
+                </dd>
+              </div>
+            </dl>
+            <a v-if="spot.websiteAction" :href="spot.websiteAction.url" target="_blank" rel="noopener noreferrer" class="mt-5 inline-flex min-h-11 items-center rounded-lg bg-terracotta-600 px-4 py-2.5 text-sm font-semibold text-white">{{ spot.websiteAction.label }}を見る</a>
+          </div>
         </div>
-      </div>
-    </article>
-  </div>
+      </DialogContent>
+    </DialogPortal>
+  </DialogRoot>
 </template>
+
+<style scoped>
+.spot-detail-sheet {
+  bottom: var(--spot-sheet-visible-bottom, 0px);
+  height: var(--spot-sheet-height, 60dvh);
+  --sheet-motion-duration: 180ms;
+}
+
+.spot-detail-sheet__drag-region {
+  touch-action: none;
+  user-select: none;
+}
+
+.spot-detail-sheet__drag-region button {
+  touch-action: manipulation;
+}
+
+.spot-detail-sheet__body {
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (min-width: 768px) {
+  .spot-detail-sheet {
+    inset: 50% 1.25rem auto auto;
+    width: min(32rem, calc(100vw - 2.5rem));
+    height: min(52rem, calc(100dvh - 2.5rem));
+    max-height: calc(100dvh - 2.5rem);
+    transform: translate3d(0, -50%, 0) !important;
+    border-radius: 1.5rem;
+  }
+
+  .spot-detail-sheet__drag-region {
+    touch-action: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spot-detail-sheet { --sheet-motion-duration: 0ms; }
+}
+</style>
