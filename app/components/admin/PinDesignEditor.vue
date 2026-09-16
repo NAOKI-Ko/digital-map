@@ -23,6 +23,7 @@ const props = withDefaults(defineProps<{
   spotId: string
   compact?: boolean
   showSave?: boolean
+  guardNavigation?: boolean
   initialValue: {
     pinIconType: PinIconType
     pinIconId: string | null
@@ -32,7 +33,7 @@ const props = withDefaults(defineProps<{
     pinSize: PinSize
     importance?: 'normal' | 'featured'
   }
-}>(), { compact: false, showSave: true })
+}>(), { compact: false, showSave: true, guardNavigation: true })
 
 const emit = defineEmits<{
   updated: [design: SpotPinDesignResponse['design']]
@@ -241,5 +242,5 @@ defineExpose({ isDirty: () => isDirty.value, reset, save })
     <p v-if="successMessage" role="status" class="mt-5 text-sm text-emerald-700">{{ successMessage }}</p>
     <div v-if="showSave" class="mt-6 flex justify-end"><button type="button" :disabled="isSaving" class="rounded-lg bg-terracotta-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60" @click="save">{{ isSaving ? '保存中…' : 'ピンデザインを保存' }}</button></div>
   </div>
-  <UnsavedChangesGuard :dirty="isDirty && !isSaving" />
+  <UnsavedChangesGuard v-if="guardNavigation" :dirty="isDirty && !isSaving" />
 </template>

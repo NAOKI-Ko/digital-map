@@ -2,6 +2,7 @@
 import SaveFeedback from '~/components/ui/SaveFeedback.vue'
 import SpotCombobox from '~/components/admin/SpotCombobox.vue'
 import PinDesignEditor from '~/components/admin/PinDesignEditor.vue'
+import UnsavedChangesGuard from '~/components/admin/UnsavedChangesGuard.vue'
 import { defineAsyncComponent } from 'vue'
 import ConfirmDialog from '~/components/ui/ConfirmDialog.vue'
 import { resolveMapEditorReturnContext } from '~/utils/map-editor-camera'
@@ -37,6 +38,7 @@ const selectedFloorId = ref(requestedFloorId)
 const position = ref<ImagePosition | null>(null)
 const initialCamera = ref<MapViewerCameraState | null>(returnContext)
 const selectedFloor = computed(() => data.value?.floors.find(floor => floor.id === selectedFloorId.value))
+const floorOptions = computed(() => data.value?.floors.map(floor => ({ value: floor.id, label: floor.name })) ?? [])
 const selectedFloorSpots = computed(() => spotData.value?.spots.filter(spot => spot.floorId === selectedFloorId.value) ?? [])
 const positionedFloorSpots = computed(() => selectedFloorSpots.value.filter(hasPosition))
 const unpositionedFloorSpots = computed(() => selectedFloorSpots.value.filter(spot => !hasPosition(spot)))
@@ -82,7 +84,11 @@ watch(() => data.value?.floors, (floors) => {
 watch(selectedFloorId, () => {
   position.value = null
   placementMode.value = 'idle'
-  if (!selectedFloorSpots.value.some(spot => spot.id === placementSpotId.value)) placementSpotId.value = ''
+  placementSpotId.value = ''
+  pendingPinDesign.value = null
+  addressCandidates.value = []
+  addressSearchStatus.value = ''
+  moveStatus.value = ''
 })
 
 watch(placementSpotId, () => {
@@ -134,6 +140,20 @@ function startDesignEditing() {
 function hasPendingChanges() {
   return needsPinEditorDiscardConfirmation(placementMode.value, position.value, pinDesignEditorRef.value?.isDirty() ?? false)
 }
+
+const pageDirty = computed(() => Boolean(
+  position.value
+  || (designEditing.value && placementSpot.value && pendingPinDesign.value
+    && JSON.stringify(pendingPinDesign.value) !== JSON.stringify({
+      pinIconType: placementSpot.value.pinIconType,
+      pinIconId: placementSpot.value.pinIconId,
+      pinIconImageUrl: placementSpot.value.pinIconImageUrl,
+      pinIconAssetId: placementSpot.value.pinIconAssetId,
+      pinColor: placementSpot.value.pinColor,
+      pinSize: placementSpot.value.pinSize,
+      importance: placementSpot.value.importance,
+    }))
+))
 
 function requestTransition(action: () => void) {
   if (!hasPendingChanges()) {
@@ -355,26 +375,30 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEscape))
     <div v-else-if="error" class="mt-8 rounded-xl bg-red-50 p-8 text-sm text-red-700">フロアを読み込めませんでした。</div>
     <div v-else-if="!data?.floors.length" class="mt-8 rounded-xl bg-amber-50 p-8 text-sm text-amber-800">先にフロアを1件以上登録してください。</div>
     <template v-else-if="selectedFloor">
-      <div class="mt-6 grid items-start gap-5 lg:grid-cols-2">
+      <div data-pin-editor-toolbar class="mt-6 grid gap-3 sm:grid-cols-[minmax(0,2fr)_minmax(12rem,1fr)] sm:items-end">
+        <div class="min-w-0">
+          <SpotCombobox
+            v-model="positionedSearchSpotId"
+            :spots="positionedFloorSpots"
+            label="配置済みSpotを検索"
+            input-id="positioned-spot-search"
+            placeholder="Spot名・カテゴリー・フロアで検索"
+            empty-message="該当する配置済みSpotはありません。"
+          />
+        </div>
+        <div class="min-w-0">
+          <label class="mb-1.5 block text-xs font-semibold text-stone-600" for="pin-editor-floor-select">フロア選択</label>
+          <UiSelect
+            id="pin-editor-floor-select"
+            :model-value="selectedFloorId"
+            :options="floorOptions"
+            label="編集フロアを選択"
+            @update:model-value="selectFloor"
+          />
+        </div>
+      </div>
+      <div data-pin-editor-workspace class="mt-3 grid items-start gap-5 lg:grid-cols-2">
         <section class="min-w-0" aria-label="地図操作">
-          <div class="mb-3 grid gap-3 sm:grid-cols-[minmax(12rem,1fr)_minmax(0,2fr)] sm:items-end">
-            <div class="min-w-0">
-              <SpotCombobox
-                v-model="positionedSearchSpotId"
-                :spots="positionedFloorSpots"
-                label="配置済みSpotを検索"
-                input-id="positioned-spot-search"
-                placeholder="Spot名・カテゴリー・フロアで検索"
-                empty-message="該当する配置済みSpotはありません。"
-              />
-            </div>
-            <div class="min-w-0">
-              <p class="mb-1.5 text-xs font-semibold text-stone-600">フロア選択</p>
-              <div class="flex flex-wrap gap-2" role="tablist" aria-label="編集フロア">
-                <button v-for="floor in data.floors" :key="floor.id" type="button" role="tab" :aria-selected="floor.id === selectedFloorId" class="min-h-10 rounded-full px-3 py-2 text-sm font-semibold" :class="floor.id === selectedFloorId ? 'bg-stone-900 text-white' : 'bg-white text-stone-700 shadow-sm'" @click="selectFloor(floor.id)">{{ floor.name }}</button>
-              </div>
-            </div>
-          </div>
           <ClientOnly>
             <LazyMapViewer
               ref="mapViewer"
@@ -429,6 +453,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEscape))
                   :initial-value="placementSpot"
                   compact
                   :show-save="false"
+                  :guard-navigation="false"
                   @changed="handlePinDesignChanged"
                   @updated="updatePinDesign"
                 />
@@ -460,6 +485,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEscape))
       </div>
       <ConfirmDialog :open="unplaceConfirmOpen" title="PIN配置を解除" message="Spot情報とカテゴリーは残したまま、イラスト上の配置を解除します。公開中の場合は下書きへ戻ります。" confirm-label="配置を解除する" destructive @cancel="unplaceConfirmOpen = false" @confirm="unplaceSpot" />
       <ConfirmDialog :open="discardConfirmOpen" title="未保存の変更があります" message="保存していない位置またはPINデザインの変更を破棄して切り替えますか？" confirm-label="変更を破棄" cancel-label="編集を続ける" destructive @cancel="keepEditing" @confirm="discardAndContinue" />
+      <UnsavedChangesGuard :dirty="pageDirty" />
     </template>
   </div>
 </template>
