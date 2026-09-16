@@ -28,6 +28,7 @@ const selectedSpotId = ref<string | null>(null)
 const selectedCategoryIds = ref<string[]>([])
 const floorSelectorOpen = ref(false)
 const infoOpen = ref(false)
+const detailExpanded = ref(false)
 let spotTrigger: HTMLElement | null = null
 let spotTriggerId: string | null = null
 
@@ -93,11 +94,13 @@ function selectSpot(spot: MapViewerSpot) {
   if (document.activeElement instanceof HTMLElement) spotTrigger = document.activeElement
   spotTriggerId = spot.id
   selectedSpotId.value = spot.id
+  detailExpanded.value = false
   if (data.value?.map.id) sendPublicAnalytics({ type: 'SPOT_VIEW', mapId: data.value.map.id, spotId: spot.id })
 }
 
 function closeSpot() {
   selectedSpotId.value = null
+  detailExpanded.value = false
   nextTick(() => requestAnimationFrame(() => {
     const fallback = spotTriggerId
       ? [...document.querySelectorAll<HTMLElement>('.map-viewer-marker[data-spot-id]')].find(element => element.dataset.spotId === spotTriggerId)
@@ -161,9 +164,9 @@ onMounted(() => {
       </header>
 
       <section class="relative h-[100svh] min-h-0 sm:h-[calc(100svh-3.5rem)]">
-        <div v-if="showFloorSelector" class="absolute left-3 top-3 z-20 sm:left-5 sm:top-5">
-          <button type="button" class="flex min-h-11 items-center gap-2 rounded-full border border-white/70 bg-white/80 px-4 text-sm font-bold shadow-sm backdrop-blur" aria-haspopup="dialog" :aria-expanded="floorSelectorOpen" @click="floorSelectorOpen = true">
-            {{ selectedFloor.name }} <span aria-hidden="true">⌄</span>
+        <div v-if="showFloorSelector" class="absolute left-3 top-3 z-20 max-w-[calc(100%-8.5rem)] sm:left-5 sm:top-5 sm:max-w-none">
+          <button type="button" class="flex min-h-11 max-w-full items-center gap-2 rounded-full border border-white/70 bg-white/80 px-4 text-sm font-bold shadow-sm backdrop-blur" aria-haspopup="dialog" :aria-expanded="floorSelectorOpen" @click="floorSelectorOpen = true">
+            <span class="truncate">{{ selectedFloor.name }}</span> <span class="shrink-0" aria-hidden="true">⌄</span>
           </button>
         </div>
 
@@ -175,8 +178,9 @@ onMounted(() => {
         </div>
 
         <div
+          v-show="!detailExpanded"
           class="pointer-events-none absolute left-1/2 z-20 w-[min(50vw,44rem)] -translate-x-1/2 transition-[bottom] max-sm:w-[calc(100vw-1.5rem)]"
-          :class="selectedSpot ? 'bottom-[calc(8.75rem+env(safe-area-inset-bottom))] sm:bottom-[max(1rem,env(safe-area-inset-bottom))]' : 'bottom-[max(1rem,env(safe-area-inset-bottom))]'"
+          :class="selectedSpot ? 'bottom-[calc(12rem+env(safe-area-inset-bottom))] sm:bottom-[max(1rem,env(safe-area-inset-bottom))]' : 'bottom-[calc(2.5rem+env(safe-area-inset-bottom))] sm:bottom-[max(1rem,env(safe-area-inset-bottom))]'"
         >
           <div class="pointer-events-auto">
             <CategoryFilter v-model="selectedCategoryIds" :categories="categories" />
@@ -210,6 +214,7 @@ onMounted(() => {
         v-if="selectedSpot"
         :spot="selectedSpot"
         @close="closeSpot"
+        @expanded-change="detailExpanded = $event"
       />
       <PublicFloorSelector v-if="floorSelectorOpen" :floors="data.map.floors" :model-value="selectedFloorId" @select="selectFloor" @close="floorSelectorOpen = false" />
       <PublicMapInfo v-if="infoOpen" :map-name="data.map.name" :organization-name="data.map.organizationName" :logo-url="data.map.logoUrl" :website-url="data.map.websiteUrl" :sns-url="data.map.snsUrl" :official-label="t.official" @close="infoOpen = false" />

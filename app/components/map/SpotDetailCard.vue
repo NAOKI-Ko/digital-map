@@ -7,6 +7,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   close: []
+  expandedChange: [expanded: boolean]
 }>()
 
 const expanded = ref(false)
@@ -29,6 +30,8 @@ onMounted(() => nextTick(() => closeButton.value?.focus()))
 watch(() => props.spot.id, () => {
   expanded.value = false
 })
+
+watch(expanded, value => emit('expandedChange', value), { immediate: true })
 </script>
 
 <template>
@@ -39,7 +42,7 @@ watch(() => props.spot.id, () => {
       aria-modal="true"
       :aria-labelledby="`spot-detail-title-${spot.id}`"
       class="pointer-events-auto w-full rounded-t-3xl bg-white shadow-2xl transition-[max-height] sm:max-h-[calc(100svh-2.5rem)] sm:max-w-md sm:overflow-y-auto sm:rounded-3xl"
-      :class="expanded ? 'max-h-[82svh] overflow-y-auto' : 'max-h-36 overflow-hidden'"
+      :class="expanded ? 'max-h-[calc(100dvh-4.5rem-env(safe-area-inset-top))] overflow-y-auto overscroll-contain' : 'max-h-48 overflow-hidden'"
       @keydown="handleKeydown"
     >
       <button
@@ -66,7 +69,7 @@ watch(() => props.spot.id, () => {
         <button
           ref="closeButton"
           type="button"
-          class="absolute right-4 top-4 grid size-10 place-items-center rounded-full bg-stone-100 text-xl leading-none text-stone-700 hover:bg-stone-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-900"
+          class="sticky top-4 z-10 float-right grid size-10 place-items-center rounded-full bg-stone-100 text-xl leading-none text-stone-700 shadow-sm hover:bg-stone-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-900"
           aria-label="スポット詳細を閉じる"
           @click="$emit('close')"
         >
@@ -79,6 +82,15 @@ watch(() => props.spot.id, () => {
         <h2 :id="`spot-detail-title-${spot.id}`" class="mt-1 pr-12 text-2xl font-bold tracking-tight text-stone-900">
           {{ spot.name }}
         </h2>
+        <button
+          v-if="!expanded"
+          type="button"
+          class="mt-3 inline-flex min-h-11 items-center rounded-full bg-stone-900 px-5 text-sm font-bold text-white sm:hidden"
+          aria-label="スポットの詳細をすべて表示"
+          @click.stop="expanded = true"
+        >
+          詳細を見る
+        </button>
         <div :class="expanded ? 'block' : 'hidden sm:block'">
           <p v-if="spot.description" class="mt-4 whitespace-pre-line text-sm leading-7 text-stone-700">
             {{ spot.description }}

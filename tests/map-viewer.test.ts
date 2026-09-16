@@ -2,6 +2,8 @@ import { describe, expect, it, vi } from 'vitest'
 import {
   ABSOLUTE_ZOOM_LIMITS,
   addMarkerAtPosition,
+  beginGeolocationRequest,
+  consumeOutsideGeolocation,
   createFloorZoomConstraints,
   createMapViewerStyle,
   createMapViewerOptions,
@@ -9,6 +11,7 @@ import {
   constrainImagePlacementCandidate,
   GEOLOCATE_CONTROL_OPTIONS,
   GEOLOCATION_OUTSIDE_MESSAGE,
+  GEOLOCATION_TOAST_DURATION_MS,
   getFloorLayerIds,
   getImagePlacementCandidate,
   getMapViewerCameraState,
@@ -321,6 +324,21 @@ describe('GeolocateControlの追加判定', () => {
       showAccuracyCircle: false,
     })
     expect(GEOLOCATION_OUTSIDE_MESSAGE)
-      .toBe('現在地はこのマップのエリアから離れているようです')
+      .toBe('現在地はこのマップから離れています')
+    expect(GEOLOCATION_TOAST_DURATION_MS).toBe(5_000)
+  })
+
+  it('同じ現在地requestではエリア外通知を一度だけ消費し、次の明示requestで再通知できる', () => {
+    let state = beginGeolocationRequest({ requestId: 0, notifiedRequestId: null })
+    let result = consumeOutsideGeolocation(state)
+    expect(result.notify).toBe(true)
+    state = result.state
+
+    result = consumeOutsideGeolocation(state)
+    expect(result.notify).toBe(false)
+    state = beginGeolocationRequest(result.state)
+
+    result = consumeOutsideGeolocation(state)
+    expect(result.notify).toBe(true)
   })
 })

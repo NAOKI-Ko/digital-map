@@ -346,7 +346,7 @@ defineExpose({
 
   .map-viewer-control-group {
     gap: 0.375rem;
-    margin-top: 4.25rem;
+    margin-top: 4.25rem !important;
   }
 
   .map-viewer-navigation-control button + button {

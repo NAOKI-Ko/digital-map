@@ -6,6 +6,7 @@ const publicPage = readFileSync(new URL('../app/pages/[mapSlug]/index.vue', impo
 const floorSelector = readFileSync(new URL('../app/components/map/PublicFloorSelector.vue', import.meta.url), 'utf8')
 const info = readFileSync(new URL('../app/components/map/PublicMapInfo.vue', import.meta.url), 'utf8')
 const detail = readFileSync(new URL('../app/components/map/SpotDetailCard.vue', import.meta.url), 'utf8')
+const mapViewer = readFileSync(new URL('../app/components/map/MapViewer.vue', import.meta.url), 'utf8')
 
 describe('公開Mapのモバイル契約', () => {
   it('Spot一覧を公開画面から機能ごと削除する', () => {
@@ -34,7 +35,12 @@ describe('公開Mapのモバイル契約', () => {
   it('Spot詳細はcollapsedからexpandedへ展開できる', () => {
     expect(detail).toContain('const expanded = ref(false)')
     expect(detail).toContain('@click="expanded = !expanded"')
-    expect(detail).toContain("expanded ? 'max-h-[82svh] overflow-y-auto' : 'max-h-36 overflow-hidden'")
+    expect(detail).toContain('詳細を見る')
+    expect(detail).toContain('@click.stop="expanded = true"')
+    expect(detail).toContain('100dvh-4.5rem-env(safe-area-inset-top)')
+    expect(publicPage).toContain('@expanded-change="detailExpanded = $event"')
+    expect(publicPage).toContain('v-show="!detailExpanded"')
+    expect(detail).toContain('sticky top-4')
   })
 
   it('選択時にmarker DOMを作り直さず重なりPINへclickが移らない', () => {
@@ -45,12 +51,20 @@ describe('公開Mapのモバイル契約', () => {
 
   it('モバイルはheaderなしでMapが100svhを使いCategoryを1行scrollする', () => {
     const category = readFileSync(new URL('../app/components/map/CategoryFilter.vue', import.meta.url), 'utf8')
-    const mapViewer = readFileSync(new URL('../app/components/map/MapViewer.vue', import.meta.url), 'utf8')
     expect(publicPage).toContain('hidden h-14')
     expect(publicPage).toContain('h-[100svh]')
     expect(category).toContain('overflow-x-auto')
+    expect(category).toContain('text-[13px]')
+    expect(category).toContain('h-9')
+    expect(category).toContain('min-h-11')
     expect(category).not.toContain('overflowCategories')
     expect(mapViewer).toContain(':style="{ height }"')
     expect(mapViewer).toContain('class="h-full w-full transition-opacity duration-150"')
+  })
+
+  it('top controls、Map controls、Category、attributionへ独立した配置zoneを持つ', () => {
+    expect(publicPage).toContain('max-w-[calc(100%-8.5rem)]')
+    expect(publicPage).toContain('bottom-[calc(2.5rem+env(safe-area-inset-bottom))]')
+    expect(mapViewer).toContain('margin-top: 4.25rem !important;')
   })
 })

@@ -35,12 +35,32 @@ export const ABSOLUTE_ZOOM_LIMITS = {
 } as const
 export const ZOOM_OUT_ALLOWANCE = 0
 export const ZOOM_IN_ALLOWANCE = 6
-export const GEOLOCATION_OUTSIDE_MESSAGE = '現在地はこのマップのエリアから離れているようです'
+export const GEOLOCATION_OUTSIDE_MESSAGE = '現在地はこのマップから離れています'
+export const GEOLOCATION_TOAST_DURATION_MS = 5_000
 export const GEOLOCATE_CONTROL_OPTIONS = {
   trackUserLocation: true,
   showUserLocation: false,
   showAccuracyCircle: false,
 } as const
+
+export interface GeolocationNoticeState {
+  requestId: number
+  notifiedRequestId: number | null
+}
+
+export function beginGeolocationRequest(state: GeolocationNoticeState): GeolocationNoticeState {
+  return { ...state, requestId: state.requestId + 1 }
+}
+
+export function consumeOutsideGeolocation(state: GeolocationNoticeState) {
+  if (state.requestId === 0 || state.notifiedRequestId === state.requestId) {
+    return { state, notify: false }
+  }
+  return {
+    state: { ...state, notifiedRequestId: state.requestId },
+    notify: true,
+  }
+}
 
 export interface UseMapViewerOptions {
   mode: MapViewerMode
@@ -235,6 +255,10 @@ export class HorizontalMapControlGroup implements IControl {
     this.container?.remove()
     this.container = null
   }
+
+  getElement() {
+    return this.container
+  }
 }
 
 export function useMapViewer(
@@ -254,6 +278,10 @@ export function useMapViewer(
   let geolocateControl: GeolocateControl | null = null
   let mapControlGroup: HorizontalMapControlGroup | null = null
   let geolocateHandler: ((position: GeolocatePositionEvent) => void) | null = null
+  let geolocateButton: HTMLButtonElement | null = null
+  let geolocateButtonHandler: (() => void) | null = null
+  let geolocationNoticeState: GeolocationNoticeState = { requestId: 0, notifiedRequestId: null }
+  let geolocationToastTimer: number | null = null
   let currentLocationMarker: Marker | null = null
   let activeSourceId: string | null = null
   let activeLayerId: string | null = null
@@ -263,9 +291,26 @@ export function useMapViewer(
   function resize() {
     const instance = map.value
     if (!instance) return
+    const camera = getMapViewerCameraState(instance)
     instance.resize()
     const corners = getFloorCorners(options.floor.value)
-    if (corners && isReady.value) updateFloorZoomConstraints(corners)
+    if (corners && isReady.value) updateFloorZoomConstraints(corners, true)
+    restoreMapViewerCamera(instance, camera)
+  }
+
+  function clearGeolocationToast() {
+    if (geolocationToastTimer !== null) window.clearTimeout(geolocationToastTimer)
+    geolocationToastTimer = null
+    geolocationAreaMessage.value = ''
+  }
+
+  function showGeolocationToast() {
+    clearGeolocationToast()
+    geolocationAreaMessage.value = GEOLOCATION_OUTSIDE_MESSAGE
+    geolocationToastTimer = window.setTimeout(() => {
+      geolocationAreaMessage.value = ''
+      geolocationToastTimer = null
+    }, GEOLOCATION_TOAST_DURATION_MS)
   }
 
   async function initialize() {
@@ -336,13 +381,17 @@ export function useMapViewer(
     if (instance && mapControlGroup && instance.hasControl(mapControlGroup)) {
       instance.removeControl(mapControlGroup)
     }
+    if (geolocateButton && geolocateButtonHandler) geolocateButton.removeEventListener('click', geolocateButtonHandler)
+    geolocateButton = null
+    geolocateButtonHandler = null
     currentLocationMarker?.remove()
     currentLocationMarker = null
     geolocateControl = null
     mapControlGroup = null
     geolocateHandler = null
+    geolocationNoticeState = { requestId: 0, notifiedRequestId: null }
     geolocationAvailable.value = false
-    geolocationAreaMessage.value = ''
+    clearGeolocationToast()
   }
 
   function syncGeolocateControl(floor: MapViewerFloor) {
@@ -369,12 +418,12 @@ export function useMapViewer(
       if (!isInside) {
         currentLocationMarker?.remove()
         currentLocationMarker = null
-        geolocationAreaMessage.value = GEOLOCATION_OUTSIDE_MESSAGE
-        if (corners) fitFloorBounds(corners, true)
+        const result = consumeOutsideGeolocation(geolocationNoticeState)
+        geolocationNoticeState = result.state
+        if (result.notify) showGeolocationToast()
         return
       }
 
-      geolocationAreaMessage.value = ''
       if (!currentLocationMarker) {
         const element = document.createElement('div')
         element.className = 'map-viewer-current-location-marker'
@@ -393,6 +442,12 @@ export function useMapViewer(
     controls.push(geolocateControl)
     mapControlGroup = new HorizontalMapControlGroup(controls)
     instance.addControl(mapControlGroup, 'top-right')
+    geolocateButton = mapControlGroup.getElement()?.querySelector<HTMLButtonElement>('.maplibregl-ctrl-geolocate') ?? null
+    geolocateButtonHandler = () => {
+      geolocationNoticeState = beginGeolocationRequest(geolocationNoticeState)
+      clearGeolocationToast()
+    }
+    geolocateButton?.addEventListener('click', geolocateButtonHandler)
     geolocationAvailable.value = true
   }
 
@@ -568,7 +623,7 @@ export function useMapViewer(
     return camera
   }
 
-  function updateFloorZoomConstraints(corners: FloorCorners) {
+  function updateFloorZoomConstraints(corners: FloorCorners, preserveCamera = false) {
     const instance = map.value
     if (!instance) return null
     const camera = getFloorCamera(corners)
@@ -576,8 +631,11 @@ export function useMapViewer(
 
     const targetZoom = camera.zoom ?? instance.getZoom()
     const zoomConstraints = createFloorZoomConstraints(targetZoom)
-    instance.setMinZoom(zoomConstraints.minZoom)
-    instance.setMaxZoom(zoomConstraints.maxZoom)
+    const currentZoom = instance.getZoom()
+    const minZoom = preserveCamera ? Math.min(zoomConstraints.minZoom, currentZoom) : zoomConstraints.minZoom
+    const maxZoom = preserveCamera ? Math.max(zoomConstraints.maxZoom, currentZoom) : zoomConstraints.maxZoom
+    instance.setMinZoom(minZoom)
+    instance.setMaxZoom(Math.max(minZoom, maxZoom))
     return { camera, targetZoom }
   }
 
