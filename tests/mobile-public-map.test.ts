@@ -70,4 +70,9 @@ describe('公開Mapのモバイル契約', () => {
     expect(mapViewer).toContain('margin-top: calc(env(safe-area-inset-top) + 4.5rem) !important;')
     expect(mapViewer).toContain('.public-map-locked .map-viewer-control-group')
   })
+
+  it('モーダル表示中も操作ヒントをmountしたまま保ちtimerを進める', () => {
+    expect(publicPage).toContain('<MapOperationHint :storage-key=')
+    expect(publicPage).not.toContain('<MapOperationHint v-if="!appModalOpen"')
+  })
 })

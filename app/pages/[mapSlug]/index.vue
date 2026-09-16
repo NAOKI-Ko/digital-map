@@ -253,7 +253,7 @@ onMounted(() => {
         </ClientOnly>
 
         <ClientOnly>
-          <MapOperationHint v-if="!appModalOpen" :storage-key="`digital-map:operation-hint:${data.map.slug}`" />
+          <MapOperationHint :storage-key="`digital-map:operation-hint:${data.map.slug}`" />
         </ClientOnly>
       </section>
 
