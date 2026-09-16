@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getCoverViewportCorners, interpolateMapCenter, isPointInsideConvexPolygon, isViewportCoveredByPolygon } from '../app/utils/public-map-camera'
+import { getCoverViewportCorners, isPointInsideConvexPolygon, isViewportCoveredByPolygon } from '../app/utils/public-map-camera'
 
 describe('public IMAGE map cover geometry', () => {
   const viewport = { width: 390, height: 844 }
@@ -21,9 +21,5 @@ describe('public IMAGE map cover geometry', () => {
     expect(getCoverViewportCorners(390, 700, 844)).toEqual([
       { x: 0, y: -72 }, { x: 390, y: -72 }, { x: 390, y: 772 }, { x: 0, y: 772 },
     ])
-  })
-
-  it('範囲外cameraを現在位置からfloor中心へ必要最小限に補間する', () => {
-    expect(interpolateMapCenter({ lat: 35, lng: 139 }, { lat: 36, lng: 141 }, 0.25)).toEqual({ lat: 35.25, lng: 139.5 })
   })
 })

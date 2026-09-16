@@ -48,14 +48,6 @@ export function isViewportCoveredByPolygon(
     .every(point => isPointInsideConvexPolygon(point, polygon))
 }
 
-export function interpolateMapCenter(from: MapCenter, to: MapCenter, amount: number): MapCenter {
-  const safeAmount = Math.min(1, Math.max(0, amount))
-  return {
-    lat: from.lat + (to.lat - from.lat) * safeAmount,
-    lng: from.lng + (to.lng - from.lng) * safeAmount,
-  }
-}
-
 export function getViewportOrientation(width: number, height: number) {
   return width > height ? 'landscape' : 'portrait'
 }

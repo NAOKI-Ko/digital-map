@@ -1,0 +1,101 @@
+{
+  "environment": {
+    "browser": "Codex in-app Chromium via Playwright-capable browser control",
+    "fixture": "temporary local-only 1448x1086 IMAGE map with two floors and one long-description spot",
+    "fixtureRemovedBeforeCommit": true
+  },
+  "390x844": {
+    "canvas": [0, 0, 390, 844],
+    "initial": {
+      "center": [0, 0],
+      "zoom": 17.35729741235609,
+      "zFit": 14.553561800989927,
+      "minZoom": 13.553561800989927,
+      "maxZoom": 23.35729741235609,
+      "bearing": 0,
+      "pitch": 45,
+      "visual": "cover"
+    },
+    "afterTenMinusClicks": {
+      "center": [2.2737367544323206e-12, -3.410605131648481e-12],
+      "zoom": 13.553561800989927,
+      "wholeImageVisible": true,
+      "oneZoomBeyondFit": true
+    },
+    "afterTwelveArrowLeftPans": {
+      "center": [-0.0064757517786802055, -8.185452315956354e-12],
+      "zoom": 13.553561800989927
+    },
+    "after60SecondsIdle": {
+      "center": [-0.0064757517786802055, -8.185452315956354e-12],
+      "zoom": 13.553561800989927,
+      "forcedCameraCorrections": 0
+    },
+    "modal": {
+      "before": { "center": [0, 0], "zoom": 17.35729741235609 },
+      "open": { "center": [0, 0], "zoom": 17.35729741235609 },
+      "longDescriptionIncludesLastLine": true,
+      "cameraStable": true
+    }
+  },
+  "430x932": {
+    "canvas": [0, 0, 430, 932],
+    "initial": {
+      "center": [0, 0],
+      "zoom": 17.50011307319594,
+      "zFit": 14.713138114140932,
+      "minZoom": 13.713138114140932,
+      "maxZoom": 23.50011307319594,
+      "visual": "cover"
+    },
+    "afterTenMinusClicks": {
+      "zoom": 13.713138114140932,
+      "wholeImageVisible": true,
+      "oneZoomBeyondFit": true
+    },
+    "afterTwelveArrowRightPans": {
+      "center": [0.005620479926619737, 6.281197784119286e-12],
+      "zoom": 13.713138114140932,
+      "forcedCameraCorrection": false
+    },
+    "floorSwitch": {
+      "floor": "second-floor",
+      "center": [0, 0],
+      "zoom": 17.500113073194647,
+      "minZoom": 13.713138114139639
+    }
+  },
+  "1440x900": {
+    "canvas": [1, 57, 1438, 842],
+    "initial": {
+      "center": [0, 0],
+      "zoom": 16.183741981498063,
+      "zFit": 16.183741981498063,
+      "minZoom": 15.183741981498063,
+      "maxZoom": 22.183741981498063
+    },
+    "infoOpenCloseCameraStable": true,
+    "categoryChangeCameraStable": true
+  },
+  "resize390x844To844x390": {
+    "before": {
+      "center": [0, 0],
+      "zoom": 17.35729741235609,
+      "minZoom": 13.553561800989927,
+      "maxZoom": 23.35729741235609,
+      "bearing": 0,
+      "pitch": 45
+    },
+    "after": {
+      "center": [0, 0],
+      "zoom": 17.35729741235609,
+      "minZoom": 13.700493903858275,
+      "maxZoom": 23.35729741235609,
+      "bearing": 0,
+      "pitch": 45
+    },
+    "centerBearingPitchPreserved": true,
+    "refit": false
+  },
+  "physicalIphoneSafari": "not run"
+}

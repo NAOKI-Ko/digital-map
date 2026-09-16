@@ -5,6 +5,7 @@ import {
   beginGeolocationRequest,
   consumeOutsideGeolocation,
   createFloorZoomConstraints,
+  createPublicFloorZoomConstraints,
   createMapViewerStyle,
   createMapViewerOptions,
   createSpotMarkerOptions,
@@ -12,6 +13,7 @@ import {
   GEOLOCATE_CONTROL_OPTIONS,
   GEOLOCATION_OUTSIDE_MESSAGE,
   GEOLOCATION_TOAST_DURATION_MS,
+  PUBLIC_ZOOM_OUT_ALLOWANCE,
   getFloorLayerIds,
   getImagePlacementCandidate,
   getMapViewerCameraState,
@@ -138,6 +140,18 @@ describe('フロアごとのズーム制約', () => {
 
   it('非有限値は安全な初期ズームとして扱う', () => {
     expect(createFloorZoomConstraints(Number.NaN)).toEqual({ minZoom: 1, maxZoom: 7 })
+  })
+
+  it('公開Mapは24px fitからさらに1 zoom-outでき、初期coverとminZoomを分離する', () => {
+    expect(createPublicFloorZoomConstraints(16.25, 18.5)).toEqual({ minZoom: 15.25, maxZoom: 24 })
+    expect(createPublicFloorZoomConstraints(16.25, 17)).toEqual({ minZoom: 15.25, maxZoom: 23 })
+    expect(PUBLIC_ZOOM_OUT_ALLOWANCE).toBe(1)
+  })
+
+  it('公開Mapのmin/maxも絶対範囲を越えない', () => {
+    expect(createPublicFloorZoomConstraints(-10, 3)).toEqual({ minZoom: 0, maxZoom: 9 })
+    expect(createPublicFloorZoomConstraints(30, 30)).toEqual({ minZoom: 23, maxZoom: 24 })
+    expect(createPublicFloorZoomConstraints(20, 0)).toEqual({ minZoom: 19, maxZoom: 19 })
   })
 })
 
