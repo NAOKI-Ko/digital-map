@@ -11,7 +11,7 @@
 | Production compilation | `pnpm build` | PASS (existing chunk-size advisory only) |
 | Production dependencies | `pnpm audit --prod` | PASS — no known vulnerabilities |
 | Prisma | `prisma validate` and `prisma generate` | PASS |
-| Fresh clone | frozen install, tests, typecheck and build | pending final gate |
+| Fresh clone | frozen install, tests, typecheck and build | PASS at `0e2d0a2aaf97e5dcd3ae0bb1b653470fb92ae3b4` |
 | GitHub Actions | exact final SHA | pending final gate |
 | Windows QA | backup, exact-SHA deploy and representative regression | pending final gate |
 
