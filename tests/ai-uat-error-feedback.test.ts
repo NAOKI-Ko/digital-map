@@ -6,7 +6,7 @@ describe('WU-40 AI-UAT operation feedback', () => {
   it('shows an actionable stale-revision conflict and prevents repeated approval', () => {
     const source = readFileSync(join(process.cwd(), 'app/pages/admin/maps/[mapId]/revisions.vue'), 'utf8')
     expect(source).toContain("error?.response?.status === 409")
-    expect(source).toContain('公開中のSpotが更新されたため承認できません')
+    expect(source).toContain('公開中のスポットが更新されたため承認できません')
     expect(source).toContain(':disabled="processingId === revision.id"')
   })
 

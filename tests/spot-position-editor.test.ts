@@ -65,7 +65,7 @@ describe('PIN管理workspace', () => {
   })
 
   it('配置済みSpot検索はfocusだけを行い移動modeへ入らない', () => {
-    expect(editorSource).toContain('label="配置済みSpotを検索"')
+    expect(editorSource).toContain('label="配置済みスポットを検索"')
     expect(editorSource).toContain('mapViewerRef.value?.focusSpot(spotId)')
     const selectionFunction = editorSource.slice(
       editorSource.indexOf('function selectPositionedSpot'),
