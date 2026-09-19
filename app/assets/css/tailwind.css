@@ -13,4 +13,16 @@
   body {
     @apply bg-stone-50 text-stone-900 antialiased;
   }
+
+  input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='file']),
+  textarea,
+  select {
+    @apply text-stone-950 placeholder:text-stone-400;
+  }
+}
+
+@layer components {
+  .dm-input {
+    @apply min-h-11 w-full rounded-lg border border-stone-300 bg-white px-3 py-2.5 text-sm transition-colors hover:border-stone-400 focus:border-terracotta-600 focus:outline-none focus:ring-2 focus:ring-terracotta-100 disabled:cursor-not-allowed disabled:bg-stone-100 disabled:text-stone-500;
+  }
 }
