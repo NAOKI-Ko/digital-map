@@ -28,5 +28,14 @@ See:
 - `docs/qa/wu50-ui-ux-harmonization/VERIFICATION-MATRIX.md`
 - `docs/qa/wu50-ui-ux-harmonization/VISUAL-QA.md`
 
-Final SHA, CI, Windows QA and verdict are recorded after the exact-SHA gates complete.
+## Final verification
 
+- Implementation SHA: `bc939c30d16611530d7e37b96360d135f26fb8c4`.
+- GitHub Actions: Verify run `35475968801` PASS.
+- Local and clean-clone tests/typecheck/build: PASS.
+- Production dependency audit: no known vulnerabilities.
+- Windows QA: exact implementation SHA deployed after verified DB/Media backup; 549/549 tests, typecheck, build, audits, ready/public/admin and representative browser regression PASS.
+- Open P0/P1/core P2 defects: 0.
+- Final verdict: **PASS-READY**.
+
+The final evidence-only documentation commit is allowed to follow the deployed implementation SHA; it contains no application or dependency change. main was not merged and Production was not deployed.

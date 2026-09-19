@@ -35,3 +35,6 @@ Browser: Codex in-app Chromium browser against the local Nuxt development server
 
 Open visual/a11y defects: none at P0, P1 or core P2.
 
+## Windows QA confirmation
+
+The same representative journeys passed against the active Windows QA release `bc939c30d16611530d7e37b96360d135f26fb8c4`. The public Map rendered 10 PINs and retained Map gestures, category filtering, geolocation, Spot detail and Info surfaces. Admin workspace and editor screenshots showed the normalized shell and one-column mobile editor without horizontal overflow. Browser console review returned no warnings or errors.
