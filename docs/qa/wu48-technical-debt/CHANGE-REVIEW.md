@@ -1,26 +1,34 @@
-# WU-48 Change Review
+# WU-48 R2 Change Review
 
-This is a same-author second-pass review, not an independent reviewer claim.
+This is a same-author evidence review, not an independent-review claim.
 
 | Commit | Debts | Review result |
 | --- | --- | --- |
-| `ce8df5e` | TD-001/002/003/004/008 | Async request identity, mutation guards, listener/timer teardown, rollback, and typed Spot editor preserve the baseline UI contracts. No API/schema change. |
-| `1599f8b` | TD-006 | Canonical DB comparison ignores credentials but preserves protocol/host/effective port/database; media verification now rejects extras; shell delegates to the safe implementation. |
-| `f1d5dcf` | TD-005 | Both local and S3 drivers expose ETag conditional writes; S3 412 is normalized; compensation skips rather than overwrites a newer pointer. |
-| `f77bd84` | TD-007 | CI pins Node/pnpm, starts isolated PostgreSQL, uses frozen lockfile, then migrations/audit/typecheck/tests/build. |
-| `2795b04` | TD-009 | Reka owns the title id again; focus uses a non-semantic data hook. Browser AX tree points `DialogContent` to the generated title and the warning disappears. |
-| `b2a35f7` | TD-010 | The override is restricted to `@prisma/config>deepmerge-ts` 8.0.2. Prisma stays on stable 7.10.0; no RC, Prisma major, direct application dependency, or unrelated lockfile update is included. Full compatibility verification passed. |
+| `a1af180` | TD-016/017 | Replaced substring/generic-string handling with recursive forbidden-key checks and typed, contained asset rewriting. |
+| `0e58c5c` | TD-005A/B | Added per-key local serialization and bounded PostgreSQL per-map serialization while retaining conditional compensation. |
+| `3bd1094` | TD-006A/B | Normalized PostgreSQL destination identity, required a distinct DB name, and rejected links before media traversal. |
+| `993f232` | TD-021 | Bound completion/failure effects to the originating editor context and operation generation. |
+| `7345bba` | TD-019 | Replaced independently representable public overlays with an exclusive tagged state. |
+| `33ac175` | TD-018 | Added timer/state interaction coverage for geolocation notice lifecycle. |
+| `d6cc28e` | TD-014/015 | Added production audit to CI and `main` push verification; repository-setting mutations remain approval-gated. |
+| `82eecf3` | TD-020 | Aligned publication, storage, restore, active-branch, and override-removal documentation. |
+| `7c57e57` | TD-005B portability follow-up | Made the Prisma dependency explicit. This repaired a Windows-only direct-module test failure caught before activation. |
 
-## Non-changes reviewed
+## Verification review
 
-- No schema/migration or API contract was changed.
-- No role, tenant, approval, or public visibility rule was loosened.
-- No camera, gesture, initial cover, minimum zoom, or public-map visual redesign was introduced.
-- No Prisma major/RC or unrelated dependency was updated. The only lockfile resolution change is `deepmerge-ts` 7.1.5 to 8.0.2 under `@prisma/config`.
-- WU-44 localization scope and the real-floor MapLibre path were retained with recorded evidence.
+- Local and final fresh-clone matrices passed at implementation SHA `7c57e57`: frozen install, production audit, Prisma validate/generate, 28 migrations, IMAGE spatial audit, typecheck, 78 files/522 tests, build, and clean tree.
+- GitHub Actions run `35459480854` passed the same source gates.
+- Windows candidate `82eecf3` was not activated after its direct-module test exposed the missing explicit import. The corrected SHA passed every gate before activation.
+- Final Windows browser regression covered public rendering, PIN detail/focus return, Info, and admin selection/move/Cancel with no console warning/error.
+- Backup checksum verification, disposable DB/media restore, exact media count, Windows junction rejection, and cleanup passed.
+
+## Deliberate non-changes
+
+- No Prisma major/RC, schema migration, API/role/tenant/public-visibility relaxation, camera/gesture redesign, advisory suppression, or test weakening.
+- No main merge, default-branch change, branch-protection/ruleset mutation, Production deployment, or automatic Human UAT pass.
+- Old Windows releases and all backups remain preserved.
 
 ## Remaining review gates
 
-- Hosted CI, final fresh clone, Windows exact-tree/deploy, verified backup/isolated restore all passed and are tracked in `VERIFICATION-MATRIX.md`.
-- TD-010 is fixed and verified under the approved narrow override. TD-011 Human UAT remains open, so the parent restart gate remains BLOCKED.
-- A different human or agent has not independently reviewed these commits.
+- TD-011 requires physical iPhone Safari and real outside-area GPS Human UAT.
+- TD-014 requires approval for authoritative branch/settings governance. Until both are resolved, the parent WU-48 restart gate remains BLOCKED.
