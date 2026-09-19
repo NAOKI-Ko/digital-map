@@ -8,14 +8,14 @@ const notFound = () => createError({ statusCode: 404, statusMessage: 'スポッ�
 export async function requireAssignedSpotEditor(event: H3Event, spotId: string) {
   const session = await requireUser(event)
   const spot = await prisma.spot.findUnique({
-    where: { id: spotId },
+    where: { id: spotId, tenantId: session.user.tenantId },
     include: {
       floor: { include: { map: { select: { id: true, tenantId: true } } } }, editorAssignment: true,
       fieldValues: { include: { fieldDefinition: true } },
       photos: { include: { asset: true }, orderBy: { order: 'asc' } },
     },
   })
-  if (!spot || spot.editorAssignment?.userId !== session.user.id) throw notFound()
+  if (!spot || spot.tenantId !== spot.floor.map.tenantId || spot.editorAssignment?.userId !== session.user.id) throw notFound()
   const membership = await prisma.tenantMember.findUnique({
     where: { tenantId_userId: { tenantId: spot.floor.map.tenantId, userId: session.user.id } },
   })
@@ -56,7 +56,7 @@ export async function approveSpotRevision(event: H3Event, revisionId: string) {
   const { session, map } = await requireMapAccess(event)
   return prisma.$transaction(async (tx) => {
     const revision = await tx.spotRevision.findFirst({
-      where: { id: revisionId, status: 'PENDING', spot: { floor: { mapId: map.id } } },
+      where: { id: revisionId, status: 'PENDING', spot: { tenantId: map.tenantId, floor: { mapId: map.id } } },
       include: { spot: true, photos: { orderBy: { order: 'asc' } } },
     })
     if (!revision) throw createError({ statusCode: 404, statusMessage: '承認待ちRevisionが見つかりません。' })
@@ -93,7 +93,7 @@ export async function approveSpotRevision(event: H3Event, revisionId: string) {
 export async function rejectSpotRevision(event: H3Event, revisionId: string, reason: string) {
   const { session, map } = await requireMapAccess(event)
   const updated = await prisma.$transaction(async (tx) => {
-    const result = await tx.spotRevision.updateMany({ where: { id: revisionId, status: 'PENDING', spot: { floor: { mapId: map.id } } }, data: { status: 'REJECTED', reviewerId: session.user.id, reviewedAt: new Date(), rejectReason: reason } })
+    const result = await tx.spotRevision.updateMany({ where: { id: revisionId, status: 'PENDING', spot: { tenantId: map.tenantId, floor: { mapId: map.id } } }, data: { status: 'REJECTED', reviewerId: session.user.id, reviewedAt: new Date(), rejectReason: reason } })
     if (result.count === 1) {
       await tx.spotRevisionPhoto.deleteMany({ where: { revisionId } })
       await appendAuditEvent(tx, { tenantId: map.tenantId, actorUserId: session.user.id, action: 'SPOT_REVISION_REJECTED', targetType: 'SpotRevision', targetId: revisionId, mapId: map.id, metadata: { reasonProvided: true } })

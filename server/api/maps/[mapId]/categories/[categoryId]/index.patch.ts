@@ -5,7 +5,7 @@ import { resolveTenantMediaAsset } from '~~/server/utils/media'
 
 export default defineEventHandler(async (event): Promise<CategoryResponse> => {
   const { map, session } = await requireOwnedMap(event)
-  const ownedCategory = await requireOwnedCategory(map.id, getRouterParam(event, 'categoryId'))
+  const ownedCategory = await requireOwnedCategory(map.id, map.tenantId, getRouterParam(event, 'categoryId'))
   const result = categoryUpdateSchema.safeParse(await readBody(event))
   if (!result.success) throw createError({ statusCode: 422, statusMessage: result.error.issues[0]?.message ?? '入力内容を確認してください。' })
 

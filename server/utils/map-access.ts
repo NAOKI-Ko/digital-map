@@ -71,6 +71,7 @@ export async function requireOwnedSpot(event: H3Event) {
   const spot = await prisma.spot.findFirst({
     where: {
       id: spotId,
+      tenantId: map.tenantId,
       floor: { mapId: map.id },
     },
     select: { id: true, floorId: true, x: true, y: true, isPublished: true },

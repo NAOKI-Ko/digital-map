@@ -30,12 +30,13 @@ export default defineEventHandler(async (event): Promise<AdminSpotResponse> => {
   const spot = await prisma.$transaction(async (transaction) => {
     const categories = result.data.categoryIds === undefined
       ? null
-      : await validateSpotCategories(transaction, map.id, result.data.categoryIds)
+      : await validateSpotCategories(transaction, map.id, map.tenantId, result.data.categoryIds)
     await validateSpotFieldSubmission(transaction, map.id, result.data, result.data.customValues, ownedSpot.id)
     const { categoryIds: _categoryIds, customValues, ...spotData } = result.data
     const updated = await transaction.spot.update({
       where: { id: ownedSpot.id },
       data: {
+        tenantId: map.tenantId,
         liveVersion: { increment: 1 },
         ...spotData,
         description: spotData.description || null,

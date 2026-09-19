@@ -51,6 +51,8 @@ export function toAdminSpotDetail(spot: SpotWithFloor) {
     )),
     x: spot.x,
     y: spot.y,
+    lat: spot.lat,
+    lng: spot.lng,
     photos,
     photoAssetIds: photos.map(photo => assetIdByUrl.get(photo) ?? null),
     hoursText: spot.hoursText,

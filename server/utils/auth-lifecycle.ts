@@ -20,7 +20,7 @@ export async function issueOrganizationInvitation(input: { tenantId: string, ema
 }
 
 export async function issueSpotEditorInvitation(input: { tenantId: string, spotId: string, email: string, createdById: string }) {
-  const spot = await prisma.spot.findFirst({ where: { id: input.spotId, floor: { map: { tenantId: input.tenantId } } }, select: { id: true } })
+  const spot = await prisma.spot.findFirst({ where: { id: input.spotId, tenantId: input.tenantId, floor: { map: { tenantId: input.tenantId } } }, select: { id: true } })
   if (!spot) throw createError({ statusCode: 404, statusMessage: 'スポットが見つかりません。' })
   const email = normalizeAuthEmail(input.email)
   const { rawToken, tokenHash } = createAuthToken()
@@ -87,7 +87,7 @@ export async function acceptOrganizationInvitation(input: {
     if (invitation.purpose === 'SPOT_EDITOR') {
       if (!invitation.targetSpotId) throw invalidInvite()
       const target = await tx.spot.findFirst({
-        where: { id: invitation.targetSpotId, floor: { map: { tenantId: invitation.tenantId } } },
+        where: { id: invitation.targetSpotId, tenantId: invitation.tenantId, floor: { map: { tenantId: invitation.tenantId } } },
         select: { id: true },
       })
       if (!target) throw invalidInvite()

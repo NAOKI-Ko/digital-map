@@ -17,6 +17,7 @@ export default defineEventHandler(async (event): Promise<CategoryResponse> => {
     const asset = await resolveTenantMediaAsset(session.user.tenantId, result.data.iconAssetId, 'icon')
     const category = await prisma.category.create({
       data: {
+        tenantId: map.tenantId,
         mapId: map.id,
         name: result.data.name,
         order,

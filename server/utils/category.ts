@@ -18,13 +18,14 @@ export function sortSpotCategories<T extends { name: string, order: number }>(ca
 export async function validateSpotCategories(
   client: Prisma.TransactionClient,
   mapId: string,
+  tenantId: string,
   categoryIds: readonly string[],
 ) {
   const uniqueIds = [...new Set(categoryIds)]
   if (uniqueIds.length === 0) return []
 
   const categories = await client.category.findMany({
-    where: { id: { in: uniqueIds }, mapId },
+    where: { id: { in: uniqueIds }, mapId, tenantId },
     select: { id: true, name: true, order: true, iconType: true, iconPresetId: true, iconImageUrl: true, iconAssetId: true },
     orderBy: categoryOrderBy,
   })
@@ -34,10 +35,10 @@ export async function validateSpotCategories(
   return categories
 }
 
-export async function requireOwnedCategory(mapId: string, categoryId: string | undefined) {
+export async function requireOwnedCategory(mapId: string, tenantId: string, categoryId: string | undefined) {
   if (!categoryId) throw createError({ statusCode: 400, statusMessage: 'カテゴリーIDが必要です。' })
   const category = await prisma.category.findFirst({
-    where: { id: categoryId, mapId },
+    where: { id: categoryId, mapId, tenantId },
     include: { _count: { select: { spotCategories: true } } },
   })
   if (!category) throw createError({ statusCode: 404, statusMessage: 'カテゴリーが見つかりません。' })

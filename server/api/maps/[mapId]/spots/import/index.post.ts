@@ -72,6 +72,7 @@ export default defineEventHandler(async (event): Promise<SpotCsvImportResponse> 
       if (row.status === 'NEW') {
         const spot = await transaction.spot.create({
           data: {
+            tenantId: map.tenantId,
             floorId: context.floor.id,
             name: row.name,
             ...standardSpotData(row, context.fields),

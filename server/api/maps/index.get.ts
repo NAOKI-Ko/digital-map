@@ -21,7 +21,7 @@ export default defineEventHandler(async (event): Promise<AdminMapListResponse> =
   })
 
   return {
-    permissions: { canCreateMap: membership.role === 'OWNER', isOwner: membership.role === 'OWNER' },
+    permissions: { canCreateMap: membership.role === 'OWNER' && maps.length === 0, isOwner: membership.role === 'OWNER' },
     maps: maps.map(map => ({
       id: map.id,
       name: map.name,

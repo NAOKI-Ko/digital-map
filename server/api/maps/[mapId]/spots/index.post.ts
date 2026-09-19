@@ -21,13 +21,14 @@ export default defineEventHandler(async (event): Promise<AdminSpotResponse> => {
   }
 
   const spot = await prisma.$transaction(async (transaction) => {
-    const categories = await validateSpotCategories(transaction, map.id, result.data.categoryIds ?? [])
+    const categories = await validateSpotCategories(transaction, map.id, map.tenantId, result.data.categoryIds ?? [])
     await validateSpotFieldSubmission(transaction, map.id, result.data, result.data.customValues)
     const { categoryIds: _categoryIds, customValues, ...spotData } = result.data
     const fieldValues = Object.entries(customValues).flatMap(([fieldDefinitionId, value]) =>
       value === null || value === '' ? [] : [{ fieldDefinitionId, valueJson: value }])
     return transaction.spot.create({
       data: {
+        tenantId: map.tenantId,
         ...spotData,
         description: spotData.description || null,
         address: spotData.address || null,

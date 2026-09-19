@@ -29,7 +29,7 @@ export default defineEventHandler(async (event): Promise<SpotBulkResponse> => {
       return
     }
     if (categoryId === null) return
-    const [category] = await validateSpotCategories(transaction, map.id, [categoryId])
+    const [category] = await validateSpotCategories(transaction, map.id, map.tenantId, [categoryId])
     if (!category) return
     if (input.action === 'addCategory') {
       await transaction.spotCategory.createMany({
