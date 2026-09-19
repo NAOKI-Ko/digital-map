@@ -26,6 +26,8 @@ export interface AdminNavigationItem {
   activePaths: string[]
   exact?: boolean
   activeHash?: string
+  disabled?: boolean
+  status?: string
 }
 
 export interface AdminNavigationContext {
@@ -35,7 +37,7 @@ export interface AdminNavigationContext {
 }
 
 export const adminNavigationGroupLabels: Record<AdminNavigationGroupId, string> = {
-  organization: '組織',
+  organization: 'ワークスペース',
   map: 'マップ',
   operations: '公開・運用',
   team: 'チーム',
@@ -48,14 +50,14 @@ function mapPath(mapId: string, suffix = '') {
 
 export function buildAdminNavigation(context: AdminNavigationContext): AdminNavigationItem[] {
   const items: AdminNavigationItem[] = [{
-    id: 'maps',
-    label: 'マップ一覧',
-    shortLabel: 'マップ一覧',
-    icon: 'maps',
-    to: '/admin/dashboard',
+    id: 'workspace-home',
+    label: 'ホーム',
+    shortLabel: 'ホーム',
+    icon: 'home',
+    to: context.mapId ? mapPath(context.mapId) : '/admin/dashboard',
     group: 'organization',
     rail: true,
-    activePaths: ['/admin/dashboard'],
+    activePaths: context.mapId ? [mapPath(context.mapId)] : ['/admin/dashboard'],
     exact: true,
   }]
 
@@ -73,14 +75,9 @@ export function buildAdminNavigation(context: AdminNavigationContext): AdminNavi
   }
 
   if (context.mapId) {
-    const root = mapPath(context.mapId)
     items.push(
       {
-        id: 'map-home', label: 'ホーム', shortLabel: 'ホーム', icon: 'home', to: root,
-        group: 'map', rail: true, activePaths: [root], exact: true,
-      },
-      {
-        id: 'map-edit', label: 'マップ編集', shortLabel: 'マップ編集', icon: 'edit', to: mapPath(context.mapId, '/settings'),
+        id: 'illustration-map', label: 'イラストマップ', shortLabel: 'イラストマップ', icon: 'edit', to: mapPath(context.mapId, '/editor'),
         group: 'map', rail: true,
         activePaths: [
           mapPath(context.mapId, '/settings'),
@@ -88,6 +85,10 @@ export function buildAdminNavigation(context: AdminNavigationContext): AdminNavi
           mapPath(context.mapId, '/editor'),
           mapPath(context.mapId, '/fields'),
         ],
+      },
+      {
+        id: 'real-map', label: 'リアルマップ', shortLabel: 'リアルマップ（準備中）', icon: 'maps', to: '',
+        group: 'map', rail: false, activePaths: [], disabled: true, status: '準備中',
       },
       {
         id: 'spots', label: 'スポット', shortLabel: 'スポット', icon: 'spot', to: mapPath(context.mapId, '/spots'),
@@ -130,7 +131,7 @@ export function buildAdminNavigation(context: AdminNavigationContext): AdminNavi
         group: 'management', rail: false, activePaths: ['/admin/organization/audit'],
       },
       {
-        id: 'organization-settings', label: '組織設定', shortLabel: '組織設定', icon: 'settings', to: '/admin/organization#settings',
+        id: 'organization-settings', label: 'ワークスペース設定', shortLabel: 'ワークスペース設定', icon: 'settings', to: '/admin/organization#settings',
         group: 'management', rail: false, activePaths: ['/admin/organization'], exact: true, activeHash: '#settings',
       },
     )

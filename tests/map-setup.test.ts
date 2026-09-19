@@ -14,15 +14,15 @@ describe('イラストマップ作成セットアップ', () => {
     expect(mapCreateSchema.safeParse({ mapType: 'real', name: '有松', slug: 'arimatsu' }).success).toBe(false)
   })
 
-  it('リアルマップを無効表示し今後対応予定と説明する', () => {
+  it('Map種別選択をせずリアルマップを今後対応予定と説明する', () => {
     expect(newMapSource).toContain('リアルマップ')
     expect(newMapSource).toContain('今後対応予定')
     expect(newMapSource).toContain('aria-disabled="true"')
+    expect(newMapSource).not.toContain('selectedType')
   })
 
   it('公開パスを明示指定し、Spot標準項目を自動初期化する', () => {
-    expect(newMapSource).toContain('mapType: selectedType.value')
-    expect(newMapSource).not.toContain('mapType: selectedType,')
+    expect(newMapSource).toContain("mapType: 'illustration'")
     expect(createApiSource).toContain('slug: input.slug')
     expect(createApiSource).toContain('defaultSpotFieldDefinitions')
   })

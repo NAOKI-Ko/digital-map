@@ -6,30 +6,31 @@ import {
   isAdminNavigationItemActive,
 } from '../app/utils/admin-navigation'
 
-describe('WU-41 admin navigation model', () => {
-  it('OWNERへMap管理とOWNER専用destinationを返す', () => {
+describe('WU-50 single-map workspace navigation model', () => {
+  it('OWNERへ単一Map navigationとOWNER専用destinationを返す', () => {
     const items = buildAdminNavigation({ mapId: 'map-a', isOwner: true, hasAssignedSpots: false })
     expect(items.map(item => item.id)).toEqual(expect.arrayContaining([
-      'maps', 'map-home', 'map-edit', 'spots', 'categories', 'publish', 'analytics', 'revisions', 'map-editors', 'members', 'audit', 'organization-settings',
+      'workspace-home', 'illustration-map', 'real-map', 'spots', 'categories', 'publish', 'analytics', 'revisions', 'map-editors', 'members', 'audit', 'organization-settings',
     ]))
+    expect(items.find(item => item.id === 'real-map')).toMatchObject({ disabled: true, status: '準備中', to: '' })
     expect(items.map(item => item.id)).not.toContain('assigned-spots')
   })
 
   it('Map EDITORからOWNER専用destinationを除外する', () => {
     const items = buildAdminNavigation({ mapId: 'map-a', isOwner: false, hasAssignedSpots: false })
-    expect(items.map(item => item.id)).toEqual(expect.arrayContaining(['map-home', 'map-edit', 'spots', 'publish', 'analytics', 'revisions']))
+    expect(items.map(item => item.id)).toEqual(expect.arrayContaining(['workspace-home', 'illustration-map', 'real-map', 'spots', 'publish', 'analytics', 'revisions']))
     expect(items.map(item => item.id)).not.toEqual(expect.arrayContaining(['map-editors', 'members', 'audit', 'organization-settings']))
   })
 
   it('Spot EditorだけならMap管理を表示せず、assignmentがある場合だけ担当Spotを表示する', () => {
     const assigned = buildAdminNavigation({ mapId: null, isOwner: false, hasAssignedSpots: true })
-    expect(assigned.map(item => item.id)).toEqual(['maps', 'assigned-spots'])
-    expect(buildAdminNavigation({ mapId: null, isOwner: false, hasAssignedSpots: false }).map(item => item.id)).toEqual(['maps'])
+    expect(assigned.map(item => item.id)).toEqual(['workspace-home', 'assigned-spots'])
+    expect(buildAdminNavigation({ mapId: null, isOwner: false, hasAssignedSpots: false }).map(item => item.id)).toEqual(['workspace-home'])
   })
 
   it('Map編集の子routeとOrganization hashを正しくactiveにする', () => {
     const items = buildAdminNavigation({ mapId: 'map-a', isOwner: true, hasAssignedSpots: false })
-    const mapEdit = items.find(item => item.id === 'map-edit')!
+    const mapEdit = items.find(item => item.id === 'illustration-map')!
     const members = items.find(item => item.id === 'members')!
     const settings = items.find(item => item.id === 'organization-settings')!
     expect(isAdminNavigationItemActive(mapEdit, '/admin/maps/map-a/floors/floor-a/georeference')).toBe(true)
@@ -47,4 +48,3 @@ describe('WU-41 admin navigation model', () => {
     ])
   })
 })
-

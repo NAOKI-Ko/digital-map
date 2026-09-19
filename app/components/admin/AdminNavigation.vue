@@ -25,7 +25,7 @@ const organizations = computed(() => organizationData.value?.organizations ?? []
 const maps = computed(() => mapData.value?.maps ?? [])
 const activeOrganization = computed(() => organizations.value.find(item => item.id === organizationData.value?.activeOrganizationId))
 const routeMapId = computed(() => typeof route.params.mapId === 'string' ? route.params.mapId : null)
-const currentMap = computed(() => maps.value.find(map => map.id === routeMapId.value) ?? null)
+const currentMap = computed(() => maps.value.find(map => map.id === routeMapId.value) ?? (maps.value.length === 1 ? maps.value[0]! : null))
 const isOwner = computed(() => activeOrganization.value?.role === 'OWNER')
 const showLabels = computed(() => props.mobile || props.expanded)
 const navigation = computed(() => buildAdminNavigation({
@@ -38,7 +38,7 @@ const groupedNavigation = computed(() => groupOrder
   .map(id => ({ id, label: adminNavigationGroupLabels[id], items: navigation.value.filter(item => item.group === id) }))
   .filter(group => group.items.length))
 const railNavigation = computed(() => navigation.value.filter(item => item.rail))
-const contextLabel = computed(() => [activeOrganization.value?.name, currentMap.value?.name].filter(Boolean).join(' / ') || 'OrganizationとMapを選択')
+const contextLabel = computed(() => [activeOrganization.value?.name, currentMap.value?.name].filter(Boolean).join(' / ') || 'ワークスペースを選択')
 
 function isActive(item: AdminNavigationItem) {
   return isAdminNavigationItemActive(item, route.path, route.hash)
@@ -57,15 +57,6 @@ async function switchOrganization(event: Event) {
   }
   await $fetch('/api/organizations/active', { method: 'POST', body: { tenantId } })
   await reloadNuxtApp({ path: '/admin/dashboard', force: true })
-}
-
-async function switchMap(event: Event) {
-  const select = event.target as HTMLSelectElement
-  const mapId = select.value
-  if (!mapId || mapId === currentMap.value?.id) return
-  await navigateTo(`/admin/maps/${mapId}`)
-  if (route.params.mapId !== mapId) select.value = currentMap.value?.id ?? ''
-  else isContextOpen.value = false
 }
 
 function closeContextOnEscape(event: KeyboardEvent) {
@@ -96,47 +87,41 @@ function handleNavigate() {
 <template>
   <div class="flex h-full flex-col overflow-visible border-r border-stone-200 bg-stone-100 text-stone-800">
     <div class="flex min-h-[4.5rem] items-center border-b border-stone-200" :class="showLabels ? 'px-4' : 'justify-center px-2'">
-      <NuxtLink to="/admin/dashboard" class="group relative flex min-h-11 items-center rounded-lg focus-visible:outline-stone-700" :class="showLabels ? 'gap-3' : 'justify-center px-3'" aria-label="Digital Map マップ一覧" @click="handleNavigate">
+      <NuxtLink :to="currentMap ? `/admin/maps/${currentMap.id}` : '/admin/dashboard'" class="group relative flex min-h-11 items-center rounded-lg focus-visible:outline-stone-700" :class="showLabels ? 'gap-3' : 'justify-center px-3'" aria-label="Digital Map ホーム" @click="handleNavigate">
         <span class="grid size-9 shrink-0 place-items-center rounded-lg bg-terracotta-600 text-sm font-black text-white">D</span>
         <span v-if="showLabels" class="min-w-0">
           <span class="block text-[0.65rem] font-semibold tracking-[0.2em] text-stone-600">DIGITAL MAP</span>
-          <span class="mt-0.5 block truncate text-sm font-bold">マップ管理</span>
+          <span class="mt-0.5 block truncate text-sm font-bold">ワークスペース</span>
         </span>
-        <span v-else class="admin-nav-tooltip">マップ一覧</span>
+        <span v-else class="admin-nav-tooltip">ホーム</span>
       </NuxtLink>
     </div>
 
     <div class="relative border-b border-stone-200 p-2">
       <div v-if="showLabels" class="space-y-3 rounded-xl bg-transparent p-3">
         <label class="block text-[0.65rem] font-semibold uppercase tracking-wider text-stone-600">
-          組織
-          <select :value="organizationData?.activeOrganizationId" class="mt-1.5 min-h-11 w-full rounded-lg border border-stone-200 bg-white px-3 text-sm font-semibold text-stone-800" aria-label="Organizationを切り替える" @change="switchOrganization">
+          ワークスペース
+          <select :value="organizationData?.activeOrganizationId" class="mt-1.5 min-h-11 w-full rounded-lg border border-stone-200 bg-white px-3 text-sm font-semibold text-stone-800" aria-label="ワークスペースを切り替える" @change="switchOrganization">
             <option v-for="organization in organizations" :key="organization.id" :value="organization.id">{{ organization.name }}</option>
           </select>
         </label>
-        <label v-if="maps.length" class="block text-[0.65rem] font-semibold uppercase tracking-wider text-stone-600">
+        <div v-if="currentMap" class="block text-[0.65rem] font-semibold uppercase tracking-wider text-stone-600">
           現在のマップ
-          <select :value="currentMap?.id ?? ''" class="mt-1.5 min-h-11 w-full rounded-lg border border-stone-200 bg-white px-3 text-sm font-semibold text-stone-800" aria-label="Mapを切り替える" @change="switchMap">
-            <option value="" disabled>マップを選択</option>
-            <option v-for="map in maps" :key="map.id" :value="map.id">{{ map.name }}</option>
-          </select>
-        </label>
+          <p class="mt-1.5 truncate rounded-lg border border-stone-200 bg-stone-50 px-3 py-3 text-sm font-semibold normal-case tracking-normal text-stone-800">{{ currentMap.name }}</p>
+        </div>
       </div>
       <button v-else type="button" class="group relative flex min-h-11 w-full items-center justify-center rounded-lg text-stone-600 transition-colors hover:bg-stone-200/60 hover:text-stone-950 motion-reduce:transition-none" :aria-expanded="isContextOpen" aria-controls="admin-context-popover" :aria-label="contextLabel" :title="contextLabel" @click="isContextOpen = !isContextOpen">
         <AdminIcon name="switch" />
         <span class="admin-nav-tooltip">{{ contextLabel }}</span>
       </button>
       <div v-if="!showLabels && isContextOpen" id="admin-context-popover" class="absolute left-[4.25rem] top-2 z-50 w-72 rounded-xl border border-stone-200 bg-white p-4 text-stone-900 shadow-xl">
-        <p class="text-xs font-semibold text-stone-500">組織</p>
-        <select :value="organizationData?.activeOrganizationId" class="mt-1 min-h-11 w-full rounded-lg border border-stone-300 bg-white px-3 text-sm" aria-label="Organizationを切り替える" @change="switchOrganization">
+        <p class="text-xs font-semibold text-stone-500">ワークスペース</p>
+        <select :value="organizationData?.activeOrganizationId" class="mt-1 min-h-11 w-full rounded-lg border border-stone-300 bg-white px-3 text-sm" aria-label="ワークスペースを切り替える" @change="switchOrganization">
           <option v-for="organization in organizations" :key="organization.id" :value="organization.id">{{ organization.name }}</option>
         </select>
-        <template v-if="maps.length">
+        <template v-if="currentMap">
           <p class="mt-4 text-xs font-semibold text-stone-500">現在のマップ</p>
-          <select :value="currentMap?.id ?? ''" class="mt-1 min-h-11 w-full rounded-lg border border-stone-300 bg-white px-3 text-sm" aria-label="Mapを切り替える" @change="switchMap">
-            <option value="" disabled>マップを選択</option>
-            <option v-for="map in maps" :key="map.id" :value="map.id">{{ map.name }}</option>
-          </select>
+          <p class="mt-1 rounded-lg bg-stone-50 px-3 py-3 text-sm font-semibold">{{ currentMap.name }}</p>
         </template>
       </div>
     </div>
@@ -146,14 +131,19 @@ function handleNavigate() {
         <section v-for="group in groupedNavigation" :key="group.id" class="mb-4">
           <h2 class="px-3 pb-1.5 text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-stone-500">{{ group.label }}</h2>
           <div class="space-y-0.5">
-            <NuxtLink v-for="item in group.items" :key="item.id" :to="item.to" class="flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-semibold transition-colors motion-reduce:transition-none" :class="isActive(item) ? 'bg-terracotta-50 text-terracotta-800 ring-1 ring-inset ring-terracotta-200' : 'text-stone-600 hover:bg-stone-200/60 hover:text-stone-950'" :aria-current="isActive(item) ? 'page' : undefined" @click="handleNavigate">
-              <AdminIcon :name="item.icon" class="shrink-0" /><span class="truncate">{{ item.label }}</span>
-            </NuxtLink>
+            <div v-for="item in group.items" :key="item.id">
+              <div v-if="item.disabled" aria-disabled="true" class="flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-semibold text-stone-400">
+                <AdminIcon :name="item.icon" class="shrink-0" /><span class="truncate">{{ item.label }}</span><span class="ml-auto rounded-full bg-stone-200 px-2 py-0.5 text-[0.65rem] text-stone-600">{{ item.status }}</span>
+              </div>
+              <NuxtLink v-else :to="item.to" class="flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-semibold transition-colors motion-reduce:transition-none" :class="isActive(item) ? 'bg-terracotta-50 text-terracotta-800 ring-1 ring-inset ring-terracotta-200' : 'text-stone-600 hover:bg-stone-200/60 hover:text-stone-950'" :aria-current="isActive(item) ? 'page' : undefined" @click="handleNavigate">
+                <AdminIcon :name="item.icon" class="shrink-0" /><span class="truncate">{{ item.label }}</span>
+              </NuxtLink>
+            </div>
           </div>
         </section>
       </template>
       <div v-else class="space-y-1">
-        <NuxtLink v-for="item in railNavigation" :key="item.id" :to="item.to" class="group relative flex min-h-11 items-center justify-center rounded-lg transition-colors motion-reduce:transition-none" :class="isActive(item) ? 'bg-terracotta-50 text-terracotta-800 ring-1 ring-inset ring-terracotta-200' : 'text-stone-600 hover:bg-stone-200/60 hover:text-stone-950'" :aria-current="isActive(item) ? 'page' : undefined" :aria-label="item.shortLabel" :title="item.shortLabel" @click="handleNavigate">
+        <NuxtLink v-for="item in railNavigation.filter(item => !item.disabled)" :key="item.id" :to="item.to" class="group relative flex min-h-11 items-center justify-center rounded-lg transition-colors motion-reduce:transition-none" :class="isActive(item) ? 'bg-terracotta-50 text-terracotta-800 ring-1 ring-inset ring-terracotta-200' : 'text-stone-600 hover:bg-stone-200/60 hover:text-stone-950'" :aria-current="isActive(item) ? 'page' : undefined" :aria-label="item.shortLabel" :title="item.shortLabel" @click="handleNavigate">
           <AdminIcon :name="item.icon" /><span class="admin-nav-tooltip">{{ item.shortLabel }}</span>
         </NuxtLink>
       </div>

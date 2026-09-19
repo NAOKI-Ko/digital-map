@@ -15,7 +15,9 @@ describe('WU-41 admin shell contracts', () => {
     expect(layout).toContain("localStorage.setItem('adminSidebarExpanded'")
     expect(layout).not.toMatch(/localStorage\.setItem\([^)]*(?:role|permission|mapId|tenantId)/i)
     expect(navigation).toContain("await navigateTo('/admin/dashboard')")
-    expect(navigation).toContain("await navigateTo(`/admin/maps/${mapId}`)")
+    expect(navigation).not.toContain('function switchMap')
+    expect(navigation).toContain('ワークスペースを切り替える')
+    expect(navigation).toContain('現在のマップ')
   })
 
   it('rail tooltip/current semanticsとmobile dialog keyboard behaviorを持つ', () => {
