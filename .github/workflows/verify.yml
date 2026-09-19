@@ -3,8 +3,6 @@ name: Verify
 on:
   pull_request:
   push:
-    branches-ignore:
-      - main
 
 permissions:
   contents: read
@@ -40,6 +38,7 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm audit --prod --audit-level high
       - run: pnpm prisma:validate
       - run: pnpm prisma:generate
       - run: pnpm exec prisma migrate deploy
