@@ -190,7 +190,10 @@ docs/                要件・設計・画面仕様・タスク
 ## データ公開とセキュリティ
 
 - 管理APIは管理者セッションと`tenantId`による所有権検証を通します。
-- 公開APIは`Map.isPublished === true`のマップだけを返します。
+- WU-48中の実装正本ブランチは`refactor/wu48-technical-debt-20260919`で、R2修正はそこから分岐します。`main`への昇格はHuman UATと明示承認後に別途行います。
+- 公開操作はDBのライブ行をそのまま配信せず、locale別`PublicMap`をimmutable release manifestとcontent-hash assetへ固定し、`current.json`だけを切り替えます。公開viewerにライブDB fallbackはありません。
+- `Map.isPublished`、`Map.currentReleaseId`、`current.json`は同一Map単位で直列化して更新し、成功後は同じ公開結果を表します。
+- 開発・単一プロセスのローカル配信は`PUBLIC_STORAGE_DRIVER=local`と`PUBLIC_STORAGE_ROOT`を使います。複数プロセス対応の本番配信は`PUBLIC_STORAGE_DRIVER=r2`とR2接続設定を使い、ローカルdriverを共有ストレージとして運用しません。
 - 公開マップ内でも、`Spot.isPublished === true`かつ正規化`x`/`y`設定済みのスポットだけを返します。
 - MediaAssetの一覧・参照・削除はTenant境界を検証し、使用中assetの削除は拒否します。
 - Spot Fieldは有効かつ公開設定で空でない値だけを公開し、内部/無効項目を返しません。
@@ -212,3 +215,9 @@ docker compose exec -T postgres \
 ```
 
 画像ボリュームとDBは同じ時点でバックアップし、参照先URLと実ファイルの整合性を保ってください。
+
+復元は`ALLOW_DISPOSABLE_RESTORE=true`を明示した隔離先だけを対象にします。`RESTORE_DATABASE_URL`は接続元と異なるデータベース名でなければならず、`postgres:`/`postgresql:`、既定port、認証情報、query表記の差では別DBとみなしません。メディアmanifestは完全一致を検証し、symlink／junctionを追跡しません。共有・QA・本番DBへrestoreテストを実行しないでください。
+
+## 依存関係の監査
+
+CIは`pnpm audit --prod --audit-level high`を実行します。`pnpm-workspace.yaml`の`@prisma/config>deepmerge-ts` overrideは、Prisma 7.10.0が未修正版を固定している期間だけの限定措置です。承認済みの安定版Prismaが`deepmerge-ts >= 8`を直接解決するようになった時点でoverrideを外し、依存監査、全テスト、型検査、Prisma validate/generate、隔離DB migration・空間監査、build、公開／管理画面回帰を再実行します。Prisma本体のメジャー更新やRC移行は別承認です。
