@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { uploadedImageUrlSchema } from './photo'
 
 export const mapNameSchema = z.object({
   name: z
@@ -35,7 +36,7 @@ export const mapBrandingSchema = z.object({
   organizationName: nullableText(100, '団体名は100文字以内で入力してください。'),
   logoUrl: z.preprocess(
     value => typeof value === 'string' && value.trim() === '' ? null : value,
-    z.string().trim().startsWith('/uploads/', 'アップロードしたロゴ画像を指定してください。').nullable(),
+    uploadedImageUrlSchema.nullable(),
   ),
   logoAssetId: z.string().min(1).nullable().optional(),
   websiteUrl: nullableHttpUrl,
