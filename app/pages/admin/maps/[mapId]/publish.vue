@@ -2,6 +2,7 @@
 import PublicSharePanel from '~/components/admin/PublicSharePanel.vue'
 import PaperExportPanel from '~/components/admin/PaperExportPanel.vue'
 import { buildPublicMapUrl } from '~~/shared/utils/public-url'
+import { resolvePublicationToggleAction } from '~~/shared/utils/map-publication'
 import type { AdminMapResponse } from '~~/shared/types/map'
 import type { MapPublicationResponse } from '~~/shared/types/map-publication'
 import type { MapFloorListResponse } from '~~/shared/types/floor'
@@ -12,7 +13,7 @@ const route = useRoute()
 const mapId = route.params.mapId as string
 const { data, error, status } = await useFetch<AdminMapResponse>(`/api/maps/${mapId}`)
 const { data: floorData } = await useFetch<MapFloorListResponse>(`/api/maps/${mapId}/floors`)
-const { data: releaseData, refresh: refreshReleases } = await useFetch<{ currentReleaseId: string | null, releases: Array<{ id: string, createdAt: string, readyAt: string | null }> }>(`/api/maps/${mapId}/releases`)
+const { data: releaseData, status: releaseStatus, refresh: refreshReleases } = await useFetch<{ currentReleaseId: string | null, releases: Array<{ id: string, createdAt: string, readyAt: string | null }> }>(`/api/maps/${mapId}/releases`)
 const isSaving = ref(false)
 const releaseDate = new Intl.DateTimeFormat('ja-JP', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Tokyo' })
 const errorMessage = ref('')
@@ -32,9 +33,20 @@ async function togglePublication() {
   isSaving.value = true
   errorMessage.value = ''
   successMessage.value = ''
-  const nextState = !data.value.map.isPublished
+  const currentReleaseId = releaseData.value?.currentReleaseId
+  const action = resolvePublicationToggleAction(data.value.map.isPublished, currentReleaseId)
 
   try {
+    if (action === 'resume-current-release') {
+      if (!currentReleaseId) throw new Error('CURRENT_RELEASE_NOT_READY')
+      await $fetch(`/api/maps/${mapId}/releases/${currentReleaseId}/rollback`, { method: 'POST' })
+      data.value.map.isPublished = true
+      successMessage.value = '公開停止前の版を再公開しました。公開URLから閲覧できます。'
+      await refreshReleases()
+      return
+    }
+
+    const nextState = action === 'publish-latest'
     const response = await $fetch<MapPublicationResponse>(`/api/maps/${mapId}/publish`, {
       method: 'POST',
       body: { isPublished: nextState },
@@ -53,6 +65,34 @@ async function togglePublication() {
   }
   catch {
     errorMessage.value = '公開状態を変更できませんでした。もう一度お試しください。'
+  }
+  finally {
+    isSaving.value = false
+  }
+}
+
+async function publishLatest() {
+  if (!data.value) return
+  isSaving.value = true
+  errorMessage.value = ''
+  successMessage.value = ''
+  try {
+    const response = await $fetch<MapPublicationResponse>(`/api/maps/${mapId}/publish`, {
+      method: 'POST',
+      body: { isPublished: true },
+    })
+    data.value = {
+      map: {
+        ...data.value.map,
+        isPublished: response.publication.isPublished,
+        updatedAt: response.publication.updatedAt,
+      },
+    }
+    successMessage.value = '最新の編集内容から新しい公開版を作成しました。'
+    await refreshReleases()
+  }
+  catch {
+    errorMessage.value = '新しい公開版を作成できませんでした。画像や公開内容を確認してください。'
   }
   finally {
     isSaving.value = false
@@ -112,13 +152,18 @@ async function rollbackRelease(releaseId: string) {
             type="button"
             role="switch"
             :aria-checked="data.map.isPublished"
-            :disabled="isSaving"
+            :disabled="isSaving || releaseStatus === 'pending'"
             class="inline-flex min-w-48 items-center justify-center rounded-lg px-5 py-3 text-sm font-semibold text-white disabled:opacity-60"
             :class="data.map.isPublished ? 'bg-stone-700 hover:bg-stone-800' : 'bg-emerald-700 hover:bg-emerald-800'"
             @click="togglePublication"
           >
-            {{ isSaving ? '変更中…' : data.map.isPublished ? 'マップを非公開にする' : 'マップを公開する' }}
+            {{ isSaving ? '変更中…' : data.map.isPublished ? 'マップを非公開にする' : releaseData?.currentReleaseId ? '停止前の版を再公開する' : 'マップを公開する' }}
           </button>
+        </div>
+
+        <div v-if="!data.map.isPublished && releaseData?.currentReleaseId" class="mt-4 rounded-lg border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-700">
+          <p>停止前の版ではなく、現在の編集内容から新しい公開版を作る場合はこちらを使用します。</p>
+          <button type="button" class="mt-3 rounded border border-stone-300 bg-white px-3 py-2 text-xs font-semibold hover:bg-stone-100 disabled:opacity-60" :disabled="isSaving" @click="publishLatest">最新内容を公開する</button>
         </div>
 
         <p v-if="errorMessage" role="alert" class="mt-5 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{{ errorMessage }}</p>

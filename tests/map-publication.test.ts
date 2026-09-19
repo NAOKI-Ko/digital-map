@@ -14,6 +14,7 @@ vi.mock('../server/utils/prisma', () => ({
 }))
 
 import { setOwnedMapPublication } from '../server/utils/map-publication'
+import { resolvePublicationToggleAction } from '../shared/utils/map-publication'
 
 describe('マップの公開状態更新', () => {
   beforeEach(() => {
@@ -45,5 +46,20 @@ describe('マップの公開状態更新', () => {
 
     await expect(setOwnedMapPublication('map-2', 'tenant-1', false)).resolves.toBeNull()
     expect(mocks.update).not.toHaveBeenCalled()
+  })
+})
+
+describe('公開スイッチの操作分岐', () => {
+  it('公開中は非公開化する', () => {
+    expect(resolvePublicationToggleAction(true, 'release-1')).toBe('unpublish')
+  })
+
+  it('公開停止中で現行版があれば安全に同じ版を再公開する', () => {
+    expect(resolvePublicationToggleAction(false, 'release-1')).toBe('resume-current-release')
+  })
+
+  it('初回公開では最新内容から公開版を作る', () => {
+    expect(resolvePublicationToggleAction(false, null)).toBe('publish-latest')
+    expect(resolvePublicationToggleAction(false, undefined)).toBe('publish-latest')
   })
 })
