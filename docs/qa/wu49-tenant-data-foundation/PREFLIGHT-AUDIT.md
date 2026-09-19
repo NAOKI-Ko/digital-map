@@ -106,3 +106,18 @@ Post-cleanup:
 ## Updated preflight decision
 
 Spot and Category backfills remain unambiguous, Category tenant-name uniqueness has no collision, and no Tenant now has more than one Map. The cleanup blocker is resolved. Migration `20260920020000_map_tenant_unique` may enforce the hard maximum-one-Map invariant.
+
+## Windows QA completion evidence
+
+The hard migration was applied on active Windows QA from exact implementation SHA `8c4675ee019cbfcde06fe9964fcb05a70b699b94`. The active post-migration inventory is 4 Tenants, 3 Maps, 8 Floors, 17 Spots, and 7 Categories. The tenant-data audit reports zero ownership, coordinate, capability, or multi-Map anomalies; the IMAGE spatial audit reports zero anomalies. PostgreSQL reports all 30 migrations current.
+
+Only the four approved fixed Map IDs were removed. `demo-arimatsu-map` remains the sole `qa` Map and is published through original READY release `cmu15w386000u4sva3mh5wty7`. Other Tenant Map counts did not change, all 11 MediaAssets remained, and all pre-existing release and backup folders were retained.
+
+The final verified backup is `C:\DigitalMap\backups\post-wu49-unblock-8c4675e-20260920-064305`:
+
+- DB dump: `db\digital-map-20260919T214307Z.dump`, 121,994 bytes, SHA-256 `502e228bfdab26c992e3759f4e01a482f557b7bb6cea3dc62abae80644cf30b3`
+- DB metadata: SHA-256 `de79bf403fa0287164565f28faec778bfd53495f570105d809ee3c65f3839af8`
+- Media archive: `media\20260919T214308Z\media.tar.gz`, 19,946,363 bytes, SHA-256 `640dbdba282ba1e9caec63894df648b3e591ba4b2bf1f9d7378e0b159db37981`
+- Media manifest: SHA-256 `b621f49993e3ae9f1631b73513d25a79fd04c35301f23d148cca7e7cd4ab36b1`
+
+That backup was restored to disposable database `digital_map_wu49_postdeploy_restore_20260920` and an empty disposable media directory. Media manifest verification, migration deploy/status, both audits, retained counts `4/3/8/17/7`, expected published Map count `1`, and `/api/ready` HTTP 200 all passed. Only the disposable database, disposable media, and disposable logs were deleted afterward; the backup was preserved.

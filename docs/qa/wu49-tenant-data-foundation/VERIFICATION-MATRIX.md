@@ -3,7 +3,7 @@
 Date: 2026-09-20 (Asia/Tokyo)
 
 Baseline: `f22c04a3adefcd384053751c53394e9d35186029`  
-Implementation candidate: `eb21d65b896042b96e6848c0de85d42453ea952a`
+Deployed implementation: `8c4675ee019cbfcde06fe9964fcb05a70b699b94`
 
 ## Automated verification
 
@@ -20,8 +20,12 @@ Implementation candidate: `eb21d65b896042b96e6848c0de85d42453ea952a`
 | Type check | PASS | Nuxt type check completed without errors. |
 | Tests | PASS | 81 files / 542 tests passed against PostgreSQL, including hard unique success/failure, direct second-Map rejection, and concurrent first-Map creation. |
 | Build | PASS | Nuxt production build completed. Only the existing large Map chunk and plugin timing warnings were emitted. |
-| Fresh-clone reproduction | PASS | Exact candidate SHA passed install, audit, Prisma, all 29 migrations, tenant/image audits, type check, 539 tests, build, and clean-tree checks. |
-| GitHub Actions | PASS | `Verify` run [35464902322](https://github.com/NAOKI-Ko/digital-map/actions/runs/35464902322) passed install, production audit, Prisma validation/generation/migration, both audits, type check, tests, and build for pushed SHA `bca561ba0b9799fc39c20e3609c954ac268e1e2f`. |
+| Fresh-clone reproduction | PASS | Clean checkout of exact SHA `8c4675e` passed frozen install, production audit, Prisma validation/generation, type check, 81 files / 542 tests (526 passed, 16 DB-dependent skipped without local `DATABASE_URL`), build, `git diff --check`, and clean-tree checks. The same exact SHA passed all 542 tests against isolated PostgreSQL on Windows QA. |
+| GitHub Actions | PASS | Final `Verify` run [35469796067](https://github.com/NAOKI-Ko/digital-map/actions/runs/35469796067) passed for pushed SHA `8c4675ee019cbfcde06fe9964fcb05a70b699b94`. An intermediate run at `4993c64` correctly failed because append-only audit cleanup was attempted; commit `8c4675e` reverted that weakening and the final run passed. |
+| Windows candidate gates | PASS | Frozen install, production audit, Prisma generation/validation, all 30 migrations, tenant/image audits, 81 files / 542 tests on an isolated database, type check, and production build passed. |
+| Exact tracked-tree deployment | PASS | Archive SHA-256 `1d7e7d1038d0a93214fbd617729b203702dcb70890ab2c03e72b55c1f1534bd6`; all 535 tracked files were verified byte-for-byte before activation. |
+| Windows health | PASS | Active release `C:\DigitalMap\releases\8c4675ee019cbfcde06fe9964fcb05a70b699b94`; PostgreSQL/app/tunnel healthy; local and public health, ready, admin login, and public Map endpoints returned HTTP 200. |
+| Post-deploy backup/restore | PASS | Verified backup `post-wu49-unblock-8c4675e-20260920-064305` restored to disposable DB/media; exact media verification, all migrations, both audits, counts `4/3/8/17/7`, expected public Map, and restored `/api/ready` 200 passed; disposable targets were deleted. |
 
 ## Contract and regression coverage
 
@@ -51,8 +55,10 @@ A local Nuxt server was run against the disposable fresh database. The following
 
 The demo seed's remote `picsum.photos` photo URLs are intentionally not valid uploaded-asset URLs for immutable publication. For this disposable browser fixture only, `Spot.photosJson` was cleared before publication; product code and repository seed data were not changed. The local publication URL display uses the configured default `localhost:3000`, so verification opened the equivalent route on the test server's port `3011` directly.
 
+Windows Chrome regression passed for dashboard (exactly one Map), Map home, 16-item Spot list, Spot detail/edit, all 7 Categories, PIN move/cancel without saving, public pins/categories/detail, and zero console warnings/errors. Unpublish succeeded. The immediate publish toggle failed because 13 active legacy `photosJson` values are absolute remote URLs and immutable publication rejects them as `INVALID_PUBLIC_ASSET_URL`. No KEEP data was edited. The original READY release was safely restored through the supported release-history UI (temporary rollback to the preceding READY release, then back to original release `cmu15w386000u4sva3mh5wty7`), and the public Map plus dashboard were reverified.
+
 ## Windows QA cleanup and activation status
 
-The approved fixed-ID cleanup succeeded after a new verified backup. Exactly four Maps were deleted, KEEP remains intact, no MediaAsset was deleted, and every Tenant has zero or one Map. Migration `20260920020000_map_tenant_unique` and its new tests pass locally and on a representative QA restore.
+The approved fixed-ID cleanup, hard one-Map migration, source/CI gates, exact-SHA Windows deployment, endpoint checks, and post-deploy backup/restore succeeded. Exactly four Maps were deleted, KEEP remains intact, no MediaAsset was deleted, every Tenant has zero or one Map, and old releases/backups remain.
 
-Windows QA exact-SHA deployment, final browser regression, post-deploy backup/restore, and final CI evidence remain pending at this document revision.
+Final WU-49 verdict is `BLOCKED`, not `PASS-READY`, because the required Windows browser publish/unpublish/republish path did not complete through the publish toggle. The active service is healthy and restored to its original published release; the remaining blocker is compatibility handling or owner-approved normalization of the 13 legacy remote photo URLs. No main merge or Production deployment was performed.
