@@ -9,6 +9,10 @@ const migration = await readFile(
   new URL('../prisma/migrations/20260920010000_tenant_data_foundation/migration.sql', import.meta.url),
   'utf8',
 )
+const mapUniquenessMigration = await readFile(
+  new URL('../prisma/migrations/20260920020000_map_tenant_unique/migration.sql', import.meta.url),
+  'utf8',
+)
 
 async function withPreWu49Schema(run: (client: Client) => Promise<void>) {
   const schema = `wu49_migration_${randomUUID().replaceAll('-', '')}`
@@ -23,6 +27,7 @@ async function withPreWu49Schema(run: (client: Client) => Promise<void>) {
         id TEXT PRIMARY KEY,
         "tenantId" TEXT NOT NULL REFERENCES "Tenant"(id)
       );
+      CREATE INDEX "Map_tenantId_idx" ON "Map"("tenantId");
       CREATE TABLE "MapFloor" (
         id TEXT PRIMARY KEY,
         "mapId" TEXT NOT NULL REFERENCES "Map"(id)
@@ -98,6 +103,35 @@ integration('WU-49 upgrade migration', () => {
         SELECT count(*)::int AS count
         FROM information_schema.columns
         WHERE table_schema = current_schema() AND table_name = 'Spot' AND column_name = 'tenantId'
+      `)).rows[0]?.count).toBe(0)
+    })
+  })
+
+  it('enforces at most one Map per Tenant while allowing an onboarding Tenant with zero Maps', async () => {
+    await withPreWu49Schema(async (client) => {
+      await client.query(`
+        INSERT INTO "Tenant" (id) VALUES ('tenant-a'), ('tenant-onboarding');
+        INSERT INTO "Map" (id, "tenantId") VALUES ('map-a', 'tenant-a');
+      `)
+      await client.query(migration)
+      await client.query(mapUniquenessMigration)
+      await expect(client.query(`INSERT INTO "Map" (id, "tenantId") VALUES ('map-b', 'tenant-a')`)).rejects.toThrow(/duplicate key/)
+      expect((await client.query(`SELECT count(*)::int AS count FROM "Map" WHERE "tenantId"='tenant-onboarding'`)).rows[0]?.count).toBe(0)
+    })
+  })
+
+  it('refuses hard 1:1 activation when a Tenant still owns multiple Maps', async () => {
+    await withPreWu49Schema(async (client) => {
+      await client.query(`
+        INSERT INTO "Tenant" (id) VALUES ('tenant-a');
+        INSERT INTO "Map" (id, "tenantId") VALUES ('map-a', 'tenant-a'), ('map-b', 'tenant-a');
+      `)
+      await client.query(migration)
+      await expect(client.query(mapUniquenessMigration)).rejects.toThrow(/duplicate tenantId values exist/)
+      expect((await client.query(`
+        SELECT count(*)::int AS count
+        FROM pg_indexes
+        WHERE schemaname=current_schema() AND indexname='Map_tenantId_key'
       `)).rows[0]?.count).toBe(0)
     })
   })

@@ -238,7 +238,7 @@ model MapMember {
 
 model Map {
   id                   String                @id @default(cuid())
-  tenantId             String
+  tenantId             String                @unique
   tenant               Tenant                @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   name                 String
   slug                 String                @unique
@@ -271,7 +271,6 @@ model Map {
   createdAt            DateTime              @default(now())
   updatedAt            DateTime              @updatedAt
 
-  @@index([tenantId])
   @@index([seoImageAssetId])
 }
 

@@ -16,9 +16,9 @@ The data sample is the verified Windows QA backup `pre-wu48-r2-5d372a5-20260920-
 
 Summary: 3 Tenants, 6 Maps; one Tenant has 0 Maps, one has 1 Map, and one has more than 1 Map.
 
-### One-Map conclusion
+### Initial one-Map conclusion
 
-The `qa` Tenant violates the target invariant. Names indicate a mixture of seed/demo/test and QA journey data, but the audit cannot prove every row disposable or choose a canonical winner without product/operator input. Therefore:
+The `qa` Tenant initially violated the target invariant. Names indicated a mixture of seed/demo/test and QA journey data, and the original audit could not choose a canonical winner without product/operator input. Therefore the first WU-49 pass correctly made no destructive change.
 
 - no Map is deleted, merged, or reassigned;
 - WU-49 does not add `Map.tenantId UNIQUE`;
@@ -65,6 +65,44 @@ Tenant-scoped Category uniqueness is safe for the audited QA rows. Because multi
 - The pre-WU-49 seed created three independent demo/verification Maps in the default Tenant. Standard WU-49 seed now creates only the Arimatsu Map; it does not delete or reassign existing rows. Stage-B fixtures still describe historical multi-Map RBAC data and are not part of standard seed.
 - The only production Map creation handler is `POST /api/maps`; it currently permits a second Map.
 
-## Preflight decision
+## Approved Windows QA cleanup (2026-09-20)
 
-Spot and Category backfills are unambiguous and Category tenant-name uniqueness has no audited collision, so additive ownership migration may proceed. Hard Map 1:1 uniqueness may not. The final WU-49 verdict remains BLOCKED until the existing multi-Map QA Tenant is explicitly resolved.
+The data owner subsequently approved the following fixed-ID decision for active Windows QA only:
+
+- KEEP: `demo-arimatsu-map` / `team-demo-arimatsu`
+- DELETE: `cmtygyjq60002h8va9z5ip0o6`
+- DELETE: `cmtygyjqf0003h8vabuxkmrke`
+- DELETE: `cmu0tex4v0000z4va0wzosjdh`
+- DELETE: `cmu5jyx6x000ibovakqhgzqik`
+
+Before deletion, Windows QA still ran `7c57e573e628e94d3858ab923a8d812a1bbbe2ff`. A new verified backup was created at `C:\DigitalMap\backups\pre-wu49-cleanup-7c57e57-20260920-053426`:
+
+- DB dump: `db\digital-map-20260919T203428Z.dump`, 120,685 bytes, SHA-256 `944fb87aec92b8b547c3fcfd7b39f975a5a9b8ef056d388460d60698454ec6a2`
+- Media archive: `media\20260919T203429Z\media.tar.gz`, 19,946,363 bytes, SHA-256 `0e62ee5604cfa8c5df5dbffd6528248d105fd5db3529ecdec427675c025de960`
+- Media manifest: SHA-256 `68b4fad398d19ca1a46d1d010d2620fd767a96a9662333d2c68cf3a40023ccfa`
+- Repository backup verification: PASS
+
+Pre-delete dependent counts:
+
+| Map ID | Floors | Spots | Categories | Field definitions | Members | Releases | Map/Spot analytics | Decorations | SpotCategory | Revisions | Assignments | Invitations | Photos | Field values/translations |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| `cmtygyjq60002h8va9z5ip0o6` | 1 | 0 | 0 | 6 | 0 | 0 | 0/0 | 0 | 0 | 0 | 0 | 0 | 0 | 0/0 |
+| `cmtygyjqf0003h8vabuxkmrke` | 1 | 0 | 0 | 6 | 0 | 0 | 0/0 | 0 | 0 | 0 | 0 | 0 | 0 | 0/0 |
+| `cmu0tex4v0000z4va0wzosjdh` | 1 | 2 | 1 | 6 | 0 | 0 | 0/0 | 0 | 1 | 0 | 0 | 0 | 0 | 0/0 |
+| `cmu5jyx6x000ibovakqhgzqik` | 1 | 1 | 0 | 7 | 0 | 0 | 0/0 | 1 | 0 | 0 | 0 | 0 | 0 | 1/0 |
+
+Three MediaAssets were referenced by the delete targets. `cmu0u3p2f0007z4vagxxax4wq` was also referenced by KEEP and was explicitly recorded as shared. No MediaAsset row or media file was deleted; all 11 MediaAssets remained after cleanup.
+
+The first transaction attempt was fully rolled back because `SpotFieldValue_fieldDefinitionId_fkey` is `RESTRICT`. Read-only follow-up proved the single blocking row `cmu5k8jcb000ybova98b3n7wu` linked a Spot and FieldDefinition both owned by approved target `cmu5jyx6x000ibovakqhgzqik`. The successful transaction deleted that exact dependent row first, then exactly the four approved Map IDs, and committed only after KEEP and Map-count postconditions passed.
+
+Post-cleanup:
+
+- `qa` Tenant Map count: 1
+- retained Map: `demo-arimatsu-map` / `team-demo-arimatsu`, still published
+- all four fixed delete IDs and their normal dependents: absent
+- KEEP counts unchanged: 7 Floors, 16 Spots, 7 Categories, 11 FieldDefinitions, 1 Member, 5 Releases, 6/36 Map/Spot analytics, 1 Decoration, 14 SpotCategory rows, 6 Revisions, 1 Assignment, 3 targeted Invitations, 1 SpotPhoto, 10/4 field values/translations
+- other Tenant Map counts unchanged: `1`, `1`, and onboarding `0`
+
+## Updated preflight decision
+
+Spot and Category backfills remain unambiguous, Category tenant-name uniqueness has no collision, and no Tenant now has more than one Map. The cleanup blocker is resolved. Migration `20260920020000_map_tenant_unique` may enforce the hard maximum-one-Map invariant.

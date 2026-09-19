@@ -10,18 +10,18 @@
 6. Add nullable Spot `lat/lng` plus DB checks for pair/range/finite values.
 7. Add Map capability fields: Illustration enabled, Real enabled, and default view; backfill existing Maps to Illustration-only.
 8. Add DB checks that at least one view is enabled and the default refers to an enabled view.
-9. Do not add `Map.tenantId UNIQUE`: audited QA data violates it. Reject new duplicates in application logic.
-10. Add application-level transactional checks for cross-table invariants Prisma cannot express.
+9. After the approved fixed-ID Windows QA cleanup, apply explicit migration `20260920020000_map_tenant_unique`. It fails if any Tenant still has multiple Maps, replaces `Map_tenantId_idx` with unique `Map_tenantId_key`, and permits onboarding Tenants with zero Maps.
+10. Retain the application advisory lock and add application-level transactional checks for cross-table invariants Prisma cannot express. The database unique index is authoritative for the Map maximum-one invariant.
 
 ## Failure behavior
 
-The migration aborts on orphan ownership, tenant Category name collisions, invalid existing coordinates, or invalid capability state. It never chooses a fallback Tenant, deletes a Map, merges data, or rewrites ownership arbitrarily.
+The ownership migration aborts on orphan ownership, tenant Category name collisions, invalid existing coordinates, or invalid capability state. The hard 1:1 migration aborts if duplicate `Map.tenantId` values remain. Neither migration chooses a fallback Tenant, deletes a Map, merges data, or rewrites ownership arbitrarily. The separately approved Windows QA cleanup uses only the four fixed Map IDs documented in the preflight audit.
 
 Spot/Floor and Category/Map tenant equality, SpotCategory equality, and transitional Spot/FieldDefinition equality span tables. PostgreSQL CHECK constraints cannot express these joins. WU-49 enforces them transactionally in server services and verifies them with a read-only audit plus isolated PostgreSQL tests. The document does not claim these application invariants as DB-enforced.
 
 ## Upgrade proof
 
-Use the verified pre-WU-49 QA dump in a disposable PostgreSQL 17 database. Apply only the new migration, then run tenant-data and IMAGE spatial audits. Separately, apply all migrations from zero to a fresh database. Both paths must pass before any Windows QA migration.
+Use the verified pre-cleanup QA dump in a disposable PostgreSQL 17 database, replay the same fixed-ID cleanup transaction, then apply migrations 29 and 30 and run tenant-data and IMAGE spatial audits. Separately, apply all 30 migrations from zero to a fresh database. Both paths must pass before Windows QA migration.
 
 ## Recovery
 

@@ -81,17 +81,15 @@ else {
     }
     await client.query('ROLLBACK')
 
-    const stagedOneMapBlockers = anomalies.multiMapTenants
-    const hardAnomalies = Object.entries(anomalies)
-      .filter(([name]) => name !== 'multiMapTenants')
-      .reduce((sum, [, rows]) => sum + rows.length, 0)
+    const hardAnomalies = Object.values(anomalies)
+      .reduce((sum, rows) => sum + rows.length, 0)
 
     console.log(JSON.stringify({
       counts,
       anomalies,
       policy: {
-        hardOneTenantOneMapClaimed: false,
-        stagedOneMapBlockerCount: stagedOneMapBlockers.length,
+        hardOneTenantOneMapClaimed: true,
+        multiMapTenantCount: anomalies.multiMapTenants.length,
       },
     }, null, 2))
 
@@ -100,7 +98,7 @@ else {
       process.exitCode = 1
     }
     else {
-      console.log('Tenant data foundation audit passed; ' + stagedOneMapBlockers.length + ' staged one-Map blocker(s) remain explicitly reported.')
+      console.log('Tenant data foundation audit passed; hard one-Map-per-Tenant policy has zero blockers.')
     }
   }
   catch (error) {

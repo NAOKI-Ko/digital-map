@@ -97,6 +97,13 @@ integration('PostgreSQL-backed tenant data foundation integrity', () => {
     await expect(prisma.$executeRaw`UPDATE "Map" SET "realMapEnabled" = false WHERE id = ${mapA}`).rejects.toThrow()
   })
 
+  it('enforces one Map per Tenant in PostgreSQL', async () => {
+    await expect(prisma.map.create({
+      data: { tenantId: tenantA, name: 'Second Map A', slug: `wu49-second-map-${suffix}` },
+    })).rejects.toThrow()
+    expect(await prisma.map.count({ where: { tenantId: tenantA } })).toBe(1)
+  })
+
   it('serializes creation so exactly one first Map can be created', async () => {
     const attempts = await Promise.allSettled([1, 2].map(index => prisma.$transaction(async (transaction) => {
       await assertTenantCanCreateMap(transaction, tenantCreation)

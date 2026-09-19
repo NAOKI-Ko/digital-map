@@ -11,10 +11,10 @@
 ## Map
 
 - Current: many Maps may reference one Tenant; no explicit view capabilities.
-- WU-49: adds Illustration/Real enablement and default-view configuration.
+- WU-49: adds Illustration/Real enablement and default-view configuration, plus hard unique `tenantId` after the approved QA cleanup.
 - Backfill: all existing Maps become Illustration enabled, Real disabled, default Illustration.
 - Compatibility: Map/Floor/public URLs and immutable snapshots remain unchanged.
-- Future cleanup: add hard `tenantId` uniqueness only after approved real-data resolution.
+- Database invariant: each Tenant owns at most one standard Map; a Tenant may own zero Maps during onboarding.
 
 ## Spot
 

@@ -19,7 +19,7 @@ The transitional schema deliberately retains compatibility relations:
 - Category keeps `mapId`. Its `tenantId` must equal the Map tenant.
 - Existing Map-scoped routes remain compatibility APIs and validate the canonical tenant.
 - `SpotFieldDefinition` remains Map-owned. A future migration must decide how tenant-owned definitions and per-view presentation interact before changing it.
-- Existing QA data contains a Tenant with multiple Maps. WU-49 does not delete, merge, or silently reassign those Maps, so DB-level one-to-one uniqueness is staged rather than falsely claimed.
+- A data-owner-approved fixed-ID Windows QA cleanup retained `demo-arimatsu-map` and removed four legacy QA Maps after a verified backup and dependency inventory. WU-49 now enforces at most one Map per Tenant with a database unique index; onboarding Tenants may still have zero Maps.
 
 This compatibility storage is not the final ideal architecture. A later approved migration may extract Illustration placement from Spot and remove Category's Map relation after all consumers and real data are migrated.
 
