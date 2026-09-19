@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
-import { createFloorSwitchState, shouldShowFloorSelector } from '../app/utils/public-map-ui'
+import { closeFilteredSpot, createFloorSwitchState, selectedSpotIdFromOverlay, shouldShowFloorSelector, type PublicOverlay } from '../app/utils/public-map-ui'
 
 const publicPage = readFileSync(new URL('../app/pages/[mapSlug]/index.vue', import.meta.url), 'utf8')
 const floorSelector = readFileSync(new URL('../app/components/map/PublicFloorSelector.vue', import.meta.url), 'utf8')
@@ -24,6 +24,17 @@ describe('公開Mapのモバイル契約', () => {
   it('フロア切替でSpot詳細とCategory選択を解除する', () => {
     expect(createFloorSwitchState('f1', 'f2')).toEqual({ floorId: 'f2', selectedSpotId: null, selectedCategoryIds: [] })
     expect(createFloorSwitchState('f1', 'f1')).toBeNull()
+  })
+
+  it('Spot/Floor/Info overlayは型として排他的で、filter対象外Spotを閉じる', () => {
+    let overlay: PublicOverlay = { type: 'spot', spotId: 'spot-a' }
+    expect(selectedSpotIdFromOverlay(overlay)).toBe('spot-a')
+    overlay = { type: 'floor' }
+    expect(selectedSpotIdFromOverlay(overlay)).toBeNull()
+    overlay = { type: 'info' }
+    expect(selectedSpotIdFromOverlay(overlay)).toBeNull()
+    expect(closeFilteredSpot({ type: 'spot', spotId: 'spot-a' }, ['spot-b'])).toBeNull()
+    expect(closeFilteredSpot({ type: 'spot', spotId: 'spot-a' }, ['spot-a'])).toEqual({ type: 'spot', spotId: 'spot-a' })
   })
 
   it('Info内から利用規約とPrivacyに到達できる', () => {

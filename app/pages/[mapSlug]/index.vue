@@ -6,7 +6,7 @@ import PublicFloorSelector from '~/components/map/PublicFloorSelector.vue'
 import PublicMapInfo from '~/components/map/PublicMapInfo.vue'
 import SpotDetailCard from '~/components/map/SpotDetailCard.vue'
 import { collectSpotCategories, filterSpotsByCategoryIds } from '~/utils/category-filter'
-import { createFloorSwitchState, shouldShowFloorSelector } from '~/utils/public-map-ui'
+import { closeFilteredSpot, createFloorSwitchState, selectedSpotIdFromOverlay, shouldShowFloorSelector, type PublicOverlay } from '~/utils/public-map-ui'
 import type { MapViewerSpot } from '~~/shared/types/map-viewer'
 import type { PublicMapResponse } from '~~/shared/types/public-map'
 import { messages, normalizeLocale } from '~~/shared/i18n/messages'
@@ -24,10 +24,11 @@ const { data, error, status } = await useFetch<PublicMapResponse>(
   { query: computed(() => requestedLocale.value === 'en' ? { lang: 'en' } : {}) },
 )
 const selectedFloorId = ref('')
-const selectedSpotId = ref<string | null>(null)
+const overlay = ref<PublicOverlay>(null)
+const selectedSpotId = computed(() => selectedSpotIdFromOverlay(overlay.value))
 const selectedCategoryIds = ref<string[]>([])
-const floorSelectorOpen = ref(false)
-const infoOpen = ref(false)
+const floorSelectorOpen = computed(() => overlay.value?.type === 'floor')
+const infoOpen = computed(() => overlay.value?.type === 'info')
 let spotTrigger: HTMLElement | null = null
 let spotTriggerId: string | null = null
 let focusRestoreTimer: number | null = null
@@ -53,7 +54,7 @@ const categories = computed(() => (
 ))
 const visibleSpots = computed(() => filterSpotsByCategoryIds(selectedFloor.value?.spots ?? [], selectedCategoryIds.value))
 const showFloorSelector = computed(() => shouldShowFloorSelector(data.value?.map.floors.length ?? 0))
-const appModalOpen = computed(() => Boolean(selectedSpot.value || floorSelectorOpen.value || infoOpen.value))
+const appModalOpen = computed(() => overlay.value !== null)
 const publicBaseUrl = useRuntimeConfig().public.publicBaseUrl as string
 const localeUrl = (locale: 'ja' | 'en') => buildPublicLocaleUrl(publicBaseUrl, mapSlug.value, locale)
 const absoluteImage = computed(() => data.value?.map.seo.imageUrl ? new URL(data.value.map.seo.imageUrl, publicBaseUrl).toString() : undefined)
@@ -69,14 +70,12 @@ watch(() => data.value?.map.floors, (floors) => {
 }, { immediate: true })
 
 watch(selectedFloorId, () => {
-  selectedSpotId.value = null
+  overlay.value = null
   selectedCategoryIds.value = []
 })
 
 watch(selectedCategoryIds, () => {
-  if (!visibleSpots.value.some(spot => spot.id === selectedSpotId.value)) {
-    selectedSpotId.value = null
-  }
+  overlay.value = closeFilteredSpot(overlay.value, visibleSpots.value.map(spot => spot.id))
 })
 
 useSeoMeta({
@@ -103,9 +102,7 @@ function selectSpot(spot: MapViewerSpot) {
   spotTrigger = [...document.querySelectorAll<HTMLElement>('.map-viewer-marker[data-spot-id]')]
     .find(element => element.dataset.spotId === spot.id) ?? null
   spotTriggerId = spot.id
-  floorSelectorOpen.value = false
-  infoOpen.value = false
-  selectedSpotId.value = spot.id
+  overlay.value = { type: 'spot', spotId: spot.id }
   if (data.value?.map.id) sendPublicAnalytics({ type: 'SPOT_VIEW', mapId: data.value.map.id, spotId: spot.id })
 }
 
@@ -114,7 +111,7 @@ function closeSpot(source: 'pointer' | 'other' = 'other') {
   clearPendingSpotClose()
   const closingSpotId = selectedSpotId.value
   const closingTrigger = spotTrigger
-  selectedSpotId.value = null
+  overlay.value = null
   const restoreFocus = () => {
     const fallbackMarker = [...document.querySelectorAll<HTMLElement>('.map-viewer-marker[data-spot-id]')]
       .find(element => element.dataset.spotId === closingSpotId)
@@ -174,22 +171,17 @@ function closeSpot(source: 'pointer' | 'other' = 'other') {
 }
 
 function openFloorSelector() {
-  selectedSpotId.value = null
-  infoOpen.value = false
-  floorSelectorOpen.value = true
+  overlay.value = { type: 'floor' }
 }
 
 function openInfo() {
-  selectedSpotId.value = null
-  floorSelectorOpen.value = false
-  infoOpen.value = true
+  overlay.value = { type: 'info' }
 }
 
 function selectFloor(floorId: string) {
-  floorSelectorOpen.value = false
+  overlay.value = null
   const state = createFloorSwitchState(selectedFloorId.value, floorId)
   if (!state) return
-  selectedSpotId.value = state.selectedSpotId
   selectedCategoryIds.value = state.selectedCategoryIds
   selectedFloorId.value = state.floorId
 }
@@ -296,8 +288,8 @@ onBeforeUnmount(clearPendingSpotClose)
         :spot="selectedSpot"
         @close="closeSpot"
       />
-      <PublicFloorSelector v-if="floorSelectorOpen" :floors="data.map.floors" :model-value="selectedFloorId" @select="selectFloor" @close="floorSelectorOpen = false" />
-      <PublicMapInfo v-if="infoOpen" :map-name="data.map.name" :organization-name="data.map.organizationName" :logo-url="data.map.logoUrl" :website-url="data.map.websiteUrl" :sns-url="data.map.snsUrl" :official-label="t.official" @close="infoOpen = false" />
+      <PublicFloorSelector v-if="floorSelectorOpen" :floors="data.map.floors" :model-value="selectedFloorId" @select="selectFloor" @close="overlay = null" />
+      <PublicMapInfo v-if="infoOpen" :map-name="data.map.name" :organization-name="data.map.organizationName" :logo-url="data.map.logoUrl" :website-url="data.map.websiteUrl" :sns-url="data.map.snsUrl" :official-label="t.official" @close="overlay = null" />
     </template>
   </main>
 </template>
