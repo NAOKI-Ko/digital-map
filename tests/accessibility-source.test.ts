@@ -17,6 +17,8 @@ describe('WCAG implementation source contract', () => {
     expect(dialog).toContain('<DialogRoot')
     expect(dialog).toContain('<DialogContent')
     expect(dialog).toContain('<DialogTitle')
+    expect(dialog).toContain('data-spot-detail-title')
+    expect(dialog).not.toContain(':id="`spot-detail-title-')
     expect(dialog).toContain('@open-auto-focus="focusHeading"')
     expect(dialog).toContain('@close-auto-focus="preventAutomaticCloseFocus"')
     expect(dialog).toContain('@pointer-down-outside="handlePointerDismiss"')

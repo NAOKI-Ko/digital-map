@@ -46,7 +46,7 @@ const sheetMotionStyle = gesture.style
 
 function focusHeading(event: Event) {
   event.preventDefault()
-  document.getElementById(`spot-detail-title-${props.spot.id}`)?.focus({ preventScroll: true })
+  document.querySelector<HTMLElement>('[data-spot-detail-title]')?.focus({ preventScroll: true })
 }
 
 function preventAutomaticCloseFocus(event: Event) {
@@ -119,7 +119,7 @@ onBeforeUnmount(() => {
               <div v-if="spot.categories.length" class="flex flex-wrap gap-1.5">
                 <span v-for="category in spot.categories" :key="category.id" class="rounded-full bg-terracotta-50 px-2 py-1 text-xs font-semibold text-terracotta-700">{{ category.name }}</span>
               </div>
-              <DialogTitle :id="`spot-detail-title-${spot.id}`" tabindex="-1" class="mt-1 text-[22px] font-bold leading-tight tracking-tight text-stone-900 outline-none">
+              <DialogTitle data-spot-detail-title tabindex="-1" class="mt-1 text-[22px] font-bold leading-tight tracking-tight text-stone-900 outline-none">
                 {{ spot.name }}
               </DialogTitle>
             </div>
