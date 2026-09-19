@@ -20,5 +20,6 @@ This is a same-author second-pass review, not an independent reviewer claim.
 
 ## Remaining review gates
 
-- Hosted CI, final fresh clone, Windows exact-tree/deploy, verified backup/isolated restore, and Human UAT are tracked in `VERIFICATION-MATRIX.md`.
+- Hosted CI, final fresh clone, Windows exact-tree/deploy, verified backup/isolated restore all passed and are tracked in `VERIFICATION-MATRIX.md`.
+- TD-010 approval and TD-011 Human UAT remain open.
 - A different human or agent has not independently reviewed these commits.

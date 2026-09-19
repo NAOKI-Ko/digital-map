@@ -6,7 +6,7 @@ Date: 2026-09-19 (Asia/Tokyo)
 
 - Stage A audit: PASS — 13 candidates classified, zero CANDIDATE, zero audit areas omitted.
 - Stage B implementation: PASS for authorized work — 9 confirmed debts fixed and verified.
-- Stage C automated/local verification: PASS except explicitly listed external gates.
+- Stage C automated/fresh-clone/CI/Windows verification: PASS except explicitly listed approval/device gates.
 - Parent development-restart gate: **BLOCKED** by TD-010 and TD-011.
 
 Counts: 13 candidates; 11 confirmed debts/test gaps; 9 fixed and verified; 2 NOT_A_DEBT; 2 unresolved BLOCKED.
@@ -35,3 +35,5 @@ Counts: 13 candidates; 11 confirmed debts/test gaps; 9 fixed and verified; 2 NOT
 - TD-011: physical iPhone Safari and real outside-area GPS event require user/device execution.
 
 No main merge, Production deployment, or task-system status update was performed.
+
+Windows QA runs exact SHA `81dbc0f0ff0f19351d5c3987621f3886bd8f54c9`; the later evidence commit is documentation-only.
