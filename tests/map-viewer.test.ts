@@ -1,29 +1,33 @@
 import { describe, expect, it, vi } from 'vitest'
 import {
-  ABSOLUTE_ZOOM_LIMITS,
   addMarkerAtPosition,
-  beginGeolocationRequest,
-  consumeOutsideGeolocation,
-  createFloorZoomConstraints,
-  createPublicFloorZoomConstraints,
-  createMapViewerStyle,
-  createMapViewerOptions,
   createSpotMarkerOptions,
   constrainImagePlacementCandidate,
-  GEOLOCATE_CONTROL_OPTIONS,
-  GEOLOCATION_OUTSIDE_MESSAGE,
-  GEOLOCATION_TOAST_DURATION_MS,
-  PUBLIC_ZOOM_OUT_ALLOWANCE,
   getFloorLayerIds,
   getImagePlacementCandidate,
-  getMapViewerCameraState,
-  restoreMapViewerCamera,
   setFlatImageSourceWarp,
-  shouldEnableGeolocate,
+} from '../app/composables/useMapViewer'
+import {
+  ABSOLUTE_ZOOM_LIMITS,
+  createFloorZoomConstraints,
+  createMapViewerOptions,
+  createMapViewerStyle,
+  createPublicFloorZoomConstraints,
+  getMapViewerCameraState,
+  PUBLIC_ZOOM_OUT_ALLOWANCE,
+  restoreMapViewerCamera,
   VIEWER_CAMERA_CONSTRAINTS,
   ZOOM_IN_ALLOWANCE,
   ZOOM_OUT_ALLOWANCE,
-} from '../app/composables/useMapViewer'
+} from '../app/composables/useMapCamera'
+import {
+  beginGeolocationRequest,
+  consumeOutsideGeolocation,
+  GEOLOCATE_CONTROL_OPTIONS,
+  GEOLOCATION_OUTSIDE_MESSAGE,
+  GEOLOCATION_TOAST_DURATION_MS,
+  shouldEnableGeolocate,
+} from '../app/composables/useMapGeolocation'
 import { getSpotMarkerPresentation } from '../app/utils/marker-element'
 import type { Map as MapLibreMap } from 'maplibre-gl'
 import type { MapViewerFloor, MapViewerSpot } from '../shared/types/map-viewer'

@@ -5,6 +5,7 @@ const layout = readFileSync('app/layouts/admin.vue', 'utf8')
 const navigation = readFileSync('app/components/admin/AdminNavigation.vue', 'utf8')
 const subnavigation = readFileSync('app/components/admin/AdminSubnavigation.vue', 'utf8')
 const viewer = readFileSync('app/composables/useMapViewer.ts', 'utf8')
+const mapCamera = readFileSync('app/composables/useMapCamera.ts', 'utf8')
 const georeference = readFileSync('app/components/admin/GeoReferenceWizard.vue', 'utf8')
 const home = readFileSync('app/pages/admin/maps/[mapId]/index.vue', 'utf8')
 const publish = readFileSync('app/pages/admin/maps/[mapId]/publish.vue', 'utf8')
@@ -34,11 +35,12 @@ describe('WU-41 admin shell contracts', () => {
   })
 
   it('MapLibre surfacesはshell eventとcontainer resizeの両方に追従する', () => {
-    for (const source of [viewer, georeference]) {
-      expect(source).toContain("admin-sidebar-resize")
-      expect(source).toContain('ResizeObserver')
-      expect(source).toContain('.resize()')
-    }
+    expect(viewer).toContain("admin-sidebar-resize")
+    expect(viewer).toContain('ResizeObserver')
+    expect(mapCamera).toContain('instance.resize()')
+    expect(georeference).toContain("admin-sidebar-resize")
+    expect(georeference).toContain('ResizeObserver')
+    expect(georeference).toContain('.resize()')
   })
 
   it('公開CTAはsummaryのusable URLに限定し、PDFはPublish内に残る', () => {
@@ -47,4 +49,3 @@ describe('WU-41 admin shell contracts', () => {
     expect(publish).toContain('<PaperExportPanel')
   })
 })
-

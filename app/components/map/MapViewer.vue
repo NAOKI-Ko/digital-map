@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { useMapViewer, type MapViewerMode } from '~/composables/useMapViewer'
+import { useMapViewer } from '~/composables/useMapViewer'
+import type { MapViewerMode } from '~/composables/useMapCamera'
 import type { ImagePosition } from '~~/lib/geo'
 import type { MapViewerCameraState, MapViewerDecoration, MapViewerFloor, MapViewerSpot } from '~~/shared/types/map-viewer'
 

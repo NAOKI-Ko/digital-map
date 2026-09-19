@@ -1,68 +1,18 @@
 import { onBeforeUnmount, onMounted, readonly, ref, shallowRef, watch, type Ref } from 'vue'
-import type { GeolocateControl, GeolocatePositionEvent, IControl, Map as MapLibreMap, MapOptions, Marker, MarkerOptions, StyleSpecification } from 'maplibre-gl'
-import { getFloorCorners, getGeoReferenceBounds, imageToRenderCoordinates, isGeoReferenced, isValidImagePosition, isWithinFloorArea, renderToImageCoordinates, toImageCoordinates, type FloorCorners, type ImagePosition, type LatLng } from '~~/lib/geo'
+import type { IControl, Map as MapLibreMap, Marker, MarkerOptions } from 'maplibre-gl'
+import { getFloorCorners, imageToRenderCoordinates, isValidImagePosition, renderToImageCoordinates, toImageCoordinates, type ImagePosition, type LatLng } from '~~/lib/geo'
 import { getDecorationRenderCoordinates } from '~~/lib/decoration'
 import type { MapViewerCameraState, MapViewerDecoration, MapViewerFloor, MapViewerSpot } from '~~/shared/types/map-viewer'
 import { createSpotMarkerElement } from '~/utils/marker-element'
 import { applyMarkerDensityPresentation, getMarkerDensityPresentation } from '~/utils/marker-density'
-import { getViewportOrientation, isViewportCoveredByPolygon, type MapCenter } from '~/utils/public-map-camera'
-
-export type MapViewerMode = 'view' | 'edit'
-
-export const VIEWER_CAMERA_CONSTRAINTS = {
-  view: {
-    bearing: 0,
-    pitch: 45,
-    minPitch: 0,
-    maxPitch: 70,
-    dragRotate: true,
-    touchPitch: true,
-    pitchWithRotate: true,
-  },
-  edit: {
-    bearing: 0,
-    pitch: 0,
-    minPitch: 0,
-    maxPitch: 0,
-    dragRotate: false,
-    touchPitch: false,
-    pitchWithRotate: false,
-  },
-} as const
-
-export const ABSOLUTE_ZOOM_LIMITS = {
-  minZoom: 0,
-  maxZoom: 24,
-} as const
-export const ZOOM_OUT_ALLOWANCE = 0
-export const PUBLIC_ZOOM_OUT_ALLOWANCE = 1
-export const ZOOM_IN_ALLOWANCE = 6
-export const GEOLOCATION_OUTSIDE_MESSAGE = '現在地はこのマップから離れています'
-export const GEOLOCATION_TOAST_DURATION_MS = 5_000
-export const GEOLOCATE_CONTROL_OPTIONS = {
-  trackUserLocation: true,
-  showUserLocation: false,
-  showAccuracyCircle: false,
-} as const
-
-export interface GeolocationNoticeState {
-  requestId: number
-  notifiedRequestId: number | null
-}
-
-export function beginGeolocationRequest(state: GeolocationNoticeState): GeolocationNoticeState {
-  return { ...state, requestId: state.requestId + 1 }
-}
-
-export function consumeOutsideGeolocation(state: GeolocationNoticeState) {
-  if (state.requestId === 0 || state.notifiedRequestId === state.requestId) {
-    return { state, notify: false }
-  }
-  return {
-    state: { ...state, notifiedRequestId: state.requestId },
-    notify: true,
-  }
-}
+import {
+  createMapViewerOptions,
+  createOneShotLocationCameraPolicy,
+  getMapViewerCameraState,
+  useMapCamera,
+  type MapViewerMode,
+} from './useMapCamera'
+import { useMapGeolocation } from './useMapGeolocation'
 
 export interface UseMapViewerOptions {
   mode: MapViewerMode
@@ -89,66 +39,6 @@ export function getFloorLayerIds(floorId: string) {
   return {
     sourceId,
     layerId: `${sourceId}-layer`,
-  }
-}
-
-export function shouldEnableGeolocate(floor: MapViewerFloor) {
-  return isGeoReferenced(floor)
-}
-
-export function createMapViewerStyle(_mode: MapViewerMode): StyleSpecification {
-  return {
-    version: 8,
-    sources: {},
-    layers: [{
-      id: 'background',
-      type: 'background',
-      paint: { 'background-color': '#f5f5f4' },
-    }],
-  }
-}
-
-export function createMapViewerOptions(container: HTMLElement | string, mode: MapViewerMode): MapOptions {
-  const camera = VIEWER_CAMERA_CONSTRAINTS[mode]
-  return {
-    container,
-    style: createMapViewerStyle(mode),
-    center: [0, 0],
-    zoom: 1,
-    minZoom: ABSOLUTE_ZOOM_LIMITS.minZoom,
-    maxZoom: ABSOLUTE_ZOOM_LIMITS.maxZoom,
-    // Disable conflicting double-click gestures; buttons and pinch/touch zoom remain native MapLibre controls.
-    doubleClickZoom: false,
-    ...camera,
-  }
-}
-
-export function createFloorZoomConstraints(fittedZoom: number) {
-  const requestedZoom = Number.isFinite(fittedZoom) ? fittedZoom : 1
-  const safeZoom = Math.min(
-    ABSOLUTE_ZOOM_LIMITS.maxZoom,
-    Math.max(ABSOLUTE_ZOOM_LIMITS.minZoom, requestedZoom),
-  )
-  return {
-    minZoom: Math.max(ABSOLUTE_ZOOM_LIMITS.minZoom, safeZoom - ZOOM_OUT_ALLOWANCE),
-    maxZoom: Math.min(ABSOLUTE_ZOOM_LIMITS.maxZoom, safeZoom + ZOOM_IN_ALLOWANCE),
-  }
-}
-
-export function createPublicFloorZoomConstraints(fittedZoom: number, initialZoom: number) {
-  const fit = Number.isFinite(fittedZoom) ? fittedZoom : 1
-  const initial = Number.isFinite(initialZoom) ? initialZoom : fit
-  const minZoom = Math.max(
-    ABSOLUTE_ZOOM_LIMITS.minZoom,
-    Math.min(ABSOLUTE_ZOOM_LIMITS.maxZoom, fit) - PUBLIC_ZOOM_OUT_ALLOWANCE,
-  )
-  const requestedMaxZoom = Math.min(
-    ABSOLUTE_ZOOM_LIMITS.maxZoom,
-    Math.max(ABSOLUTE_ZOOM_LIMITS.minZoom, initial) + ZOOM_IN_ALLOWANCE,
-  )
-  return {
-    minZoom,
-    maxZoom: Math.max(minZoom, requestedMaxZoom),
   }
 }
 
@@ -198,21 +88,6 @@ interface FlatWarpImageSource {
 export function setFlatImageSourceWarp(instance: MapLibreMap, sourceId: string) {
   const source = instance.getSource(sourceId) as FlatWarpImageSource | undefined
   source?.setWarp?.('flat')
-}
-
-export function getMapViewerCameraState(instance: MapLibreMap): MapViewerCameraState {
-  const center = instance.getCenter()
-  return {
-    center: { lat: center.lat, lng: center.lng },
-    zoom: instance.getZoom(),
-  }
-}
-
-export function restoreMapViewerCamera(instance: MapLibreMap, camera: MapViewerCameraState) {
-  instance.jumpTo({
-    center: [camera.center.lng, camera.center.lat],
-    zoom: camera.zoom,
-  })
 }
 
 function createControlButton(label: string, text: string, action: () => void) {
@@ -290,58 +165,40 @@ export function useMapViewer(
   const mapError = ref('')
   const floorError = ref('')
   const isReady = ref(false)
-  const geolocationAvailable = ref(false)
-  const geolocationAreaMessage = ref('')
   let draftMarker: Marker | null = null
   let spotMarkers: Marker[] = []
   let spotMarkerElements: Array<{ element: HTMLElement, spot: MapViewerSpot }> = []
-  let geolocateControl: GeolocateControl | null = null
-  let mapControlGroup: HorizontalMapControlGroup | null = null
-  let geolocateHandler: ((position: GeolocatePositionEvent) => void) | null = null
-  let geolocateButton: HTMLButtonElement | null = null
-  let geolocateButtonHandler: (() => void) | null = null
-  let geolocationNoticeState: GeolocationNoticeState = { requestId: 0, notifiedRequestId: null }
-  let geolocationToastTimer: number | null = null
-  let currentLocationMarker: Marker | null = null
   let activeSourceId: string | null = null
   let activeLayerId: string | null = null
   let decorationLayers: Array<{ sourceId: string, layerId: string }> = []
   let containerResizeObserver: ResizeObserver | null = null
-  let coverCameraKey = ''
-  let coverZoom: number = ABSOLUTE_ZOOM_LIMITS.minZoom
-  let largeViewportHeight = 0
-  let largeViewportOrientation = ''
-  let geolocationRequestCamera: MapViewerCameraState | null = null
 
-  function resize() {
-    const instance = map.value
-    if (!instance) return
-    const camera = getMapViewerCameraState(instance)
-    instance.resize()
-    const corners = getFloorCorners(options.floor.value)
-    if (!corners || !isReady.value) return
-    const constraints = updateFloorZoomConstraints(corners, true)
-    if (!constraints) return
-    restoreMapViewerCamera(instance, {
-      ...camera,
-      zoom: Math.min(constraints.maxZoom, Math.max(constraints.minZoom, camera.zoom)),
-    })
-  }
-
-  function clearGeolocationToast() {
-    if (geolocationToastTimer !== null) window.clearTimeout(geolocationToastTimer)
-    geolocationToastTimer = null
-    geolocationAreaMessage.value = ''
-  }
-
-  function showGeolocationToast() {
-    clearGeolocationToast()
-    geolocationAreaMessage.value = GEOLOCATION_OUTSIDE_MESSAGE
-    geolocationToastTimer = window.setTimeout(() => {
-      geolocationAreaMessage.value = ''
-      geolocationToastTimer = null
-    }, GEOLOCATION_TOAST_DURATION_MS)
-  }
+  const mapCamera = useMapCamera(container, map, {
+    mode: options.mode,
+    floor: options.floor,
+    mobileCover: options.mobileCover,
+    isReady,
+  })
+  const locationCameraPolicy = createOneShotLocationCameraPolicy(
+    () => {
+      const camera = mapCamera.getState()
+      if (!camera) throw new Error('Map camera is unavailable for a location request')
+      return camera
+    },
+    camera => mapCamera.restore(camera),
+  )
+  const geolocation = useMapGeolocation({
+    mode: options.mode,
+    map,
+    maplibre,
+    createBaseControls: () => [new MapNavigationControl()],
+    createControlGroup: controls => new HorizontalMapControlGroup(controls),
+    onExplicitRequest: () => locationCameraPolicy.beginRequest(),
+    onOutsideResult: result => locationCameraPolicy.consumeOutsideResult(result.firstForRequest),
+    onReset: () => locationCameraPolicy.reset(),
+  })
+  const resize = mapCamera.resize
+  const syncGeolocateControl = geolocation.syncControl
 
   async function initialize() {
     if (!container.value || map.value) return
@@ -358,7 +215,7 @@ export function useMapViewer(
         if (map.value !== instance) return
         isReady.value = true
         showFloor(options.floor.value, false)
-        if (options.initialCamera) restoreMapViewerCamera(instance, options.initialCamera)
+        if (options.initialCamera) mapCamera.restore(options.initialCamera)
         syncSpotMarkers()
         instance.on('zoom', syncMarkerDensity)
         syncDraftMarker(options.position.value)
@@ -395,93 +252,12 @@ export function useMapViewer(
     spotMarkers.forEach(marker => marker.remove())
     spotMarkers = []
     spotMarkerElements = []
-    removeGeolocateControl()
+    geolocation.removeControl()
     removeFloorImage()
     map.value?.remove()
     map.value = null
     maplibre.value = null
     isReady.value = false
-  }
-
-  function removeGeolocateControl() {
-    const instance = map.value
-    if (geolocateControl && geolocateHandler) {
-      geolocateControl.off('geolocate', geolocateHandler)
-    }
-    if (instance && mapControlGroup && instance.hasControl(mapControlGroup)) {
-      instance.removeControl(mapControlGroup)
-    }
-    if (geolocateButton && geolocateButtonHandler) geolocateButton.removeEventListener('click', geolocateButtonHandler)
-    geolocateButton = null
-    geolocateButtonHandler = null
-    currentLocationMarker?.remove()
-    currentLocationMarker = null
-    geolocateControl = null
-    mapControlGroup = null
-    geolocateHandler = null
-    geolocationRequestCamera = null
-    geolocationNoticeState = { requestId: 0, notifiedRequestId: null }
-    geolocationAvailable.value = false
-    clearGeolocationToast()
-  }
-
-  function syncGeolocateControl(floor: MapViewerFloor) {
-    removeGeolocateControl()
-    const instance = map.value
-    const currentMaplibre = maplibre.value
-    if (!instance || !currentMaplibre) return
-
-    const controls: IControl[] = [new MapNavigationControl()]
-    if (options.mode === 'edit' || !shouldEnableGeolocate(floor)) {
-      mapControlGroup = new HorizontalMapControlGroup(controls)
-      instance.addControl(mapControlGroup, 'top-right')
-      return
-    }
-
-    // 標準マーカーは判定より先に表示されるため無効化し、範囲内だけ独自表示する。
-    geolocateControl = new currentMaplibre.GeolocateControl(GEOLOCATE_CONTROL_OPTIONS)
-    geolocateHandler = (position) => {
-      const corners = getFloorCorners(floor)
-      const lat = position.coords.latitude
-      const lng = position.coords.longitude
-      const isInside = corners !== null && isWithinFloorArea(lat, lng, corners)
-
-      if (!isInside) {
-        currentLocationMarker?.remove()
-        currentLocationMarker = null
-        if (geolocationRequestCamera) restoreMapViewerCamera(instance, geolocationRequestCamera)
-        const result = consumeOutsideGeolocation(geolocationNoticeState)
-        geolocationNoticeState = result.state
-        if (result.notify) showGeolocationToast()
-        return
-      }
-
-      if (!currentLocationMarker) {
-        const element = document.createElement('div')
-        element.className = 'map-viewer-current-location-marker'
-        element.setAttribute('role', 'img')
-        element.setAttribute('aria-label', '現在地')
-        currentLocationMarker = addMarkerAtPosition(
-          new currentMaplibre.Marker({ element }),
-          instance,
-          { lat, lng },
-        )
-        return
-      }
-      currentLocationMarker.setLngLat([lng, lat])
-    }
-    geolocateControl.on('geolocate', geolocateHandler)
-    controls.push(geolocateControl)
-    mapControlGroup = new HorizontalMapControlGroup(controls)
-    instance.addControl(mapControlGroup, 'top-right')
-    geolocateButton = mapControlGroup.getElement()?.querySelector<HTMLButtonElement>('.maplibregl-ctrl-geolocate') ?? null
-    geolocateButtonHandler = () => {
-      geolocationNoticeState = beginGeolocationRequest(geolocationNoticeState)
-      geolocationRequestCamera = getMapViewerCameraState(instance)
-      clearGeolocationToast()
-    }
-    geolocateButton?.addEventListener('click', geolocateButtonHandler)
-    geolocationAvailable.value = true
   }
 
   function syncSpotMarkers() {
@@ -641,159 +417,13 @@ export function useMapViewer(
     })
   }
 
-  function usesMobileCover() {
-    return options.mode === 'view'
-      && (options.mobileCover?.value ?? false)
-      && Boolean(container.value && container.value.clientWidth < 768)
-  }
-
-  function measureLargeViewportHeight() {
-    if (typeof document === 'undefined') return container.value?.clientHeight ?? 0
-    const probe = document.createElement('div')
-    probe.style.cssText = 'position:fixed;left:-9999px;top:0;width:1px;height:100lvh;pointer-events:none;visibility:hidden'
-    document.body.appendChild(probe)
-    const height = probe.getBoundingClientRect().height
-    probe.remove()
-    return Math.max(height, container.value?.clientHeight ?? 0)
-  }
-
-  function getCoverViewport() {
-    const width = container.value?.clientWidth ?? 0
-    const height = container.value?.clientHeight ?? 0
-    const orientation = getViewportOrientation(width, window.innerHeight)
-    if (orientation !== largeViewportOrientation || largeViewportHeight <= 0) {
-      largeViewportOrientation = orientation
-      largeViewportHeight = measureLargeViewportHeight()
-    }
-    return { width, height, coverHeight: largeViewportHeight }
-  }
-
-  function getCoverLayoutKey() {
-    const viewport = getCoverViewport()
-    return `${Math.round(viewport.width)}:${getViewportOrientation(viewport.width, viewport.coverHeight)}:${Math.round(viewport.coverHeight)}`
-  }
-
-  function getFloorCenter(corners: FloorCorners): MapCenter {
-    const bounds = getGeoReferenceBounds(corners)
-    return {
-      lat: (bounds.southwest[1] + bounds.northeast[1]) / 2,
-      lng: (bounds.southwest[0] + bounds.northeast[0]) / 2,
-    }
-  }
-
-  function isFloorCoveringViewport(corners: FloorCorners) {
-    const instance = map.value
-    if (!instance) return false
-    const viewport = getCoverViewport()
-    const polygon = toImageCoordinates(corners).map(coordinate => instance.project(coordinate))
-    return isViewportCoveredByPolygon(polygon, viewport.width, viewport.height, viewport.coverHeight)
-  }
-
-  function jumpToCamera(center: MapCenter, zoom: number) {
-    const instance = map.value
-    if (!instance) return
-    instance.jumpTo({ center: [center.lng, center.lat], zoom })
-  }
-
-  function findMobileCoverZoom(corners: FloorCorners, center: MapCenter, startZoom: number) {
-    let low = Math.max(ABSOLUTE_ZOOM_LIMITS.minZoom, Math.min(ABSOLUTE_ZOOM_LIMITS.maxZoom, startZoom))
-    let high = low
-    jumpToCamera(center, high)
-    while (!isFloorCoveringViewport(corners) && high < ABSOLUTE_ZOOM_LIMITS.maxZoom) {
-      low = high
-      high = Math.min(ABSOLUTE_ZOOM_LIMITS.maxZoom, high + 0.5)
-      jumpToCamera(center, high)
-    }
-    for (let index = 0; index < 18 && high - low > 0.001; index += 1) {
-      const candidate = (low + high) / 2
-      jumpToCamera(center, candidate)
-      if (isFloorCoveringViewport(corners)) high = candidate
-      else low = candidate
-    }
-    jumpToCamera(center, high)
-    return high
-  }
-
-  function getRequiredMobileCoverZoom(corners: FloorCorners, fitZoom: number) {
-    const instance = map.value
-    if (!instance) return fitZoom
-    const cameraKey = `${options.floor.value.id}:${getCoverLayoutKey()}:${instance.getBearing().toFixed(2)}:${instance.getPitch().toFixed(2)}`
-    if (cameraKey === coverCameraKey) return coverZoom
-    coverZoom = findMobileCoverZoom(corners, getFloorCenter(corners), fitZoom)
-    coverCameraKey = cameraKey
-    return coverZoom
-  }
-
-  function getFloorCamera(corners: FloorCorners, padding: number) {
-    const instance = map.value
-    if (!instance) return null
-
-    const bounds = getGeoReferenceBounds(corners)
-    // 前のフロアの相対制約がカメラ計算へ影響しないよう、毎回いったん解除する。
-    instance.setMinZoom(ABSOLUTE_ZOOM_LIMITS.minZoom)
-    instance.setMaxZoom(ABSOLUTE_ZOOM_LIMITS.maxZoom)
-    const camera = instance.cameraForBounds([bounds.southwest, bounds.northeast], {
-      padding,
-      bearing: 0,
-      pitch: 0,
-      maxZoom: 20,
-    })
-    return camera
-  }
-
-  function updateFloorZoomConstraints(corners: FloorCorners, preserveCamera = false, initialZoom?: number) {
-    const instance = map.value
-    if (!instance) return null
-    const previousMaxZoom = instance.getMaxZoom()
-    const camera = getFloorCamera(corners, options.mode === 'view' ? 24 : 48)
-    if (!camera) return null
-
-    const targetZoom = camera.zoom ?? instance.getZoom()
-    const zoomConstraints = options.mode === 'view'
-      ? createPublicFloorZoomConstraints(
-          targetZoom,
-          initialZoom ?? (preserveCamera ? previousMaxZoom - ZOOM_IN_ALLOWANCE : targetZoom),
-        )
-      : createFloorZoomConstraints(targetZoom)
-    const currentZoom = instance.getZoom()
-    const maxZoom = preserveCamera ? Math.max(zoomConstraints.maxZoom, currentZoom) : zoomConstraints.maxZoom
-    instance.setMinZoom(zoomConstraints.minZoom)
-    instance.setMaxZoom(Math.max(zoomConstraints.minZoom, maxZoom))
-    return { camera, targetZoom, minZoom: zoomConstraints.minZoom, maxZoom: Math.max(zoomConstraints.minZoom, maxZoom) }
-  }
-
-  function fitFloorBounds(corners: FloorCorners, animate: boolean) {
-    const instance = map.value
-    if (!instance) return
-    if (usesMobileCover()) {
-      const camera = getFloorCamera(corners, 0)
-      if (!camera) return
-      coverCameraKey = ''
-      const center = getFloorCenter(corners)
-      const requiredZoom = getRequiredMobileCoverZoom(corners, camera.zoom ?? instance.getZoom())
-      const constraints = updateFloorZoomConstraints(corners, false, requiredZoom)
-      if (!constraints) return
-      jumpToCamera(center, requiredZoom)
-      return
-    }
-    const result = updateFloorZoomConstraints(corners)
-    if (!result) return
-    instance.easeTo({
-      center: result.camera.center,
-      zoom: result.targetZoom,
-      bearing: instance.getBearing(),
-      pitch: instance.getPitch(),
-      duration: animate ? 700 : 0,
-    })
-  }
-
   function showFloor(floor: MapViewerFloor, animate = true) {
     const instance = map.value
     const corners = getFloorCorners(floor)
     if (!instance || !isReady.value) return false
 
     removeFloorImage()
-    coverCameraKey = ''
+    mapCamera.resetFloorCamera()
 
     if (!corners) {
       floorError.value = 'このフロアは2点合わせが未設定、または正しくありません。'
@@ -818,7 +448,7 @@ export function useMapViewer(
     activeLayerId = layerId
     syncDecorations()
 
-    fitFloorBounds(corners, animate)
+    mapCamera.fitFloorBounds(corners, animate)
     return true
   }
 
@@ -863,8 +493,8 @@ export function useMapViewer(
     mapError: readonly(mapError),
     floorError: readonly(floorError),
     isReady: readonly(isReady),
-    geolocationAvailable: readonly(geolocationAvailable),
-    geolocationAreaMessage: readonly(geolocationAreaMessage),
+    geolocationAvailable: geolocation.geolocationAvailable,
+    geolocationAreaMessage: geolocation.geolocationAreaMessage,
     initialize,
     resize,
     destroy,
