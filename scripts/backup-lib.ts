@@ -4,6 +4,12 @@ import { relative, resolve, sep } from 'node:path'
 
 export interface MediaManifestEntry { path: string, size: number, sha256: string }
 
+export function canonicalDatabaseTarget(value: string) {
+  const url = new URL(value)
+  const port = url.port || (url.protocol === 'postgresql:' || url.protocol === 'postgres:' ? '5432' : '')
+  return `${url.protocol}//${url.hostname.toLowerCase()}:${port}${url.pathname}`
+}
+
 export function safeRelativePath(root: string, candidate: string) {
   const value = relative(resolve(root), resolve(candidate)).split(sep).join('/')
   if (!value || value === '..' || value.startsWith('../')) throw new Error('Path escapes the configured root')
@@ -32,9 +38,11 @@ export async function buildMediaManifest(root: string): Promise<MediaManifestEnt
 export async function verifyMediaManifest(root: string, manifest: MediaManifestEntry[]) {
   const actual = await buildMediaManifest(root)
   const expected = new Map(manifest.map(entry => [entry.path, entry]))
+  const actualPaths = new Set(actual.map(entry => entry.path))
   const missing = manifest.filter(entry => !actual.some(file => file.path === entry.path)).map(entry => entry.path)
   const mismatched = actual.filter(file => { const target = expected.get(file.path); return target && (target.size !== file.size || target.sha256 !== file.sha256) }).map(file => file.path)
-  return { valid: missing.length === 0 && mismatched.length === 0, missing, mismatched }
+  const unexpected = actual.filter(file => !expected.has(file.path)).map(file => file.path)
+  return { valid: missing.length === 0 && mismatched.length === 0 && unexpected.length === 0, missing, mismatched, unexpected, actualCount: actualPaths.size, expectedCount: expected.size }
 }
 
 export function retentionPlan(files: Array<{ path: string, timestamp: Date }>, daily = 7, weekly = 4) {

@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
-import { buildMediaManifest, retentionPlan, safeRelativePath, verifyMediaManifest } from '../scripts/backup-lib'
+import { buildMediaManifest, canonicalDatabaseTarget, retentionPlan, safeRelativePath, verifyMediaManifest } from '../scripts/backup-lib'
 
 describe('WU-29 backup and restore helpers', () => {
   it('creates deterministic relative-path/size/SHA-256 media manifests and detects missing media', async () => {
@@ -14,12 +14,21 @@ describe('WU-29 backup and restore helpers', () => {
     const manifest = await buildMediaManifest(root)
     expect(manifest.map(entry => entry.path)).toEqual(['a.png', 'nested/b.jpg'])
     expect(manifest.every(entry => /^[a-f0-9]{64}$/.test(entry.sha256))).toBe(true)
-    expect(await verifyMediaManifest(root, manifest)).toEqual({ valid: true, missing: [], mismatched: [] })
+    expect(await verifyMediaManifest(root, manifest)).toEqual({ valid: true, missing: [], mismatched: [], unexpected: [], actualCount: 2, expectedCount: 2 })
     expect(await verifyMediaManifest(root, [...manifest, { path: 'missing.png', size: 1, sha256: '0'.repeat(64) }])).toMatchObject({ valid: false, missing: ['missing.png'] })
+    await writeFile(join(root, 'unexpected.gif'), Buffer.from('not in backup'))
+    expect(await verifyMediaManifest(root, manifest)).toMatchObject({ valid: false, unexpected: ['unexpected.gif'] })
   })
 
   it('rejects paths outside the configured backup/media root', () => {
     expect(() => safeRelativePath('/safe/root', '/safe/other/file')).toThrow('escapes')
+  })
+
+  it('identifies the same restore database even when credentials and default-port spelling differ', () => {
+    expect(canonicalDatabaseTarget('postgresql://live:secret@DB.EXAMPLE/digital_map'))
+      .toBe(canonicalDatabaseTarget('postgresql://restore:other@db.example:5432/digital_map'))
+    expect(canonicalDatabaseTarget('postgresql://restore:other@db.example:5432/disposable'))
+      .not.toBe(canonicalDatabaseTarget('postgresql://live:secret@db.example/digital_map'))
   })
 
   it('keeps 7 daily plus up to 4 weekly representatives and only plans older deletion', () => {
@@ -40,5 +49,7 @@ describe('WU-29 backup and restore helpers', () => {
     expect(restore).toContain("process.env.ALLOW_DISPOSABLE_RESTORE !== 'true'")
     expect(restore).toContain('Refusing to restore into DATABASE_URL')
     expect(windowsBackup).not.toContain('bash ')
+    expect(windowsBackup).toContain('pnpm backup:verify')
+    expect(windowsBackup).toContain('BACKUP_ROOT.Length -gt 120')
   })
 })
