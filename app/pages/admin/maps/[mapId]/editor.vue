@@ -8,6 +8,7 @@ import ConfirmDialog from '~/components/ui/ConfirmDialog.vue'
 import { resolveMapEditorReturnContext } from '~/utils/map-editor-camera'
 import { createLatestRequestGate } from '~/utils/latest-request'
 import { applySelectedPinDesignDraft, isPositionEditing, needsPinEditorDiscardConfirmation, toPositionUpdatePayload, type PinEditorMode } from '~/utils/pin-editor-state'
+import { createPinEditorOperationGate, type PinEditorOperationContext } from '~/utils/pin-editor-operation'
 import { isGeoReferenced, type ImagePosition } from '~~/lib/geo'
 import { getAddressPlacementCandidate } from '~~/lib/address-placement'
 import type { GeocodeResponse, GeocodeResult } from '~~/shared/types/geocode'
@@ -78,6 +79,11 @@ const isSearchingAddress = ref(false)
 const addressRequestGate = createLatestRequestGate()
 const positionSaving = ref(false)
 const unplacing = ref(false)
+const operationGate = createPinEditorOperationGate(() => ({
+  spotId: placementSpotId.value,
+  floorId: selectedFloorId.value,
+  mode: placementMode.value,
+}))
 
 watch(() => data.value?.floors, (floors) => {
   if (floors?.length && !floors.some(floor => floor.id === selectedFloorId.value)) {
@@ -86,6 +92,7 @@ watch(() => data.value?.floors, (floors) => {
 }, { immediate: true })
 
 watch(selectedFloorId, () => {
+  operationGate.invalidate()
   addressRequestGate.invalidate()
   isSearchingAddress.value = false
   position.value = null
@@ -98,6 +105,7 @@ watch(selectedFloorId, () => {
 })
 
 watch(placementSpotId, () => {
+  operationGate.invalidate()
   addressRequestGate.invalidate()
   isSearchingAddress.value = false
   position.value = null
@@ -187,8 +195,9 @@ function discardAndContinue() {
   action?.()
 }
 
-async function finishSuccessfulSave(message: string) {
+async function finishSuccessfulSave(message: string, operation: PinEditorOperationContext) {
   await refreshSpots()
+  if (!operationGate.isCurrent(operation)) return
   position.value = null
   placementMode.value = 'idle'
   pendingPinDesign.value = null
@@ -199,6 +208,7 @@ async function finishSuccessfulSave(message: string) {
 
 async function savePosition() {
   if (!placementSpot.value || !position.value || positionSaving.value) return
+  const operation = operationGate.begin()
   positionSaving.value = true
   moveStatus.value = '位置を保存しています…'
   try {
@@ -206,10 +216,10 @@ async function savePosition() {
       method: 'PATCH',
       body: toPositionUpdatePayload(position.value),
     })
-    await finishSuccessfulSave('スポットの位置を保存しました。')
+    await finishSuccessfulSave('スポットの位置を保存しました。', operation)
   }
   catch {
-    moveStatus.value = '位置を保存できませんでした。'
+    if (operationGate.isCurrent(operation)) moveStatus.value = '位置を保存できませんでした。'
   }
   finally {
     positionSaving.value = false
@@ -218,14 +228,19 @@ async function savePosition() {
 
 async function saveDesign() {
   if (!placementSpot.value || !designEditing.value) return
+  const operation = operationGate.begin()
   moveStatus.value = 'PINデザインを保存しています…'
   const savedDesign = await pinDesignEditorRef.value?.save()
   if (!savedDesign) {
-    moveStatus.value = 'PINデザインを保存できませんでした。入力内容を保持しています。'
+    if (operationGate.isCurrent(operation)) moveStatus.value = 'PINデザインを保存できませんでした。入力内容を保持しています。'
+    return
+  }
+  if (!operationGate.isCurrent(operation)) {
+    await refreshSpots()
     return
   }
   pendingPinDesign.value = savedDesign
-  await finishSuccessfulSave('PINデザインを保存しました。')
+  await finishSuccessfulSave('PINデザインを保存しました。', operation)
 }
 
 function cancelPositionEditing() {
@@ -254,15 +269,16 @@ function cancelDesignEditing() {
 async function unplaceSpot() {
   const spot = placementSpot.value
   if (!spot || unplacing.value) return
+  const operation = operationGate.begin()
   unplacing.value = true
   moveStatus.value = 'PIN配置を解除しています…'
   try {
     await $fetch<SpotPositionResponse>(`/api/maps/${mapId}/spots/${spot.id}/position`, { method: 'DELETE' })
-    unplaceConfirmOpen.value = false
-    await finishSuccessfulSave('PIN配置を解除しました。公開中だった場合は下書きへ戻しました。')
+    if (operationGate.isCurrent(operation)) unplaceConfirmOpen.value = false
+    await finishSuccessfulSave('PIN配置を解除しました。公開中だった場合は下書きへ戻しました。', operation)
   }
   catch {
-    moveStatus.value = 'PIN配置を解除できませんでした。'
+    if (operationGate.isCurrent(operation)) moveStatus.value = 'PIN配置を解除できませんでした。'
   }
   finally {
     unplacing.value = false
