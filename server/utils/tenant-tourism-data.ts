@@ -1,4 +1,5 @@
 import type { Prisma, PrismaClient } from '~~/prisma/generated/client'
+import { prisma } from './prisma'
 
 type TenantDataClient = Prisma.TransactionClient | PrismaClient
 
