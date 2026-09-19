@@ -34,6 +34,8 @@ export function safePublicKey(key: string) {
 }
 
 export class LocalPublicStorage implements PublicObjectStorage {
+  private readonly pendingWrites = new Map<string, Promise<void>>()
+
   constructor(private readonly root: string) {}
 
   private paths(key: string) {
@@ -43,24 +45,42 @@ export class LocalPublicStorage implements PublicObjectStorage {
     return { data, metadata: `${data}.metadata.json` }
   }
 
-  async put(key: string, value: Uint8Array | string, options: PublicWriteOptions) {
-    const paths = this.paths(key)
-    await mkdir(dirname(paths.data), { recursive: true })
-    const nextBytes = Buffer.from(value)
-    const existing = await readFile(paths.data).catch(() => null)
-    const existingEtag = existing ? createHash('sha256').update(existing).digest('hex') : undefined
-    if (options.ifNoneMatch && existing) throw new Error('PUBLIC_OBJECT_PRECONDITION_FAILED')
-    if (options.ifMatchEtag && existingEtag !== options.ifMatchEtag) throw new Error('PUBLIC_OBJECT_PRECONDITION_FAILED')
-    if (options.cacheControl.includes('immutable')) {
-      if (existing) {
-        if (existing.equals(nextBytes)) return { etag: existingEtag }
-        throw new Error('IMMUTABLE_PUBLIC_OBJECT_EXISTS')
-      }
+  private async serializeWrite<T>(key: string, operation: () => Promise<T>): Promise<T> {
+    const previous = this.pendingWrites.get(key) ?? Promise.resolve()
+    let release!: () => void
+    const current = new Promise<void>(resolve => { release = resolve })
+    const tail = previous.then(() => current)
+    this.pendingWrites.set(key, tail)
+    await previous
+    try {
+      return await operation()
     }
-    const etag = createHash('sha256').update(nextBytes).digest('hex')
-    await writeFile(paths.data, nextBytes)
-    await writeFile(paths.metadata, JSON.stringify({ contentType: options.contentType, cacheControl: options.cacheControl, etag }))
-    return { etag }
+    finally {
+      release()
+      if (this.pendingWrites.get(key) === tail) this.pendingWrites.delete(key)
+    }
+  }
+
+  async put(key: string, value: Uint8Array | string, options: PublicWriteOptions) {
+    return this.serializeWrite(key, async () => {
+      const paths = this.paths(key)
+      await mkdir(dirname(paths.data), { recursive: true })
+      const nextBytes = Buffer.from(value)
+      const existing = await readFile(paths.data).catch(() => null)
+      const existingEtag = existing ? createHash('sha256').update(existing).digest('hex') : undefined
+      if (options.ifNoneMatch && existing) throw new Error('PUBLIC_OBJECT_PRECONDITION_FAILED')
+      if (options.ifMatchEtag && existingEtag !== options.ifMatchEtag) throw new Error('PUBLIC_OBJECT_PRECONDITION_FAILED')
+      if (options.cacheControl.includes('immutable')) {
+        if (existing) {
+          if (existing.equals(nextBytes)) return { etag: existingEtag }
+          throw new Error('IMMUTABLE_PUBLIC_OBJECT_EXISTS')
+        }
+      }
+      const etag = createHash('sha256').update(nextBytes).digest('hex')
+      await writeFile(paths.data, nextBytes)
+      await writeFile(paths.metadata, JSON.stringify({ contentType: options.contentType, cacheControl: options.cacheControl, etag }))
+      return { etag }
+    })
   }
 
   async get(key: string): Promise<PublicObject | null> {
