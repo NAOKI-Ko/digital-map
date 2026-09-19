@@ -109,12 +109,16 @@ export class MapNavigationControl implements IControl {
     this.map = map
     const container = document.createElement('div')
     container.className = 'map-viewer-navigation-control'
+    const zoomIn = createControlButton('拡大', '+', () => this.map?.zoomIn())
+    const zoomOut = createControlButton('縮小', '−', () => this.map?.zoomOut())
+    zoomIn.className = 'map-viewer-zoom-control'
+    zoomOut.className = 'map-viewer-zoom-control'
     const compass = createControlButton('方位をリセット', 'N', () => this.map?.easeTo({ bearing: 0, pitch: 0 }))
     compass.className = 'map-viewer-compass'
     this.updateCompass = () => { compass.hidden = Math.abs(map.getBearing()) < 1 }
     container.append(
-      createControlButton('拡大', '+', () => this.map?.zoomIn()),
-      createControlButton('縮小', '−', () => this.map?.zoomOut()),
+      zoomIn,
+      zoomOut,
       compass,
     )
     map.on('rotate', this.updateCompass)

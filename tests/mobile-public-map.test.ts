@@ -82,6 +82,16 @@ describe('公開Mapのモバイル契約', () => {
     expect(mapViewer).toContain('.public-map-locked .map-viewer-control-group')
   })
 
+  it('smartphone public Mapはvisible +/-だけを隠しgeolocationとgestureを維持する', () => {
+    const viewer = readFileSync(new URL('../app/composables/useMapViewer.ts', import.meta.url), 'utf8')
+    expect(mapViewer).toContain('@media (hover: none) and (pointer: coarse)')
+    expect(mapViewer).toContain('.public-map-viewer .map-viewer-zoom-control')
+    expect(viewer).toContain("zoomIn.className = 'map-viewer-zoom-control'")
+    expect(viewer).toContain("zoomOut.className = 'map-viewer-zoom-control'")
+    expect(viewer).toContain('syncGeolocateControl')
+    expect(mapViewer).not.toContain('.public-map-viewer .map-viewer-control-group {\n    display: none')
+  })
+
   it('モーダル表示中も操作ヒントをmountしたまま保ちtimerを進める', () => {
     expect(publicPage).toContain('<MapOperationHint :storage-key=')
     expect(publicPage).not.toContain('<MapOperationHint v-if="!appModalOpen"')

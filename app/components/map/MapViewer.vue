@@ -366,6 +366,12 @@ defineExpose({
   }
 }
 
+@media (hover: none) and (pointer: coarse) {
+  .public-map-viewer .map-viewer-zoom-control {
+    display: none;
+  }
+}
+
 .public-map-locked .map-viewer-control-group {
   visibility: hidden;
   pointer-events: none;
