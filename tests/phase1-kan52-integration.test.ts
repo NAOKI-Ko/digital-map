@@ -21,7 +21,8 @@ describe('Phase 1 + KAN-52 integration contract', () => {
 
     expect(schema).toMatch(/model Spot \{[\s\S]*?\n  x\s+Float\?/) 
     expect(schema).toMatch(/model Spot \{[\s\S]*?\n  y\s+Float\?/) 
-    expect(schema).not.toMatch(/model Spot \{[\s\S]*?\n  (?:lat|lng)\s+/)
+    expect(schema).toMatch(/model Spot \{[\s\S]*?\n  lat\s+Float\?/)
+    expect(schema).toMatch(/model Spot \{[\s\S]*?\n  lng\s+Float\?/)
     expect(schema).toContain('pinSize')
     expect(schema).toContain('importance')
     expect(schema).toContain('refAImageX')

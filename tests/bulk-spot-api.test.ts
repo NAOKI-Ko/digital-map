@@ -38,7 +38,7 @@ describe('release security: Spot bulk API', () => {
       spot: { deleteMany: mocks.deleteManySpots, updateMany: mocks.updateManySpots },
       spotCategory: { deleteMany: mocks.deleteManyRelations, createMany: mocks.createManyRelations },
     }
-    mocks.requireOwnedMap.mockReset().mockResolvedValue({ map: { id: 'map-a' } })
+    mocks.requireOwnedMap.mockReset().mockResolvedValue({ map: { id: 'map-a', tenantId: 'tenant-a' } })
     mocks.readBody.mockReset()
     mocks.findMany.mockReset()
     mocks.validateSpotCategories.mockReset().mockResolvedValue([])
@@ -79,7 +79,7 @@ describe('release security: Spot bulk API', () => {
     mocks.validateSpotCategories.mockResolvedValue([{ id: 'category-a' }])
 
     await expect(handler({})).resolves.toEqual({ updatedCount: 2 })
-    expect(mocks.validateSpotCategories).toHaveBeenCalledWith(expect.anything(), 'map-a', ['category-a'])
+    expect(mocks.validateSpotCategories).toHaveBeenCalledWith(expect.anything(), 'map-a', 'tenant-a', ['category-a'])
     expect(mocks.deleteManyRelations).not.toHaveBeenCalled()
     expect(mocks.createManyRelations).toHaveBeenCalledWith({
       data: [

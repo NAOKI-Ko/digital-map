@@ -39,9 +39,9 @@ describe('WU-24 Spot Editor revision', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mocks.requireUser.mockResolvedValue({ user: { id: 'editor-1', tenantId: 'tenant-a' } })
-    mocks.requireMapAccess.mockResolvedValue({ session: { user: { id: 'reviewer-1' } }, map: { id: 'map-a' } })
+    mocks.requireMapAccess.mockResolvedValue({ session: { user: { id: 'reviewer-1' } }, map: { id: 'map-a', tenantId: 'tenant-a' } })
     mocks.spotFindUnique.mockResolvedValue({
-      id: 'spot-1', liveVersion: 3, floor: { map: { id: 'map-a', tenantId: 'tenant-a' } }, editorAssignment: { userId: 'editor-1' },
+      id: 'spot-1', tenantId: 'tenant-a', liveVersion: 3, floor: { map: { id: 'map-a', tenantId: 'tenant-a' } }, editorAssignment: { userId: 'editor-1' },
     })
     mocks.membershipFindUnique.mockResolvedValue({ role: 'MEMBER' })
     mocks.fieldCount.mockResolvedValue(1)

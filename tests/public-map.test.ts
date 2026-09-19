@@ -146,6 +146,9 @@ describe('GET /api/public/:mapSlug', () => {
     expect(result).not.toHaveProperty('isPublished')
     expect(result?.floors[0]?.spots[0]).not.toHaveProperty('isPublished')
     expect(result?.floors[0]?.spots[0]).not.toHaveProperty('spotCategories')
+    expect(result?.floors[0]?.spots[0]).not.toHaveProperty('tenantId')
+    expect(result?.floors[0]?.spots[0]).not.toHaveProperty('lat')
+    expect(result?.floors[0]?.spots[0]).not.toHaveProperty('lng')
   })
 
   it('公開設定済みの項目だけを定義順で返し、内部・無効・空値を漏らさない', async () => {

@@ -29,4 +29,25 @@ describe('未配置Spot lifecycle', () => {
     expect(spotFormSchema.safeParse({ ...baseSpot, importance: 'featured', x: null, y: null }).success).toBe(true)
     expect(spotFormSchema.safeParse({ ...baseSpot, importance: 'critical', x: null, y: null }).success).toBe(false)
   })
+
+  it('実座標はnull/nullまたは有効範囲の有限な組だけを受け付ける', () => {
+    expect(spotFormSchema.safeParse({ ...baseSpot, x: null, y: null, lat: null, lng: null }).success).toBe(true)
+    expect(spotFormSchema.safeParse({ ...baseSpot, x: null, y: null, lat: -90, lng: 180 }).success).toBe(true)
+    expect(spotFormSchema.safeParse({ ...baseSpot, x: null, y: null, lat: 90, lng: -180 }).success).toBe(true)
+    expect(spotFormSchema.safeParse({ ...baseSpot, x: null, y: null, lat: 35, lng: null }).success).toBe(false)
+    expect(spotFormSchema.safeParse({ ...baseSpot, x: null, y: null, lat: null, lng: 136 }).success).toBe(false)
+    expect(spotFormSchema.safeParse({ ...baseSpot, x: null, y: null, lat: 91, lng: 136 }).success).toBe(false)
+    expect(spotFormSchema.safeParse({ ...baseSpot, x: null, y: null, lat: 35, lng: 181 }).success).toBe(false)
+    expect(spotFormSchema.safeParse({ ...baseSpot, x: null, y: null, lat: Number.NaN, lng: 136 }).success).toBe(false)
+    expect(spotFormSchema.safeParse({ ...baseSpot, x: null, y: null, lat: 35, lng: Number.POSITIVE_INFINITY }).success).toBe(false)
+  })
+
+  it('実座標とIllustration x/yを独立して保持する', () => {
+    expect(spotFormSchema.parse({ ...baseSpot, x: 0.25, y: 0.75, lat: 35.1, lng: 136.9 })).toMatchObject({
+      x: 0.25,
+      y: 0.75,
+      lat: 35.1,
+      lng: 136.9,
+    })
+  })
 })

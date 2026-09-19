@@ -34,7 +34,7 @@ describe('Category icon API ownership', () => {
   })
 
   beforeEach(() => {
-    mocks.requireOwnedMap.mockReset().mockResolvedValue({ map: { id: 'map-a' }, session: { user: { tenantId: 'tenant-a' } } })
+    mocks.requireOwnedMap.mockReset().mockResolvedValue({ map: { id: 'map-a', tenantId: 'tenant-a' }, session: { user: { tenantId: 'tenant-a' } } })
     mocks.requireOwnedCategory.mockReset().mockResolvedValue({ id: 'category-a' })
     mocks.readBody.mockReset()
     mocks.aggregate.mockReset().mockResolvedValue({ _max: { order: 0 } })
@@ -61,7 +61,7 @@ describe('Category icon API ownership', () => {
     mocks.requireOwnedCategory.mockRejectedValueOnce(Object.assign(new Error('not found'), { statusCode: 404 }))
     mocks.readBody.mockResolvedValue({ iconType: null, iconPresetId: null, iconImageUrl: null })
     await expect(updateHandler({})).rejects.toMatchObject({ statusCode: 404 })
-    expect(mocks.requireOwnedCategory).toHaveBeenCalledWith('map-a', 'category-a')
+    expect(mocks.requireOwnedCategory).toHaveBeenCalledWith('map-a', 'tenant-a', 'category-a')
     expect(mocks.update).not.toHaveBeenCalled()
   })
 

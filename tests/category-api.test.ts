@@ -36,16 +36,16 @@ describe('Category relation validation', () => {
       { id: 'c1', name: '観光', order: 1 },
     ])
     const { validateSpotCategories } = await import('../server/utils/category')
-    const result = await validateSpotCategories({ category: { findMany } } as never, 'map-1', ['c1', 'c2', 'c1'])
+    const result = await validateSpotCategories({ category: { findMany } } as never, 'map-1', 'tenant-1', ['c1', 'c2', 'c1'])
     expect(findMany).toHaveBeenCalledOnce()
-    expect(findMany).toHaveBeenCalledWith(expect.objectContaining({ where: { id: { in: ['c1', 'c2'] }, mapId: 'map-1' } }))
+    expect(findMany).toHaveBeenCalledWith(expect.objectContaining({ where: { id: { in: ['c1', 'c2'] }, mapId: 'map-1', tenantId: 'tenant-1' } }))
     expect(result).toHaveLength(2)
   })
 
   it('存在しない／他MapのCategoryを同じ422で拒否する', async () => {
     const { validateSpotCategories } = await import('../server/utils/category')
     const client = { category: { findMany: vi.fn().mockResolvedValue([]) } } as never
-    await expect(validateSpotCategories(client, 'map-1', ['other-map-category'])).rejects.toMatchObject({ statusCode: 422 })
+    await expect(validateSpotCategories(client, 'map-1', 'tenant-1', ['other-map-category'])).rejects.toMatchObject({ statusCode: 422 })
   })
 })
 
