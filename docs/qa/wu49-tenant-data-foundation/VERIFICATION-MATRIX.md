@@ -20,6 +20,7 @@ Implementation candidate: `eb21d65b896042b96e6848c0de85d42453ea952a`
 | Tests | PASS | 81 files / 539 tests passed against PostgreSQL, including migration failure cases and concurrent first-Map creation. |
 | Build | PASS | Nuxt production build completed. Only the existing large Map chunk and plugin timing warnings were emitted. |
 | Fresh-clone reproduction | PASS | Exact candidate SHA passed install, audit, Prisma, all 29 migrations, tenant/image audits, type check, 539 tests, build, and clean-tree checks. |
+| GitHub Actions | PASS | `Verify` run [35464902322](https://github.com/NAOKI-Ko/digital-map/actions/runs/35464902322) passed install, production audit, Prisma validation/generation/migration, both audits, type check, tests, and build for pushed SHA `bca561ba0b9799fc39c20e3609c954ac268e1e2f`. |
 
 ## Contract and regression coverage
 
