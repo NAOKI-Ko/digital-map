@@ -436,7 +436,7 @@ onBeforeUnmount(() => {
           />
         </div>
       </div>
-      <div data-pin-editor-workspace class="mt-3 grid items-start gap-5 lg:grid-cols-2">
+      <div data-pin-editor-workspace class="mt-3 grid min-h-0 items-stretch gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(360px,1fr)] xl:grid-cols-[minmax(0,7fr)_minmax(380px,3fr)]">
         <section class="min-w-0" aria-label="地図操作">
           <ClientOnly>
             <LazyMapViewer
@@ -449,6 +449,7 @@ onBeforeUnmount(() => {
               :candidate-spot="candidateSpot"
               :candidate-kind="candidateKind"
               :placement-enabled="placementActive"
+              height="min(68vh, 46rem)"
               label="ピン配置地図"
               :initial-camera="initialCamera"
               @camera-changed="handleCameraChanged"
@@ -458,12 +459,12 @@ onBeforeUnmount(() => {
             <template #fallback><div class="h-[38rem] animate-pulse rounded-xl bg-stone-100" /></template>
           </ClientOnly>
         </section>
-        <aside class="self-start rounded-xl border border-stone-200 bg-white p-5 shadow-sm xl:max-h-[calc(100vh-8rem)] xl:overflow-y-auto">
+        <UiInspector class="overflow-hidden rounded-xl border border-stone-200" :title="designEditing ? 'PINデザインを編集' : placementActive ? 'PIN位置を編集' : 'インスペクター'">
           <SaveFeedback v-if="route.query.saved === 'spot-created'" class="mt-3" state="success" message="スポットを登録しました。" />
           <SpotCombobox v-if="placementMode === 'idle'" :model-value="placementSpotIsPositioned ? '' : placementSpotId" :spots="unpositionedFloorSpots" @update:model-value="selectUnpositionedSpot" />
 
           <section class="mt-6 border-t border-stone-200 pt-5" aria-live="polite">
-            <h2 class="text-sm font-bold text-stone-900">{{ designEditing ? 'PINデザインを編集' : placementActive ? 'PIN位置を編集' : '選択中のスポット' }}</h2>
+            <h2 class="text-sm font-bold text-stone-900">{{ placementMode === 'idle' ? '選択中のスポット' : '編集中のスポット' }}</h2>
             <p v-if="!placementSpot" class="mt-3 text-sm text-stone-600">地図上のPINを選択してください。</p>
             <template v-else>
               <h3 class="mt-3 text-lg font-bold text-stone-900">{{ placementSpot.name }}</h3>
@@ -496,8 +497,6 @@ onBeforeUnmount(() => {
                   @changed="handlePinDesignChanged"
                   @updated="updatePinDesign"
                 />
-                <button type="button" class="mt-6 w-full rounded-lg bg-terracotta-600 px-4 py-2.5 text-sm font-semibold text-white" @click="saveDesign">デザインを保存</button>
-                <button type="button" class="mt-2 w-full rounded-lg border border-stone-300 px-4 py-2 text-sm font-semibold text-stone-700" @click="requestTransition(cancelDesignEditing)">キャンセル</button>
               </div>
             </template>
           </section>
@@ -515,12 +514,15 @@ onBeforeUnmount(() => {
           <div v-if="placementActive" class="mt-4 rounded-lg border border-terracotta-200 bg-terracotta-50 p-3 text-sm font-semibold text-terracotta-900">
             {{ placementMode === 'moving' ? (position ? '移動先を確認し、保存してください。' : '元のPINは薄く表示されています。地図をクリックして移動先を仮配置してください。') : (position ? '仮配置を確認し、保存してください。' : '地図をクリックして仮配置してください。') }}
           </div>
-          <button v-if="placementActive" type="button" :disabled="!position || positionSaving" class="mt-4 w-full rounded-lg bg-terracotta-600 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50" @click="savePosition">{{ positionSaving ? '保存中…' : 'この位置を保存' }}</button>
-          <div v-if="placementActive" class="mt-2 grid gap-2">
-            <button type="button" class="rounded-lg border border-stone-300 px-4 py-2 text-sm font-semibold text-stone-700" @click="requestTransition(cancelPositionEditing)">キャンセル</button>
-          </div>
-          <p v-if="moveStatus" role="status" class="mt-4 text-xs leading-5 text-stone-600">{{ moveStatus }}</p>
-        </aside>
+          <template v-if="designEditing || placementActive" #footer>
+            <p v-if="moveStatus" role="status" class="mb-3 text-xs leading-5 text-stone-600">{{ moveStatus }}</p>
+            <UiFormActions>
+              <UiButton variant="secondary" :disabled="positionSaving" @click="requestTransition(designEditing ? cancelDesignEditing : cancelPositionEditing)">キャンセル</UiButton>
+              <UiButton v-if="designEditing" @click="saveDesign">デザインを保存</UiButton>
+              <UiButton v-else :busy="positionSaving" :disabled="!position || positionSaving" @click="savePosition">{{ positionSaving ? '保存中…' : 'この位置を保存' }}</UiButton>
+            </UiFormActions>
+          </template>
+        </UiInspector>
       </div>
       <ConfirmDialog :open="unplaceConfirmOpen" title="PIN配置を解除" message="Spot情報とカテゴリーは残したまま、イラスト上の配置を解除します。公開中の場合は下書きへ戻ります。" confirm-label="配置を解除する" destructive :busy="unplacing" @cancel="unplaceConfirmOpen = false" @confirm="unplaceSpot" />
       <ConfirmDialog :open="discardConfirmOpen" title="未保存の変更があります" message="保存していない位置またはPINデザインの変更を破棄して切り替えますか？" confirm-label="変更を破棄" cancel-label="編集を続ける" destructive @cancel="keepEditing" @confirm="discardAndContinue" />

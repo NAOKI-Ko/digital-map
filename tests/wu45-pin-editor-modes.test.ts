@@ -61,10 +61,12 @@ describe('WU-45 PIN editor modes', () => {
     expect(editorSource).toContain('title="未保存の変更があります"')
   })
 
-  it('検索とFloorはMap直上、desktopは等幅、狭幅は縦積み', () => {
+  it('検索とFloorはMap直上、desktopはcanvas優先、狭幅は縦積み', () => {
     expect(editorSource.indexOf('input-id="positioned-spot-search"')).toBeLessThan(editorSource.indexOf('フロア選択'))
     expect(editorSource.indexOf('data-pin-editor-toolbar')).toBeLessThan(editorSource.indexOf('data-pin-editor-workspace'))
-    expect(editorSource).toContain('lg:grid-cols-2')
+    expect(editorSource).toContain('lg:grid-cols-[minmax(0,2fr)_minmax(360px,1fr)]')
+    expect(editorSource).toContain('xl:grid-cols-[minmax(0,7fr)_minmax(380px,3fr)]')
+    expect(editorSource).toContain('<UiInspector')
     expect(editorSource).toContain('sm:grid-cols-[minmax(0,2fr)_minmax(12rem,1fr)]')
     expect(editorSource).toContain('<section class="min-w-0" aria-label="地図操作">')
     expect(editorSource).toContain('<UiSelect')
