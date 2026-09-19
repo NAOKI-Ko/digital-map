@@ -27,11 +27,11 @@ async function save(item: FloorDecorationItem) {
   saveError.value = ''
   try {
     await $fetch(`/api/maps/${mapId}/floors/${floorId}/decorations/${item.id}`, { method: 'PATCH', body: { x: item.x, y: item.y, width: item.width, rotation: item.rotation, order: item.order } })
-    message.value = 'Decorationを保存しました。'
+    message.value = '装飾を保存しました。'
   }
   catch {
     message.value = ''
-    saveError.value = 'Decorationを保存できませんでした。保存済みの状態へ戻しました。'
+    saveError.value = '装飾を保存できませんでした。保存済みの状態へ戻しました。'
     await refresh()
   }
 }
@@ -73,7 +73,7 @@ onBeforeUnmount(() => activeDragCleanup?.())
 <template>
   <div class="max-w-6xl">
     <NuxtLink :to="`/admin/maps/${mapId}/floors`" class="text-sm font-semibold text-stone-600">← フロア管理に戻る</NuxtLink>
-    <h1 class="mt-5 text-3xl font-bold">{{ floor?.name }} Decoration</h1>
+    <h1 class="mt-5 text-3xl font-bold">{{ floor?.name }}の装飾</h1>
     <p class="mt-2 text-sm text-stone-600">画像を配置してドラッグ、サイズ変更、回転、前後移動ができます。PINより下の専用レイヤーに表示されます。</p>
     <div class="mt-7 grid gap-6 lg:grid-cols-[1fr_20rem]">
       <div v-if="floor" class="relative select-none overflow-hidden rounded-xl border bg-stone-100" :style="{ aspectRatio: `${floor.imageWidth}/${floor.imageHeight}` }">
@@ -81,7 +81,7 @@ onBeforeUnmount(() => activeDragCleanup?.())
         <img v-for="item in data?.decorations" :key="item.id" :src="item.imageUrl" alt="" draggable="false" class="absolute z-10 cursor-move object-contain" :class="{ 'outline outline-2 outline-terracotta-600': item.id === selectedId }" :style="{ left: `${item.x * 100}%`, top: `${item.y * 100}%`, width: `${item.width * 100}%`, transform: `translate(-50%, -50%) rotate(${item.rotation}deg)`, zIndex: item.order + 1 }" @pointerdown.prevent="startDrag($event, item)" @click="selectedId = item.id">
       </div>
       <aside class="space-y-5">
-        <MediaPicker :map-id="mapId" label="Decoration画像" usage="decoration" @selected="addDecoration" />
+        <MediaPicker :map-id="mapId" label="装飾画像" usage="decoration" @selected="addDecoration" />
         <section v-if="selected" class="rounded-xl border bg-white p-4">
           <h2 class="font-bold">選択中</h2>
           <label class="mt-4 block text-xs font-semibold">サイズ<input v-model.number="selected.width" type="range" min="0.03" max="1" step="0.01" class="mt-2 w-full" @change="save(selected)"></label>

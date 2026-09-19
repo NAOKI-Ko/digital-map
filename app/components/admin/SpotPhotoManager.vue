@@ -98,7 +98,7 @@ async function persist(nextPhotos: string[], nextAssetIds: Array<string | null>)
         <p class="mt-1 text-sm text-stone-600">PNG / JPEG、1枚10MBまで、最大6枚。最初の写真を代表画像として扱います。</p>
       </div>
     </div>
-    <MediaPicker v-if="photos.length < 6" :map-id="mapId" label="Spot写真" usage="photo" class="mt-5" @selected="addPhoto" />
+    <MediaPicker v-if="photos.length < 6" :map-id="mapId" label="スポット写真" usage="photo" class="mt-5" @selected="addPhoto" />
 
     <p v-if="errorMessage" role="alert" class="mt-4 text-sm text-red-600">{{ errorMessage }}</p>
     <p v-if="successMessage" role="status" class="mt-4 text-sm text-emerald-700">{{ successMessage }}</p>

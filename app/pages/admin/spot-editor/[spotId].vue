@@ -109,9 +109,9 @@ async function upload(event: Event) {
 
 <template>
   <section class="max-w-2xl">
-    <NuxtLink to="/admin/spot-editor" class="text-sm underline">← 担当Spotへ</NuxtLink>
-    <h1 class="mt-5 text-2xl font-bold">Spot情報の編集</h1>
-    <p v-if="loadError" role="alert" class="mt-4 rounded bg-red-50 p-4 text-red-800">このSpotを編集する権限がないか、担当から外れています。</p>
+    <NuxtLink to="/admin/spot-editor" class="text-sm underline">← 担当スポットへ</NuxtLink>
+    <h1 class="mt-5 text-2xl font-bold">スポット情報の編集</h1>
+    <p v-if="loadError" role="alert" class="mt-4 rounded bg-red-50 p-4 text-red-800">このスポットを編集する権限がないか、担当から外れています。</p>
     <template v-else>
       <p v-if="data?.blockedByPreviousAssignee" class="mt-4 rounded bg-amber-50 p-4">前の担当者の承認待ちRevisionがあるため、レビュー完了まで新しい編集は保存できません。</p>
       <p v-if="message" role="status" class="mt-4 rounded bg-green-50 p-4">{{ message }}</p>

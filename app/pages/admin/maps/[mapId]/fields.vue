@@ -265,7 +265,7 @@ function dropOn(targetId: string) {
     <header class="mt-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
       <div>
         <h1 class="text-3xl font-bold">スポット情報項目</h1>
-        <p class="mt-2 text-sm text-stone-600">Spotで使用する情報項目と表示順を管理します。</p>
+        <p class="mt-2 text-sm text-stone-600">スポットで使用する情報項目と表示順を管理します。</p>
       </div>
       <button type="button" class="min-h-11 shrink-0 rounded-lg bg-terracotta-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-terracotta-700" @click="requestAdd">＋ 項目を追加</button>
     </header>
@@ -358,7 +358,7 @@ function dropOn(targetId: string) {
 
     <p v-if="fields.length === 0" class="mt-6 rounded-xl border border-dashed border-stone-300 p-8 text-center text-sm text-stone-600">項目がありません。「項目を追加」から作成してください。</p>
 
-    <UiDialog :open="addDialogOpen" title="カスタム項目を追加" description="Spotで入力する新しい情報項目を作成します。" max-width="sm" @close="addDialogOpen = false">
+    <UiDialog :open="addDialogOpen" title="カスタム項目を追加" description="スポットで入力する新しい情報項目を作成します。" max-width="sm" @close="addDialogOpen = false">
       <form class="space-y-4" @submit.prevent="createCustomField">
         <div class="max-h-72 space-y-3 overflow-y-auto pr-1">
           <label class="block text-sm font-semibold text-stone-700">

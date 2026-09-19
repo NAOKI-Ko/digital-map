@@ -189,7 +189,7 @@ function getErrorMessage(error: unknown) {
         </button>
       </div>
       <p v-if="floor.spotCount > 0" class="mt-3 text-right text-sm font-semibold text-amber-700">イラスト上のPIN位置は変わりません。実世界との対応のみ更新されます。</p>
-      <ConfirmDialog :open="removeConfirmOpen" title="ジオリファレンスを解除" message="保存済みの実世界との対応を解除します。Spotやイラスト上のPIN位置は削除・変更されません。" confirm-label="解除する" destructive :busy="isSaving" @cancel="removeConfirmOpen = false" @confirm="removeGeoReference" />
+      <ConfirmDialog :open="removeConfirmOpen" title="ジオリファレンスを解除" message="保存済みの実世界との対応を解除します。スポットやイラスト上のPIN位置は削除・変更されません。" confirm-label="解除する" destructive :busy="isSaving" @cancel="removeConfirmOpen = false" @confirm="removeGeoReference" />
     </template>
   </div>
 </template>

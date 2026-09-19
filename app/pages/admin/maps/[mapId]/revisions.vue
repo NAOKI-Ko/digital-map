@@ -16,7 +16,7 @@ async function approve(id: string) {
     await refresh()
   } catch (error: any) {
     operationError.value = error?.statusCode === 409 || error?.response?.status === 409
-      ? '公開中のSpotが更新されたため承認できません。内容を確認して却下してください。'
+      ? '公開中のスポットが更新されたため承認できません。内容を確認して却下してください。'
       : '承認に失敗しました。時間をおいて再度お試しください。'
   } finally {
     processingId.value = null

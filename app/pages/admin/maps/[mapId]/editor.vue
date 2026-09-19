@@ -419,10 +419,10 @@ onBeforeUnmount(() => {
           <SpotCombobox
             v-model="positionedSearchSpotId"
             :spots="positionedFloorSpots"
-            label="配置済みSpotを検索"
+            label="配置済みスポットを検索"
             input-id="positioned-spot-search"
-            placeholder="Spot名・カテゴリー・フロアで検索"
-            empty-message="該当する配置済みSpotはありません。"
+            placeholder="スポット名・カテゴリー・フロアで検索"
+            empty-message="該当する配置済みスポットはありません。"
           />
         </div>
         <div class="min-w-0">
@@ -524,7 +524,7 @@ onBeforeUnmount(() => {
           </template>
         </UiInspector>
       </div>
-      <ConfirmDialog :open="unplaceConfirmOpen" title="PIN配置を解除" message="Spot情報とカテゴリーは残したまま、イラスト上の配置を解除します。公開中の場合は下書きへ戻ります。" confirm-label="配置を解除する" destructive :busy="unplacing" @cancel="unplaceConfirmOpen = false" @confirm="unplaceSpot" />
+      <ConfirmDialog :open="unplaceConfirmOpen" title="PIN配置を解除" message="スポット情報とカテゴリーは残したまま、イラスト上の配置を解除します。公開中の場合は下書きへ戻ります。" confirm-label="配置を解除する" destructive :busy="unplacing" @cancel="unplaceConfirmOpen = false" @confirm="unplaceSpot" />
       <ConfirmDialog :open="discardConfirmOpen" title="未保存の変更があります" message="保存していない位置またはPINデザインの変更を破棄して切り替えますか？" confirm-label="変更を破棄" cancel-label="編集を続ける" destructive @cancel="keepEditing" @confirm="discardAndContinue" />
       <UnsavedChangesGuard :dirty="pageDirty" />
     </template>

@@ -14,7 +14,7 @@ const isWorking = ref(false)
 const canImport = computed(() => preview.value !== null && preview.value.total > 0 && preview.value.errors === 0 && preview.value.conflicts === 0)
 const exportUrl = computed(() => floorId.value ? `/api/maps/${mapId}/spots/import/export?floorId=${encodeURIComponent(floorId.value)}` : '')
 
-useHead({ title: 'Spot CSV Export・一括編集 | デジタルマップ' })
+useHead({ title: 'スポットCSV出力・一括編集 | デジタルマップ' })
 
 watch(floorId, () => {
   preview.value = null
@@ -60,14 +60,14 @@ async function importCsv() {
     <header class="mt-5">
       <p class="text-sm font-medium text-terracotta-700">スポット管理</p>
       <h1 class="mt-1 text-3xl font-bold text-stone-900">CSV Export・一括編集</h1>
-      <p class="mt-2 text-sm text-stone-600">1つのフロアの既存SpotをExportして安全に一括編集できます。従来形式のCSVは新規登録専用として引き続き利用できます。</p>
+      <p class="mt-2 text-sm text-stone-600">1つのフロアの既存スポットをCSV出力して安全に一括編集できます。従来形式のCSVは新規登録専用として引き続き利用できます。</p>
     </header>
     <section class="mt-8 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
       <div class="flex flex-wrap gap-3">
         <a :href="`/api/maps/${mapId}/spots/import/template`" class="inline-flex rounded-lg border border-stone-300 px-4 py-2.5 text-sm font-semibold">テンプレートをダウンロード</a>
-        <a :href="exportUrl || undefined" :aria-disabled="!floorId" :class="!floorId ? 'pointer-events-none opacity-40' : ''" class="inline-flex rounded-lg border border-stone-300 px-4 py-2.5 text-sm font-semibold">既存SpotをCSV出力</a>
+        <a :href="exportUrl || undefined" :aria-disabled="!floorId" :class="!floorId ? 'pointer-events-none opacity-40' : ''" class="inline-flex rounded-lg border border-stone-300 px-4 py-2.5 text-sm font-semibold">既存スポットをCSV出力</a>
       </div>
-      <p class="mt-3 text-sm text-stone-600">Export CSVの <code>__</code> で始まる列は内部管理用です。編集・削除しないでください。CSVから行を削除してもSpotは削除されません。</p>
+      <p class="mt-3 text-sm text-stone-600">出力CSVの <code>__</code> で始まる列は内部管理用です。編集・削除しないでください。CSVから行を削除してもスポットは削除されません。</p>
       <div class="mt-6 grid gap-5 sm:grid-cols-2">
         <label class="text-sm font-semibold">対象フロア<select v-model="floorId" class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5"><option value="">選択してください</option><option v-for="floor in data?.floors" :key="floor.id" :value="floor.id">{{ floor.name }}</option></select></label>
         <label class="text-sm font-semibold">CSVファイル<input type="file" accept=".csv,text/csv" class="mt-2 block w-full text-sm" @change="readCsv"></label>

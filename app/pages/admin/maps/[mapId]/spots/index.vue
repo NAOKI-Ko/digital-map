@@ -216,6 +216,6 @@ function formatDate(value: string) {
       </div>
     </section>
     <ConfirmDialog :open="bulkDeleteOpen" title="スポットを一括削除" :message="`選択した${selectedSpotIds.length}件のスポットを削除します。関連する写真やカテゴリー設定も登録から外れ、元に戻せません。`" confirm-label="削除する" destructive :busy="isBulkSaving" @cancel="bulkDeleteOpen = false" @confirm="executeBulk('delete')" />
-    <ConfirmDialog :open="pendingCategoryAction !== null" title="カテゴリー一括操作" :message="`選択した${selectedSpotIds.length}件へ「${data?.filters.categories.find(category => category.id === bulkCategoryId)?.name ?? ''}」を${pendingCategoryAction === 'addCategory' ? '追加' : '削除'}します。他のCategoryは維持されます。`" confirm-label="実行する" :busy="isBulkSaving" @cancel="pendingCategoryAction = null" @confirm="pendingCategoryAction && executeBulk(pendingCategoryAction)" />
+    <ConfirmDialog :open="pendingCategoryAction !== null" title="カテゴリー一括操作" :message="`選択した${selectedSpotIds.length}件へ「${data?.filters.categories.find(category => category.id === bulkCategoryId)?.name ?? ''}」を${pendingCategoryAction === 'addCategory' ? '追加' : '削除'}します。他のカテゴリーは維持されます。`" confirm-label="実行する" :busy="isBulkSaving" @cancel="pendingCategoryAction = null" @confirm="pendingCategoryAction && executeBulk(pendingCategoryAction)" />
   </div>
 </template>
