@@ -6,6 +6,7 @@ import { isMapLocale, mapLocales } from '~~/shared/constants/map-languages'
 import { uploadedImageUrlSchema } from '~~/shared/schemas/photo'
 import { appendAuditEvent } from './audit'
 import { notifyOperations, operationalLog } from './observability'
+import { prisma } from './prisma'
 import { getLivePublicMapById } from './public-map'
 import { getPublicStorage, immutableCacheControl, pointerCacheControl, type PublicObjectStorage, type PublicWriteResult } from './public-storage'
 
