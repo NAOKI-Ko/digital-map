@@ -29,6 +29,8 @@ const props = withDefaults(defineProps<{
     customValues: {},
     x: null,
     y: null,
+    lat: null,
+    lng: null,
   }),
   fields: () => [],
   isSubmitting: false,
@@ -37,6 +39,7 @@ const props = withDefaults(defineProps<{
 
 const emit = defineEmits<{
   submit: [input: SpotFormInput]
+  cancel: []
 }>()
 
 const { defineField, errors, handleSubmit, meta, resetForm, setErrors } = useForm<SpotFormInput>({
@@ -52,6 +55,8 @@ const [website, websiteAttrs] = defineField('website')
 const [hoursText, hoursTextAttrs] = defineField('hoursText')
 const [holidayText, holidayTextAttrs] = defineField('holidayText')
 const [phone, phoneAttrs] = defineField('phone')
+const [lat, latAttrs] = defineField('lat')
+const [lng, lngAttrs] = defineField('lng')
 const [customValues] = defineField('customValues')
 const enabledFields = computed(() => props.fields.filter(field => field.enabled).toSorted((a, b) => a.order - b.order))
 const descriptionField = computed(() => enabledFields.value.find(field => field.semanticKey === 'description'))
@@ -75,8 +80,11 @@ watch(() => props.initialValue, value => resetForm({ values: value }), { deep: t
 
 const submit = handleSubmit((values) => {
   const enabledCustomIds = new Set(enabledFields.value.filter(field => field.kind === 'custom').map(field => field.id))
+  const normalizeCoordinate = (value: unknown) => value === '' || value === undefined ? null : Number(value)
   const submittedValues = {
     ...values,
+    lat: normalizeCoordinate(values.lat),
+    lng: normalizeCoordinate(values.lng),
     customValues: Object.fromEntries(Object.entries(values.customValues).filter(([fieldId]) => enabledCustomIds.has(fieldId))),
   }
   const result = spotFormSchema.safeParse(submittedValues)
@@ -90,6 +98,11 @@ const submit = handleSubmit((values) => {
 
   emit('submit', result.data)
 })
+
+function cancel() {
+  resetForm({ values: props.initialValue })
+  emit('cancel')
+}
 
 </script>
 
@@ -131,6 +144,19 @@ const submit = handleSubmit((values) => {
       </div>
     </section>
 
+    <section class="border-t border-stone-200 pt-5">
+      <h2 class="text-lg font-bold text-stone-900">位置情報</h2>
+      <p class="mt-1 text-sm leading-6 text-stone-600">緯度・経度は実地図表示用です。イラスト上のPIN位置は「PIN配置」で設定します。</p>
+      <div class="mt-5 grid gap-5 sm:grid-cols-2">
+        <UiField for-id="spot-lat" label="緯度" hint="-90〜90の範囲。未設定にする場合は緯度・経度を両方空欄にします。" :error="errors.lat">
+          <input id="spot-lat" v-model="lat" v-bind="latAttrs" type="number" inputmode="decimal" min="-90" max="90" step="any" class="dm-input" placeholder="35.1815">
+        </UiField>
+        <UiField for-id="spot-lng" label="経度" hint="-180〜180の範囲。" :error="errors.lng">
+          <input id="spot-lng" v-model="lng" v-bind="lngAttrs" type="number" inputmode="decimal" min="-180" max="180" step="any" class="dm-input" placeholder="136.9066">
+        </UiField>
+      </div>
+    </section>
+
 
 
     <section class="border-t border-stone-200 pt-5">
@@ -155,11 +181,12 @@ const submit = handleSubmit((values) => {
 
 
     <p class="text-xs text-stone-500">写真・ピンの見た目・公開状態は、スポット保存後にそれぞれの欄で設定できます。</p>
-    <div class="flex justify-end border-t border-stone-200 pt-6">
-      <button type="submit" :disabled="isSubmitting || floors.length === 0" class="rounded-lg bg-terracotta-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60">
+    <UiFormActions sticky-mobile>
+      <UiButton variant="secondary" :disabled="isSubmitting" @click="cancel">キャンセル</UiButton>
+      <UiButton type="submit" :busy="isSubmitting" :disabled="isSubmitting || floors.length === 0">
         {{ isSubmitting ? '保存中…' : submitLabel }}
-      </button>
-    </div>
+      </UiButton>
+    </UiFormActions>
   </form>
   <UnsavedChangesGuard :dirty="meta.dirty && !isSubmitting" />
 </template>

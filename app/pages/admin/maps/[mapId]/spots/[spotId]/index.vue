@@ -46,6 +46,8 @@ const initialValue = computed<SpotFormInput | undefined>(() => data.value
       customValues: data.value.spot.customValues,
       x: data.value.spot.x,
       y: data.value.spot.y,
+      lat: data.value.spot.lat,
+      lng: data.value.spot.lng,
     }
   : undefined)
 
@@ -101,6 +103,10 @@ function continueWithDuplicate() {
   if (input) void persistSpot(input)
 }
 
+function cancelForm() {
+  void navigateTo(returnTo.value)
+}
+
 async function saveEnglish() {
   englishState.value = 'saving'
   try {
@@ -133,7 +139,7 @@ async function saveEnglish() {
       <SaveFeedback class="mt-6" :state="isSubmitting ? 'saving' : submitError ? 'error' : successMessage ? 'success' : 'idle'" :message="submitError || successMessage" />
       <section class="mt-6 border-t border-stone-200 pt-5">
         <ClientOnly>
-          <SpotForm :floors="data.floors" :categories="data.categories" :fields="data.fields" :initial-value="initialValue" :is-submitting="isSubmitting" @submit="updateSpot" />
+          <SpotForm :floors="data.floors" :categories="data.categories" :fields="data.fields" :initial-value="initialValue" :is-submitting="isSubmitting" @submit="updateSpot" @cancel="cancelForm" />
           <template #fallback>
             <p class="text-sm text-stone-600">フォームを読み込んでいます…</p>
           </template>

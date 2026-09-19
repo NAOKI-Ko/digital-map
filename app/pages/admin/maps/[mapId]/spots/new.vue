@@ -53,6 +53,8 @@ const initialValue = computed<SpotFormInput>(() => {
     customValues: {},
     x: requestedX !== null && requestedY !== null ? requestedX : null,
     y: requestedX !== null && requestedY !== null ? requestedY : null,
+    lat: null,
+    lng: null,
   }
 })
 const isSubmitting = ref(false)
@@ -111,6 +113,10 @@ function continueWithDuplicate() {
   cancelDuplicateWarning()
   if (input) void persistSpot(input)
 }
+
+function cancelForm() {
+  void navigateTo(editorReturnLocation.value ?? `/admin/maps/${mapId}/spots`)
+}
 </script>
 
 <template>
@@ -125,7 +131,7 @@ function continueWithDuplicate() {
     <SaveFeedback class="mt-6" :state="isSubmitting ? 'saving' : submitError ? 'error' : 'idle'" :message="submitError" />
     <section class="mt-8 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
       <ClientOnly>
-        <SpotForm :floors="floors" :categories="categoryData?.categories ?? []" :fields="fieldData?.fields ?? []" :initial-value="initialValue" :is-submitting="isSubmitting" submit-label="スポットを登録する" @submit="createSpot" />
+        <SpotForm :floors="floors" :categories="categoryData?.categories ?? []" :fields="fieldData?.fields ?? []" :initial-value="initialValue" :is-submitting="isSubmitting" submit-label="スポットを登録する" @submit="createSpot" @cancel="cancelForm" />
         <template #fallback>
           <p class="text-sm text-stone-600">フォームを読み込んでいます…</p>
         </template>
