@@ -1,6 +1,6 @@
 # WU-48 Technical Debt Audit and Closure
 
-Date: 2026-09-19 (Asia/Tokyo)
+Date: 2026-09-20 (Asia/Tokyo)
 
 ## Current verdict
 
@@ -43,4 +43,4 @@ Counts: 13 candidates; 11 confirmed debts/test gaps; 10 fixed and verified; 2 NO
 
 No main merge, Production deployment, or task-system status update was performed.
 
-Windows QA runs exact SHA `81dbc0f0ff0f19351d5c3987621f3886bd8f54c9`; the later evidence commit is documentation-only.
+Windows QA runs exact SHA `5d372a5a4332238af0d7084edd305a557f08f522`; the later evidence commit is documentation-only.
