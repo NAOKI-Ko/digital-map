@@ -1,13 +1,23 @@
 import { createHash } from 'node:crypto'
-import { readdir, readFile, stat } from 'node:fs/promises'
+import { lstat, readdir, readFile } from 'node:fs/promises'
 import { relative, resolve, sep } from 'node:path'
 
 export interface MediaManifestEntry { path: string, size: number, sha256: string }
 
 export function canonicalDatabaseTarget(value: string) {
   const url = new URL(value)
-  const port = url.port || (url.protocol === 'postgresql:' || url.protocol === 'postgres:' ? '5432' : '')
-  return `${url.protocol}//${url.hostname.toLowerCase()}:${port}${url.pathname}`
+  if (url.protocol !== 'postgresql:' && url.protocol !== 'postgres:') throw new Error('Only PostgreSQL restore URLs are supported')
+  const database = decodeURIComponent(url.pathname.replace(/^\//, ''))
+  if (!database) throw new Error('Database name is required')
+  return `postgresql://${url.hostname.toLowerCase()}:${url.port || '5432'}/${database}`
+}
+
+export function databaseName(value: string) {
+  const url = new URL(value)
+  if (url.protocol !== 'postgresql:' && url.protocol !== 'postgres:') throw new Error('Only PostgreSQL restore URLs are supported')
+  const name = decodeURIComponent(url.pathname.replace(/^\//, ''))
+  if (!name) throw new Error('Database name is required')
+  return name
 }
 
 export function safeRelativePath(root: string, candidate: string) {
@@ -25,7 +35,7 @@ export async function buildMediaManifest(root: string): Promise<MediaManifestEnt
   async function visit(directory: string) {
     for (const name of (await readdir(directory)).sort()) {
       const path = resolve(directory, name)
-      const info = await stat(path)
+      const info = await lstat(path)
       if (info.isSymbolicLink()) throw new Error(`Symlinks are not supported: ${name}`)
       if (info.isDirectory()) await visit(path)
       else if (info.isFile()) entries.push({ path: safeRelativePath(root, path), size: info.size, sha256: await sha256File(path) })

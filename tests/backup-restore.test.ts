@@ -1,9 +1,9 @@
-import { mkdtemp, mkdir, writeFile } from 'node:fs/promises'
+import { mkdtemp, mkdir, rm, symlink, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
-import { buildMediaManifest, canonicalDatabaseTarget, retentionPlan, safeRelativePath, verifyMediaManifest } from '../scripts/backup-lib'
+import { buildMediaManifest, canonicalDatabaseTarget, databaseName, retentionPlan, safeRelativePath, verifyMediaManifest } from '../scripts/backup-lib'
 
 describe('WU-29 backup and restore helpers', () => {
   it('creates deterministic relative-path/size/SHA-256 media manifests and detects missing media', async () => {
@@ -26,9 +26,32 @@ describe('WU-29 backup and restore helpers', () => {
 
   it('identifies the same restore database even when credentials and default-port spelling differ', () => {
     expect(canonicalDatabaseTarget('postgresql://live:secret@DB.EXAMPLE/digital_map'))
-      .toBe(canonicalDatabaseTarget('postgresql://restore:other@db.example:5432/digital_map'))
+      .toBe(canonicalDatabaseTarget('postgres://restore:other@db.example:5432/digital_map?sslmode=require'))
+    expect(canonicalDatabaseTarget('postgresql://live@db.example/digital%5Fmap'))
+      .toBe(canonicalDatabaseTarget('postgres://other@DB.EXAMPLE:5432/digital_map'))
     expect(canonicalDatabaseTarget('postgresql://restore:other@db.example:5432/disposable'))
       .not.toBe(canonicalDatabaseTarget('postgresql://live:secret@db.example/digital_map'))
+    expect(canonicalDatabaseTarget('postgresql://live@db.example:5433/digital_map')).not.toBe(canonicalDatabaseTarget('postgresql://live@db.example/digital_map'))
+    expect(canonicalDatabaseTarget('postgresql://live@other.example/digital_map')).not.toBe(canonicalDatabaseTarget('postgresql://live@db.example/digital_map'))
+    expect(databaseName('postgres://user@db.example/digital%5Fmap')).toBe('digital_map')
+  })
+
+  it('media manifestはroot内外を問わずsymlinkを追跡しない', async () => {
+    const parent = await mkdtemp(join(tmpdir(), 'digital-map-media-links-'))
+    const root = join(parent, 'root')
+    const outside = join(parent, 'outside')
+    await mkdir(root); await mkdir(outside)
+    await writeFile(join(root, 'file.png'), 'inside')
+    await writeFile(join(outside, 'secret.png'), 'outside')
+    await symlink(join(outside, 'secret.png'), join(root, 'outside-file.png'))
+    await expect(buildMediaManifest(root)).rejects.toThrow('Symlinks are not supported')
+    await rm(join(root, 'outside-file.png'))
+    await symlink(outside, join(root, 'outside-dir'))
+    await expect(buildMediaManifest(root)).rejects.toThrow('Symlinks are not supported')
+    await rm(join(root, 'outside-dir'))
+    await symlink(join(root, 'file.png'), join(root, 'inside-link.png'))
+    await expect(buildMediaManifest(root)).rejects.toThrow('Symlinks are not supported')
+    await rm(parent, { recursive: true, force: true })
   })
 
   it('keeps 7 daily plus up to 4 weekly representatives and only plans older deletion', () => {
