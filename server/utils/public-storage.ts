@@ -1,4 +1,5 @@
 import { GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
+import { createHash } from 'node:crypto'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { Buffer } from 'node:buffer'
 import { dirname, resolve, sep } from 'node:path'
@@ -11,9 +12,18 @@ export interface PublicObject {
 }
 
 export interface PublicObjectStorage {
-  put(key: string, value: Uint8Array | string, options: { contentType: string, cacheControl: string }): Promise<void>
+  put(key: string, value: Uint8Array | string, options: PublicWriteOptions): Promise<PublicWriteResult>
   get(key: string): Promise<PublicObject | null>
 }
+
+export interface PublicWriteOptions {
+  contentType: string
+  cacheControl: string
+  ifMatchEtag?: string
+  ifNoneMatch?: boolean
+}
+
+export interface PublicWriteResult { etag?: string }
 
 export const immutableCacheControl = 'public, max-age=31536000, immutable'
 export const pointerCacheControl = 'no-cache, max-age=0, must-revalidate'
@@ -33,25 +43,31 @@ export class LocalPublicStorage implements PublicObjectStorage {
     return { data, metadata: `${data}.metadata.json` }
   }
 
-  async put(key: string, value: Uint8Array | string, options: { contentType: string, cacheControl: string }) {
+  async put(key: string, value: Uint8Array | string, options: PublicWriteOptions) {
     const paths = this.paths(key)
     await mkdir(dirname(paths.data), { recursive: true })
+    const nextBytes = Buffer.from(value)
+    const existing = await readFile(paths.data).catch(() => null)
+    const existingEtag = existing ? createHash('sha256').update(existing).digest('hex') : undefined
+    if (options.ifNoneMatch && existing) throw new Error('PUBLIC_OBJECT_PRECONDITION_FAILED')
+    if (options.ifMatchEtag && existingEtag !== options.ifMatchEtag) throw new Error('PUBLIC_OBJECT_PRECONDITION_FAILED')
     if (options.cacheControl.includes('immutable')) {
-      const existing = await readFile(paths.data).catch(() => null)
       if (existing) {
-        if (existing.equals(Buffer.from(value))) return
+        if (existing.equals(nextBytes)) return { etag: existingEtag }
         throw new Error('IMMUTABLE_PUBLIC_OBJECT_EXISTS')
       }
     }
-    await writeFile(paths.data, value)
-    await writeFile(paths.metadata, JSON.stringify(options))
+    const etag = createHash('sha256').update(nextBytes).digest('hex')
+    await writeFile(paths.data, nextBytes)
+    await writeFile(paths.metadata, JSON.stringify({ contentType: options.contentType, cacheControl: options.cacheControl, etag }))
+    return { etag }
   }
 
   async get(key: string): Promise<PublicObject | null> {
     const paths = this.paths(key)
     try {
       const [bytes, metadata] = await Promise.all([readFile(paths.data), readFile(paths.metadata, 'utf8').then(JSON.parse)])
-      return { bytes, contentType: metadata.contentType, cacheControl: metadata.cacheControl } satisfies PublicObject
+      return { bytes, contentType: metadata.contentType, cacheControl: metadata.cacheControl, etag: metadata.etag ?? createHash('sha256').update(bytes).digest('hex') } satisfies PublicObject
     }
     catch { return null }
   }
@@ -63,8 +79,25 @@ export class S3PublicStorage implements PublicObjectStorage {
     this.client = new S3Client({ endpoint: config.endpoint, region: config.region, credentials: { accessKeyId: config.accessKeyId, secretAccessKey: config.secretAccessKey } })
   }
 
-  async put(key: string, value: Uint8Array | string, options: { contentType: string, cacheControl: string }) {
-    await this.client.send(new PutObjectCommand({ Bucket: this.bucket, Key: safePublicKey(key), Body: value, ContentType: options.contentType, CacheControl: options.cacheControl, IfNoneMatch: options.cacheControl.includes('immutable') ? '*' : undefined }))
+  async put(key: string, value: Uint8Array | string, options: PublicWriteOptions) {
+    try {
+      const result = await this.client.send(new PutObjectCommand({
+        Bucket: this.bucket,
+        Key: safePublicKey(key),
+        Body: value,
+        ContentType: options.contentType,
+        CacheControl: options.cacheControl,
+        IfMatch: options.ifMatchEtag,
+        IfNoneMatch: (options.ifNoneMatch || options.cacheControl.includes('immutable')) ? '*' : undefined,
+      }))
+      return { etag: result.ETag }
+    }
+    catch (error: any) {
+      if (error?.name === 'PreconditionFailed' || error?.$metadata?.httpStatusCode === 412) {
+        throw new Error('PUBLIC_OBJECT_PRECONDITION_FAILED')
+      }
+      throw error
+    }
   }
 
   async get(key: string): Promise<PublicObject | null> {

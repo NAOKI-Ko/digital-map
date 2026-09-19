@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { loadCurrentPublicSnapshot, rewriteReleaseAssets, validatePublicSnapshot } from '../server/utils/public-release'
+import { compensatePointer, loadCurrentPublicSnapshot, rewriteReleaseAssets, validatePublicSnapshot } from '../server/utils/public-release'
 import { immutableCacheControl, LocalPublicStorage, pointerCacheControl } from '../server/utils/public-storage'
 
 const roots: string[] = []
@@ -49,7 +49,7 @@ describe('CDN-first public release', () => {
   it('同じassetの複数参照をrelease内で一度だけ書き込む', async () => {
     const uploadRoot = await mkdtemp(join(tmpdir(), 'release-duplicate-upload-')); roots.push(uploadRoot)
     await writeFile(join(uploadRoot, 'floor.png'), 'shared-floor')
-    const put = vi.fn(async () => undefined)
+    const put = vi.fn(async () => ({}))
     const storage = { put, get: vi.fn(async () => null) }
     const copied = await rewriteReleaseAssets({ ja: ['/uploads/floor.png'], en: { floor: '/uploads/floor.png' } }, storage, 'public/maps/map/releases/r1', uploadRoot)
     expect(put).toHaveBeenCalledTimes(1)
@@ -60,6 +60,31 @@ describe('CDN-first public release', () => {
     expect(validatePublicSnapshot({ map: { name: 'public' } })).toBe(true)
     expect(() => validatePublicSnapshot({ spotRevisions: [{ payload: 'draft' }] })).toThrow('PRIVATE_SNAPSHOT_FIELD')
     expect(() => validatePublicSnapshot({ passwordHash: 'secret' })).toThrow('PRIVATE_SNAPSHOT_FIELD')
+  })
+
+  it('古いpublish失敗のcompensationが新しいcurrent pointerを巻き戻さない', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'public-pointer-race-')); roots.push(root)
+    const storage = new LocalPublicStorage(root)
+    const key = 'public/maps/map/current.json'
+    const options = { contentType: 'application/json', cacheControl: pointerCacheControl }
+    const original = JSON.stringify({ releaseId: 'r0', manifestKey: 'r0.json', published: true })
+    const stale = JSON.stringify({ releaseId: 'r1', manifestKey: 'r1.json', published: true })
+    const newest = JSON.stringify({ releaseId: 'r2', manifestKey: 'r2.json', published: true })
+    await storage.put(key, original, options)
+    const beforeStale = await storage.get(key)
+    const staleWrite = await storage.put(key, stale, { ...options, ifMatchEtag: beforeStale?.etag })
+    const beforeNewest = await storage.get(key)
+    await storage.put(key, newest, { ...options, ifMatchEtag: beforeNewest?.etag })
+
+    await expect(storage.put(key, original, { ...options, ifMatchEtag: staleWrite.etag }))
+      .rejects.toThrow('PUBLIC_OBJECT_PRECONDITION_FAILED')
+    expect(await compensatePointer(storage, 'map', beforeStale, staleWrite.etag, {
+      releaseId: null,
+      manifestKey: null,
+      published: false,
+      updatedAt: new Date().toISOString(),
+    })).toBe(false)
+    expect(JSON.parse(new TextDecoder().decode((await storage.get(key))?.bytes))).toMatchObject({ releaseId: 'r2' })
   })
 
   it('公開viewer APIは通常表示でPrisma/live DBへfallbackしない', async () => {

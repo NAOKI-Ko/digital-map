@@ -6,7 +6,7 @@ import { isMapLocale, mapLocales } from '~~/shared/constants/map-languages'
 import { appendAuditEvent } from './audit'
 import { notifyOperations, operationalLog } from './observability'
 import { getLivePublicMapById } from './public-map'
-import { getPublicStorage, immutableCacheControl, pointerCacheControl, type PublicObjectStorage } from './public-storage'
+import { getPublicStorage, immutableCacheControl, pointerCacheControl, type PublicObjectStorage, type PublicWriteResult } from './public-storage'
 
 type ReleaseLocales = { ja: PublicMap } & Record<string, PublicMap>
 type CurrentPointer = { releaseId: string | null, manifestKey: string | null, published: boolean, updatedAt: string }
@@ -16,7 +16,7 @@ export function currentPointerKey(slug: string) { return `public/maps/${slug}/cu
 
 function parseJson<T>(bytes: Uint8Array): T { return JSON.parse(new TextDecoder().decode(bytes)) as T }
 
-export async function rewriteReleaseAssets(value: unknown, storage: PublicObjectStorage, root: string, uploadDirectory: string, copied = new Map<string, string>(), writes = new Map<string, Promise<void>>()): Promise<unknown> {
+export async function rewriteReleaseAssets(value: unknown, storage: PublicObjectStorage, root: string, uploadDirectory: string, copied = new Map<string, string>(), writes = new Map<string, Promise<PublicWriteResult>>()): Promise<unknown> {
   if (typeof value === 'string' && value.startsWith('/uploads/')) {
     const cached = copied.get(value)
     if (cached) return cached
@@ -77,14 +77,46 @@ export async function buildPublicRelease(mapId: string, actorUserId: string, upl
 }
 
 async function putPointer(storage: PublicObjectStorage, slug: string, pointer: CurrentPointer) {
-  await storage.put(currentPointerKey(slug), JSON.stringify(pointer), { contentType: 'application/json; charset=utf-8', cacheControl: pointerCacheControl })
+  const current = await storage.get(currentPointerKey(slug))
+  const result = await storage.put(currentPointerKey(slug), JSON.stringify(pointer), {
+    contentType: 'application/json; charset=utf-8',
+    cacheControl: pointerCacheControl,
+    ifMatchEtag: current?.etag,
+    ifNoneMatch: !current,
+  })
+  return { previous: current, writtenEtag: result.etag }
+}
+
+export async function compensatePointer(
+  storage: PublicObjectStorage,
+  slug: string,
+  previous: Awaited<ReturnType<PublicObjectStorage['get']>>,
+  writtenEtag: string | undefined,
+  fallback: CurrentPointer,
+) {
+  if (!writtenEtag) return false
+  try {
+    await storage.put(
+      currentPointerKey(slug),
+      previous?.bytes ?? JSON.stringify(fallback),
+      {
+        contentType: previous?.contentType ?? 'application/json; charset=utf-8',
+        cacheControl: previous?.cacheControl ?? pointerCacheControl,
+        ifMatchEtag: writtenEtag,
+      },
+    )
+    return true
+  }
+  catch (error) {
+    if (error instanceof Error && error.message === 'PUBLIC_OBJECT_PRECONDITION_FAILED') return false
+    throw error
+  }
 }
 
 export async function activatePublicRelease(mapId: string, releaseId: string, tenantId: string, actorUserId: string, storage = getPublicStorage()) {
   const release = await prisma.publicRelease.findFirst({ where: { id: releaseId, mapId, status: 'READY' }, include: { map: { select: { slug: true, currentReleaseId: true } } } })
   if (!release?.manifestKey) throw createError({ statusCode: 404, statusMessage: '公開可能なリリースが見つかりません。' })
-  const oldObject = await storage.get(currentPointerKey(release.map.slug))
-  await putPointer(storage, release.map.slug, { releaseId, manifestKey: release.manifestKey, published: true, updatedAt: new Date().toISOString() })
+  const pointerWrite = await putPointer(storage, release.map.slug, { releaseId, manifestKey: release.manifestKey, published: true, updatedAt: new Date().toISOString() })
   try {
     await prisma.$transaction(async (transaction) => {
       await transaction.map.update({ where: { id: mapId }, data: { currentReleaseId: releaseId, isPublished: true } })
@@ -92,10 +124,10 @@ export async function activatePublicRelease(mapId: string, releaseId: string, te
     })
   }
   catch (error) {
-    if (oldObject) await storage.put(currentPointerKey(release.map.slug), oldObject.bytes, { contentType: oldObject.contentType, cacheControl: oldObject.cacheControl })
-    else await putPointer(storage, release.map.slug, { releaseId: null, manifestKey: null, published: false, updatedAt: new Date().toISOString() })
-    operationalLog('error', { code: 'PUBLIC_POINTER_COMPENSATED', route: 'publish', message: 'DB activation failed after pointer update', mapId })
-    await notifyOperations({ code: 'PUBLIC_POINTER_COMPENSATED', route: 'publish', message: 'DB activation failed after pointer update' })
+    const compensated = await compensatePointer(storage, release.map.slug, pointerWrite.previous, pointerWrite.writtenEtag, { releaseId: null, manifestKey: null, published: false, updatedAt: new Date().toISOString() })
+    const code = compensated ? 'PUBLIC_POINTER_COMPENSATED' : 'PUBLIC_POINTER_COMPENSATION_SKIPPED'
+    operationalLog('error', { code, route: 'publish', message: compensated ? 'DB activation failed after pointer update' : 'A newer pointer prevented stale compensation', mapId })
+    await notifyOperations({ code, route: 'publish', message: compensated ? 'DB activation failed after pointer update' : 'A newer pointer prevented stale compensation' })
     throw error
   }
   return release
@@ -104,8 +136,7 @@ export async function activatePublicRelease(mapId: string, releaseId: string, te
 export async function unpublishCurrentMap(mapId: string, tenantId: string, actorUserId: string, storage = getPublicStorage()) {
   const map = await prisma.map.findUnique({ where: { id: mapId }, select: { slug: true, currentReleaseId: true } })
   if (!map) throw createError({ statusCode: 404, statusMessage: 'マップが見つかりません。' })
-  const old = await storage.get(currentPointerKey(map.slug))
-  await putPointer(storage, map.slug, { releaseId: map.currentReleaseId, manifestKey: null, published: false, updatedAt: new Date().toISOString() })
+  const pointerWrite = await putPointer(storage, map.slug, { releaseId: map.currentReleaseId, manifestKey: null, published: false, updatedAt: new Date().toISOString() })
   try {
     await prisma.$transaction(async (transaction) => {
       await transaction.map.update({ where: { id: mapId }, data: { isPublished: false } })
@@ -113,7 +144,7 @@ export async function unpublishCurrentMap(mapId: string, tenantId: string, actor
     })
   }
   catch (error) {
-    if (old) await storage.put(currentPointerKey(map.slug), old.bytes, { contentType: old.contentType, cacheControl: old.cacheControl })
+    await compensatePointer(storage, map.slug, pointerWrite.previous, pointerWrite.writtenEtag, { releaseId: null, manifestKey: null, published: false, updatedAt: new Date().toISOString() })
     throw error
   }
 }
