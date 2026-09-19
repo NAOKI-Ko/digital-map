@@ -20,31 +20,6 @@ const arimatsuDemoAssetDirectory = fileURLToPath(
   new URL('./seed-assets/arimatsu-demo/', import.meta.url),
 )
 
-const verificationMaps = [
-  {
-    name: '湯かおり温泉郷(テスト)',
-    slug: 'test-yukaori-onsen',
-    floor: {
-      id: 'seed-floor-yukaori-onsen',
-      name: '全体マップ',
-      illustrationUrl: '/uploads/sample-onsen-illustration.png',
-      imageWidth: 1600,
-      imageHeight: 2000,
-    },
-  },
-  {
-    name: '里山リゾート みのりの杜(テスト)',
-    slug: 'test-satoyama-minori-resort',
-    floor: {
-      id: 'seed-floor-satoyama-minori-resort',
-      name: '全体マップ',
-      illustrationUrl: '/uploads/sample-satoyama-resort-illustration.png',
-      imageWidth: 2000,
-      imageHeight: 1400,
-    },
-  },
-] as const
-
 const arimatsuDemoAssets = [
   { source: 'arimatsu-map.png', target: 'arimatsu-demo-map.png' },
   { source: 'custom-icon-stamp.png', target: 'custom-icon-stamp.png' },
@@ -257,14 +232,14 @@ const arimatsuDemoSpots = [
 const adapter = new PrismaPg({ connectionString })
 const prisma = new PrismaClient({ adapter })
 
-async function syncSeedSpotCategories(mapId: string, spots: readonly { id: string, category: string }[]) {
+async function syncSeedSpotCategories(tenantId: string, mapId: string, spots: readonly { id: string, category: string }[]) {
   const categoryNames = [...new Set(spots.map(spot => spot.category.trim()))]
     .sort((left, right) => left.localeCompare(right, 'ja'))
   const categories = await Promise.all(categoryNames.map((name, order) => (
     prisma.category.upsert({
-      where: { mapId_name: { mapId, name } },
-      update: { order },
-      create: { mapId, name, order },
+      where: { tenantId_name: { tenantId, name } },
+      update: { mapId, order },
+      create: { tenantId, mapId, name, order },
       select: { id: true, name: true },
     })
   )))
@@ -335,7 +310,10 @@ async function seedArimatsuDemo(tenantId: string) {
     const imagePosition = renderToImageCoordinates(arimatsuFloorSpatial, { lat, lng })
     if (!imagePosition) throw new Error(`Spot ${id} のIMAGE位置を計算できません。`)
     const data = {
+      tenantId,
       floorId: floor.id,
+      lat,
+      lng,
       ...spotData,
       ...imagePosition,
       isPublished: false,
@@ -348,7 +326,7 @@ async function seedArimatsuDemo(tenantId: string) {
     })
   }))
 
-  await syncSeedSpotCategories(map.id, arimatsuDemoSpots)
+  await syncSeedSpotCategories(tenantId, map.id, arimatsuDemoSpots)
 
   console.info(`有松チーム内デモを作成しました: ${arimatsuDemoSpots.length}スポット（すべて下書き）`)
 }
@@ -386,46 +364,6 @@ async function main() {
   })
 
   console.info(`管理者を作成しました: ${admin.email} (${tenant.name})`)
-
-  for (const verificationMap of verificationMaps) {
-    const map = await prisma.map.upsert({
-      where: { slug: verificationMap.slug },
-      update: {
-        tenantId: tenant.id,
-        name: verificationMap.name,
-        isPublished: false,
-      },
-      create: {
-        tenantId: tenant.id,
-        name: verificationMap.name,
-        slug: verificationMap.slug,
-        isPublished: false,
-      },
-    })
-
-    await prisma.mapFloor.upsert({
-      where: { id: verificationMap.floor.id },
-      update: {
-        mapId: map.id,
-        name: verificationMap.floor.name,
-        illustrationUrl: verificationMap.floor.illustrationUrl,
-        imageWidth: verificationMap.floor.imageWidth,
-        imageHeight: verificationMap.floor.imageHeight,
-        order: 0,
-      },
-      create: {
-        id: verificationMap.floor.id,
-        mapId: map.id,
-        name: verificationMap.floor.name,
-        illustrationUrl: verificationMap.floor.illustrationUrl,
-        imageWidth: verificationMap.floor.imageWidth,
-        imageHeight: verificationMap.floor.imageHeight,
-        order: 0,
-      },
-    })
-
-    console.info(`実地確認用マップを作成しました: ${verificationMap.name}`)
-  }
 
   await seedArimatsuDemo(tenant.id)
 }

@@ -11,12 +11,14 @@ const ids = ['wu45-pin-existing', 'wu45-pin-new'] as const
 async function setup() {
   const floor = await prisma.mapFloor.findFirstOrThrow({
     where: { map: { slug: 'team-demo-arimatsu' } },
+    include: { map: { select: { tenantId: true } } },
     orderBy: { order: 'asc' },
   })
 
   await prisma.spot.upsert({
     where: { id: ids[0] },
     update: {
+      tenantId: floor.map.tenantId,
       floorId: floor.id,
       name: 'WU45 既存PIN fixture',
       description: 'Disposable WU-45 browser QA fixture',
@@ -33,6 +35,7 @@ async function setup() {
     },
     create: {
       id: ids[0],
+      tenantId: floor.map.tenantId,
       floorId: floor.id,
       name: 'WU45 既存PIN fixture',
       description: 'Disposable WU-45 browser QA fixture',
@@ -50,6 +53,7 @@ async function setup() {
   await prisma.spot.upsert({
     where: { id: ids[1] },
     update: {
+      tenantId: floor.map.tenantId,
       floorId: floor.id,
       name: 'WU45 新規配置 fixture',
       description: 'Disposable WU-45 browser QA fixture',
@@ -66,6 +70,7 @@ async function setup() {
     },
     create: {
       id: ids[1],
+      tenantId: floor.map.tenantId,
       floorId: floor.id,
       name: 'WU45 新規配置 fixture',
       description: 'Disposable WU-45 browser QA fixture',

@@ -75,21 +75,21 @@ async function main() {
   })
   await prisma.spot.upsert({
     where: { id: 'wu40-spot-b1' },
-    update: { floorId: floorB.id, name: 'Tenant B Private Spot', description: 'must never leak', x: 0.5, y: 0.5 },
-    create: { id: 'wu40-spot-b1', floorId: floorB.id, name: 'Tenant B Private Spot', description: 'must never leak', x: 0.5, y: 0.5 },
+    update: { tenantId: tenantB.id, floorId: floorB.id, name: 'Tenant B Private Spot', description: 'must never leak', x: 0.5, y: 0.5 },
+    create: { id: 'wu40-spot-b1', tenantId: tenantB.id, floorId: floorB.id, name: 'Tenant B Private Spot', description: 'must never leak', x: 0.5, y: 0.5 },
   })
 
   const category = await prisma.category.upsert({
-    where: { mapId_name: { mapId: mapA1.id, name: 'WU40 Duplicate' } },
-    update: { order: 99 },
-    create: { id: 'wu40-category-duplicate', mapId: mapA1.id, name: 'WU40 Duplicate', order: 99 },
+    where: { tenantId_name: { tenantId: mapA1.tenantId, name: 'WU40 Duplicate' } },
+    update: { mapId: mapA1.id, order: 99 },
+    create: { id: 'wu40-category-duplicate', tenantId: mapA1.tenantId, mapId: mapA1.id, name: 'WU40 Duplicate', order: 99 },
   })
   const floorA = await prisma.mapFloor.findFirstOrThrow({ where: { mapId: mapA1.id }, orderBy: { order: 'asc' } })
   for (const [id, positioned] of [['wu40-duplicate-1', true], ['wu40-duplicate-2', false]] as const) {
     await prisma.spot.upsert({
       where: { id },
-      update: { floorId: floorA.id, name: '重複スポット', description: 'WU40 duplicate warning fixture', x: positioned ? 0.82 : null, y: positioned ? 0.2 : null, isPublished: false },
-      create: { id, floorId: floorA.id, name: '重複スポット', description: 'WU40 duplicate warning fixture', x: positioned ? 0.82 : null, y: positioned ? 0.2 : null, isPublished: false },
+      update: { tenantId: mapA1.tenantId, floorId: floorA.id, name: '重複スポット', description: 'WU40 duplicate warning fixture', x: positioned ? 0.82 : null, y: positioned ? 0.2 : null, isPublished: false },
+      create: { id, tenantId: mapA1.tenantId, floorId: floorA.id, name: '重複スポット', description: 'WU40 duplicate warning fixture', x: positioned ? 0.82 : null, y: positioned ? 0.2 : null, isPublished: false },
     })
     await prisma.spotCategory.upsert({ where: { spotId_categoryId: { spotId: id, categoryId: category.id } }, update: {}, create: { spotId: id, categoryId: category.id } })
   }

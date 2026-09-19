@@ -18,6 +18,8 @@ model Tenant {
   snsUrl           String?
   members          TenantMember[]
   maps             Map[]
+  spots            Spot[]
+  categories       Category[]
   mediaAssets      MediaAsset[]             @relation("TenantMediaAssets")
   invitations      OrganizationInvitation[]
   auditEvents      AuditEvent[]
@@ -215,6 +217,11 @@ enum MapRole {
   EDITOR
 }
 
+enum MapView {
+  ILLUSTRATION
+  REAL
+}
+
 model MapMember {
   id        String   @id @default(cuid())
   mapId     String
@@ -246,6 +253,9 @@ model Map {
   seoImageAssetId      String?
   seoImageAsset        MediaAsset?           @relation("MapSeoImageAsset", fields: [seoImageAssetId], references: [id], onDelete: SetNull)
   isPublished          Boolean               @default(false)
+  illustrationEnabled  Boolean               @default(true)
+  realMapEnabled       Boolean               @default(false)
+  defaultMapView       MapView               @default(ILLUSTRATION)
   defaultLocale        String                @default("ja")
   enabledLocales       String[]              @default(["ja"])
   translations         MapTranslation[]
@@ -326,6 +336,8 @@ model MapTranslation {
 
 model Category {
   id             String                @id @default(cuid())
+  tenantId       String
+  tenant         Tenant                @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   mapId          String
   map            Map                   @relation(fields: [mapId], references: [id], onDelete: Cascade)
   name           String
@@ -340,7 +352,8 @@ model Category {
   createdAt      DateTime              @default(now())
   updatedAt      DateTime              @updatedAt
 
-  @@unique([mapId, name])
+  @@unique([tenantId, name])
+  @@index([tenantId, order])
   @@index([mapId, order])
 }
 
@@ -386,6 +399,8 @@ model MapFloor {
 
 model Spot {
   id                     String                      @id @default(cuid())
+  tenantId               String
+  tenant                 Tenant                      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   floorId                String
   floor                  MapFloor                    @relation(fields: [floorId], references: [id], onDelete: Cascade)
   name                   String
@@ -395,6 +410,8 @@ model Spot {
   website                String?
   x                      Float?
   y                      Float?
+  lat                    Float?
+  lng                    Float?
   photosJson             Json                        @default("[]")
   hoursText              String?
   holidayText            String?
@@ -420,6 +437,7 @@ model Spot {
   createdAt              DateTime                    @default(now())
   updatedAt              DateTime                    @updatedAt
 
+  @@index([tenantId])
   @@index([floorId])
   @@index([floorId, isPublished])
 }

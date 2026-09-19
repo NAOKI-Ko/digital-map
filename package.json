@@ -11,6 +11,7 @@
     "restore:db": "node --import tsx scripts/restore-db.ts",
     "restore:media": "node --import tsx scripts/backup-media.ts restore",
     "audit:image-spatial-migration": "node --import tsx scripts/audit-image-spatial-migration.ts",
+    "audit:tenant-data-foundation": "node --import tsx scripts/audit-tenant-data-foundation.ts",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "media:backfill": "node --import tsx scripts/media-backfill.ts",

@@ -19,6 +19,24 @@ export const mapCreateSchema = z.object({
 
 export type MapCreateInput = z.infer<typeof mapCreateSchema>
 
+export const mapCapabilitySchema = z.object({
+  illustrationEnabled: z.boolean(),
+  realMapEnabled: z.boolean(),
+  defaultMapView: z.enum(['ILLUSTRATION', 'REAL']),
+}).superRefine((value, context) => {
+  if (!value.illustrationEnabled && !value.realMapEnabled) {
+    context.addIssue({ code: 'custom', path: ['illustrationEnabled'], message: '少なくとも1つの表示を有効にしてください。' })
+  }
+  if (value.defaultMapView === 'ILLUSTRATION' && !value.illustrationEnabled) {
+    context.addIssue({ code: 'custom', path: ['defaultMapView'], message: '既定のイラスト表示を有効にしてください。' })
+  }
+  if (value.defaultMapView === 'REAL' && !value.realMapEnabled) {
+    context.addIssue({ code: 'custom', path: ['defaultMapView'], message: '既定の実地図表示を有効にしてください。' })
+  }
+})
+
+export type MapCapabilityInput = z.infer<typeof mapCapabilitySchema>
+
 const nullableText = (maximum: number, message: string) => z.preprocess(
   value => typeof value === 'string' && value.trim() === '' ? null : value,
   z.string().trim().max(maximum, message).nullable(),

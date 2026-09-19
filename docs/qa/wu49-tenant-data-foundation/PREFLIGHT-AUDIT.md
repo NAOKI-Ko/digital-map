@@ -62,7 +62,7 @@ Tenant-scoped Category uniqueness is safe for the audited QA rows. Because multi
 - SpotCategory currently relies on handlers selecting Categories from the current Map; the join itself has no cross-tenant DB constraint.
 - Public snapshot building traverses Map → Floors → Spots and Map-scoped Categories. Its payload contract must remain unchanged.
 - `SpotFieldDefinition` and custom values remain Map-scoped by explicit WU-49 exception.
-- Seed creates three independent demo/verification Maps in the default Tenant. Stage-B fixtures also intentionally require two Maps in Tenant A.
+- The pre-WU-49 seed created three independent demo/verification Maps in the default Tenant. Standard WU-49 seed now creates only the Arimatsu Map; it does not delete or reassign existing rows. Stage-B fixtures still describe historical multi-Map RBAC data and are not part of standard seed.
 - The only production Map creation handler is `POST /api/maps`; it currently permits a second Map.
 
 ## Preflight decision

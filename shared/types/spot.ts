@@ -12,6 +12,8 @@ export interface AdminSpotSummary {
   importance: SpotImportance
   x: number | null
   y: number | null
+  lat: number | null
+  lng: number | null
   isPublished: boolean
   pinIconType: PinIconType
   pinIconId: string | null

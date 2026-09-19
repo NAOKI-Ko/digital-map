@@ -39,14 +39,14 @@ else {
     await client.connect()
     await client.query('BEGIN TRANSACTION READ ONLY')
     let exceptionCount = 0
-    const legacySchema = (await client.query<{ present: boolean }>(`
+    const imageSchema = (await client.query<{ present: boolean }>(`
       SELECT EXISTS (
         SELECT 1 FROM information_schema.columns
-        WHERE table_schema = current_schema() AND table_name = 'Spot' AND column_name = 'lat'
+        WHERE table_schema = current_schema() AND table_name = 'Spot' AND column_name = 'x'
       ) AS present
     `)).rows[0]?.present === true
 
-    if (!legacySchema) {
+    if (imageSchema) {
       const invalidFloors = (await client.query(`SELECT "id", "mapId", "imageWidth", "imageHeight" FROM "MapFloor" WHERE "imageWidth" <= 0 OR "imageHeight" <= 0 ORDER BY "mapId", "id"`)).rows
       const partialSpots = (await client.query(`SELECT "id", "floorId", "name", "x", "y" FROM "Spot" WHERE ("x" IS NULL) <> ("y" IS NULL) ORDER BY "floorId", "id"`)).rows
       const outsideSpots = (await client.query(`SELECT "id", "floorId", "name", "x", "y" FROM "Spot" WHERE "x" < 0 OR "x" > 1 OR "y" < 0 OR "y" > 1 ORDER BY "floorId", "id"`)).rows

@@ -8,6 +8,9 @@ const optionalCoordinate = (minimum: number, maximum: number, message: string) =
   z.number({ error: message }).finite().min(minimum, message).max(maximum, message).nullable(),
 )
 
+const optionalRealCoordinate = (minimum: number, maximum: number, message: string) =>
+  z.number({ error: message }).finite(message).min(minimum, message).max(maximum, message).nullable().optional()
+
 export const spotFormSchema = z.object({
   floorId: z.string().min(1, 'フロアを選択してください。'),
   name: z.string().trim().min(1, '店名・スポット名を入力してください。').max(100, '名称は100文字以内で入力してください。'),
@@ -31,11 +34,20 @@ export const spotFormSchema = z.object({
   customValues: customSpotValuesSchema,
   x: optionalCoordinate(0, 1, 'X座標は0〜1で入力してください。'),
   y: optionalCoordinate(0, 1, 'Y座標は0〜1で入力してください。'),
+  lat: optionalRealCoordinate(-90, 90, '緯度は-90〜90で入力してください。'),
+  lng: optionalRealCoordinate(-180, 180, '経度は-180〜180で入力してください。'),
 }).superRefine((value, context) => {
   if ((value.x === null) !== (value.y === null)) {
     const message = 'X座標とY座標は両方入力するか、両方空欄にしてください。'
     context.addIssue({ code: 'custom', path: ['x'], message })
     context.addIssue({ code: 'custom', path: ['y'], message })
+  }
+  if (value.lat !== undefined || value.lng !== undefined) {
+    if ((value.lat === null || value.lat === undefined) !== (value.lng === null || value.lng === undefined)) {
+      const message = '緯度と経度は両方入力するか、両方空欄にしてください。'
+      context.addIssue({ code: 'custom', path: ['lat'], message })
+      context.addIssue({ code: 'custom', path: ['lng'], message })
+    }
   }
 })
 
