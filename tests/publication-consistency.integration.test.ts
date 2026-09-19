@@ -32,8 +32,12 @@ integration('PostgreSQL-backed same-map publication serialization', () => {
   })
 
   afterAll(async () => {
-    await prisma.tenant.delete({ where: { id: tenantId } }).catch(() => undefined)
-    await prisma.user.delete({ where: { id: userId } }).catch(() => undefined)
+    await prisma.map.update({
+      where: { id: mapId },
+      data: { currentReleaseId: null, isPublished: false },
+    })
+    await prisma.tenant.delete({ where: { id: tenantId } })
+    await prisma.user.delete({ where: { id: userId } })
     if (storageRoot) await rm(storageRoot, { recursive: true, force: true })
   })
 
