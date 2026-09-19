@@ -13,10 +13,12 @@ Verification target will be the final documentation SHA. Results below distingui
 | IMAGE spatial audit | PASS | zero invalid floors/references, partial/outside spots, or published-unpositioned spots |
 | Publication race | PASS | stale ETag compensation cannot replace newer pointer |
 | Backup validation logic | PASS | canonical DB identity and missing/mismatch/unexpected media tests |
-| Dependency audit | BLOCKED | one high production advisory, TD-010; patch requires major update approval |
+| Dependency audit | PASS | `pnpm audit --prod`: zero advisories after path-scoped `@prisma/config>deepmerge-ts` 8.0.2 override |
+| Dependency compatibility | PASS | Prisma remains 7.10.0; frozen install, validate/generate, 76 files/510 tests, typecheck, PostgreSQL 17 migrations/audit, build, and browser regression passed |
 | CI definition | PASS | GitHub Actions run `35449134155`; Node 24, pnpm 11.9.0, PostgreSQL 17; migrations/audit/typecheck/510 tests/build passed |
 | Desktop Chromium public Map | PASS | real MapLibre rendering; PIN detail, close/focus return, Info exclusivity, categories; no error and repaired Reka warning absent |
 | Admin Chromium | PASS | bulk publish/unpublish; PIN selection, move draft, Cancel; no error/warning |
+| Dependency follow-up browser regression | PASS | isolated DB/release; public MapLibre, PIN detail/generated title, category filter; authenticated admin login, PIN selection and move/Cancel; console empty |
 | 390×844 / 430×932 Chromium shell | PASS with limitation | responsive controls/safe-area layout captured; macOS headless WebGL was unavailable, so real Map rendering used controlled desktop and WU-47 width-specific evidence |
 | Mock geolocation behavior | PASS | request IDs, one notice, five-second contract, new explicit request, and no watcher camera pullback covered by tests |
 | Physical iPhone Safari | BLOCKED | TD-011 |

@@ -15,7 +15,7 @@ The audit traced entry points through UI/composables, APIs, persistence, public 
 | Import/export/PDF | CSV, media, PDF routes and tests | validation, authorization, partial application | no new defect confirmed | none | source and existing behavior tests |
 | Tests | 76 files after changes | behavior vs source checks, failures, races, cleanup, skip/only | new behavior/race coverage added | none | 510 tests, no skip/only |
 | Performance | build output, viewer update boundaries, existing representative fixture | no invented scale target; check measured build and repeated UI paths | no measured regression; large map-library chunk recorded | none | production build and browser observation |
-| Dependency / CI / operations | lockfile, workflow, scripts, backup docs | reproducibility, advisory scope, exact verification | TD-006/007 fixed; TD-010 blocked | none | pnpm audit, CI definition, drills |
+| Dependency / CI / operations | lockfile, workflow, scripts, backup docs | reproducibility, advisory scope, exact verification | TD-006/007/010 fixed | none | pnpm audit, compatibility matrix, CI definition, drills |
 | Documentation | README, operations, WU42-WU47 QA docs | current source of truth and contradictions | backup/restore corrected | none | document/source comparison |
 
 ## Inventory notes
