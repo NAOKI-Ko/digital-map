@@ -30,6 +30,15 @@ const floorSelectorOpen = ref(false)
 const infoOpen = ref(false)
 let spotTrigger: HTMLElement | null = null
 let spotTriggerId: string | null = null
+let focusRestoreTimer: number | null = null
+let pointerCloseCleanup: (() => void) | null = null
+
+function clearPendingSpotClose() {
+  pointerCloseCleanup?.()
+  pointerCloseCleanup = null
+  if (focusRestoreTimer !== null) window.clearTimeout(focusRestoreTimer)
+  focusRestoreTimer = null
+}
 
 const selectedFloor = computed(() => (
   data.value?.map.floors.find(floor => floor.id === selectedFloorId.value)
@@ -102,6 +111,7 @@ function selectSpot(spot: MapViewerSpot) {
 
 function closeSpot(source: 'pointer' | 'other' = 'other') {
   if (!selectedSpotId.value) return
+  clearPendingSpotClose()
   const closingSpotId = selectedSpotId.value
   const closingTrigger = spotTrigger
   selectedSpotId.value = null
@@ -116,28 +126,51 @@ function closeSpot(source: 'pointer' | 'other' = 'other') {
     }
   }
   if (source !== 'pointer') {
-    nextTick(() => window.setTimeout(restoreFocus, 50))
+    nextTick(() => {
+      focusRestoreTimer = window.setTimeout(() => {
+        focusRestoreTimer = null
+        restoreFocus()
+      }, 50)
+    })
     return
   }
   let finished = false
+  let blockSameGestureClick: ((event: MouseEvent) => void) | null = null
+  let finishTimer: number | null = null
+  const cleanup = () => {
+    window.removeEventListener('pointerup', finishPointerGesture, true)
+    window.removeEventListener('mouseup', finishPointerGesture, true)
+    if (blockSameGestureClick) window.removeEventListener('click', blockSameGestureClick, true)
+    if (finishTimer !== null) window.clearTimeout(finishTimer)
+    if (focusRestoreTimer !== null) window.clearTimeout(focusRestoreTimer)
+    finishTimer = null
+    focusRestoreTimer = null
+  }
   const finishPointerGesture = () => {
     if (finished) return
     finished = true
     window.removeEventListener('pointerup', finishPointerGesture, true)
     window.removeEventListener('mouseup', finishPointerGesture, true)
-    const blockSameGestureClick = (event: MouseEvent) => {
+    if (finishTimer !== null) window.clearTimeout(finishTimer)
+    finishTimer = null
+    blockSameGestureClick = (event: MouseEvent) => {
       event.preventDefault()
       event.stopImmediatePropagation()
     }
     window.addEventListener('click', blockSameGestureClick, { capture: true, once: true })
-    nextTick(() => window.setTimeout(() => {
-      window.removeEventListener('click', blockSameGestureClick, true)
-      restoreFocus()
-    }))
+    nextTick(() => {
+      focusRestoreTimer = window.setTimeout(() => {
+        if (blockSameGestureClick) window.removeEventListener('click', blockSameGestureClick, true)
+        focusRestoreTimer = null
+        pointerCloseCleanup = null
+        restoreFocus()
+      })
+    })
   }
+  pointerCloseCleanup = cleanup
   window.addEventListener('pointerup', finishPointerGesture, true)
   window.addEventListener('mouseup', finishPointerGesture, true)
-  window.setTimeout(finishPointerGesture, 1000)
+  finishTimer = window.setTimeout(finishPointerGesture, 1000)
 }
 
 function openFloorSelector() {
@@ -169,6 +202,7 @@ onMounted(() => {
   if (!route.query.lang && data.value?.map.enabledLocales.includes('en') && navigator.language.toLowerCase().startsWith('en')) void switchLocale('en')
   if (data.value?.map.id && data.value.map.releaseId) recordMapViewOnce(data.value.map.id, data.value.map.releaseId)
 })
+onBeforeUnmount(clearPendingSpotClose)
 </script>
 
 <template>

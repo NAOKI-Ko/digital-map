@@ -55,6 +55,10 @@ onMounted(() => {
   if (saved) requestAnimationFrame(() => window.scrollTo({ top: Number(saved) || 0 }))
 })
 onBeforeRouteLeave(() => sessionStorage.setItem(`spot-list-scroll:${mapId}`, String(window.scrollY)))
+onBeforeUnmount(() => {
+  if (searchTimer) clearTimeout(searchTimer)
+  searchTimer = null
+})
 
 function spotDetailLocation(spotId: string) {
   return { path: `/admin/maps/${mapId}/spots/${spotId}`, query: { returnTo: route.fullPath } }

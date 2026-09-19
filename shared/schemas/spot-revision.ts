@@ -15,4 +15,6 @@ export const spotRevisionPayloadSchema = z.object({
   photoAssetIds: z.array(z.string().min(1)).max(50).refine(ids => new Set(ids).size === ids.length, '写真が重複しています。'),
 }).strict()
 
+export type SpotRevisionPayload = z.infer<typeof spotRevisionPayloadSchema>
+
 export const rejectSpotRevisionSchema = z.object({ reason: z.string().trim().min(1).max(1_000) })

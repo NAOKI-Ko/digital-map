@@ -16,16 +16,27 @@ const floor = computed(() => floorData.value?.floors.find(item => item.id === fl
 const selectedId = ref<string | null>(null)
 const selected = computed(() => data.value?.decorations.find(item => item.id === selectedId.value) ?? null)
 const message = ref('')
+const saveError = ref('')
+let activeDragCleanup: (() => void) | null = null
 
 async function addDecoration(image: UploadedImage) {
   const response = await $fetch<FloorDecorationResponse>(`/api/maps/${mapId}/floors/${floorId}/decorations`, { method: 'POST', body: { assetId: image.assetId, x: 0.5, y: 0.5, width: 0.2, rotation: 0 } })
   await refresh(); selectedId.value = response.decoration.id
 }
 async function save(item: FloorDecorationItem) {
-  await $fetch(`/api/maps/${mapId}/floors/${floorId}/decorations/${item.id}`, { method: 'PATCH', body: { x: item.x, y: item.y, width: item.width, rotation: item.rotation, order: item.order } })
-  message.value = 'Decorationを保存しました。'
+  saveError.value = ''
+  try {
+    await $fetch(`/api/maps/${mapId}/floors/${floorId}/decorations/${item.id}`, { method: 'PATCH', body: { x: item.x, y: item.y, width: item.width, rotation: item.rotation, order: item.order } })
+    message.value = 'Decorationを保存しました。'
+  }
+  catch {
+    message.value = ''
+    saveError.value = 'Decorationを保存できませんでした。保存済みの状態へ戻しました。'
+    await refresh()
+  }
 }
 function startDrag(event: PointerEvent, item: FloorDecorationItem) {
+  activeDragCleanup?.()
   selectedId.value = item.id
   const surface = (event.currentTarget as HTMLElement).parentElement!
   const move = (next: PointerEvent) => {
@@ -33,8 +44,18 @@ function startDrag(event: PointerEvent, item: FloorDecorationItem) {
     item.x = Math.min(1, Math.max(0, (next.clientX - bounds.left) / bounds.width))
     item.y = Math.min(1, Math.max(0, (next.clientY - bounds.top) / bounds.height))
   }
-  const end = () => { window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', end); void save(item) }
-  window.addEventListener('pointermove', move); window.addEventListener('pointerup', end)
+  const cleanup = () => {
+    window.removeEventListener('pointermove', move)
+    window.removeEventListener('pointerup', end)
+    window.removeEventListener('pointercancel', cancel)
+    if (activeDragCleanup === cleanup) activeDragCleanup = null
+  }
+  const end = () => { cleanup(); void save(item) }
+  const cancel = () => { cleanup(); void refresh() }
+  activeDragCleanup = cleanup
+  window.addEventListener('pointermove', move)
+  window.addEventListener('pointerup', end)
+  window.addEventListener('pointercancel', cancel)
 }
 async function duplicate(item: FloorDecorationItem) {
   const response = await $fetch<FloorDecorationResponse>(`/api/maps/${mapId}/floors/${floorId}/decorations`, { method: 'POST', body: { assetId: item.assetId, x: Math.min(1, item.x + 0.03), y: Math.min(1, item.y + 0.03), width: item.width, rotation: item.rotation } })
@@ -46,6 +67,7 @@ async function remove(item: FloorDecorationItem) {
 async function moveLayer(item: FloorDecorationItem, delta: number) {
   item.order = Math.max(0, item.order + delta); await save(item); await refresh()
 }
+onBeforeUnmount(() => activeDragCleanup?.())
 </script>
 
 <template>
@@ -67,6 +89,7 @@ async function moveLayer(item: FloorDecorationItem, delta: number) {
           <div class="mt-4 grid grid-cols-2 gap-2"><button type="button" class="rounded border p-2 text-xs" @click="moveLayer(selected, -1)">後ろへ</button><button type="button" class="rounded border p-2 text-xs" @click="moveLayer(selected, 1)">前へ</button><button type="button" class="rounded border p-2 text-xs" @click="duplicate(selected)">複製</button><button type="button" class="rounded border border-red-200 p-2 text-xs text-red-700" @click="remove(selected)">インスタンス削除</button></div>
         </section>
         <p v-if="message" role="status" class="text-sm text-stone-600">{{ message }}</p>
+        <p v-if="saveError" role="alert" class="text-sm text-red-700">{{ saveError }}</p>
       </aside>
     </div>
   </div>

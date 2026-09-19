@@ -172,6 +172,7 @@ export function useMapViewer(
   let activeLayerId: string | null = null
   let decorationLayers: Array<{ sourceId: string, layerId: string }> = []
   let containerResizeObserver: ResizeObserver | null = null
+  let focusSpotTimer: number | null = null
 
   const mapCamera = useMapCamera(container, map, {
     mode: options.mode,
@@ -372,7 +373,9 @@ export function useMapViewer(
 
     const zoom = Math.min(instance.getMaxZoom(), Math.max(instance.getZoom(), instance.getMinZoom() + 2))
     instance.easeTo({ center: [renderPosition.lng, renderPosition.lat], zoom, duration: 600 })
-    window.setTimeout(() => {
+    if (focusSpotTimer !== null) window.clearTimeout(focusSpotTimer)
+    focusSpotTimer = window.setTimeout(() => {
+      focusSpotTimer = null
       spotMarkerElements.find(item => item.spot.id === spotId)?.element.focus()
     }, 650)
     return true
@@ -464,6 +467,8 @@ export function useMapViewer(
     window.removeEventListener('admin-sidebar-resize', resize)
     containerResizeObserver?.disconnect()
     containerResizeObserver = null
+    if (focusSpotTimer !== null) window.clearTimeout(focusSpotTimer)
+    focusSpotTimer = null
     destroy()
   })
 

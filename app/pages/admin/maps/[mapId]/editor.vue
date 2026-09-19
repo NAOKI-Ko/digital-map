@@ -6,6 +6,7 @@ import UnsavedChangesGuard from '~/components/admin/UnsavedChangesGuard.vue'
 import { defineAsyncComponent } from 'vue'
 import ConfirmDialog from '~/components/ui/ConfirmDialog.vue'
 import { resolveMapEditorReturnContext } from '~/utils/map-editor-camera'
+import { createLatestRequestGate } from '~/utils/latest-request'
 import { applySelectedPinDesignDraft, isPositionEditing, needsPinEditorDiscardConfirmation, toPositionUpdatePayload, type PinEditorMode } from '~/utils/pin-editor-state'
 import { isGeoReferenced, type ImagePosition } from '~~/lib/geo'
 import { getAddressPlacementCandidate } from '~~/lib/address-placement'
@@ -74,6 +75,9 @@ let pendingTransition: (() => void) | null = null
 const addressCandidates = ref<GeocodeResult[]>([])
 const addressSearchStatus = ref('')
 const isSearchingAddress = ref(false)
+const addressRequestGate = createLatestRequestGate()
+const positionSaving = ref(false)
+const unplacing = ref(false)
 
 watch(() => data.value?.floors, (floors) => {
   if (floors?.length && !floors.some(floor => floor.id === selectedFloorId.value)) {
@@ -82,6 +86,8 @@ watch(() => data.value?.floors, (floors) => {
 }, { immediate: true })
 
 watch(selectedFloorId, () => {
+  addressRequestGate.invalidate()
+  isSearchingAddress.value = false
   position.value = null
   placementMode.value = 'idle'
   placementSpotId.value = ''
@@ -92,6 +98,8 @@ watch(selectedFloorId, () => {
 })
 
 watch(placementSpotId, () => {
+  addressRequestGate.invalidate()
+  isSearchingAddress.value = false
   position.value = null
   placementMode.value = 'idle'
   addressCandidates.value = []
@@ -190,7 +198,8 @@ async function finishSuccessfulSave(message: string) {
 }
 
 async function savePosition() {
-  if (!placementSpot.value || !position.value) return
+  if (!placementSpot.value || !position.value || positionSaving.value) return
+  positionSaving.value = true
   moveStatus.value = '位置を保存しています…'
   try {
     await $fetch<SpotPositionResponse>(`/api/maps/${mapId}/spots/${placementSpot.value.id}/position`, {
@@ -201,6 +210,9 @@ async function savePosition() {
   }
   catch {
     moveStatus.value = '位置を保存できませんでした。'
+  }
+  finally {
+    positionSaving.value = false
   }
 }
 
@@ -241,7 +253,8 @@ function cancelDesignEditing() {
 
 async function unplaceSpot() {
   const spot = placementSpot.value
-  if (!spot) return
+  if (!spot || unplacing.value) return
+  unplacing.value = true
   moveStatus.value = 'PIN配置を解除しています…'
   try {
     await $fetch<SpotPositionResponse>(`/api/maps/${mapId}/spots/${spot.id}/position`, { method: 'DELETE' })
@@ -250,6 +263,9 @@ async function unplaceSpot() {
   }
   catch {
     moveStatus.value = 'PIN配置を解除できませんでした。'
+  }
+  finally {
+    unplacing.value = false
   }
 }
 
@@ -266,21 +282,25 @@ function handleCameraChanged(_value: MapViewerCameraState) {
 async function searchPlacementAddress() {
   const spot = placementSpot.value
   if (!spot?.address || !selectedFloor.value || !isGeoReferenced(selectedFloor.value)) return
+  const floorIdAtRequest = selectedFloor.value.id
+  const request = addressRequestGate.begin()
   isSearchingAddress.value = true
   addressCandidates.value = []
   addressSearchStatus.value = '住所を検索しています…'
   try {
     const response = await $fetch<GeocodeResponse>('/api/geocode', { query: { q: spot.address } })
+    if (!addressRequestGate.isCurrent(request) || placementSpotId.value !== spot.id || selectedFloorId.value !== floorIdAtRequest || !placementActive.value) return
     addressCandidates.value = response.results
     addressSearchStatus.value = response.results.length
       ? '候補を選んで地図上の仮位置を確認してください。'
       : '候補が見つかりませんでした。地図上で手動配置できます。'
   }
   catch {
+    if (!addressRequestGate.isCurrent(request)) return
     addressSearchStatus.value = '住所を検索できませんでした。地図上で手動配置できます。'
   }
   finally {
-    isSearchingAddress.value = false
+    if (addressRequestGate.isCurrent(request)) isSearchingAddress.value = false
   }
 }
 
@@ -359,7 +379,10 @@ function handleEscape(event: KeyboardEvent) {
 }
 
 onMounted(() => window.addEventListener('keydown', handleEscape))
-onBeforeUnmount(() => window.removeEventListener('keydown', handleEscape))
+onBeforeUnmount(() => {
+  addressRequestGate.invalidate()
+  window.removeEventListener('keydown', handleEscape)
+})
 </script>
 
 <template>
@@ -476,14 +499,14 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEscape))
           <div v-if="placementActive" class="mt-4 rounded-lg border border-terracotta-200 bg-terracotta-50 p-3 text-sm font-semibold text-terracotta-900">
             {{ placementMode === 'moving' ? (position ? '移動先を確認し、保存してください。' : '元のPINは薄く表示されています。地図をクリックして移動先を仮配置してください。') : (position ? '仮配置を確認し、保存してください。' : '地図をクリックして仮配置してください。') }}
           </div>
-          <button v-if="placementActive" type="button" :disabled="!position" class="mt-4 w-full rounded-lg bg-terracotta-600 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50" @click="savePosition">この位置を保存</button>
+          <button v-if="placementActive" type="button" :disabled="!position || positionSaving" class="mt-4 w-full rounded-lg bg-terracotta-600 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50" @click="savePosition">{{ positionSaving ? '保存中…' : 'この位置を保存' }}</button>
           <div v-if="placementActive" class="mt-2 grid gap-2">
             <button type="button" class="rounded-lg border border-stone-300 px-4 py-2 text-sm font-semibold text-stone-700" @click="requestTransition(cancelPositionEditing)">キャンセル</button>
           </div>
           <p v-if="moveStatus" role="status" class="mt-4 text-xs leading-5 text-stone-600">{{ moveStatus }}</p>
         </aside>
       </div>
-      <ConfirmDialog :open="unplaceConfirmOpen" title="PIN配置を解除" message="Spot情報とカテゴリーは残したまま、イラスト上の配置を解除します。公開中の場合は下書きへ戻ります。" confirm-label="配置を解除する" destructive @cancel="unplaceConfirmOpen = false" @confirm="unplaceSpot" />
+      <ConfirmDialog :open="unplaceConfirmOpen" title="PIN配置を解除" message="Spot情報とカテゴリーは残したまま、イラスト上の配置を解除します。公開中の場合は下書きへ戻ります。" confirm-label="配置を解除する" destructive :busy="unplacing" @cancel="unplaceConfirmOpen = false" @confirm="unplaceSpot" />
       <ConfirmDialog :open="discardConfirmOpen" title="未保存の変更があります" message="保存していない位置またはPINデザインの変更を破棄して切り替えますか？" confirm-label="変更を破棄" cancel-label="編集を続ける" destructive @cancel="keepEditing" @confirm="discardAndContinue" />
       <UnsavedChangesGuard :dirty="pageDirty" />
     </template>
