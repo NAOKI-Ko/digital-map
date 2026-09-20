@@ -1,6 +1,6 @@
 # WU-52 verification matrix
 
-Base: `73466a03cdf8ae130b5ed9613389f775c82589de`  
+Base: `73466a03cdf8ae130b5ed9613389f775c82589de`
 Branch: `refactor/wu52-direct-manipulation-toast-csv-revision-20260920`
 
 | Area | Evidence | Result |
