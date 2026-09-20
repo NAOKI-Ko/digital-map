@@ -2,9 +2,11 @@
 
 ## 1. Final verdict
 
-**BLOCKED: WINDOWS QA HOST UNREACHABLE**
+**PASS-READY — Windows QA gate explicitly waived by the product owner on 2026-09-20.**
 
-All implementation-controlled local, isolated-DB, clean-clone, browser, accessibility, and GitHub Actions gates passed. The mandatory Windows QA gate could not start because the configured `chiffonchan` SSH endpoint timed out. This run therefore does not claim `PASS-READY`.
+All implementation-controlled local, isolated-DB, clean-clone, browser, accessibility, and GitHub Actions gates passed. The configured `chiffonchan` Windows QA endpoint was unreachable because the product owner was away from the Windows machine's local network. Windows QA was **not executed**. The product owner explicitly accepted that residual risk and approved WU-51 based on the completed local/isolated/browser/CI evidence.
+
+This waiver does not represent a Windows QA PASS and must not be described as one.
 
 ## 2. Base SHA / branch
 
@@ -83,6 +85,7 @@ The following terms were documented and intentionally not reinterpreted: `フロ
 - IMAGE spatial audit: PASS, zero exceptions.
 - Clean clone at implementation SHA: frozen install, 538 tests, typecheck, and build PASS.
 - GitHub Actions Verify run `35493221472`: PASS at the implementation SHA.
+- Final report/evidence Verify run `35493453757`: PASS.
 
 ## 13. Browser / visual / accessibility results
 
@@ -96,15 +99,24 @@ The following terms were documented and intentionally not reinterpreted: `フロ
 
 ## 14. Windows QA result
 
-**BLOCKED.** The configured `chiffonchan` SSH connection timed out before the deployment guide could be read. No Windows backup, release deployment, database mutation, service restart, or browser verification occurred.
+**NOT EXECUTED — ACCEPTED / WAIVED RESIDUAL RISK.**
 
-## 15. Open defects
+The configured `chiffonchan` SSH connection timed out because the product owner was away from the Windows QA machine's local Wi-Fi environment. No Windows backup, release deployment, database mutation, service restart, or Windows browser verification occurred.
 
-No implementation defect is open at P0, P1, or core P2. The only final-gate blocker is external Windows QA host availability. When the host is reachable, the remaining work is the prescribed verified backup, exact implementation-SHA deployment, full Windows gates, health/admin/public smoke checks, and representative responsive/focus/browser QA.
+On 2026-09-20 the product owner explicitly decided that the completed local, isolated PostgreSQL, browser, clean-clone, and CI results are sufficient for WU-51 and that Windows QA will not block this WU.
+
+## 15. Open defects / residual risk
+
+No implementation defect is open at P0, P1, or core P2.
+
+Accepted residual risk:
+- WU-51 implementation SHA `93b31892...` was not deployed or validated on the Windows QA host in this WU.
+
+This is an explicit product-owner waiver, not a hidden or implied PASS.
 
 ## 16. main / Production status
 
 - main was not merged.
 - Production was not deployed or accessed.
 - The implementation branch was pushed only to run CI.
-- Windows QA was not changed because the host was unreachable.
+- Windows QA was not changed.
