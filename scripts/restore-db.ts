@@ -2,7 +2,7 @@ import { spawn } from 'node:child_process'
 import { canonicalDatabaseTarget, databaseName } from './backup-lib'
 
 async function main() {
-  const source = process.argv[2]
+  const source = process.argv.slice(2).find(value => value !== '--')
   const targetValue = process.env.RESTORE_DATABASE_URL
   if (!source || !targetValue || process.env.ALLOW_DISPOSABLE_RESTORE !== 'true') throw new Error('restore requires dump path, RESTORE_DATABASE_URL, and ALLOW_DISPOSABLE_RESTORE=true')
   if (process.env.DATABASE_URL) {

@@ -6,9 +6,12 @@ pnpm backup:db
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 pnpm backup:media
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+pnpm backup:public
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 $dbDump = Get-ChildItem (Join-Path $env:BACKUP_ROOT 'db') -Filter '*.dump' | Sort-Object LastWriteTimeUtc -Descending | Select-Object -First 1
 $mediaBackup = Get-ChildItem (Join-Path $env:BACKUP_ROOT 'media') -Directory | Sort-Object LastWriteTimeUtc -Descending | Select-Object -First 1
-if (-not $dbDump -or -not $mediaBackup) { throw 'Backup outputs could not be resolved for verification.' }
-pnpm backup:verify -- $dbDump.FullName $mediaBackup.FullName
+$publicBackup = Get-ChildItem (Join-Path $env:BACKUP_ROOT 'public') -Directory | Sort-Object LastWriteTimeUtc -Descending | Select-Object -First 1
+if (-not $dbDump -or -not $mediaBackup -or -not $publicBackup) { throw 'Complete DB + Media + Public backup outputs could not be resolved for verification.' }
+pnpm backup:verify -- $dbDump.FullName $mediaBackup.FullName $publicBackup.FullName
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 Write-Host "Verified backup created: $($env:BACKUP_ROOT)"

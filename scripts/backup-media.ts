@@ -10,7 +10,8 @@ const run = (command: string, args: string[]) => new Promise<void>((resolvePromi
 })
 
 async function main() {
-  const mode = process.argv[2]
+  const argumentsList = process.argv.slice(2).filter(value => value !== '--')
+  const mode = argumentsList[0]
   const mediaRoot = resolve(process.env.MEDIA_ROOT || process.env.NUXT_UPLOAD_DIR || 'public/uploads')
   const backupRoot = resolve(process.env.BACKUP_ROOT || './backups')
   const timestamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z')
@@ -26,7 +27,7 @@ async function main() {
     return
   }
   if (mode === 'restore') {
-    const source = process.argv[3]
+    const source = argumentsList[1]
     const restoreRoot = process.env.RESTORE_MEDIA_ROOT
     if (!source || !restoreRoot || process.env.ALLOW_DISPOSABLE_RESTORE !== 'true') throw new Error('restore requires backup dir, RESTORE_MEDIA_ROOT, and ALLOW_DISPOSABLE_RESTORE=true')
     const target = resolve(restoreRoot)
