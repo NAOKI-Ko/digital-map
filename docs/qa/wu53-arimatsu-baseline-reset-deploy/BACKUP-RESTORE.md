@@ -21,3 +21,22 @@ Authoritative published baseline bundle:
 - Empty disposable Media/Public restore, baseline/Tenant/IMAGE audits, `/api/ready`, and three public paths: PASS
 
 No archive contains plaintext credentials.
+
+Windows pre-deploy backup:
+
+`C:\DigitalMap\backups\wu53-pre-30b983b-20260920-2132`
+
+- DB SHA-256: `40446309336b60624dedb7438ab3134f30e61d7ba3537eb3174beed10021a334`
+- Media SHA-256: `c90cda3bc755168ecc78c11a4a3fb738a189b881d4ae72cc8a6ed556b1a925fc`
+- Public SHA-256: `64fe2bd6a14912d250cde35bd1cce10dd5954dfd7da0a4b58d74dc7c8b168346`
+- Status: VERIFIED before deployment; Public archive disposable extraction PASS
+
+Windows post-deploy backup:
+
+`C:\DigitalMap\backups\wu53-post-30b983b-20260920-125852`
+
+- DB SHA-256: `b2b33babd362ffa36d56376d7f2edbd604df458f9406dff38164097363b80a84`
+- Media SHA-256: `9f143a33961db4017b14bcdbdad042ce0b751b9a34df6f78f3949b6aba5d5269`
+- Public SHA-256: `ce1b54f91108e08b59a832bfe19488d55a26aa34f3ee34ac48914d682fd92293`
+- Disposable restore: database `digital_map_wu53_disposable`, separate empty Media/Public roots, all audits, `/api/ready`, and three public paths PASS
+- Cleanup: disposable database and restore roots removed after proof
