@@ -48,7 +48,7 @@ const emit = defineEmits<{
     >
       <SelectTrigger
         :aria-label="label"
-        class="inline-flex min-h-11 w-full items-center justify-between gap-3 rounded-lg border border-stone-300 bg-white px-3 py-2 text-left text-sm text-stone-900 outline-none transition hover:border-stone-400 focus-visible:ring-2 focus-visible:ring-terracotta-500 disabled:cursor-not-allowed disabled:bg-stone-100 disabled:text-stone-400"
+        class="dm-field-focus inline-flex min-h-11 w-full items-center justify-between gap-3 rounded-lg border border-stone-300 bg-white px-3 py-2 text-left text-sm text-stone-900 transition hover:border-stone-400 disabled:cursor-not-allowed disabled:bg-stone-100 disabled:text-stone-400"
       >
         <SelectValue :placeholder="placeholder" />
         <span aria-hidden="true" class="text-stone-500">⌄</span>

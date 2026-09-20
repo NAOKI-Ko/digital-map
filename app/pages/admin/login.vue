@@ -115,7 +115,7 @@ const submit = handleSubmit(async (values) => {
               v-bind="emailAttrs"
               type="email"
               autocomplete="username"
-              class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5 text-stone-900 outline-none transition focus:border-terracotta-500 focus:ring-2 focus:ring-terracotta-100"
+              class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5 text-stone-900 transition"
               :class="{ 'border-red-500': errors.email }"
             >
             <p v-if="errors.email" class="mt-1.5 text-sm text-red-600">
@@ -133,7 +133,7 @@ const submit = handleSubmit(async (values) => {
               v-bind="passwordAttrs"
               type="password"
               autocomplete="current-password"
-              class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5 text-stone-900 outline-none transition focus:border-terracotta-500 focus:ring-2 focus:ring-terracotta-100"
+              class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5 text-stone-900 transition"
               :class="{ 'border-red-500': errors.password }"
             >
             <p v-if="errors.password" class="mt-1.5 text-sm text-red-600">
@@ -152,14 +152,14 @@ const submit = handleSubmit(async (values) => {
           <button
             type="submit"
             :disabled="isSubmitting"
-            class="w-full rounded-lg bg-terracotta-600 px-4 py-3 font-semibold text-white transition hover:bg-terracotta-700 focus:outline-none focus:ring-2 focus:ring-terracotta-400 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+            class="w-full rounded-lg bg-terracotta-600 px-4 py-3 font-semibold text-white transition hover:bg-terracotta-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {{ isSubmitting ? '確認中…' : 'ログイン' }}
           </button>
         </form>
 
         <p class="mt-6 text-center text-sm text-stone-500"><NuxtLink to="/reset-password" class="underline">パスワードをお忘れですか？</NuxtLink></p>
-        <p class="mt-3 text-center text-sm text-stone-500"><NuxtLink to="/signup" class="font-semibold underline">新しい組織を登録</NuxtLink></p>
+        <p class="mt-3 text-center text-sm text-stone-500"><NuxtLink to="/signup" class="font-semibold underline">新しいワークスペースを登録</NuxtLink></p>
         <nav aria-label="法的情報" class="mt-4 flex justify-center gap-4 text-xs text-stone-500"><NuxtLink to="/terms" class="underline">利用規約</NuxtLink><NuxtLink to="/privacy" class="underline">プライバシーポリシー</NuxtLink></nav>
       </div>
     </section>

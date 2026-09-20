@@ -13,10 +13,10 @@ function toggleCategory(categoryId: string) {
 
 <template>
   <div v-if="categories.length" class="flex w-full snap-x gap-2 overflow-x-auto overscroll-x-contain px-0.5 py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" role="group" aria-label="カテゴリで絞り込み">
-    <button type="button" class="grid min-h-11 shrink-0 snap-start place-items-center rounded-full py-1 text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-stone-900" :aria-pressed="modelValue.length === 0" @click="emit('update:modelValue', [])">
+    <button type="button" class="grid min-h-11 shrink-0 snap-start place-items-center rounded-full py-1 text-sm font-semibold" :aria-pressed="modelValue.length === 0" @click="emit('update:modelValue', [])">
       <span class="flex h-8 items-center rounded-full px-3 shadow-sm backdrop-blur transition" :class="modelValue.length === 0 ? 'bg-stone-900 text-white' : 'bg-white/85 text-stone-700 hover:bg-white'">すべて</span>
     </button>
-    <button v-for="category in categories" :key="category.id" type="button" class="grid min-h-11 min-w-11 shrink-0 snap-start place-items-center rounded-full py-1 text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-stone-900" :aria-pressed="modelValue.includes(category.id)" @click="toggleCategory(category.id)">
+    <button v-for="category in categories" :key="category.id" type="button" class="grid min-h-11 min-w-11 shrink-0 snap-start place-items-center rounded-full py-1 text-sm font-semibold" :aria-pressed="modelValue.includes(category.id)" @click="toggleCategory(category.id)">
       <span class="flex h-8 items-center gap-1.5 whitespace-nowrap rounded-full px-3 shadow-sm backdrop-blur transition" :class="modelValue.includes(category.id) ? 'bg-terracotta-600 text-white' : 'bg-white/85 text-stone-700 hover:bg-white'"><CategoryIcon :icon-type="category.iconType" :icon-preset-id="category.iconPresetId" :icon-image-url="category.iconImageUrl" size="sm" /><span>{{ category.name }}</span></span>
     </button>
   </div>

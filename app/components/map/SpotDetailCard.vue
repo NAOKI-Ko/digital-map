@@ -123,10 +123,10 @@ onBeforeUnmount(() => {
                 {{ spot.name }}
               </DialogTitle>
             </div>
-            <button type="button" class="grid size-11 shrink-0 place-items-center rounded-full text-lg text-stone-700 hover:bg-stone-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-900 md:hidden" :aria-label="sheetState === 'expanded' ? 'スポット詳細の高さを戻す' : 'スポット詳細を大きく表示'" @click="setExpanded(sheetState !== 'expanded')">
+            <button type="button" class="grid size-11 shrink-0 place-items-center rounded-full text-lg text-stone-700 hover:bg-stone-100 md:hidden" :aria-label="sheetState === 'expanded' ? 'スポット詳細の高さを戻す' : 'スポット詳細を大きく表示'" @click="setExpanded(sheetState !== 'expanded')">
               <span aria-hidden="true">{{ sheetState === 'expanded' ? '⌄' : '⌃' }}</span>
             </button>
-            <button type="button" class="grid size-11 shrink-0 place-items-center rounded-full bg-stone-100 text-xl leading-none text-stone-700 hover:bg-stone-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-900" aria-label="スポット詳細を閉じる" @click="requestClose('other')">×</button>
+            <button type="button" class="grid size-11 shrink-0 place-items-center rounded-full bg-stone-100 text-xl leading-none text-stone-700 hover:bg-stone-200" aria-label="スポット詳細を閉じる" @click="requestClose('other')">×</button>
           </div>
         </header>
 

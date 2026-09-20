@@ -83,7 +83,7 @@ function handleFocusOut(event: FocusEvent) {
       :aria-expanded="open"
       :aria-activedescendant="open && activeSpot ? `${inputId}-${activeSpot.id}` : undefined"
       autocomplete="off"
-      class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5 text-sm focus:border-terracotta-500 focus:outline-none focus:ring-2 focus:ring-terracotta-100"
+      class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5 text-sm"
       :placeholder="placeholder"
       @focus="open = true"
       @input="open = true"

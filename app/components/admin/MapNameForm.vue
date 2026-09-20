@@ -59,7 +59,7 @@ const submit = handleSubmit((values) => {
         type="text"
         maxlength="100"
         autocomplete="off"
-        class="mt-3 w-full rounded-lg border border-stone-300 px-3 py-2.5 text-stone-900 outline-none transition focus:border-terracotta-500 focus:ring-2 focus:ring-terracotta-100"
+        class="mt-3 w-full rounded-lg border border-stone-300 px-3 py-2.5 text-stone-900 transition"
         :class="{ 'border-red-500': errors.name }"
         placeholder="例：○○温泉街まち歩きマップ"
       >
@@ -72,7 +72,7 @@ const submit = handleSubmit((values) => {
       <button
         type="submit"
         :disabled="isSubmitting"
-        class="rounded-lg bg-terracotta-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-terracotta-700 focus:outline-none focus:ring-2 focus:ring-terracotta-400 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+        class="rounded-lg bg-terracotta-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-terracotta-700 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {{ isSubmitting ? '保存中…' : submitLabel }}
       </button>

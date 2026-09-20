@@ -185,7 +185,7 @@ defineExpose({ isDirty: () => isDirty.value, reset, save })
           </div>
 
           <div v-if="selectedIconFamily === 'kanji'" class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <button v-for="preset in pinIconPresets" :key="preset.id" type="button" :aria-label="preset.label" :aria-pressed="design.pinIconId === preset.id" class="grid min-h-12 place-items-center rounded-xl border p-2 text-center transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-900" :class="design.pinIconId === preset.id ? 'border-terracotta-500 bg-terracotta-50 ring-2 ring-terracotta-100' : 'border-stone-200 hover:border-stone-400'" @click="design.pinIconId = preset.id">
+            <button v-for="preset in pinIconPresets" :key="preset.id" type="button" :aria-label="preset.label" :aria-pressed="design.pinIconId === preset.id" class="grid min-h-12 place-items-center rounded-xl border p-2 text-center transition" :class="design.pinIconId === preset.id ? 'border-terracotta-500 bg-terracotta-50 ring-2 ring-terracotta-100' : 'border-stone-200 hover:border-stone-400'" @click="design.pinIconId = preset.id">
               <span class="grid h-8 w-8 place-items-center rounded-full text-xs font-bold text-white" :style="{ backgroundColor: design.pinColor }" aria-hidden="true">{{ preset.symbol }}</span>
             </button>
           </div>
@@ -193,7 +193,7 @@ defineExpose({ isDirty: () => isDirty.value, reset, save })
             <section v-for="[group, presets] in materialPresetGroups" :key="group">
               <h4 class="text-xs font-bold text-stone-500">{{ group }}</h4>
               <div class="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4">
-                <button v-for="preset in presets" :key="preset.id" type="button" :aria-label="preset.label" :aria-pressed="design.pinIconId === preset.id" class="grid min-h-12 place-items-center rounded-xl border p-2 text-center transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-900" :class="design.pinIconId === preset.id ? 'border-terracotta-500 bg-terracotta-50 ring-2 ring-terracotta-100' : 'border-stone-200 hover:border-stone-400'" @click="design.pinIconId = preset.id">
+                <button v-for="preset in presets" :key="preset.id" type="button" :aria-label="preset.label" :aria-pressed="design.pinIconId === preset.id" class="grid min-h-12 place-items-center rounded-xl border p-2 text-center transition" :class="design.pinIconId === preset.id ? 'border-terracotta-500 bg-terracotta-50 ring-2 ring-terracotta-100' : 'border-stone-200 hover:border-stone-400'" @click="design.pinIconId = preset.id">
                   <span class="material-symbols-outlined grid h-8 w-8 place-items-center rounded-full text-base text-white" :style="{ backgroundColor: design.pinColor }" aria-hidden="true">{{ preset.name }}</span>
                 </button>
               </div>

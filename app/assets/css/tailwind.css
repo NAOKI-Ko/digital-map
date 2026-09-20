@@ -3,9 +3,23 @@
 @tailwind utilities;
 
 @layer base {
-  :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
-    outline: 3px solid #1c1917;
-    outline-offset: 3px;
+  :is(a, button, summary, [tabindex], input[type='checkbox'], input[type='radio'], input[type='range'], input[type='file']):focus-visible {
+    outline: 2px solid #c7401f;
+    outline-offset: 2px;
+  }
+
+  input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='file']):focus,
+  textarea:focus,
+  select:focus {
+    border-color: #c7401f;
+    box-shadow: 0 0 0 3px #fbe8e3;
+    outline: none;
+  }
+
+  .dm-field-focus:focus-visible {
+    border-color: #c7401f;
+    box-shadow: 0 0 0 3px #fbe8e3;
+    outline: none;
   }
 }
 
@@ -23,6 +37,6 @@
 
 @layer components {
   .dm-input {
-    @apply min-h-11 w-full rounded-lg border border-stone-300 bg-white px-3 py-2.5 text-sm transition-colors hover:border-stone-400 focus:border-terracotta-600 focus:outline-none focus:ring-2 focus:ring-terracotta-100 disabled:cursor-not-allowed disabled:bg-stone-100 disabled:text-stone-500;
+    @apply min-h-11 w-full rounded-lg border border-stone-300 bg-white px-3 py-2.5 text-sm transition-colors hover:border-stone-400 disabled:cursor-not-allowed disabled:bg-stone-100 disabled:text-stone-500;
   }
 }
