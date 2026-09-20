@@ -146,7 +146,7 @@ function cancel() {
 
     <section class="border-t border-stone-200 pt-5">
       <h2 class="text-lg font-bold text-stone-900">位置情報</h2>
-      <p class="mt-1 text-sm leading-6 text-stone-600">緯度・経度は実地図表示用です。イラスト上のPIN位置は「PIN配置」で設定します。</p>
+      <p class="mt-1 text-sm leading-6 text-stone-600">緯度・経度は実地図表示用です。イラスト上のピン位置は「ピン配置」で設定します。</p>
       <div class="mt-5 grid gap-5 sm:grid-cols-2">
         <UiField for-id="spot-lat" label="緯度" hint="-90〜90の範囲。未設定にする場合は緯度・経度を両方空欄にします。" :error="errors.lat">
           <input id="spot-lat" v-model="lat" v-bind="latAttrs" type="number" inputmode="decimal" min="-90" max="90" step="any" class="dm-input" placeholder="35.1815">

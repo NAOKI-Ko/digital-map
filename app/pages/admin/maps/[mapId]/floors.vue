@@ -278,7 +278,7 @@ async function confirmDeleteFloor() {
                       class="rounded-full px-2.5 py-1 text-xs font-semibold"
                       :class="isFloorGeoreferenced(floor) ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'"
                     >
-                      {{ isFloorGeoreferenced(floor) ? 'ジオリファレンス設定済み' : 'ジオリファレンス未設定' }}
+                      {{ isFloorGeoreferenced(floor) ? '位置合わせ設定済み' : '位置合わせ未設定' }}
                     </span>
                   </div>
                   <input :id="`floor-name-${floor.id}`" v-model="floor.name" maxlength="50" class="mt-1 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm">
@@ -292,11 +292,11 @@ async function confirmDeleteFloor() {
               <p class="mt-2 text-xs text-stone-500">登録スポット: {{ floor.spotCount }}件</p>
               <details class="mt-4 rounded-lg border border-stone-200 p-3">
                 <summary class="cursor-pointer text-sm font-semibold text-stone-800">フロア画像を差し替える</summary>
-                <p class="mt-2 text-xs leading-5 text-amber-700">既存PINのイラスト上の相対位置と2点合わせ設定は維持されます。画像内容や比率が変わっても自動補正されません。差し替え後にジオリファレンスの対応を確認してください。</p>
+                <p class="mt-2 text-xs leading-5 text-amber-700">既存ピンのイラスト上の相対位置と2点合わせ設定は維持されます。画像内容や比率が変わっても自動補正されません。差し替え後にマップの位置合わせを確認してください。</p>
                 <div class="mt-3"><MediaPicker :map-id="mapId" label="差し替え画像" usage="floor" @selected="replaceFloorImage(floor, $event)" /></div>
               </details>
               <div class="mt-4 flex flex-wrap gap-3">
-                <NuxtLink :to="`/admin/maps/${mapId}/floors/${floor.id}/georeference`" class="rounded-lg border border-terracotta-300 bg-terracotta-50 px-4 py-2 text-sm font-semibold text-terracotta-800 hover:bg-terracotta-100">{{ isFloorGeoreferenced(floor) ? 'ジオリファレンスを調整' : 'ジオリファレンスを設定' }}</NuxtLink>
+                <NuxtLink :to="`/admin/maps/${mapId}/floors/${floor.id}/georeference`" class="rounded-lg border border-terracotta-300 bg-terracotta-50 px-4 py-2 text-sm font-semibold text-terracotta-800 hover:bg-terracotta-100">{{ isFloorGeoreferenced(floor) ? '位置合わせを調整' : '位置合わせを設定' }}</NuxtLink>
                 <NuxtLink :to="`/admin/maps/${mapId}/floors/${floor.id}/decorations`" class="rounded-lg border border-stone-300 px-4 py-2 text-sm font-semibold text-stone-800">装飾を編集</NuxtLink>
                 <button type="button" :disabled="busyFloorId === floor.id" class="rounded-lg bg-stone-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60" @click="updateFloor(floor)">変更を保存</button>
                 <button type="button" :disabled="busyFloorId === floor.id" class="rounded-lg px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-50 disabled:opacity-60" @click="requestDeleteFloor(floor)">削除</button>

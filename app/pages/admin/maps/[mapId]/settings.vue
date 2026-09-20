@@ -178,7 +178,7 @@ async function removeLanguage(locale: MapLocale) {
 
 async function saveSeo() {
   seoState.value = 'saving'
-  try { await $fetch(`/api/maps/${mapId}/seo`, { method: 'PATCH', body: seo }); seoState.value = 'success'; seoMessage.value = 'SEO設定を保存しました。次回公開時にSnapshotへ反映されます。' }
+  try { await $fetch(`/api/maps/${mapId}/seo`, { method: 'PATCH', body: seo }); seoState.value = 'success'; seoMessage.value = 'SEO設定を保存しました。次回の公開内容に反映されます。' }
   catch { seoState.value = 'error'; seoMessage.value = 'SEO設定を保存できませんでした。' }
 }
 </script>
@@ -269,7 +269,7 @@ async function saveSeo() {
           <button class="rounded-lg bg-stone-900 px-5 py-2.5 text-sm font-semibold text-white" :disabled="translationState === 'saving'">英語訳を保存</button>
         </form>
 
-        <UiDialog :open="languageDialogOpen" title="言語を追加" description="このマップのField表示名で使用する言語を選択します。" max-width="sm" @close="languageDialogOpen = false">
+        <UiDialog :open="languageDialogOpen" title="言語を追加" description="このマップの項目名で使用する言語を選択します。" max-width="sm" @close="languageDialogOpen = false">
           <form class="space-y-5" @submit.prevent="addLanguage">
             <UiSelect v-model="selectedLocale" :options="availableLanguageOptions" label="追加する言語" placeholder="言語を選択" />
             <div class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
@@ -321,7 +321,7 @@ async function saveSeo() {
 
       <section v-if="data.map.permissions?.canManageEditors" id="team" v-show="activeSection === 'team'" class="settings-section">
         <h2 class="text-lg font-bold text-stone-900">このマップの編集者</h2>
-        <p class="mt-2 text-sm text-stone-600">組織メンバーへ、このマップだけの編集権限を割り当てます。組織オーナーはすべてのマップを編集できます。</p>
+        <p class="mt-2 text-sm text-stone-600">ワークスペースのメンバーへ、このマップだけの編集権限を割り当てます。ワークスペースのオーナーはすべてのマップを編集できます。</p>
         <NuxtLink :to="`/admin/maps/${mapId}/editors`" class="mt-5 inline-flex rounded-lg bg-stone-900 px-4 py-2.5 text-sm font-semibold text-white">編集者を管理する</NuxtLink>
       </section>
 

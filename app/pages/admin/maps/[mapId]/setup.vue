@@ -46,7 +46,7 @@ async function addCategories() {
   <div class="max-w-5xl">
     <p class="text-sm font-medium text-terracotta-700">イラストマップ セットアップ</p>
     <h1 class="mt-1 text-3xl font-bold">{{ mapData?.map.name ?? 'マップ' }}を準備する</h1>
-    <p class="mt-2 text-sm text-stone-600">ジオリファレンスは任意です。イラストと項目を登録すれば、設定とスポット登録を進められます。</p>
+    <p class="mt-2 text-sm text-stone-600">マップの位置合わせは任意です。イラストと項目を登録すれば、設定とスポット登録を進められます。</p>
     <SaveFeedback v-if="route.query.saved === 'map-created'" class="mt-5" state="success" message="マップを作成しました。セットアップを続けてください。" />
 
     <ol class="mt-8 grid gap-4 sm:grid-cols-2">
@@ -67,7 +67,7 @@ async function addCategories() {
 
     <section class="mt-6 rounded-2xl border bg-white p-6">
       <h2 class="font-bold">後から設定できる項目</h2>
-      <p class="mt-2 text-sm text-stone-600">ジオリファレンス、団体情報・ロゴ、装飾は必要に応じて追加できます。</p>
+      <p class="mt-2 text-sm text-stone-600">マップの位置合わせ、ワークスペース情報・ロゴ、装飾は必要に応じて追加できます。</p>
       <NuxtLink :to="`/admin/maps/${mapId}/settings`" class="mt-4 inline-flex rounded-lg border border-stone-300 px-4 py-2.5 text-sm font-semibold">マップ設定を開く</NuxtLink>
     </section>
   </div>

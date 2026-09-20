@@ -96,7 +96,7 @@ function changeSelection() {
         </div>
         <label class="mt-3 block text-xs font-semibold text-stone-700">用途フィルター
           <select v-model="usageFilter" class="mt-1 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm">
-            <option value="all">すべての用途</option><option value="floor">フロアイラスト</option><option value="photo">スポット写真</option><option value="category">カテゴリーアイコン</option><option value="pin">カスタムPIN</option><option value="logo">ロゴ</option><option value="seo">シェア画像</option><option value="decoration">装飾</option>
+            <option value="all">すべての用途</option><option value="floor">フロアイラスト</option><option value="photo">スポット写真</option><option value="category">カテゴリーアイコン</option><option value="pin">カスタムピン</option><option value="logo">ロゴ</option><option value="seo">シェア画像</option><option value="decoration">装飾</option>
           </select>
         </label>
         <p class="mt-2 text-xs text-stone-500">別用途の画像は「すべての用途」から選べます。</p>

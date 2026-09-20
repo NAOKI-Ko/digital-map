@@ -113,7 +113,7 @@ async function upload(event: Event) {
     <h1 class="mt-5 text-2xl font-bold">スポット情報の編集</h1>
     <p v-if="loadError" role="alert" class="mt-4 rounded bg-red-50 p-4 text-red-800">このスポットを編集する権限がないか、担当から外れています。</p>
     <template v-else>
-      <p v-if="data?.blockedByPreviousAssignee" class="mt-4 rounded bg-amber-50 p-4">前の担当者の承認待ちRevisionがあるため、レビュー完了まで新しい編集は保存できません。</p>
+      <p v-if="data?.blockedByPreviousAssignee" class="mt-4 rounded bg-amber-50 p-4">前の担当者による承認待ちの変更申請があるため、確認が完了するまで新しい編集は保存できません。</p>
       <p v-if="message" role="status" class="mt-4 rounded bg-green-50 p-4">{{ message }}</p>
       <p v-if="operationError" role="alert" class="mt-4 rounded bg-red-50 p-4 text-red-800">{{ operationError }}</p>
       <form class="mt-6 space-y-4 rounded-xl bg-white p-6" @submit.prevent="save">

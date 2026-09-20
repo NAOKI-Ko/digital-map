@@ -64,7 +64,7 @@ watch(floor, (value) => {
 }, { immediate: true })
 
 useHead(() => ({
-  title: `ジオリファレンス - ${floor.value?.name ?? 'フロア'} | デジタルマップ`,
+  title: `マップの位置合わせ - ${floor.value?.name ?? 'フロア'} | Digital Map`,
 }))
 
 function focusSearchResult(result: GeocodeResult) {
@@ -91,7 +91,7 @@ async function removeGeoReference() {
     }
     draft.value = createEmptyGeoReferenceDraft()
     removeConfirmOpen.value = false
-    successMessage.value = 'ジオリファレンスを解除しました。イラスト上のPIN位置は変更していません。'
+    successMessage.value = 'マップの位置合わせを解除しました。イラスト上のピン位置は変更していません。'
   }
   catch (error) {
     saveError.value = getErrorMessage(error)
@@ -183,13 +183,13 @@ function getErrorMessage(error: unknown) {
       <div v-if="successMessage" role="status" class="mt-4 rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{{ successMessage }}</div>
       <div class="mt-5 flex flex-wrap justify-end gap-3">
         <NuxtLink v-if="cameFromEditor" :to="backPath" class="rounded-lg border border-stone-300 bg-white px-5 py-2.5 text-sm font-semibold text-stone-700 hover:bg-stone-50">ピン配置エディタに戻る</NuxtLink>
-        <button v-if="hasSavedGeoReference" type="button" :disabled="isSaving" class="rounded-lg px-5 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-50 disabled:opacity-60" @click="removeConfirmOpen = true">ジオリファレンスを解除</button>
+        <button v-if="hasSavedGeoReference" type="button" :disabled="isSaving" class="rounded-lg px-5 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-50 disabled:opacity-60" @click="removeConfirmOpen = true">位置合わせを解除</button>
         <button type="button" :disabled="isSaving || !isGeoReferenceDraftComplete(draft) || Boolean(validationError)" class="rounded-lg bg-terracotta-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60" @click="save">
           {{ isSaving ? '保存中…' : 'この内容で保存' }}
         </button>
       </div>
-      <p v-if="floor.spotCount > 0" class="mt-3 text-right text-sm font-semibold text-amber-700">イラスト上のPIN位置は変わりません。実世界との対応のみ更新されます。</p>
-      <ConfirmDialog :open="removeConfirmOpen" title="ジオリファレンスを解除" message="保存済みの実世界との対応を解除します。スポットやイラスト上のPIN位置は削除・変更されません。" confirm-label="解除する" destructive :busy="isSaving" @cancel="removeConfirmOpen = false" @confirm="removeGeoReference" />
+      <p v-if="floor.spotCount > 0" class="mt-3 text-right text-sm font-semibold text-amber-700">イラスト上のピン位置は変わりません。実世界との対応のみ更新されます。</p>
+      <ConfirmDialog :open="removeConfirmOpen" title="マップの位置合わせを解除" message="保存済みの実世界との対応を解除します。スポットやイラスト上のピン位置は削除・変更されません。" confirm-label="解除する" destructive :busy="isSaving" @cancel="removeConfirmOpen = false" @confirm="removeGeoReference" />
     </template>
   </div>
 </template>

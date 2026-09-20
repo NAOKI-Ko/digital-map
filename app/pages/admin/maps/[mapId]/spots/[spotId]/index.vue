@@ -132,8 +132,8 @@ async function saveEnglish() {
         <h1 class="mt-1 text-2xl font-bold tracking-tight text-stone-900 sm:text-3xl">{{ data.spot.name }}</h1>
       </header>
       <div class="mt-5 flex flex-wrap items-center gap-3 border-y border-stone-200 py-3 text-sm">
-        <span class="font-semibold text-stone-700">PIN: {{ data.spot.x === null || data.spot.y === null ? '未配置' : '配置済み' }}</span>
-        <NuxtLink :to="{ path: `/admin/maps/${mapId}/editor`, query: { floorId: data.spot.floorId, placeSpotId: data.spot.id } }" class="font-semibold text-terracotta-700 hover:text-terracotta-800">PIN配置画面で編集</NuxtLink>
+        <span class="font-semibold text-stone-700">ピン: {{ data.spot.x === null || data.spot.y === null ? '未配置' : '配置済み' }}</span>
+        <NuxtLink :to="{ path: `/admin/maps/${mapId}/editor`, query: { floorId: data.spot.floorId, placeSpotId: data.spot.id } }" class="font-semibold text-terracotta-700 hover:text-terracotta-800">ピン配置画面で編集</NuxtLink>
       </div>
       <NuxtLink :to="`/admin/maps/${mapId}/spots/${spotId}/assignee`" class="ml-2 mt-5 inline-flex rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-sm font-semibold">スポット担当者</NuxtLink>
       <SaveFeedback class="mt-6" :state="isSubmitting ? 'saving' : submitError ? 'error' : successMessage ? 'success' : 'idle'" :message="submitError || successMessage" />

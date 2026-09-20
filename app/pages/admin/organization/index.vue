@@ -6,7 +6,7 @@ import type { OrganizationMembersResponse } from '~~/shared/types/organization'
 import type { UploadedImage } from '~~/shared/types/upload'
 
 definePageMeta({ layout: 'admin', middleware: 'auth' })
-useHead({ title: '組織設定・メンバー | デジタルマップ' })
+useHead({ title: 'ワークスペース設定・メンバー | Digital Map' })
 
 const { data: organizationData, error: organizationError, refresh: refreshOrganization } = await useFetch('/api/organization')
 const { data: memberData, refresh: refreshMembers } = await useFetch<OrganizationMembersResponse>('/api/organization/members')
@@ -37,7 +37,7 @@ async function saveOrganization() {
       websiteUrl: form.websiteUrl || null, snsUrl: form.snsUrl || null,
     } })
     await refreshOrganization()
-    message.value = '組織設定を保存しました。'
+    message.value = 'ワークスペース設定を保存しました。'
   })
 }
 
@@ -77,7 +77,7 @@ async function removeMember(userId: string) {
   await run(async () => {
     await $fetch(`/api/organization/members/${userId}`, { method: 'DELETE' })
     await refreshMembers()
-    message.value = '組織から削除しました。ユーザーアカウントは削除されません。'
+    message.value = 'ワークスペースから削除しました。ユーザーアカウントは削除されません。'
   })
 }
 
@@ -94,33 +94,33 @@ async function run(action: () => Promise<void>) {
 <template>
   <div class="max-w-5xl">
     <header>
-      <p class="text-sm font-medium text-terracotta-700">組織</p>
-      <h1 class="mt-1 text-3xl font-bold text-stone-900">組織設定・メンバー</h1>
-      <NuxtLink to="/admin/organization/audit" class="mt-3 inline-block text-sm font-semibold underline">監査ログを見る</NuxtLink>
+      <p class="text-sm font-medium text-terracotta-700">ワークスペース</p>
+      <h1 class="mt-1 text-3xl font-bold text-stone-900">ワークスペース設定・メンバー</h1>
+      <NuxtLink to="/admin/organization/audit" class="mt-3 inline-block text-sm font-semibold underline">操作履歴を見る</NuxtLink>
     </header>
     <SaveFeedback class="mt-6" :state="saving ? 'saving' : errorMessage ? 'error' : message ? 'success' : 'idle'" :message="errorMessage || message" />
 
-    <section v-if="organizationError" class="mt-6 rounded-xl border border-red-200 bg-red-50 p-5 text-sm text-red-800">組織設定とメンバー管理は、組織オーナーだけが利用できます。</section>
+    <section v-if="organizationError" class="mt-6 rounded-xl border border-red-200 bg-red-50 p-5 text-sm text-red-800">ワークスペース設定とメンバー管理は、ワークスペースのオーナーだけが利用できます。</section>
 
     <section v-if="organization" id="settings" class="mt-6 scroll-mt-6 border-t border-stone-200 pt-5">
-      <h2 class="text-lg font-bold">組織設定</h2>
+      <h2 class="text-lg font-bold">ワークスペース設定</h2>
       <form class="mt-5 grid gap-4" @submit.prevent="saveOrganization">
-        <label class="text-sm font-semibold">組織名<input v-model="form.name" required maxlength="100" class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5"></label>
+        <label class="text-sm font-semibold">ワークスペース名<input v-model="form.name" required maxlength="100" class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5"></label>
         <div class="grid gap-4 sm:grid-cols-2">
           <label class="text-sm font-semibold">公式WebサイトURL<input v-model="form.websiteUrl" type="url" class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5"></label>
           <label class="text-sm font-semibold">SNS URL<input v-model="form.snsUrl" type="url" class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5"></label>
         </div>
         <div>
-          <p class="text-sm font-semibold">組織ロゴ</p>
-          <div v-if="form.logoUrl" class="mt-2 flex items-center gap-3"><img :src="form.logoUrl" alt="組織ロゴ" class="size-16 rounded-lg object-contain"><button type="button" class="text-sm font-semibold text-red-700" @click="form.logoUrl = ''; form.logoAssetId = null">外す</button></div>
-          <details class="mt-3"><summary class="w-fit cursor-pointer text-sm text-stone-600">ロゴ画像を選択・変更</summary><ImageUploader class="mt-3" label="組織ロゴ" @uploaded="useLogo" /></details>
+          <p class="text-sm font-semibold">ワークスペースのロゴ</p>
+          <div v-if="form.logoUrl" class="mt-2 flex items-center gap-3"><img :src="form.logoUrl" alt="ワークスペースのロゴ" class="size-16 rounded-lg object-contain"><button type="button" class="text-sm font-semibold text-red-700" @click="form.logoUrl = ''; form.logoAssetId = null">外す</button></div>
+          <details class="mt-3"><summary class="w-fit cursor-pointer text-sm text-stone-600">ロゴ画像を選択・変更</summary><ImageUploader class="mt-3" label="ワークスペースのロゴ" @uploaded="useLogo" /></details>
         </div>
         <button :disabled="saving" class="justify-self-end rounded-lg bg-stone-900 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">保存</button>
       </form>
     </section>
 
     <section v-if="organization" id="members" class="mt-6 scroll-mt-6 border-t border-stone-200 pt-5">
-      <h2 class="text-lg font-bold">組織メンバー招待</h2>
+      <h2 class="text-lg font-bold">ワークスペースへメンバーを招待</h2>
       <p class="mt-1 text-sm text-stone-600">招待を承認するまでメンバーには追加されません。招待リンクは発行時だけ表示されます。</p>
       <form class="mt-5 flex gap-3" @submit.prevent="addMember">
         <input v-model="email" aria-label="招待先メールアドレス" required type="email" autocomplete="off" placeholder="member@example.com" class="min-w-0 flex-1 rounded-lg border border-stone-300 px-3 py-2.5">
@@ -147,11 +147,11 @@ async function run(action: () => Promise<void>) {
           <div class="flex flex-wrap gap-2">
             <button v-if="member.role === 'MEMBER'" :disabled="saving" class="rounded-lg border px-3 py-2 text-sm font-semibold" @click="changeRole(member.userId, 'OWNER')">オーナーにする</button>
             <button v-else :disabled="saving" class="rounded-lg border px-3 py-2 text-sm font-semibold" @click="changeRole(member.userId, 'MEMBER')">メンバーにする</button>
-            <button :disabled="saving" class="rounded-lg border border-red-200 px-3 py-2 text-sm font-semibold text-red-700" @click="removeTarget = { userId: member.userId, label: member.displayName || member.email }">組織から削除</button>
+            <button :disabled="saving" class="rounded-lg border border-red-200 px-3 py-2 text-sm font-semibold text-red-700" @click="removeTarget = { userId: member.userId, label: member.displayName || member.email }">ワークスペースから削除</button>
           </div>
         </article>
       </div>
     </section>
-    <ConfirmDialog :open="removeTarget !== null" title="組織から削除" :message="removeTarget ? `「${removeTarget.label}」を組織から削除します。ユーザーアカウントは削除されません。` : ''" confirm-label="組織から削除" destructive :busy="saving" @cancel="removeTarget = null" @confirm="removeTarget && removeMember(removeTarget.userId)" />
+    <ConfirmDialog :open="removeTarget !== null" title="ワークスペースから削除" :message="removeTarget ? `「${removeTarget.label}」をワークスペースから削除します。ユーザーアカウントは削除されません。` : ''" confirm-label="ワークスペースから削除" destructive :busy="saving" @cancel="removeTarget = null" @confirm="removeTarget && removeMember(removeTarget.userId)" />
   </div>
 </template>

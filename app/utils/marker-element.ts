@@ -63,7 +63,7 @@ export function createSpotMarkerElement(
   element.style.setProperty('--pin-color-dark', presentation.darkColor)
   const candidateLabel = options.candidate === 'move' ? '移動先' : '仮配置'
   element.setAttribute('aria-label', options.candidate
-    ? `${spot.name}の${candidateLabel}PINをドラッグして位置調整`
+    ? `${spot.name}の${candidateLabel}ピンをドラッグして位置調整`
     : options.ghost
       ? `${spot.name}の元の位置`
       : options.mode === 'edit'

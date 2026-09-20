@@ -99,11 +99,11 @@ export function buildAdminNavigation(context: AdminNavigationContext): AdminNavi
         group: 'map', rail: false, activePaths: [mapPath(context.mapId, '/categories')],
       },
       {
-        id: 'publish', label: '公開管理', shortLabel: '公開管理', icon: 'publish', to: mapPath(context.mapId, '/publish'),
+        id: 'publish', label: '公開', shortLabel: '公開', icon: 'publish', to: mapPath(context.mapId, '/publish'),
         group: 'operations', rail: true, activePaths: [mapPath(context.mapId, '/publish')],
       },
       {
-        id: 'analytics', label: 'アクセス解析', shortLabel: 'アクセス解析', icon: 'analytics', to: mapPath(context.mapId, '/analytics'),
+        id: 'analytics', label: 'アクセス状況', shortLabel: 'アクセス状況', icon: 'analytics', to: mapPath(context.mapId, '/analytics'),
         group: 'operations', rail: false, activePaths: [mapPath(context.mapId, '/analytics')],
       },
       {
@@ -127,7 +127,7 @@ export function buildAdminNavigation(context: AdminNavigationContext): AdminNavi
         group: 'team', rail: false, activePaths: ['/admin/organization'], exact: true, activeHash: '#members',
       },
       {
-        id: 'audit', label: '監査ログ', shortLabel: '監査ログ', icon: 'audit', to: '/admin/organization/audit',
+        id: 'audit', label: '操作履歴', shortLabel: '操作履歴', icon: 'audit', to: '/admin/organization/audit',
         group: 'management', rail: false, activePaths: ['/admin/organization/audit'],
       },
       {
@@ -161,7 +161,7 @@ export function buildMapEditSubnavigation(mapId: string) {
 export function buildSpotSubnavigation(mapId: string) {
   return [
     { label: '一覧', to: mapPath(mapId, '/spots') },
-    { label: 'CSV取込', to: mapPath(mapId, '/spots/import') },
+    { label: 'CSVでまとめて登録', to: mapPath(mapId, '/spots/import') },
     { label: '承認待ち', to: mapPath(mapId, '/revisions') },
   ]
 }

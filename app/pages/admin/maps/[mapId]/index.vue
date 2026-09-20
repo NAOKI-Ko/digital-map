@@ -7,7 +7,7 @@ const mapId = String(route.params.mapId)
 const { data, error, refresh, status } = await useFetch<MapHomeSummaryResponse>(`/api/maps/${mapId}/home-summary`, { query: { days: 30 } })
 const dateTimeFormatter = new Intl.DateTimeFormat('ja-JP', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Tokyo' })
 
-useHead(() => ({ title: `${data.value?.map.name ?? 'マップホーム'} | デジタルマップ` }))
+useHead(() => ({ title: `${data.value?.map.name ?? 'ホーム'} | Digital Map` }))
 
 function formatDateTime(value: string) {
   return dateTimeFormatter.format(new Date(value))
@@ -22,13 +22,13 @@ function formatDateTime(value: string) {
     </section>
 
     <section v-else-if="error || !data" class="rounded-xl border border-red-200 bg-red-50 p-6">
-      <h1 class="text-lg font-bold text-red-900">マップホームを読み込めませんでした</h1>
+      <h1 class="text-lg font-bold text-red-900">ホームを読み込めませんでした</h1>
       <p class="mt-2 text-sm text-red-700">アクセス権または通信状態を確認してください。</p>
       <button type="button" class="mt-4 min-h-11 rounded-lg border border-red-300 bg-white px-4 text-sm font-semibold text-red-800 hover:bg-red-100" @click="refresh()">再読み込み</button>
     </section>
 
     <template v-else>
-      <AdminPageHeader eyebrow="マップホーム" :title="data.map.name">
+      <AdminPageHeader eyebrow="ホーム" :title="data.map.name">
         <template #actions>
           <NuxtLink :to="`/admin/maps/${mapId}/settings`" class="inline-flex min-h-11 items-center justify-center rounded-lg bg-terracotta-600 px-4 text-sm font-semibold text-white shadow-sm hover:bg-terracotta-700">マップを編集</NuxtLink>
           <a v-if="data.map.publicUrl" :href="data.map.publicUrl" target="_blank" rel="noopener noreferrer" class="inline-flex min-h-11 items-center justify-center rounded-lg border border-stone-300 bg-white px-4 text-sm font-semibold text-stone-800 hover:bg-stone-100">公開マップを見る<span class="ml-1" aria-hidden="true">↗</span></a>
@@ -41,7 +41,7 @@ function formatDateTime(value: string) {
         <span class="text-stone-500">{{ data.map.lastPublishedAt ? `最終公開 ${formatDateTime(data.map.lastPublishedAt)}` : 'まだ公開されていません' }}</span>
       </div>
 
-      <section class="mt-6 grid grid-cols-2 divide-x divide-stone-200 border-y border-stone-200 py-2 lg:grid-cols-4" aria-label="MAPサマリー">
+      <section class="mt-6 grid grid-cols-2 divide-x divide-stone-200 border-y border-stone-200 py-2 lg:grid-cols-4" aria-label="マップの概要">
         <AdminMetricCard label="スポット" :value="data.metrics.spotCount" hint="登録済み" />
         <AdminMetricCard label="未配置" :value="data.metrics.unpositionedSpotCount" :hint="data.metrics.unpositionedSpotCount ? '位置設定が必要' : 'すべて配置済み'" :tone="data.metrics.unpositionedSpotCount ? 'warning' : 'neutral'" />
         <AdminMetricCard label="承認待ち" :value="data.metrics.pendingRevisionCount" :hint="data.metrics.pendingRevisionCount ? '確認が必要' : '確認待ちはありません'" :tone="data.metrics.pendingRevisionCount ? 'accent' : 'neutral'" />
@@ -59,7 +59,7 @@ function formatDateTime(value: string) {
               </NuxtLink>
             </li>
           </ul>
-          <div v-else class="mt-4 rounded-lg bg-emerald-50 px-4 py-5"><p class="text-sm font-semibold text-emerald-900">現在、対応が必要な項目はありません</p><p class="mt-1 text-xs text-emerald-800">MAPの状態は整っています。</p></div>
+          <div v-else class="mt-4 rounded-lg bg-emerald-50 px-4 py-5"><p class="text-sm font-semibold text-emerald-900">現在、対応が必要な項目はありません</p><p class="mt-1 text-xs text-emerald-800">マップの状態は整っています。</p></div>
         </section>
 
         <section class="min-w-0 border-t border-stone-200 pt-5">
@@ -77,4 +77,3 @@ function formatDateTime(value: string) {
     </template>
   </div>
 </template>
-

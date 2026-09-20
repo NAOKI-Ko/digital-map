@@ -105,7 +105,7 @@ defineExpose({
         :class="{ 'pointer-events-none': !floorErrorActionTo }"
       >
         <p>{{ floorError }}</p>
-        <NuxtLink v-if="floorErrorActionTo" :to="floorErrorActionTo" class="mt-4 inline-flex rounded-lg bg-terracotta-600 px-4 py-2 text-sm font-semibold text-white hover:bg-terracotta-700">ジオリファレンスを設定</NuxtLink>
+        <NuxtLink v-if="floorErrorActionTo" :to="floorErrorActionTo" class="mt-4 inline-flex rounded-lg bg-terracotta-600 px-4 py-2 text-sm font-semibold text-white hover:bg-terracotta-700">マップの位置合わせを設定</NuxtLink>
       </div>
       <p
         v-if="geolocationAreaMessage"

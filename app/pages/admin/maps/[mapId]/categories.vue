@@ -163,7 +163,7 @@ async function saveEnglishName(category: CategorySummary) {
 <template>
   <div class="max-w-4xl">
     <NuxtLink :to="`/admin/maps/${mapId}/settings`" class="text-sm font-medium text-stone-600 hover:text-stone-900">← マップ設定に戻る</NuxtLink>
-    <header class="mt-5"><p class="text-sm font-medium text-terracotta-700">マップ設定</p><h1 class="mt-1 text-3xl font-bold text-stone-900">カテゴリー管理</h1><p class="mt-2 text-sm text-stone-600">カテゴリー名・アイコン・並び順を一元管理します。カテゴリーアイコンはスポットのPINデザインには影響しません。</p></header>
+    <header class="mt-5"><p class="text-sm font-medium text-terracotta-700">マップ設定</p><h1 class="mt-1 text-3xl font-bold text-stone-900">カテゴリー管理</h1><p class="mt-2 text-sm text-stone-600">カテゴリー名・アイコン・並び順を一元管理します。カテゴリーアイコンはスポットのピンデザインには影響しません。</p></header>
     <SaveFeedback class="mt-6" :state="saveState" :message="message" />
     <details class="mt-6 border-y border-stone-200 py-4" :open="!data?.categories.length"><summary class="w-fit cursor-pointer text-sm font-semibold text-terracotta-700">＋ カテゴリーを追加</summary><form class="mt-4 space-y-4" @submit.prevent="createCategory">
       <div><label for="new-category-name" class="text-sm font-semibold text-stone-800">新しいカテゴリー名</label><input id="new-category-name" v-model="newName" maxlength="50" required class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5" placeholder="カテゴリー名"></div>
@@ -191,7 +191,7 @@ async function saveEnglishName(category: CategorySummary) {
 
     <AppDialog :open="editingId !== null" title="カテゴリー名を編集" description="カテゴリー名とアイコンを変更できます。" max-width="lg" @close="closeEditor">
       <form class="space-y-5" @submit.prevent="saveCategory" @keydown.enter="handleEditEnter">
-        <div><label for="edit-category-name" class="text-sm font-semibold text-stone-800">カテゴリー名</label><input id="edit-category-name" v-model="editName" autofocus maxlength="50" class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-terracotta-600"></div>
+        <div><label for="edit-category-name" class="text-sm font-semibold text-stone-800">カテゴリー名</label><input id="edit-category-name" v-model="editName" autofocus maxlength="50" class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5"></div>
         <CategoryIconEditor v-model="editIcon" :map-id="mapId" />
         <p v-if="editError" role="alert" class="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{{ editError }}</p>
         <div class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end"><button type="button" :disabled="isSaving" class="rounded-lg border border-stone-300 px-4 py-2.5 text-sm font-semibold" @click="closeEditor">キャンセル</button><button :disabled="isSaving" class="rounded-lg bg-terracotta-600 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50">{{ isSaving ? '保存中…' : '保存' }}</button></div>

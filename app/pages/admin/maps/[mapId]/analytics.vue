@@ -9,20 +9,20 @@ const { data, refresh, error, status } = await useFetch<{ timezone: string, disp
 const dailySeries = computed(() => analyticsSeries(start.value, end.value, data.value?.daily ?? []))
 const peak = computed(() => Math.max(1, ...data.value?.daily.map(day => day.viewCount) ?? []))
 const spotPeak = computed(() => Math.max(1, ...data.value?.topSpots.map(spot => spot.viewCount) ?? []))
-useHead({ title: 'アクセス解析 | デジタルマップ' })
+useHead({ title: 'アクセス状況 | Digital Map' })
 </script>
 
 <template>
   <div class="max-w-6xl">
-    <NuxtLink :to="`/admin/maps/${mapId}`" class="text-sm font-medium text-stone-600">← マップホーム</NuxtLink>
-    <AdminPageHeader class="mt-5" eyebrow="公開・運用" title="アクセス解析" description="公開マップとスポットの閲覧状況を確認できます。" />
+    <NuxtLink :to="`/admin/maps/${mapId}`" class="text-sm font-medium text-stone-600">← ホーム</NuxtLink>
+    <AdminPageHeader class="mt-5" eyebrow="公開・運用" title="アクセス状況" description="公開マップとスポットの閲覧状況を確認できます。" />
     <form class="mt-6 flex flex-wrap items-end gap-3 border-y border-stone-200 py-4" @submit.prevent="refresh()">
       <label class="text-xs font-semibold text-stone-600">開始日<input v-model="start" type="date" required class="mt-1 block min-h-11 rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm"></label>
       <label class="text-xs font-semibold text-stone-600">終了日<input v-model="end" type="date" required class="mt-1 block min-h-11 rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm"></label>
       <button class="min-h-11 rounded-lg bg-stone-800 px-4 text-sm font-semibold text-white">更新</button>
       <p class="pb-3 text-xs text-stone-500">日別の集計基準：UTC</p>
     </form>
-    <p v-if="error" role="alert" class="mt-4 text-sm text-red-700">アクセス解析を読み込めませんでした。日付範囲（最大367日）と通信状態を確認してください。</p>
+    <p v-if="error" role="alert" class="mt-4 text-sm text-red-700">アクセス状況を読み込めませんでした。日付範囲（最大367日）と通信状態を確認してください。</p>
     <p v-else-if="status === 'pending'" role="status" class="py-8 text-sm text-stone-500">集計を読み込んでいます…</p>
     <template v-else-if="data">
       <div class="flex items-baseline gap-4 border-b border-stone-200 py-5"><span class="text-sm text-stone-600">期間中のマップ閲覧数</span><strong class="text-3xl tracking-tight text-stone-900">{{ data.totalViews.toLocaleString('ja-JP') }}</strong><span class="text-xs text-stone-500">回</span></div>

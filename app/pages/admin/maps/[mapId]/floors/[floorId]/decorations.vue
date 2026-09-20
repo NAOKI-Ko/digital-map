@@ -74,7 +74,7 @@ onBeforeUnmount(() => activeDragCleanup?.())
   <div class="max-w-6xl">
     <NuxtLink :to="`/admin/maps/${mapId}/floors`" class="text-sm font-semibold text-stone-600">← フロア管理に戻る</NuxtLink>
     <h1 class="mt-5 text-3xl font-bold">{{ floor?.name }}の装飾</h1>
-    <p class="mt-2 text-sm text-stone-600">画像を配置してドラッグ、サイズ変更、回転、前後移動ができます。PINより下の専用レイヤーに表示されます。</p>
+    <p class="mt-2 text-sm text-stone-600">画像を配置してドラッグ、サイズ変更、回転、前後移動ができます。ピンより下の専用レイヤーに表示されます。</p>
     <div class="mt-7 grid gap-6 lg:grid-cols-[1fr_20rem]">
       <div v-if="floor" class="relative select-none overflow-hidden rounded-xl border bg-stone-100" :style="{ aspectRatio: `${floor.imageWidth}/${floor.imageHeight}` }">
         <img :src="floor.illustrationUrl" alt="" class="absolute inset-0 size-full object-contain">
