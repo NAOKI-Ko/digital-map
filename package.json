@@ -16,6 +16,8 @@
     "qa:baseline:audit": "node --import tsx scripts/qa/audit-arimatsu-baseline.ts",
     "qa:baseline:bundle": "node --import tsx scripts/qa/create-baseline-bundle.ts",
     "qa:baseline:browser": "node --import tsx scripts/qa/browser-audit-arimatsu-baseline.ts",
+    "qa:repair:spot-fields": "node --import tsx scripts/qa/repair-default-spot-fields.ts",
+    "audit:default-spot-fields": "node --import tsx scripts/qa/audit-default-spot-fields.ts",
     "audit:image-spatial-migration": "node --import tsx scripts/audit-image-spatial-migration.ts",
     "audit:tenant-data-foundation": "node --import tsx scripts/audit-tenant-data-foundation.ts",
     "dev": "nuxt dev",

@@ -24,7 +24,7 @@ describe('イラストマップ作成セットアップ', () => {
   it('公開パスを明示指定し、Spot標準項目を自動初期化する', () => {
     expect(newMapSource).toContain("mapType: 'illustration'")
     expect(createApiSource).toContain('slug: input.slug')
-    expect(createApiSource).toContain('defaultSpotFieldDefinitions')
+    expect(createApiSource).toContain('ensureDefaultSpotFieldDefinitions(transaction, created.id)')
   })
 
   it('Category候補はopt-inで、任意の位置合わせを完了条件にしない', () => {

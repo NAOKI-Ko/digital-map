@@ -1,8 +1,76 @@
-import type { SpotFieldDefinitionItem } from '~~/shared/types/spot-field'
-import type { StandardSpotFieldKey, SpotFieldType } from '~~/shared/constants/spot-fields'
-import type { Prisma } from '~~/prisma/generated/client'
-import { validateCustomFieldValue } from '~~/shared/schemas/spot-field'
-import { isMapLocale } from '~~/shared/constants/map-languages'
+import type { SpotFieldDefinitionItem } from '../../shared/types/spot-field'
+import type { StandardSpotFieldKey, SpotFieldType } from '../../shared/constants/spot-fields'
+import type { Prisma } from '../../prisma/generated/client'
+import { defaultSpotFieldDefinitions, standardSpotFieldKeys } from '../../shared/constants/spot-fields'
+import { validateCustomFieldValue } from '../../shared/schemas/spot-field'
+import { isMapLocale } from '../../shared/constants/map-languages'
+
+type SpotFieldClient = Pick<Prisma.TransactionClient, 'spotFieldDefinition'>
+
+export interface DefaultSpotFieldRepairResult {
+  existingSemanticKeys: StandardSpotFieldKey[]
+  createdSemanticKeys: StandardSpotFieldKey[]
+  finalStandardCount: number
+}
+
+export interface DefaultSpotFieldInvariantResult {
+  valid: boolean
+  missingSemanticKeys: StandardSpotFieldKey[]
+  duplicateSemanticKeys: StandardSpotFieldKey[]
+  unexpectedStandardSemanticKeys: Array<string | null>
+}
+
+export function inspectDefaultSpotFieldInvariant(fields: Array<{ kind: string, semanticKey: string | null }>): DefaultSpotFieldInvariantResult {
+  const standardFields = fields.filter(field => field.kind === 'standard')
+  const counts = new Map<string, number>()
+  for (const field of standardFields) {
+    if (field.semanticKey) counts.set(field.semanticKey, (counts.get(field.semanticKey) ?? 0) + 1)
+  }
+  const missingSemanticKeys = standardSpotFieldKeys.filter(key => !counts.has(key))
+  const duplicateSemanticKeys = standardSpotFieldKeys.filter(key => (counts.get(key) ?? 0) > 1)
+  const allowed = new Set<string>(standardSpotFieldKeys)
+  const unexpectedStandardSemanticKeys = standardFields
+    .map(field => field.semanticKey)
+    .filter(key => key === null || !allowed.has(key))
+  return {
+    valid: missingSemanticKeys.length === 0 && duplicateSemanticKeys.length === 0 && unexpectedStandardSemanticKeys.length === 0 && standardFields.length === standardSpotFieldKeys.length,
+    missingSemanticKeys,
+    duplicateSemanticKeys,
+    unexpectedStandardSemanticKeys,
+  }
+}
+
+export async function ensureDefaultSpotFieldDefinitions(client: SpotFieldClient, mapId: string): Promise<DefaultSpotFieldRepairResult> {
+  const existing = await client.spotFieldDefinition.findMany({
+    where: { mapId },
+    select: { kind: true, semanticKey: true, order: true },
+    orderBy: [{ order: 'asc' }, { id: 'asc' }],
+  })
+  const allowed = new Set<string>(standardSpotFieldKeys)
+  const existingSemanticKeys = existing
+    .filter(field => field.kind === 'standard' && field.semanticKey && allowed.has(field.semanticKey))
+    .map(field => field.semanticKey as StandardSpotFieldKey)
+  const existingKeySet = new Set(existingSemanticKeys)
+  const missing = defaultSpotFieldDefinitions.filter(field => !existingKeySet.has(field.semanticKey))
+  const existingOrders = new Set(existing.map(field => field.order))
+  const canonicalOrderCollides = missing.some(field => existingOrders.has(field.order))
+  const maxOrder = existing.reduce((maximum, field) => Math.max(maximum, field.order), -1)
+  const data = missing.map((field, index) => ({
+    ...field,
+    mapId,
+    order: canonicalOrderCollides ? maxOrder + index + 1 : field.order,
+  }))
+  if (data.length) await client.spotFieldDefinition.createMany({ data, skipDuplicates: true })
+  const finalFields = await client.spotFieldDefinition.findMany({
+    where: { mapId, kind: 'standard', semanticKey: { in: [...standardSpotFieldKeys] } },
+    select: { semanticKey: true },
+  })
+  return {
+    existingSemanticKeys,
+    createdSemanticKeys: missing.map(field => field.semanticKey),
+    finalStandardCount: finalFields.length,
+  }
+}
 
 export function toSpotFieldDefinition(field: {
   id: string

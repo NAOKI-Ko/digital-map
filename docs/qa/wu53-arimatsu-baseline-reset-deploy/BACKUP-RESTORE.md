@@ -22,6 +22,8 @@ Authoritative published baseline bundle:
 
 No archive contains plaintext credentials.
 
+> WU-54 note (2026-09-20): the WU-53 authoritative published baseline is retained as historical evidence but is **SUPERSEDED — missing default SpotFieldDefinition invariant**. Use the newer WU-54 authoritative baseline documented in `docs/qa/wu54-default-spot-fields-baseline-repair/BASELINE-REPAIR.md` for recovery after WU-54 acceptance.
+
 Windows pre-deploy backup:
 
 `C:\DigitalMap\backups\wu53-pre-30b983b-20260920-2132`

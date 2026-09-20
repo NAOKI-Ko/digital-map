@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url'
 import { PrismaPg } from '@prisma/adapter-pg'
 import { hash } from 'bcryptjs'
 import { PrismaClient } from '../../prisma/generated/client'
+import { ensureDefaultSpotFieldDefinitions } from '../../server/utils/spot-field'
 import {
   ARIMATSU_SPOTS,
   ARIMATSU_USERS,
@@ -89,6 +90,7 @@ async function main() {
           defaultLocale: 'ja',
           enabledLocales: ['ja'],
         } })
+        await ensureDefaultSpotFieldDefinitions(transaction, map.id)
 
         for (const credential of credentials) {
           const user = users.get(credential.key)!

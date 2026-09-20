@@ -1,7 +1,7 @@
 import { mapCreateSchema } from '~~/shared/schemas/map'
 import type { AdminMapResponse } from '~~/shared/types/map'
-import { defaultSpotFieldDefinitions } from '~~/shared/constants/spot-fields'
 import { assertTenantCanCreateMap, TenantAlreadyHasMapError } from '~~/server/utils/tenant-tourism-data'
+import { ensureDefaultSpotFieldDefinitions } from '~~/server/utils/spot-field'
 
 export default defineEventHandler(async (event): Promise<AdminMapResponse> => {
   const { session } = await requireTenantOwner(event)
@@ -14,7 +14,6 @@ export default defineEventHandler(async (event): Promise<AdminMapResponse> => {
         tenantId: session.user.tenantId,
         name: input.name,
         slug: input.slug,
-        spotFieldDefinitions: { create: defaultSpotFieldDefinitions.map(field => ({ ...field })) },
       }, select: {
       id: true,
       name: true,
@@ -31,6 +30,7 @@ export default defineEventHandler(async (event): Promise<AdminMapResponse> => {
         select: { floors: true },
       },
         } })
+      await ensureDefaultSpotFieldDefinitions(transaction, created.id)
       await transaction.tenant.update({ where: { id: session.user.tenantId }, data: { onboardingState: 'ACTIVE' } })
       return created
     })

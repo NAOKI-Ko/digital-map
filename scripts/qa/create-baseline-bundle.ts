@@ -4,6 +4,7 @@ import { readdir, readFile, stat, writeFile } from 'node:fs/promises'
 import { basename, resolve } from 'node:path'
 import { databaseName, sha256File } from '../backup-lib'
 import { verifyPublicStorageBackup } from '../public-storage-backup-lib'
+import { standardSpotFieldKeys } from '../../shared/constants/spot-fields'
 
 async function latestChild(directory: string, suffix?: string) {
   const entries = await readdir(directory, { withFileTypes: true })
@@ -28,7 +29,7 @@ async function main() {
   const publicManifest = await verifyPublicStorageBackup(publicStorage)
   const createdAt = new Date().toISOString()
   const appSha = process.env.APP_COMMIT_SHA || process.env.DEPLOYED_SHA || 'unknown'
-  await writeFile(`${dbDump}.json`, JSON.stringify({ timestamp: createdAt, commitSha: appSha, sha256: dbSha256, format: 'custom', createdBy: 'WU-53 verified bundle' }, null, 2))
+  await writeFile(`${dbDump}.json`, JSON.stringify({ timestamp: createdAt, commitSha: appSha, sha256: dbSha256, format: 'custom', createdBy: 'verified QA baseline bundle' }, null, 2))
 
   const aliases = ['ARIMATSU_FON_EMAIL', 'ARIMATSU_TAMA_EMAIL', 'ARIMATSU_NAU_EMAIL'].map((name, index) => process.env[name] || ['fon@arimatsu.test', 'tama@arimatsu.test', 'nau@arimatsu.test'][index])
   const manifest = {
@@ -41,7 +42,16 @@ async function main() {
       media: { path: `media/${basename(media)}`, archiveSha256: mediaManifest.archiveSha256, files: mediaManifest.files.length },
       public: { path: `public/${basename(publicStorage)}`, archiveSha256: publicManifest.archiveSha256, files: publicManifest.files.length },
     },
-    topology: { users: 3, workspaces: 3, maps: 3, spotsPerMap: 16, workspaceNames: ['有松マップ｜ふぉん', '有松マップ｜たま', '有松マップ｜なう'], publicSlugs: ['arimatsu-fon', 'arimatsu-tama', 'arimatsu-nau'] },
+    topology: {
+      users: 3,
+      workspaces: 3,
+      maps: 3,
+      spotsPerMap: 16,
+      standardSpotFieldsPerMap: standardSpotFieldKeys.length,
+      standardSpotFieldSemanticKeys: [...standardSpotFieldKeys],
+      workspaceNames: ['有松マップ｜ふぉん', '有松マップ｜たま', '有松マップ｜なう'],
+      publicSlugs: ['arimatsu-fon', 'arimatsu-tama', 'arimatsu-nau'],
+    },
     loginAliases: aliases,
   }
   const manifestText = JSON.stringify(manifest, null, 2) + '\n'
