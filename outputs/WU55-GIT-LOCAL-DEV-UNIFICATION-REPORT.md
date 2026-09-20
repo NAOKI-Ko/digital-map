@@ -1,15 +1,16 @@
 # WU-55 Git / local development unification report
 
-## Verdict at evidence commit
+## Verdict
 
-Local implementation and verification are PASS. GitHub PR/CI/default-branch/protection/tag/remote-cleanup gates are completed after this evidence commit and are reported in the task handoff; they must not be inferred as PASS from this file alone.
+PASS-READY. GitHub governance, canonical local topology, final authoritative WU-54 baseline, persistence, quality, clean-clone, CI, and browser gates passed. Production and `main` are unchanged.
 
 ## Immutable references
 
 - Starting `dev`: `db662f07490b7a2016ea27f3221cbf738f586fed`
 - Starting `main`: `a58b4353bd108e6586f329080c772f69b8aaffda`
 - WU-55 implementation: `abef5fe192f41d85e158ce8d41c1713e46cccfc0`
-- Evidence SHA: the commit containing this report; resolve with `git log --format=%H -- outputs/WU55-GIT-LOCAL-DEV-UNIFICATION-REPORT.md`
+- Initial evidence SHA: `1323c38c7b90c0cea98e7cd64e90c80144b561e2`
+- PR #1 / integration merge: `https://github.com/NAOKI-Ko/digital-map/pull/1` / `2a1200e0f01ab478c748c08f95353442c9ee9f75`
 - Production: unchanged; no deployment performed
 
 ## Git before state
@@ -78,12 +79,16 @@ The first Vitest pass was mistakenly pointed at canonical `digital_map` and left
 - Public route status: 200
 - QA credentials were not printed or committed; temporary clipboard content was cleared
 
-## Remaining post-evidence gates
+## Post-evidence completion
 
-- Push WU-55 branch and open PR to `dev`
-- Verify PR and post-merge GitHub Actions
-- Change GitHub default branch to `dev`
-- Protect `dev` and `main` with PR + required `verify`; disable force push/deletion
-- Create annotated tag `qa-baseline-wu54-20260921` at starting `dev`
-- Delete only remote branches proven merged/closed/unreferenced
-- Reconfirm `main` SHA and Production remain unchanged
+- PR #1 and both PR checks passed; merge-commit integration completed.
+- Post-merge Verify run `35527732332` passed.
+- GitHub default branch is `dev`.
+- `dev` and `main` are protected with PR + strict `verify`; force push/deletion are disabled.
+- Annotated tag `qa-baseline-wu54-20260921` points to the exact WU-54 evidence SHA.
+- All removed remote branches were re-queried, unused by open PRs, and ancestors of `origin/dev`; only `dev` and `main` remain.
+- `main` remains `a58b4353bd108e6586f329080c772f69b8aaffda`; Production was not deployed.
+
+## Final authoritative baseline resolution
+
+The initial local bundle's zero-custom discrepancy was resolved from the Windows WU-54 `VERIFIED` post-fix backup without changing Windows. The DB archive SHA-256 is `2eb05a24ee1aaf3a3f092293aefcae0d3de287eb95bb8920fcca2ea83ab1b1f1`; matching Media and Public archives are `67770cb19309f0540acb6514fbcacc551475bd4cc77517531024c73c52de0999` and `16f80b82b9fa05de4cc107dd25256f83c7660e5ccd207e06e2bd6e08597c388c`. Disposable restore proved 18 standard fields plus one custom field before canonical restore. The final canonical baseline then passed two additional recreates, all 34 manifest checksums, authenticated role/field smoke, and public canvas rendering.
