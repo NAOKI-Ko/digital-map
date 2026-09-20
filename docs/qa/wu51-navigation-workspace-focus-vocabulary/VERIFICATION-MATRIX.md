@@ -20,10 +20,13 @@
 | Accessibility | Keyboard, focus, dialog/drawer behavior, axe | PASS — browser keyboard checks + automated axe suite |
 | Clean clone | Frozen install, tests, typecheck, build at implementation SHA | PASS — `93b31892f95a2966a591cdb45825cf12e2603d11` |
 | GitHub Actions | Verify workflow at implementation SHA | PASS — run `35493221472` |
-| Windows QA | Backup, exact-SHA deployment, full gates, runtime/browser checks | BLOCKED — `chiffonchan` SSH endpoint timed out; no remote mutation occurred |
+| Final evidence CI | Final report/evidence verification | PASS — run `35493453757` |
+| Windows QA | Backup, exact-SHA deployment, full gates, runtime/browser checks | **WAIVED / NOT EXECUTED** — product owner explicitly accepted this residual risk on 2026-09-20 because the Windows host was outside the reachable local network |
 
 ## Final gate status
 
-All implementation-controlled and shared CI gates passed. Windows QA could not begin because the configured host was unreachable, so WU-51 cannot be labelled `PASS-READY` in this run. The correct verdict is `BLOCKED: WINDOWS QA HOST UNREACHABLE`.
+**PASS-READY by explicit product-owner acceptance.**
 
-No backup, release activation, service restart, database change, main merge, or Production deployment was attempted on the unreachable host.
+All implementation-controlled local, isolated PostgreSQL, clean-clone, browser, accessibility, and GitHub Actions gates passed. Windows QA was not executed and is not represented as PASS. The product owner explicitly waived that environment-specific gate for WU-51 and accepted the remaining residual risk.
+
+No Windows backup, release activation, service restart, database change, main merge, or Production deployment was performed.
