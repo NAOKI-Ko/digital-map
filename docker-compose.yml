@@ -1,5 +1,8 @@
+name: digital-map-local
+
 services:
   app:
+    profiles: ['full']
     build:
       context: .
       dockerfile: Dockerfile
@@ -9,14 +12,24 @@ services:
         condition: service_healthy
     environment:
       DATABASE_URL: postgresql://digital_map:digital_map@postgres:5432/digital_map?schema=public
+      DEPLOYMENT_ENV: development
       HOST: 0.0.0.0
+      MAIL_PROVIDER: fake
+      NUXT_DEPLOYMENT_ENVIRONMENT: development
       NUXT_SESSION_PASSWORD: ${NUXT_SESSION_PASSWORD:-local-session-password-change-before-production}
-      NUXT_UPLOAD_DIR: /app/.output/public/uploads
+      NUXT_UPLOAD_DIR: /app/.local-data/uploads
+      PUBLIC_BASE_URL: http://localhost:3000
+      PUBLIC_STORAGE_DRIVER: local
+      PUBLIC_STORAGE_ROOT: /app/.local-data/public
+      ADMIN_BASE_URL: http://localhost:3000
+      NUXT_TRUSTED_ORIGINS: http://localhost:3000
+      TRUSTED_HOSTS: localhost:3000
       PORT: 3000
     ports:
       - '3000:3000'
     volumes:
-      - uploads:/app/.output/public/uploads
+      - ./.local-data/uploads:/app/.local-data/uploads
+      - ./.local-data/public:/app/.local-data/public
 
   postgres:
     image: postgres:17-alpine
@@ -25,6 +38,8 @@ services:
       POSTGRES_DB: digital_map
       POSTGRES_USER: digital_map
       POSTGRES_PASSWORD: digital_map
+    ports:
+      - '127.0.0.1:5432:5432'
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U digital_map -d digital_map']
       interval: 5s
@@ -35,4 +50,3 @@ services:
 
 volumes:
   postgres_data:
-  uploads:

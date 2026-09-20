@@ -2,6 +2,7 @@
 .nuxt
 .output
 node_modules
+.local-data
 public/uploads/*
 !public/uploads/.gitkeep
 *.log
