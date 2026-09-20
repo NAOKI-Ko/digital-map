@@ -46,4 +46,3 @@ The following established domain terms require a separate product decision befor
 - `ワークスペース`
 
 WU-51 keeps these terms unchanged. Source identifiers and technical tests are not mechanically renamed.
-

@@ -46,4 +46,3 @@ The Workspace row uses a quiet hover state and chevron. The Map label has no bor
 ## Context boundary
 
 A Workspace change is a hard context boundary. The Workspace List uses the existing `POST /api/organizations/active`, then reloads `/admin/dashboard`; old `mapId`, `spotId`, `floorId`, and editor routes are never carried into the new Workspace.
-
