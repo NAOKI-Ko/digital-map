@@ -4,9 +4,9 @@ Date: 2026-09-20 (Asia/Tokyo)
 
 ## 1. Final verdict
 
-`BLOCKED: GITHUB PUSH / CI AUTHORIZATION REQUIRED`
+`PASS-READY`
 
-The application work and all available local authoritative gates pass. The candidate has not been pushed to `NAOKI-Ko/digital-map`, so GitHub Actions Verify has not run. `PASS-READY` is intentionally not claimed until that required non-waived gate succeeds.
+The application work and all required non-waived gates pass. The candidate was pushed to `NAOKI-Ko/digital-map`; GitHub Actions Verify run `35507208674` passed every step on candidate SHA `fa3114f3136051ff7699c7c300e70cdbea5588a2`.
 
 ## 2. Base SHA / branch
 
@@ -136,7 +136,7 @@ PASS locally and in browser QA.
 - Production dependency audit at high threshold: zero known vulnerabilities.
 - `git diff --check` PASS.
 - Build has the pre-existing large-chunk advisory only.
-- GitHub Actions Verify: NOT EXECUTED because the branch has not been authorized for push.
+- GitHub Actions Verify: PASS, run `35507208674` (`fa3114f3136051ff7699c7c300e70cdbea5588a2`).
 
 ## 16. Browser / visual / accessibility
 
@@ -153,7 +153,6 @@ PASS for exercised local scenarios at 1280x800, 390x844, and 430x932.
 - P0: 0
 - P1: 0
 - Core P2: 0 found in completed local gates
-- External gate: GitHub push/CI authorization is outstanding.
 - Evidence limitation: numeric browser Long Task/FPS measurements were unavailable; observable responsiveness and request-boundary evidence passed.
 
 ## 18. Windows QA status
@@ -166,4 +165,4 @@ This is recorded as the product-owner waiver in the WU-52 input and is not descr
 
 - `main`: unchanged
 - Production: unchanged; no deployment performed
-- Candidate exists only on the local WU-52 branch pending explicit authorization to push to GitHub and run CI.
+- Candidate is pushed to the remote WU-52 branch; no merge or deployment was performed.
