@@ -45,3 +45,18 @@
 ## タスクの進め方
 
 `docs/tasks.md`のタスクを上から順に、1タスク=1PR相当の粒度で進める。各タスクの完了条件を満たしたら次のタスクに進む。設計判断に迷った場合は`docs/design.md`を正とし、そこに記載がない場合は`docs/requirements.md`の要件に立ち返って判断する。
+
+## Git・ローカル開発運用
+
+- 通常の作業は最新の`dev`から開始する。古い`main`や過去WUブランチを通常開発のbaseにしない
+- `main`はProductionソースラインであり、明示的なProductionリリース承認なしにmerge・deployしない
+- 通常の逐次WUでは1つの正規クローン内でブランチを切り替える。WUごとの新規worktreeやCompose projectを作らない
+- worktreeは並行作業、緊急hotfix、またはユーザーの明示指示がある場合だけ使う
+- ローカルCompose project名は`digital-map-local`、canonical DB名は`digital_map`とする
+- 通常の開発は`docker compose up -d postgres`とホスト`pnpm dev`を使う。Full-stack smokeだけ`docker compose --profile full up -d --build app`を使う
+- Managed Mediaは`.local-data/uploads`、Local Public Storageは`.local-data/public`をホストとDockerで共有する
+- 破壊的なintegration testはcanonical `digital_map`へ向けず、同じPostgreSQL内の使い捨てDBを使う
+- `docker compose down -v`を通常運用で実行したり、気軽なpackage scriptとして追加したりしない
+- migration追加WUは、使い捨てDBでvalidate・test・auditしてから、バックアップ済みcanonical DBへ意図的に適用する
+- base SHA、implementation SHA、evidence SHA、CI run、deployed SHAの証跡を保持する。証跡済みSHAを変えるrebase／squashは避ける
+- 詳細は`docs/operations/git-branch-governance.md`と`docs/operations/local-development-environment.md`を正とする

@@ -37,7 +37,18 @@ Dockerを使わない場合：
 - pnpm 11.9
 - PostgreSQL 17
 
-## Docker Composeで起動する
+## Gitブランチ運用
+
+- `dev`が通常開発とWindows QAの統合ブランチです。通常のWUは最新の`dev`から`feature/`、`fix/`、`chore/`ブランチを作成し、PRで`dev`へ統合します。
+- `main`はProductionのソースラインです。明示的なリリース承認がある場合だけ進めます。
+- 通常の逐次WUでは、同じ正規クローンでブランチを切り替えます。WUごとのworktreeは作成しません。
+- 証跡済みコミットのSHAを変えるrebaseやsquashは避け、原則としてmerge commitで統合します。
+
+詳細は[`docs/operations/git-branch-governance.md`](docs/operations/git-branch-governance.md)を参照してください。
+
+## ローカル開発環境
+
+通常の開発では、単一のComposeプロジェクト`digital-map-local`でPostgreSQLだけを常駐させ、Nuxtはホストで起動します。
 
 1. リポジトリを取得し、環境変数ファイルを作成します。
 
@@ -47,15 +58,34 @@ Dockerを使わない場合：
 
 2. `.env`の`NUXT_SESSION_PASSWORD`を、十分に長いランダム文字列へ変更します。
 
-3. アプリとPostgreSQLをビルド・起動します。
+3. PostgreSQLを起動し、依存関係とDBを準備します。
 
    ```bash
-   docker compose up -d --build
+   pnpm local:db
+   pnpm install --frozen-lockfile
+   pnpm prisma:generate
+   pnpm exec prisma migrate deploy
    ```
 
-   アプリ起動時に`prisma migrate deploy`が実行され、未適用のマイグレーションが自動適用されます。
+4. ホストでNuxtを起動します。
 
-4. 初期管理者を作成します。パスワードは12文字以上が必要です。
+   ```bash
+   pnpm dev
+   ```
+
+   DBは`digital_map`、Managed Mediaは`.local-data/uploads`、Local Public Storageは`.local-data/public`を正とします。
+
+フルDocker smokeでは、ホストのNuxtを停止してから同じComposeプロジェクトの`app` profileを起動します。
+
+```bash
+pnpm local:full
+```
+
+`app`も同じDBと`.local-data`を参照します。ホストNuxtとDocker appを同時にport 3000で起動しないでください。
+
+アプリ起動時に`prisma migrate deploy`が実行されます。
+
+初期管理者を作成する場合、パスワードは12文字以上が必要です。
 
    ```bash
    docker compose exec \
@@ -72,24 +102,19 @@ Dockerを使わない場合：
 状態確認とログ表示：
 
 ```bash
-docker compose ps
-docker compose logs -f app
+pnpm local:status
+pnpm local:logs
 ```
 
-停止・再起動：
+通常停止：
 
 ```bash
-docker compose stop
-docker compose start
+pnpm local:down
 ```
 
-コンテナだけを削除する場合：
+`docker compose down`はコンテナとネットワークだけを停止・削除し、PostgreSQL volumeは保持します。`docker compose down -v`はDBを削除する破壊操作なので、通常運用では実行禁止です。
 
-```bash
-docker compose down
-```
-
-`docker compose down -v`はPostgreSQLとアップロード画像のボリュームも削除します。開発データを意図的に初期化する場合以外は実行しないでください。
+詳細は[`docs/operations/local-development-environment.md`](docs/operations/local-development-environment.md)を参照してください。
 
 ## 有松チーム内デモデータ
 
@@ -114,7 +139,7 @@ pnpm db:seed
 
 有松デモのマップと全スポットは常に下書きとしてupsertされます。固定IDを使うため、同じコマンドを繰り返しても重複登録されません。チーム確認後に手動編集した同デモデータは、次回seedで定義済みの内容へ戻る点に注意してください。
 
-## Dockerを使わずに開発する
+## ホストNuxtで開発する
 
 1. PostgreSQLを起動し、`.env.example`を`.env`へコピーして`DATABASE_URL`を接続先に合わせます。
 2. 依存関係・Prisma Client・DBを準備します。
@@ -132,7 +157,7 @@ pnpm db:seed
    pnpm dev
    ```
 
-ローカルアップロードは`public/uploads/`へ保存されます。本番ビルドでは`NUXT_UPLOAD_DIR`で永続化先を明示してください。
+ローカルのManaged MediaとPublic Storageは`.local-data/`に集約します。ホストNuxtとDocker appで同じ内容を共有し、別の隠れた保存先を作らないでください。
 
 ## 環境変数
 
@@ -140,7 +165,9 @@ pnpm db:seed
 |---|---|---|
 | `DATABASE_URL` | Prisma/PostgreSQL接続文字列 | ローカル既定値は`postgresql://digital_map:digital_map@localhost:5432/digital_map?schema=public`。Compose内ではサービス名`postgres`を使用 |
 | `NUXT_SESSION_PASSWORD` | セッションCookieの署名・暗号化 | 本番では32文字以上のランダム値を必ず指定。Composeの既定値は開発専用 |
-| `NUXT_UPLOAD_DIR` | アップロード画像の保存先 | 開発時は空欄で`public/uploads/`。Composeでは永続ボリューム配下を指定 |
+| `NUXT_UPLOAD_DIR` | Managed Mediaの保存先 | ローカル標準は`./.local-data/uploads`。Compose appでは`/app/.local-data/uploads` |
+| `PUBLIC_STORAGE_DRIVER` | 公開snapshotの保存方式 | ローカルは`local`、Productionは承認済みR2構成 |
+| `PUBLIC_STORAGE_ROOT` | Local Public Storage | ローカル標準は`./.local-data/public`。Compose appでは`/app/.local-data/public` |
 | `NUXT_NOMINATIM_BASE_URL` | Nominatim APIのベースURL | `https://nominatim.openstreetmap.org` |
 | `NUXT_NOMINATIM_USER_AGENT` | Nominatimへ送るUser-Agent | セルフホスト先の連絡先を含む固有値へ変更することを推奨 |
 | `SEED_TENANT_NAME` | seedで作るテナント名 | `デジタルマップ運営` |
@@ -156,6 +183,10 @@ pnpm db:seed
 
 ```bash
 pnpm dev                 # 開発サーバー
+pnpm local:db            # 共通PostgreSQLを起動
+pnpm local:full          # 同じCompose projectでfull Docker smoke
+pnpm local:status        # profileを含む状態確認
+pnpm local:down          # volumeを保持して停止
 pnpm test                # Vitest
 pnpm typecheck           # Nuxt/Vueの型チェック
 pnpm build               # 本番ビルド
@@ -181,7 +212,7 @@ server/
 shared/             クライアント/サーバー共通の型・schema
 lib/geo.ts          2点合わせと座標計算
 prisma/             schema、migration、seed、seed-assets
-public/uploads/     ローカル開発時のアップロード先
+.local-data/        Git管理外の共通Managed Media / Public Storage
 docs/                要件・設計・画面仕様・タスク
 ```
 
@@ -190,7 +221,7 @@ docs/                要件・設計・画面仕様・タスク
 ## データ公開とセキュリティ
 
 - 管理APIは管理者セッションと`tenantId`による所有権検証を通します。
-- WU-48中の実装正本ブランチは`refactor/wu48-technical-debt-20260919`で、R2修正はそこから分岐します。`main`への昇格はHuman UATと明示承認後に別途行います。
+- 通常開発の正本は`dev`です。`main`はProductionソースラインとして、明示承認なしに進めません。
 - 公開操作はDBのライブ行をそのまま配信せず、locale別`PublicMap`をimmutable release manifestとcontent-hash assetへ固定し、`current.json`だけを切り替えます。公開viewerにライブDB fallbackはありません。
 - `Map.isPublished`、`Map.currentReleaseId`、`current.json`は同一Map単位で直列化して更新し、成功後は同じ公開結果を表します。
 - 開発・単一プロセスのローカル配信は`PUBLIC_STORAGE_DRIVER=local`と`PUBLIC_STORAGE_ROOT`を使います。複数プロセス対応の本番配信は`PUBLIC_STORAGE_DRIVER=r2`とR2接続設定を使い、ローカルdriverを共有ストレージとして運用しません。
@@ -204,8 +235,9 @@ docs/                要件・設計・画面仕様・タスク
 
 ## バックアップ対象
 
-- PostgreSQL: Composeボリューム`postgres_data`
-- アップロード画像: Composeボリューム`uploads`
+- PostgreSQL: Composeプロジェクト`digital-map-local`の`postgres_data` volume
+- Managed Media: `.local-data/uploads`
+- Local Public Storage: `.local-data/public`
 
 DBの論理バックアップ例：
 
