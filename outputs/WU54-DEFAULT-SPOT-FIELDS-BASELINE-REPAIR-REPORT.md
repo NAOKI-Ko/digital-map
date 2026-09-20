@@ -1,8 +1,8 @@
 # WU-54 default Spot Fields baseline repair report
 
-## Current verdict
+## Verdict
 
-IN PROGRESS — Local correction, repair, republish, recovery proof, and regression gates pass. Exact-SHA CI and Windows QA repair remain pending.
+PASS-READY — root-cause correction, Local and Windows add-only repair, normal republish, exact-SHA CI/deployment, browser regression, and both recovery proofs passed.
 
 ## Correction
 
@@ -32,10 +32,27 @@ The old WU-53 bundle is retained and marked superseded; it is not deleted or rew
 - Typecheck and production build: PASS
 - Production dependency audit: PASS, no known vulnerabilities
 - Local data audits and `git diff --check`: PASS
+- Clean clone: frozen install, 572 tests, typecheck, production build PASS
+- GitHub Actions Verify `35518510261`: PASS on exact implementation SHA `4d59caae58f011d6940fa61a8be11f1181d238ed`
 - P0/P1/core P2: 0/0/0
+
+## Windows QA
+
+- Previous SHA: `30b983b1ae15083a8a857d95f61d1a59082cefe4`
+- Deployed SHA: `4d59caae58f011d6940fa61a8be11f1181d238ed`
+- Verified pre-repair backup: `C:\DigitalMap\backups\wu54-pre-30b983b-20260920-151142`
+- Before repair: `arimatsu-fon` had one custom and no standard definitions; the other two Maps had none. The existing custom definition remained untouched.
+- Repair: six standard definitions added per Map; second run added zero; default-field, Arimatsu, Tenant, and IMAGE audits PASS.
+- Chrome: all three settings screens, create form, and edit form PASS. Phone is visible as disabled/non-public in settings and absent from normal forms.
+- CSV v3 enabled-default columns, three-account Owner/Editor matrix, normal republish, and all public routes: PASS.
+- Each current release ID changed and each immutable release history increased from one to two.
+- Verified post-fix backup: `C:\DigitalMap\backups\wu54-post-4d59caa-20260920-153420`
+- Disposable post-backup restore and four audits/readiness/public checks: PASS; disposable resources removed afterward.
+
+Windows preparation initially left integration-test data in the active QA DB. The topology audit stopped acceptance, and the verified pre-repair DB + Media + Public backup was restored before the accepted repair. The final database contains exactly the intended 3-user/3-Workspace/3-Map baseline.
 
 ## Scope
 
-Branch: `fix/wu54-default-spot-fields-baseline-repair-20260920`. No main merge and no Production deployment. Passwords and private credentials are omitted.
+Branch: `fix/wu54-default-spot-fields-baseline-repair-20260920`. No main merge and no Production deployment. Passwords and private credentials are omitted; authenticated Windows QA used encrypted SSH localhost forwarding.
 
-Final CI and Windows evidence will replace this interim verdict before completion.
+Final verdict: `PASS-READY`. Retain the new Local authoritative baseline and both WU-54 Windows backups. The historical WU-53 baseline remains retained but superseded.

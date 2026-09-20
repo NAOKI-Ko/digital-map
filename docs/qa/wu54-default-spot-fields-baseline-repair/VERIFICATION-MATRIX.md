@@ -18,11 +18,11 @@
 | Full suite: 86 files / 572 tests | PASS |
 | Typecheck / production build / dependency audit | PASS |
 | `git diff --check` | PASS |
-| Clean-clone verification | PENDING |
-| Exact implementation SHA GitHub Actions Verify | PENDING |
-| Windows pre-backup / exact-SHA deploy / guarded repair | PENDING |
-| Windows browser, forms, CSV, republish, access matrix | PENDING |
-| Windows post-backup and disposable restore | PENDING |
+| Clean-clone frozen install / 572 tests / typecheck / build | PASS |
+| Exact implementation SHA GitHub Actions Verify `35518510261` | PASS |
+| Windows pre-backup / exact-SHA deploy / guarded repair | PASS |
+| Windows browser, forms, CSV, republish, access matrix | PASS |
+| Windows post-backup and disposable restore | PASS |
 | P0 / P1 / core P2 | 0 / 0 / 0 |
 
-Current verdict: `IN PROGRESS — WINDOWS REPAIR PENDING`.
+Current verdict: `PASS-READY`.

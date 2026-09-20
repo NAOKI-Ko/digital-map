@@ -48,4 +48,52 @@ The WU-53 authoritative bundle remains retained as historical evidence but is su
 
 ## Windows QA
 
-Pending exact-SHA CI approval and remote execution. This section will be completed with pre/post backups, repair, republish, browser regression, and disposable restore evidence before the final verdict.
+### Exact-SHA deployment
+
+- Implementation SHA: `4d59caae58f011d6940fa61a8be11f1181d238ed`
+- GitHub Actions Verify: `35518510261` PASS
+- Source archive SHA-256: `ba9b59dcd6dd6e0c95c5408de204a5ad229224c500dbb5ee5dd298eba89530bf`
+- Release: `C:\DigitalMap\releases\4d59caae58f011d6940fa61a8be11f1181d238ed`
+- Local and public readiness: HTTP 200
+
+Windows rebuilt the exact archive and passed Prisma validation/generation, 86 test files and 572 tests, typecheck, production build, Tenant audit, and IMAGE audit before activation.
+
+### Windows pre-repair recovery point
+
+`C:\DigitalMap\backups\wu54-pre-30b983b-20260920-151142`
+
+- Previous runtime: `30b983b1ae15083a8a857d95f61d1a59082cefe4`
+- DB: `236a42a8d486edfde1f65b59ab8a964a259267d0701b5d62b9854cb54d653604`
+- Managed Media: `81d7c9caf06dc60af6e2e0b2d6af8cfad782f6f13abcd9ab599f796b7f1f305d`
+- Public Storage: `d2b5b805814dde8282b5d49c344a52b004992662bf1198aa4f5fcea4e131408b`
+- Verification: PASS before deployment or repair
+
+The active-data audit showed that `arimatsu-fon` had one existing custom field and zero standard fields; `arimatsu-tama` and `arimatsu-nau` had zero definitions. The accepted repair preserved the custom field and added six standards to each Map. A second guarded run added zero rows.
+
+During release preparation, PostgreSQL integration tests were initially pointed at the active QA database and left a fourth test Map. The post-repair Arimatsu audit detected this and stopped acceptance. The complete verified pre-repair DB + Media + Public set was restored, returning the topology to 3 users / 3 Workspaces / 3 Maps / 48 Spots / 12 Categories / 3 MediaAssets before the accepted repair was rerun. No contaminated state was accepted or backed up as the WU-54 result.
+
+### Windows functional result
+
+- Chrome: six standard rows on all three settings screens; phone shown as `停止中` and `非公開`; the existing custom field remained on `arimatsu-fon`.
+- Spot create/edit: enabled description/address/hours/holiday/website fields rendered; phone did not.
+- CSV v3: 説明, 住所, 営業時間, 定休日, Webサイト included; 電話番号 excluded.
+- Three-user Owner/Editor access matrix: PASS over encrypted SSH localhost forwarding; plaintext credentials were not sent through the public tunnel or copied to Windows.
+- Normal owner publish flow: PASS for all three Maps; old release history retained.
+- Public routes and public/local readiness: HTTP 200.
+
+| Map | Previous release | New release | History |
+|---|---|---|---:|
+| `arimatsu-fon` | `cmu9salhx0000y8u1jk6knzyb` | `cmu9z3vg80000zovaw2vimp1m` | 2 |
+| `arimatsu-tama` | `cmu9salxa0002y8u1q5vrfpr2` | `cmu9z3wji0002zova4tvyxcwl` | 2 |
+| `arimatsu-nau` | `cmu9samd10004y8u1lczpnbqc` | `cmu9z3x400004zovanj17ites` | 2 |
+
+### Windows post-fix recovery point
+
+`C:\DigitalMap\backups\wu54-post-4d59caa-20260920-153420`
+
+- DB: `2eb05a24ee1aaf3a3f092293aefcae0d3de287eb95bb8920fcca2ea83ab1b1f1`
+- Managed Media: `67770cb19309f0540acb6514fbcacc551475bd4cc77517531024c73c52de0999`
+- Public Storage: `16f80b82b9fa05de4cc107dd25256f83c7660e5ccd207e06e2bd6e08597c388c`
+- Backup verification: PASS
+- Disposable restore: separate DB plus empty Media/Public roots; default-field, Arimatsu, Tenant, IMAGE, readiness, and all three public routes PASS
+- Cleanup: disposable DB and restore roots removed after proof; all WU-53 and WU-54 backups retained
