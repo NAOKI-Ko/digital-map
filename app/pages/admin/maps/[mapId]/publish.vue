@@ -17,7 +17,7 @@ const { data: releaseData, status: releaseStatus, refresh: refreshReleases } = a
 const isSaving = ref(false)
 const releaseDate = new Intl.DateTimeFormat('ja-JP', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Tokyo' })
 const errorMessage = ref('')
-const successMessage = ref('')
+const { success } = useToast()
 const configuredPublicOrigin = useRuntimeConfig().public.publicBaseUrl as string
 const publicUrl = computed(() => data.value
   ? buildPublicMapUrl(configuredPublicOrigin, data.value.map.slug)
@@ -32,7 +32,6 @@ async function togglePublication() {
 
   isSaving.value = true
   errorMessage.value = ''
-  successMessage.value = ''
   const currentReleaseId = releaseData.value?.currentReleaseId
   const action = resolvePublicationToggleAction(data.value.map.isPublished, currentReleaseId)
 
@@ -41,7 +40,7 @@ async function togglePublication() {
       if (!currentReleaseId) throw new Error('CURRENT_RELEASE_NOT_READY')
       await $fetch(`/api/maps/${mapId}/releases/${currentReleaseId}/rollback`, { method: 'POST' })
       data.value.map.isPublished = true
-      successMessage.value = '公開停止前の版を再公開しました。公開URLから閲覧できます。'
+      success('公開停止前の版を再公開しました。公開URLから閲覧できます', 'map-publication')
       await refreshReleases()
       return
     }
@@ -58,9 +57,7 @@ async function togglePublication() {
         updatedAt: response.publication.updatedAt,
       },
     }
-    successMessage.value = response.publication.isPublished
-      ? 'マップを公開しました。公開URLから閲覧できます。'
-      : 'マップを非公開にしました。公開URLからは閲覧できません。'
+    success(response.publication.isPublished ? 'マップを公開しました。公開URLから閲覧できます' : 'マップを非公開にしました', 'map-publication')
     await refreshReleases()
   }
   catch {
@@ -75,7 +72,6 @@ async function publishLatest() {
   if (!data.value) return
   isSaving.value = true
   errorMessage.value = ''
-  successMessage.value = ''
   try {
     const response = await $fetch<MapPublicationResponse>(`/api/maps/${mapId}/publish`, {
       method: 'POST',
@@ -88,7 +84,7 @@ async function publishLatest() {
         updatedAt: response.publication.updatedAt,
       },
     }
-    successMessage.value = '最新の編集内容から新しい公開版を作成しました。'
+    success('最新の編集内容から新しい公開版を作成しました', 'map-publication')
     await refreshReleases()
   }
   catch {
@@ -106,7 +102,7 @@ async function rollbackRelease(releaseId: string) {
     await $fetch(`/api/maps/${mapId}/releases/${releaseId}/rollback`, { method: 'POST' })
     await refreshReleases()
     if (data.value) data.value.map.isPublished = true
-    successMessage.value = '選択した過去リリースへ内容を戻しました。'
+    success('選択した過去リリースへ内容を戻しました', 'map-publication')
   }
   catch { errorMessage.value = 'リリースを切り戻せませんでした。' }
   finally { isSaving.value = false }
@@ -167,7 +163,6 @@ async function rollbackRelease(releaseId: string) {
         </div>
 
         <p v-if="errorMessage" role="alert" class="mt-5 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{{ errorMessage }}</p>
-        <p v-if="successMessage" role="status" class="mt-5 rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{{ successMessage }}</p>
       </section>
 
       <section v-if="releaseData?.releases.length" class="mt-7 border-t border-stone-200 pt-5">

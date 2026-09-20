@@ -4,11 +4,13 @@ import { encodeCsv, parseCsv } from '~~/lib/csv'
 import { validateCustomFieldValue } from '~~/shared/schemas/spot-field'
 import type { SpotCsvClassification, SpotCsvFieldDiff, SpotCsvMessage, SpotCsvPreview, SpotCsvRowStatus } from '~~/shared/types/spot-csv'
 
-export const SPOT_CSV_VERSION = '2'
-export const SPOT_CSV_SYSTEM_HEADERS = ['__csvVersion', '__schemaVersion', '__spotId', '__rowVersion'] as const
+export const SPOT_CSV_VERSION = '3'
+export const SPOT_CSV_SYSTEM_HEADERS = ['__csvVersion', '__schemaVersion', '__spotId', '__rowVersion', '__floorId'] as const
+const SPOT_CSV_V2_SYSTEM_HEADERS = ['__csvVersion', '__schemaVersion', '__spotId', '__rowVersion'] as const
 
 type CsvField = { id: string, kind: string, semanticKey: string | null, label: string, type: string, enabled: boolean, required: boolean, order: number }
 type CsvCategory = { id: string, name: string }
+type CsvFloor = { id: string, name: string, order: number }
 type CsvSpot = {
   id: string
   floorId: string
@@ -29,6 +31,8 @@ export interface ParsedSpotCsvRow {
   rowNumber: number
   spotId: string | null
   suppliedRowVersion: string
+  floorId: string | null
+  floorName: string
   name: string
   standardValues: Record<string, string>
   customValues: Record<string, string | number | boolean | null>
@@ -43,7 +47,8 @@ export interface ParsedSpotCsvRow {
 }
 
 export interface SpotCsvContext {
-  floor: { id: string }
+  floor?: { id: string }
+  floors?: CsvFloor[]
   fields: CsvField[]
   categories: CsvCategory[]
   existingNames: string[]
@@ -83,13 +88,14 @@ function hashCanonical(value: unknown) {
   return createHash('sha256').update(JSON.stringify(value)).digest('base64url')
 }
 
-export function computeSpotCsvSchemaVersion(fields: CsvField[], enabledLocales: string[] = ['ja']) {
+export function computeSpotCsvSchemaVersion(fields: CsvField[], enabledLocales: string[] = ['ja'], floors?: CsvFloor[]) {
   return hashCanonical({
-    version: Number(SPOT_CSV_VERSION),
+    version: floors ? Number(SPOT_CSV_VERSION) : 2,
     locales: [...enabledLocales].sort(),
     fields: fields
-      .map(field => ({ id: field.id, kind: field.kind, semanticKey: field.semanticKey, type: field.type, enabled: field.enabled, required: field.required }))
+      .map(field => ({ id: field.id, kind: field.kind, semanticKey: field.semanticKey, type: field.type, enabled: field.enabled, required: field.required, ...(floors ? { order: field.order, label: field.label } : {}) }))
       .sort((a, b) => a.id.localeCompare(b.id)),
+    ...(floors ? { floors: floors.map(floor => ({ id: floor.id, name: floor.name, order: floor.order })).toSorted((a, b) => a.order - b.order || a.id.localeCompare(b.id)) } : {}),
   })
 }
 
@@ -103,6 +109,36 @@ function dataHeaders(fields: CsvField[], enabledLocales: string[]) {
     ? ['spot:name[en]', ...enabled.filter(isTranslatableField).map(field => `${fieldHeader(field)}[en]`)]
     : []
   return ['spot:name', ...enabled.map(fieldHeader), 'categories', ...english]
+}
+
+const standardJapaneseLabels: Record<string, string> = {
+  description: '説明', address: '住所', phone: '電話番号', website: 'Webサイト', hours: '営業時間', holiday: '定休日',
+}
+
+type V3Column = { header: string, field?: CsvField, english?: boolean, kind: 'floor' | 'name' | 'field' | 'categories' }
+
+function uniqueHumanLabel(label: string, counts: Map<string, number>) {
+  const count = (counts.get(label) ?? 0) + 1
+  counts.set(label, count)
+  return count === 1 ? label : `${label}（${count}）`
+}
+
+export function spotCsvV3Columns(fields: CsvField[], enabledLocales: string[]): V3Column[] {
+  const counts = new Map<string, number>()
+  const columns: V3Column[] = [{ header: 'フロア', kind: 'floor' }, { header: 'スポット名', kind: 'name' }]
+  for (const field of enabledFields(fields)) {
+    const base = field.kind === 'standard' && field.semanticKey ? (standardJapaneseLabels[field.semanticKey] ?? field.label) : field.label
+    columns.push({ header: uniqueHumanLabel(base, counts), kind: 'field', field })
+  }
+  columns.push({ header: 'カテゴリー', kind: 'categories' })
+  if (enabledLocales.includes('en')) {
+    columns.push({ header: 'スポット名（英語）', kind: 'name', english: true })
+    for (const field of enabledFields(fields).filter(isTranslatableField)) {
+      const japanese = columns.find(column => column.field?.id === field.id && !column.english)?.header ?? field.label
+      columns.push({ header: `${japanese}（英語）`, kind: 'field', field, english: true })
+    }
+  }
+  return columns
 }
 
 export function createSpotCsvTemplate(fields: CsvField[], enabledLocales: string[] = ['ja']) {
@@ -184,11 +220,32 @@ function stateCellValues(spot: CsvSpot, fields: CsvField[], categories: CsvCateg
 }
 
 export function createSpotCsvExport(context: SpotCsvContext) {
-  const headers = [...SPOT_CSV_SYSTEM_HEADERS, ...dataHeaders(context.fields, context.enabledLocales)]
+  if (context.floors) {
+    const columns = spotCsvV3Columns(context.fields, context.enabledLocales)
+    const headers = [...columns.map(column => column.header), ...SPOT_CSV_SYSTEM_HEADERS]
+    const floorById = new Map(context.floors.map(floor => [floor.id, floor]))
+    const categoryNames = new Map(context.categories.map(category => [category.id, category.name]))
+    const rows = context.spots
+      .toSorted((a, b) => (floorById.get(a.floorId)?.order ?? 0) - (floorById.get(b.floorId)?.order ?? 0) || a.name.localeCompare(b.name, 'ja') || a.id.localeCompare(b.id))
+      .map((spot) => {
+        const state = spotEditableState(spot, context.fields)
+        const values = columns.map((column) => {
+          if (column.kind === 'floor') return floorById.get(spot.floorId)?.name ?? ''
+          if (column.kind === 'name') return column.english ? state.english.name : state.name
+          if (column.kind === 'categories') return state.categories.map(id => categoryNames.get(id) ?? '').filter(Boolean).join('|')
+          const field = column.field!
+          if (column.english) return field.kind === 'standard' && field.semanticKey ? state.english[field.semanticKey as keyof Omit<typeof state.english, 'custom'>] : state.english.custom[field.id]
+          return field.kind === 'standard' && field.semanticKey ? state.standard[field.semanticKey as keyof typeof state.standard] : state.custom[field.id]
+        }).map(value => protectSpreadsheetValue(value === undefined || value === null ? '' : String(value)))
+        return [...values, SPOT_CSV_VERSION, context.schemaVersion, spot.id, computeSpotCsvRowVersion(spot, context.fields, context.enabledLocales), spot.floorId]
+      })
+    return encodeCsv([headers, ...rows])
+  }
+  const headers = [...SPOT_CSV_V2_SYSTEM_HEADERS, ...dataHeaders(context.fields, context.enabledLocales)]
   const rows = context.spots
-    .filter(spot => spot.floorId === context.floor.id)
+    .filter(spot => spot.floorId === context.floor!.id)
     .toSorted((a, b) => a.name.localeCompare(b.name, 'ja') || a.id.localeCompare(b.id))
-    .map(spot => [SPOT_CSV_VERSION, context.schemaVersion, spot.id, computeSpotCsvRowVersion(spot, context.fields, context.enabledLocales), ...stateCellValues(spot, context.fields, context.categories, context.enabledLocales)])
+    .map(spot => ['2', context.schemaVersion, spot.id, computeSpotCsvRowVersion(spot, context.fields, context.enabledLocales), ...stateCellValues(spot, context.fields, context.categories, context.enabledLocales)])
   return encodeCsv([headers, ...rows])
 }
 
@@ -207,7 +264,7 @@ function parseTypedValue(field: CsvField, raw: string) {
   return { value: raw, valid: validateCustomFieldValue(field.type, raw) }
 }
 
-function emptyPreview(version: 1 | 2, message: string): { preview: SpotCsvPreview, parsedRows: ParsedSpotCsvRow[] } {
+function emptyPreview(version: 1 | 2 | 3, message: string): { preview: SpotCsvPreview, parsedRows: ParsedSpotCsvRow[] } {
   return {
     preview: {
       version, total: 0, valid: 0, newCount: 0, updateCount: 0, unchangedCount: 0, warnings: 0, conflicts: 0, errors: 1,
@@ -282,28 +339,44 @@ export function previewSpotCsv(
   enabledLocales: string[] = ['ja'],
   spots: CsvSpot[] = [],
   floorId?: string,
+  floors?: CsvFloor[],
 ): { preview: SpotCsvPreview, parsedRows: ParsedSpotCsvRow[] } {
   const parsed = parseCsv(source)
   if (parsed.error || parsed.rows.length === 0) return emptyPreview(1, parsed.error ?? 'ヘッダー行がありません。')
   const headers = parsed.rows[0]!
   const hasSystemHeader = headers.some(header => header.startsWith('__'))
-  const version: 1 | 2 = hasSystemHeader ? 2 : 1
+  const csvVersionIndex = headers.indexOf('__csvVersion')
+  const declaredVersion = csvVersionIndex >= 0 ? parsed.rows[1]?.[csvVersionIndex]?.trim() : ''
+  const version: 1 | 2 | 3 = declaredVersion === SPOT_CSV_VERSION ? 3 : hasSystemHeader ? 2 : 1
   const enabled = enabledFields(fields)
   const allowedFields = new Map(enabled.map(field => [fieldHeader(field), field]))
   const englishFields = new Map(enabled.filter(isTranslatableField).map(field => [`${fieldHeader(field)}[en]`, field]))
+  const v3Columns = spotCsvV3Columns(fields, enabledLocales)
+  const v3ColumnByHeader = new Map(v3Columns.map(column => [column.header, column]))
   const categoryByName = new Map(categories.map(category => [category.name, category.id]))
   const headerErrors: SpotCsvMessage[] = []
   if (new Set(headers).size !== headers.length) headerErrors.push({ level: 'error', message: '重複した列があります。' })
   if (version === 1 && headers[0] !== 'spot:name') headerErrors.push({ level: 'error', message: '先頭列はspot:nameである必要があります。' })
   if (version === 2) {
-    for (const systemHeader of SPOT_CSV_SYSTEM_HEADERS) if (!headers.includes(systemHeader)) headerErrors.push({ level: 'error', message: `必須システム列がありません: ${systemHeader}` })
+    for (const systemHeader of SPOT_CSV_V2_SYSTEM_HEADERS) if (!headers.includes(systemHeader)) headerErrors.push({ level: 'error', message: `必須システム列がありません: ${systemHeader}` })
     for (const requiredHeader of dataHeaders(fields, enabledLocales)) if (!headers.includes(requiredHeader)) headerErrors.push({ level: 'error', message: `v2 CSVの必須列がありません: ${requiredHeader}` })
   }
-  for (const header of headers) {
-    if ((SPOT_CSV_SYSTEM_HEADERS as readonly string[]).includes(header)) continue
-    const isEnglish = header === 'spot:name[en]' || englishFields.has(header)
-    if (isEnglish && !enabledLocales.includes('en')) headerErrors.push({ level: 'error', message: `無効なlocale列です: ${header}` })
-    else if (header !== 'spot:name' && header !== 'categories' && !allowedFields.has(header) && !isEnglish) headerErrors.push({ level: 'error', message: `未対応の列です: ${header}` })
+  if (version === 3) {
+    if (!floors) headerErrors.push({ level: 'error', message: 'このCSVはマップ全体の取込画面で確認してください。' })
+    for (const header of [...v3Columns.map(column => column.header), ...SPOT_CSV_SYSTEM_HEADERS]) if (!headers.includes(header)) headerErrors.push({ level: 'error', message: `v3 CSVの必須列がありません: ${header}` })
+    const lastHumanIndex = Math.max(...v3Columns.map(column => headers.indexOf(column.header)))
+    const firstSystemIndex = Math.min(...SPOT_CSV_SYSTEM_HEADERS.map(header => headers.indexOf(header)).filter(index => index >= 0))
+    if (firstSystemIndex <= lastHumanIndex) headerErrors.push({ level: 'error', message: 'システム管理用の列はCSVの末尾から移動しないでください。' })
+  } else {
+    for (const header of headers) {
+      if ((SPOT_CSV_V2_SYSTEM_HEADERS as readonly string[]).includes(header)) continue
+      const isEnglish = header === 'spot:name[en]' || englishFields.has(header)
+      if (isEnglish && !enabledLocales.includes('en')) headerErrors.push({ level: 'error', message: `無効なlocale列です: ${header}` })
+      else if (header !== 'spot:name' && header !== 'categories' && !allowedFields.has(header) && !isEnglish) headerErrors.push({ level: 'error', message: `未対応の列です: ${header}` })
+    }
+  }
+  if (version === 3) {
+    for (const header of headers) if (!(SPOT_CSV_SYSTEM_HEADERS as readonly string[]).includes(header) && !v3ColumnByHeader.has(header)) headerErrors.push({ level: 'error', message: `未対応の列です: ${header}` })
   }
   if (headerErrors.length) {
     const result = emptyPreview(version, headerErrors[0]!.message)
@@ -314,26 +387,34 @@ export function previewSpotCsv(
 
   const headerIndex = new Map(headers.map((header, index) => [header, index]))
   const rawCell = (cells: string[], header: string) => cells[headerIndex.get(header) ?? -1] ?? ''
-  const dataCell = (cells: string[], header: string) => version === 2 ? restoreSpreadsheetValue(rawCell(cells, header)) : rawCell(cells, header).trim()
+  const dataCell = (cells: string[], header: string) => version >= 2 ? restoreSpreadsheetValue(rawCell(cells, header)) : rawCell(cells, header).trim()
+  const nameHeader = version === 3 ? 'スポット名' : 'spot:name'
+  const categoryHeader = version === 3 ? 'カテゴリー' : 'categories'
+  const floorById = new Map((floors ?? []).map(floor => [floor.id, floor]))
+  const floorsByName = new Map<string, CsvFloor[]>()
+  for (const currentFloor of floors ?? []) floorsByName.set(currentFloor.name, [...(floorsByName.get(currentFloor.name) ?? []), currentFloor])
   const csvNameCounts = new Map<string, number>()
   const spotIdCounts = new Map<string, number>()
   for (const cells of parsed.rows.slice(1)) {
-    const name = dataCell(cells, 'spot:name').trim()
+    const name = dataCell(cells, nameHeader).trim()
     const spotId = rawCell(cells, '__spotId').trim()
     if (name) csvNameCounts.set(name, (csvNameCounts.get(name) ?? 0) + 1)
     if (spotId) spotIdCounts.set(spotId, (spotIdCounts.get(spotId) ?? 0) + 1)
   }
   const existingNameSet = new Set(existingNames)
   const spotById = new Map(spots.map(spot => [spot.id, spot]))
-  const schemaVersion = computeSpotCsvSchemaVersion(fields, enabledLocales)
+  const schemaVersion = computeSpotCsvSchemaVersion(fields, enabledLocales, version === 3 ? floors : undefined)
 
   const parsedRows = parsed.rows.slice(1).map((cells, rowIndex): ParsedSpotCsvRow => {
     const rowNumber = rowIndex + 2
     const messages: SpotCsvMessage[] = []
-    const name = dataCell(cells, 'spot:name').trim()
+    const name = dataCell(cells, nameHeader).trim()
     const spotIdValue = rawCell(cells, '__spotId').trim()
     const spotId = spotIdValue || null
     const suppliedRowVersion = rawCell(cells, '__rowVersion').trim()
+    const suppliedFloorId = rawCell(cells, '__floorId').trim()
+    const floorName = version === 3 ? dataCell(cells, 'フロア').trim() : (floorById.get(spotById.get(spotIdValue)?.floorId ?? floorId ?? '')?.name ?? '')
+    let resolvedFloorId: string | null = floorId ?? null
     const standardValues: Record<string, string> = {}
     const customValues: Record<string, string | number | boolean | null> = {}
     const englishStandardValues: Record<string, string> = {}
@@ -346,8 +427,8 @@ export function previewSpotCsv(
     if (name && existingNameSet.has(name) && (!spotId || spotById.get(spotId)?.name !== name)) messages.push({ level: 'warning', message: '同名のSpotが既にあります。' })
     if (name && (csvNameCounts.get(name) ?? 0) > 1) messages.push({ level: 'warning', message: 'CSV内に同名のSpotがあります。' })
 
-    if (version === 2) {
-      if (rawCell(cells, '__csvVersion').trim() !== SPOT_CSV_VERSION) messages.push({ level: 'error', message: '__csvVersionが不正です。' })
+    if (version >= 2) {
+      if (rawCell(cells, '__csvVersion').trim() !== String(version)) messages.push({ level: 'error', message: '__csvVersionが不正です。' })
       const suppliedSchemaVersion = rawCell(cells, '__schemaVersion').trim()
       if (!suppliedSchemaVersion) messages.push({ level: 'error', message: '__schemaVersionは必須です。' })
       else if (suppliedSchemaVersion !== schemaVersion) messages.push({ level: 'conflict', message: '項目構成がExport時から変更されています。最新CSVを再Exportしてください。' })
@@ -358,24 +439,46 @@ export function previewSpotCsv(
       if (spotId && !existing) messages.push({ level: 'error', message: 'Spot IDが存在しないか、対象Mapに属していません。' })
       else if (existing && floorId && existing.floorId !== floorId) messages.push({ level: 'error', message: 'Spot IDが選択したFloorに属していません。' })
       else if (existing && suppliedRowVersion && suppliedRowVersion !== computeSpotCsvRowVersion(existing, fields, enabledLocales)) messages.push({ level: 'conflict', message: 'SpotがExport後に変更されています。最新CSVを再Exportしてください。' })
+      if (version === 2 && !floorId && floors && !existing) messages.push({ level: 'error', message: 'このCSVは旧形式です。最新のCSVを書き出してから編集してください。' })
+      if (version === 2 && existing) resolvedFloorId = existing.floorId
+      if (version === 3) {
+        if (existing) {
+          resolvedFloorId = existing.floorId
+          const canonicalFloor = floorById.get(existing.floorId)
+          if (suppliedFloorId !== existing.floorId || floorName !== canonicalFloor?.name) messages.push({ level: 'error', message: '既存スポットのフロア変更はCSVではできません。マップ上で変更してください。' })
+        } else {
+          const matches = floorsByName.get(floorName) ?? []
+          if (!floorName) messages.push({ level: 'error', message: '新規スポットのフロアは必須です。' })
+          else if (matches.length === 0) messages.push({ level: 'error', message: `フロアが見つかりません: ${floorName}` })
+          else if (matches.length > 1) messages.push({ level: 'error', message: `同名のフロアが複数あるため特定できません: ${floorName}` })
+          else {
+            resolvedFloorId = matches[0]!.id
+            if (suppliedFloorId && suppliedFloorId !== resolvedFloorId) messages.push({ level: 'error', message: 'フロア名と__floorIdが一致しません。' })
+          }
+        }
+      }
     }
+
+    if (version === 1 && !floorId && floors) messages.push({ level: 'error', message: 'このCSVは旧形式です。最新のCSVを書き出してから編集してください。' })
 
     for (const field of enabled) {
       if (version === 1 && !headerIndex.has(fieldHeader(field))) continue
-      const raw = dataCell(cells, fieldHeader(field))
+      const v3Header = v3Columns.find(column => column.field?.id === field.id && !column.english)?.header
+      const raw = dataCell(cells, version === 3 ? (v3Header ?? field.label) : fieldHeader(field))
       if (field.required && raw === '') messages.push({ level: 'error', message: `${field.label}は必須です。` })
       const typed = parseTypedValue(field, raw)
       if (!typed.valid) messages.push({ level: 'error', message: `${field.label}の値の形式が不正です。` })
       if (field.kind === 'standard' && field.semanticKey) standardValues[field.semanticKey] = typed.value === null ? '' : String(typed.value)
       else customValues[field.id] = typed.value as string | number | boolean | null
     }
-    englishName = dataCell(cells, 'spot:name[en]')
+    englishName = dataCell(cells, version === 3 ? 'スポット名（英語）' : 'spot:name[en]')
     for (const [header, field] of englishFields) {
-      const raw = dataCell(cells, header)
+      const v3Header = v3Columns.find(column => column.field?.id === field.id && column.english)?.header
+      const raw = dataCell(cells, version === 3 ? (v3Header ?? header) : header)
       if (field.kind === 'standard' && field.semanticKey) englishStandardValues[field.semanticKey] = raw
       else englishCustomValues[field.id] = raw
     }
-    const categoryRaw = dataCell(cells, 'categories')
+    const categoryRaw = dataCell(cells, categoryHeader)
     if (categoryRaw) {
       for (const categoryName of categoryRaw.split('|').map(value => value.trim()).filter(Boolean)) {
         const categoryId = categoryByName.get(categoryName)
@@ -383,7 +486,7 @@ export function previewSpotCsv(
         else messages.push({ level: 'error', message: `未登録のカテゴリーです: ${categoryName}` })
       }
     }
-    const row: ParsedSpotCsvRow = { rowNumber, spotId, suppliedRowVersion, name, standardValues, customValues, englishName, englishStandardValues, englishCustomValues, categoryIds: [...new Set(categoryIds)], status: 'NEW', classifications: ['NEW'], diffs: [], messages }
+    const row: ParsedSpotCsvRow = { rowNumber, spotId, suppliedRowVersion, floorId: resolvedFloorId, floorName, name, standardValues, customValues, englishName, englishStandardValues, englishCustomValues, categoryIds: [...new Set(categoryIds)], status: 'NEW', classifications: ['NEW'], diffs: [], messages }
     const existing = spotId ? spotById.get(spotId) : undefined
     if (existing && !messages.some(message => message.level !== 'warning')) {
       row.diffs = compareStates(spotEditableState(existing, fields), nextEditableState(existing, row, fields), fields, categories)
@@ -394,7 +497,7 @@ export function previewSpotCsv(
     row.classifications = [row.status, ...(messages.some(message => message.level === 'warning') ? ['WARNING' as const] : [])]
     return row
   })
-  const rows = parsedRows.map(row => ({ rowNumber: row.rowNumber, spotId: row.spotId, name: row.name, status: row.status, classifications: row.classifications, diffs: row.diffs, messages: row.messages }))
+  const rows = parsedRows.map(row => ({ rowNumber: row.rowNumber, spotId: row.spotId, name: row.name, floorName: row.floorName, status: row.status, classifications: row.classifications, diffs: row.diffs, messages: row.messages }))
   const errors = rows.reduce((count, row) => count + row.messages.filter(message => message.level === 'error').length, 0)
   const warnings = rows.reduce((count, row) => count + row.messages.filter(message => message.level === 'warning').length, 0)
   const conflicts = rows.reduce((count, row) => count + row.messages.filter(message => message.level === 'conflict').length, 0)
@@ -412,10 +515,10 @@ export function previewSpotCsv(
   }
 }
 
-export async function loadSpotCsvContext(client: Prisma.TransactionClient | typeof prisma, mapId: string, floorId: string): Promise<SpotCsvContext> {
-  const [map, floor, fields, categories, spots] = await Promise.all([
+export async function loadSpotCsvContext(client: Prisma.TransactionClient | typeof prisma, mapId: string, floorId?: string): Promise<SpotCsvContext> {
+  const [map, floors, fields, categories, spots] = await Promise.all([
     client.map.findUnique({ where: { id: mapId }, select: { enabledLocales: true } }),
-    client.mapFloor.findFirst({ where: { id: floorId, mapId }, select: { id: true } }),
+    client.mapFloor.findMany({ where: { mapId }, select: { id: true, name: true, order: true }, orderBy: [{ order: 'asc' }, { id: 'asc' }] }),
     client.spotFieldDefinition.findMany({ where: { mapId }, orderBy: [{ order: 'asc' }, { createdAt: 'asc' }] }),
     client.category.findMany({ where: { mapId }, select: { id: true, name: true } }),
     client.spot.findMany({
@@ -429,6 +532,15 @@ export async function loadSpotCsvContext(client: Prisma.TransactionClient | type
       },
     }),
   ])
-  if (!map || !floor) throw createError({ statusCode: 422, statusMessage: '対象フロアが見つかりません。' })
-  return { floor, fields, categories, existingNames: spots.map(spot => spot.name), enabledLocales: map.enabledLocales, spots, schemaVersion: computeSpotCsvSchemaVersion(fields, map.enabledLocales) }
+  const floor = floorId ? floors.find(candidate => candidate.id === floorId) : undefined
+  if (!map || (floorId && !floor)) throw createError({ statusCode: 422, statusMessage: '対象フロアが見つかりません。' })
+  return {
+    ...(floor ? { floor: { id: floor.id } } : { floors }),
+    fields,
+    categories,
+    existingNames: spots.map(spot => spot.name),
+    enabledLocales: map.enabledLocales,
+    spots,
+    schemaVersion: computeSpotCsvSchemaVersion(fields, map.enabledLocales, floor ? undefined : floors),
+  }
 }

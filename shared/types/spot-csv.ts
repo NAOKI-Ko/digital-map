@@ -16,6 +16,7 @@ export interface SpotCsvPreviewRow {
   rowNumber: number
   spotId: string | null
   name: string
+  floorName?: string
   status: SpotCsvRowStatus
   classifications: SpotCsvClassification[]
   messages: SpotCsvMessage[]
@@ -23,7 +24,7 @@ export interface SpotCsvPreviewRow {
 }
 
 export interface SpotCsvPreview {
-  version: 1 | 2
+  version: 1 | 2 | 3
   total: number
   valid: number
   newCount: number

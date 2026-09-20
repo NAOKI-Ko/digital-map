@@ -25,6 +25,11 @@ const scopeOptions: Array<{ id: Scope, label: string }> = [
   { id: 'map', label: 'このMAPで使用' },
   { id: 'all', label: 'すべて' },
 ]
+const usageOptions = [
+  { value: 'all', label: 'すべての用途' }, { value: 'floor', label: 'フロアイラスト' }, { value: 'photo', label: 'スポット写真' },
+  { value: 'category', label: 'カテゴリーアイコン' }, { value: 'pin', label: 'カスタムピン' }, { value: 'logo', label: 'ロゴ' },
+  { value: 'seo', label: 'シェア画像' }, { value: 'decoration', label: '装飾' },
+]
 
 const visibleAssets = computed(() => {
   let assets = data.value?.assets ?? []
@@ -94,11 +99,8 @@ function changeSelection() {
         <div class="mt-2 flex flex-wrap gap-2">
           <button v-for="item in scopeOptions" :key="item.id" type="button" class="rounded-full px-3 py-1.5 text-xs font-semibold" :class="scope === item.id ? 'bg-stone-900 text-white' : 'bg-stone-100 text-stone-700'" @click="scope = item.id">{{ item.label }}</button>
         </div>
-        <label class="mt-3 block text-xs font-semibold text-stone-700">用途フィルター
-          <select v-model="usageFilter" class="mt-1 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm">
-            <option value="all">すべての用途</option><option value="floor">フロアイラスト</option><option value="photo">スポット写真</option><option value="category">カテゴリーアイコン</option><option value="pin">カスタムピン</option><option value="logo">ロゴ</option><option value="seo">シェア画像</option><option value="decoration">装飾</option>
-          </select>
-        </label>
+        <label class="mt-3 block text-xs font-semibold text-stone-700">用途フィルター</label>
+        <UiSelect v-model="usageFilter" class="mt-1" label="用途フィルター" :options="usageOptions" />
         <p class="mt-2 text-xs text-stone-500">別用途の画像は「すべての用途」から選べます。</p>
         <div v-if="visibleAssets.length" class="mt-3 grid max-h-72 grid-cols-3 gap-2 overflow-auto">
           <button v-for="asset in visibleAssets" :key="asset.id" type="button" class="overflow-hidden rounded-lg border border-stone-200 bg-white p-1 hover:border-terracotta-500" :title="asset.originalFilename" @click="selectAsset(asset)">

@@ -23,6 +23,7 @@ const wizard = useTemplateRef<{ focusLocation: (position: LatLng) => void }>('wi
 const isSaving = ref(false)
 const saveError = ref('')
 const successMessage = ref('')
+const { success } = useToast()
 const removeConfirmOpen = ref(false)
 const cameFromEditor = computed(() => route.query.from === 'editor')
 const backPath = computed(() => cameFromEditor.value
@@ -91,7 +92,7 @@ async function removeGeoReference() {
     }
     draft.value = createEmptyGeoReferenceDraft()
     removeConfirmOpen.value = false
-    successMessage.value = 'マップの位置合わせを解除しました。イラスト上のピン位置は変更していません。'
+    success('マップの位置合わせを解除しました。イラスト上のピン位置は変更していません', `georeference-${floorId}`)
   }
   catch (error) {
     saveError.value = getErrorMessage(error)
@@ -121,7 +122,7 @@ async function save() {
         floors: data.value.floors.map(item => item.id === floorId ? response.floor : item),
       }
     }
-    successMessage.value = '2つの基準点を保存しました。'
+    success('2つの基準点を保存しました', `georeference-${floorId}`)
   }
   catch (error) {
     saveError.value = getErrorMessage(error)

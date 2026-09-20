@@ -19,7 +19,7 @@ const photos = ref([...props.initialPhotos])
 const assetIds = ref([...(props.initialPhotoAssetIds ?? props.initialPhotos.map(() => null))])
 const isSaving = ref(false)
 const errorMessage = ref('')
-const successMessage = ref('')
+const { success } = useToast()
 const removeTargetIndex = ref<number | null>(null)
 
 watch(() => props.initialPhotos, (value) => {
@@ -66,10 +66,9 @@ async function movePhoto(index: number, direction: -1 | 1) {
 async function saveChange(nextPhotos: string[], nextAssetIds: Array<string | null>, message: string) {
   isSaving.value = true
   errorMessage.value = ''
-  successMessage.value = ''
   try {
     await persist(nextPhotos, nextAssetIds)
-    successMessage.value = message
+    success(message, `spot-photos-${props.spotId}`)
   }
   catch {
     errorMessage.value = '写真を保存できませんでした。もう一度お試しください。'
@@ -101,7 +100,6 @@ async function persist(nextPhotos: string[], nextAssetIds: Array<string | null>)
     <MediaPicker v-if="photos.length < 6" :map-id="mapId" label="スポット写真" usage="photo" class="mt-5" @selected="addPhoto" />
 
     <p v-if="errorMessage" role="alert" class="mt-4 text-sm text-red-600">{{ errorMessage }}</p>
-    <p v-if="successMessage" role="status" class="mt-4 text-sm text-emerald-700">{{ successMessage }}</p>
 
     <div v-if="photos.length === 0" class="mt-5 rounded-xl border-2 border-dashed border-stone-300 bg-stone-50 p-8 text-center text-sm text-stone-600">まだ写真はありません。</div>
     <ol v-else class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

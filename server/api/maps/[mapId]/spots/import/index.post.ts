@@ -56,13 +56,13 @@ async function writeCustomValues(transaction: Prisma.TransactionClient, spotId: 
 
 export default defineEventHandler(async (event): Promise<SpotCsvImportResponse> => {
   const { map, session } = await requireOwnedMap(event)
-  const body = await readBody<{ floorId?: string, csv?: string }>(event)
-  if (!body.floorId || typeof body.csv !== 'string') throw createError({ statusCode: 422, statusMessage: 'フロアとCSVを指定してください。' })
+  const body = await readBody<{ csv?: string }>(event)
+  if (typeof body.csv !== 'string') throw createError({ statusCode: 422, statusMessage: 'CSVを指定してください。' })
 
   return await prisma.$transaction(async (transaction) => {
     // Reload and re-hash all editable state inside the final serializable transaction.
-    const context = await loadSpotCsvContext(transaction, map.id, body.floorId!)
-    const result = previewSpotCsv(body.csv!, context.fields, context.categories, context.existingNames, context.enabledLocales, context.spots, context.floor.id)
+    const context = await loadSpotCsvContext(transaction, map.id)
+    const result = previewSpotCsv(body.csv!, context.fields, context.categories, context.existingNames, context.enabledLocales, context.spots, undefined, context.floors)
     if (result.preview.conflicts > 0) throw createError({ statusCode: 409, statusMessage: '競合があります。最新CSVを再Exportしてください。変更は保存されていません。' })
     if (result.preview.errors > 0) throw createError({ statusCode: 422, statusMessage: 'エラーのあるCSVは登録できません。変更は保存されていません。' })
 
@@ -70,10 +70,11 @@ export default defineEventHandler(async (event): Promise<SpotCsvImportResponse> 
     for (const row of result.parsedRows) {
       if (row.status === 'UNCHANGED') continue
       if (row.status === 'NEW') {
+        if (!row.floorId) throw createError({ statusCode: 422, statusMessage: `行${row.rowNumber}のフロアを特定できません。` })
         const spot = await transaction.spot.create({
           data: {
             tenantId: map.tenantId,
-            floorId: context.floor.id,
+            floorId: row.floorId,
             name: row.name,
             ...standardSpotData(row, context.fields),
             x: null,
@@ -107,11 +108,10 @@ export default defineEventHandler(async (event): Promise<SpotCsvImportResponse> 
         tenantId: map.tenantId,
         actorUserId: session.user.id,
         action: 'SPOT_CSV_BULK_APPLIED',
-        targetType: 'MapFloor',
-        targetId: context.floor.id,
+        targetType: 'Map',
+        targetId: map.id,
         mapId: map.id,
         metadata: {
-          floorId: context.floor.id,
           createCount: result.preview.newCount,
           updateCount: result.preview.updateCount,
           unchangedCount: result.preview.unchangedCount,

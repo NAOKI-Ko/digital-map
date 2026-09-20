@@ -29,10 +29,10 @@ async function download() {
     <h2 class="text-lg font-bold text-stone-900">紙マップPDF</h2>
     <p class="mt-2 text-sm leading-6 text-stone-600">公開中は現在の公開リリースを使用します。未公開時は「未公開プレビュー」と表示し、QRコードを掲載しません。</p>
     <div v-if="floors.length" class="mt-5 grid gap-4 sm:grid-cols-2">
-      <label class="text-sm font-semibold">用紙<select v-model="paper" class="mt-1 w-full rounded-lg border p-2"><option>A4</option><option>A3</option></select></label>
-      <label class="text-sm font-semibold">向き<select v-model="orientation" class="mt-1 w-full rounded-lg border p-2"><option value="landscape">横</option><option value="portrait">縦</option></select></label>
-      <label class="text-sm font-semibold">フロア範囲<select v-model="floorMode" class="mt-1 w-full rounded-lg border p-2"><option value="selected">選択中のみ</option><option value="all">全フロア</option></select></label>
-      <label class="text-sm font-semibold">フロア<select v-model="floorId" :disabled="floorMode === 'all'" class="mt-1 w-full rounded-lg border p-2 disabled:opacity-50"><option v-for="floor in floors" :key="floor.id" :value="floor.id">{{ floor.name }}</option></select></label>
+      <label class="text-sm font-semibold">用紙<UiSelect v-model="paper" class="mt-1" label="用紙" :options="[{ value: 'A4', label: 'A4' }, { value: 'A3', label: 'A3' }]" /></label>
+      <label class="text-sm font-semibold">向き<UiSelect v-model="orientation" class="mt-1" label="向き" :options="[{ value: 'landscape', label: '横' }, { value: 'portrait', label: '縦' }]" /></label>
+      <label class="text-sm font-semibold">フロア範囲<UiSelect v-model="floorMode" class="mt-1" label="フロア範囲" :options="[{ value: 'selected', label: '選択中のみ' }, { value: 'all', label: '全フロア' }]" /></label>
+      <label class="text-sm font-semibold">フロア<UiSelect v-model="floorId" :disabled="floorMode === 'all'" class="mt-1" label="フロア" :options="floors.map(floor => ({ value: floor.id, label: floor.name }))" /></label>
     </div>
     <p v-else class="mt-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-800">先にフロアを作成してください。</p>
     <p v-if="!isPublished" class="mt-4 text-sm font-semibold text-amber-800">未公開プレビューとして出力します。</p>

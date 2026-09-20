@@ -44,6 +44,7 @@ const message = ref('')
 const operationError = ref('')
 const saving = ref(false)
 const uploading = ref(false)
+const { success } = useToast()
 
 watch(() => data.value, (response) => {
   const source = response?.revision?.payload ?? response?.spot
@@ -74,7 +75,7 @@ async function save() {
         photoAssetIds: photoAssetIds.value,
       },
     })
-    message.value = '承認待ちとして保存しました。'
+    success('承認待ちとして保存しました', `spot-revision-${spotId}`)
     await refresh()
   }
   catch {
@@ -114,7 +115,6 @@ async function upload(event: Event) {
     <p v-if="loadError" role="alert" class="mt-4 rounded bg-red-50 p-4 text-red-800">このスポットを編集する権限がないか、担当から外れています。</p>
     <template v-else>
       <p v-if="data?.blockedByPreviousAssignee" class="mt-4 rounded bg-amber-50 p-4">前の担当者による承認待ちの変更申請があるため、確認が完了するまで新しい編集は保存できません。</p>
-      <p v-if="message" role="status" class="mt-4 rounded bg-green-50 p-4">{{ message }}</p>
       <p v-if="operationError" role="alert" class="mt-4 rounded bg-red-50 p-4 text-red-800">{{ operationError }}</p>
       <form class="mt-6 space-y-4 rounded-xl bg-white p-6" @submit.prevent="save">
         <label v-for="field in editableFields" :key="field.key" class="block text-sm font-semibold">

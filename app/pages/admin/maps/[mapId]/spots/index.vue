@@ -29,6 +29,7 @@ const bulkCategoryId = ref('')
 const pendingCategoryAction = ref<'addCategory' | 'removeCategory' | null>(null)
 const bulkMessage = ref('')
 const isBulkSaving = ref(false)
+const { success } = useToast()
 const bulkDeleteOpen = ref(false)
 const allCurrentSelected = computed(() => Boolean(data.value?.spots.length) && data.value!.spots.every(spot => selectedSpotIds.value.includes(spot.id)))
 let searchTimer: ReturnType<typeof setTimeout> | null = null
@@ -85,7 +86,7 @@ async function executeBulk(action: 'delete' | 'publish' | 'unpublish' | 'addCate
       method: 'PATCH',
       body: { action, spotIds: selectedSpotIds.value, ...((action === 'addCategory' || action === 'removeCategory') ? { categoryId: bulkCategoryId.value } : {}) },
     })
-    bulkMessage.value = `${selectedSpotIds.value.length}件を更新しました。`
+    success(`${selectedSpotIds.value.length}件を更新しました`, 'spot-bulk-operation')
     selectedSpotIds.value = []
     bulkDeleteOpen.value = false
     pendingCategoryAction.value = null
@@ -123,32 +124,22 @@ function formatDate(value: string) {
         </div>
         <div>
           <label for="spot-category" class="text-xs font-semibold text-stone-600">カテゴリ</label>
-          <select id="spot-category" v-model="form.categoryId" class="mt-1.5 w-full rounded-lg border border-stone-300 px-3 py-2.5 text-sm">
-            <option value="">すべて</option>
-            <option v-for="category in data?.filters.categories" :key="category.id" :value="category.id">{{ category.name }}</option>
-          </select>
+          <UiSelect id="spot-category" v-model="form.categoryId" class="mt-1.5" label="カテゴリ" :options="[{ value: '', label: 'すべて' }, ...(data?.filters.categories ?? []).map(category => ({ value: category.id, label: category.name }))]" />
         </div>
-        <div><label for="spot-position" class="text-xs font-semibold text-stone-600">配置状態</label><select id="spot-position" v-model="form.position" class="mt-1.5 w-full rounded-lg border border-stone-300 px-3 py-2.5 text-sm"><option value="">すべて</option><option value="positioned">配置済み</option><option value="unpositioned">位置未設定</option></select></div>
+        <div><label for="spot-position" class="text-xs font-semibold text-stone-600">配置状態</label><UiSelect id="spot-position" v-model="form.position" class="mt-1.5" label="配置状態" :options="[{ value: '', label: 'すべて' }, { value: 'positioned', label: '配置済み' }, { value: 'unpositioned', label: '位置未設定' }]" /></div>
       </div>
       <div class="mt-3 flex flex-wrap items-start justify-between gap-3">
       <details class="min-w-0 flex-1" :open="Boolean(form.floorId || form.status || form.sort !== 'updated')">
         <summary class="w-fit cursor-pointer py-2 text-sm font-medium text-stone-600">詳細条件</summary>
         <div class="mt-2 grid gap-3 sm:grid-cols-3">
-        <div><label for="spot-sort" class="text-xs font-semibold text-stone-600">並び順</label><select id="spot-sort" v-model="form.sort" class="mt-1.5 w-full rounded-lg border border-stone-300 px-3 py-2.5 text-sm"><option value="updated">更新が新しい順</option><option value="name">名前順</option><option value="created">作成が新しい順</option></select></div>
+        <div><label for="spot-sort" class="text-xs font-semibold text-stone-600">並び順</label><UiSelect id="spot-sort" v-model="form.sort" class="mt-1.5" label="並び順" :options="[{ value: 'updated', label: '更新が新しい順' }, { value: 'name', label: '名前順' }, { value: 'created', label: '作成が新しい順' }]" /></div>
         <div>
           <label for="spot-floor" class="text-xs font-semibold text-stone-600">フロア</label>
-          <select id="spot-floor" v-model="form.floorId" class="mt-1.5 w-full rounded-lg border border-stone-300 px-3 py-2.5 text-sm">
-            <option value="">すべて</option>
-            <option v-for="floor in data?.filters.floors" :key="floor.id" :value="floor.id">{{ floor.name }}</option>
-          </select>
+          <UiSelect id="spot-floor" v-model="form.floorId" class="mt-1.5" label="フロア" :options="[{ value: '', label: 'すべて' }, ...(data?.filters.floors ?? []).map(floor => ({ value: floor.id, label: floor.name }))]" />
         </div>
         <div>
           <label for="spot-status" class="text-xs font-semibold text-stone-600">公開状態</label>
-          <select id="spot-status" v-model="form.status" class="mt-1.5 w-full rounded-lg border border-stone-300 px-3 py-2.5 text-sm">
-            <option value="">すべて</option>
-            <option value="published">公開</option>
-            <option value="draft">下書き</option>
-          </select>
+          <UiSelect id="spot-status" v-model="form.status" class="mt-1.5" label="公開状態" :options="[{ value: '', label: 'すべて' }, { value: 'published', label: '公開' }, { value: 'draft', label: '下書き' }]" />
         </div>
         </div>
       </details>
@@ -170,11 +161,11 @@ function formatDate(value: string) {
         </div>
         <div v-if="selectedSpotIds.length" class="mt-4 flex flex-wrap items-center gap-2 border-t border-stone-200 pt-4">
           <span class="text-sm font-semibold">カテゴリー一括操作:</span>
-          <select v-model="bulkCategoryId" aria-label="一括操作するカテゴリー" class="rounded-lg border border-stone-300 px-3 py-2 text-sm"><option value="">1つ選択</option><option v-for="category in data?.filters.categories" :key="category.id" :value="category.id">{{ category.name }}</option></select>
+          <UiSelect v-model="bulkCategoryId" class="min-w-52" label="一括操作するカテゴリー" :options="[{ value: '', label: '1つ選択' }, ...(data?.filters.categories ?? []).map(category => ({ value: category.id, label: category.name }))]" />
           <button type="button" :disabled="!bulkCategoryId || isBulkSaving" class="rounded-lg border px-3 py-2 text-sm font-semibold disabled:opacity-40" @click="pendingCategoryAction = 'addCategory'">追加</button>
           <button type="button" :disabled="!bulkCategoryId || isBulkSaving" class="rounded-lg border px-3 py-2 text-sm font-semibold disabled:opacity-40" @click="pendingCategoryAction = 'removeCategory'">削除</button>
         </div>
-        <p v-if="bulkMessage" role="status" class="mt-3 text-sm text-stone-600">{{ bulkMessage }}</p>
+        <p v-if="bulkMessage" role="alert" class="mt-3 text-sm text-red-700">{{ bulkMessage }}</p>
       </div>
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-4"><h2 class="font-bold text-stone-900">検索結果</h2><button type="button" class="min-h-11 px-2 text-sm font-medium text-stone-600 hover:text-stone-900" @click="toggleAllCurrent">{{ allCurrentSelected ? '選択解除' : 'すべて選択' }}</button></div>

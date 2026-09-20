@@ -46,7 +46,7 @@ const { defineField, errors, handleSubmit, meta, resetForm, setErrors } = useFor
   initialValues: props.initialValue,
 })
 
-const [floorId, floorIdAttrs] = defineField('floorId')
+const [floorId] = defineField('floorId')
 const [name, nameAttrs] = defineField('name')
 const [categoryIds] = defineField('categoryIds')
 const [description, descriptionAttrs] = defineField('description')
@@ -119,10 +119,7 @@ function cancel() {
 
         <div>
           <label for="spot-floor" class="text-sm font-semibold text-stone-800">フロア <span class="text-red-600">必須</span></label>
-          <select id="spot-floor" v-model="floorId" v-bind="floorIdAttrs" class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5">
-            <option value="">選択してください</option>
-            <option v-for="floor in floors" :key="floor.id" :value="floor.id">{{ floor.name }}</option>
-          </select>
+          <UiSelect id="spot-floor" v-model="floorId" class="mt-2" label="フロア" :options="floors.map(floor => ({ value: floor.id, label: floor.name }))" />
           <p v-if="errors.floorId" class="mt-1 text-sm text-red-600">{{ errors.floorId }}</p>
         </div>
         <div>

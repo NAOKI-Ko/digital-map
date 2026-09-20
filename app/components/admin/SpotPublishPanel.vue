@@ -16,7 +16,7 @@ const emit = defineEmits<{
 const isSaving = ref(false)
 const isPreviewOpen = ref(false)
 const errorMessage = ref('')
-const successMessage = ref('')
+const { success } = useToast()
 const pinPreset = computed(() => getPinIconPreset(props.spot.pinIconId))
 const hasCoordinates = computed(() => props.spot.x !== null && props.spot.y !== null)
 const pinStyle = computed(() => {
@@ -31,7 +31,6 @@ const pinStyle = computed(() => {
 async function togglePublication() {
   isSaving.value = true
   errorMessage.value = ''
-  successMessage.value = ''
   const nextState = !props.spot.isPublished
 
   try {
@@ -40,9 +39,7 @@ async function togglePublication() {
       body: { isPublished: nextState },
     })
     emit('updated', response.publication)
-    successMessage.value = response.publication.isPublished
-      ? 'スポットを公開対象にしました。'
-      : 'スポットを下書きに戻しました。'
+    success(response.publication.isPublished ? 'スポットを公開対象にしました' : 'スポットを下書きに戻しました', `spot-publication-${props.spotId}`)
   }
   catch {
     errorMessage.value = '公開状態を変更できませんでした。もう一度お試しください。'
@@ -86,7 +83,6 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleKeydown))
     </div>
 
     <p v-if="errorMessage" role="alert" class="mt-5 text-sm text-red-600">{{ errorMessage }}</p>
-    <p v-if="successMessage" role="status" class="mt-5 text-sm text-emerald-700">{{ successMessage }}</p>
 
     <Teleport to="body">
       <div v-if="isPreviewOpen" class="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-stone-950/60 p-4" @click.self="isPreviewOpen = false">

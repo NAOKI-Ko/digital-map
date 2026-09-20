@@ -47,7 +47,7 @@ const design = reactive<PinDesignInput>({
 })
 const isSaving = ref(false)
 const errorMessage = ref('')
-const successMessage = ref('')
+const { success } = useToast()
 const normalizedInitialValue = computed(() => ({ ...props.initialValue, pinIconId: normalizePinIconId(props.initialValue.pinIconId), importance: props.initialValue.importance ?? 'normal' }))
 const isDirty = computed(() => JSON.stringify(design) !== JSON.stringify(normalizedInitialValue.value))
 const colorPresets = ['#C7401F', '#2563EB', '#047857', '#7C3AED', '#D97706', '#292524']
@@ -111,7 +111,6 @@ async function save(): Promise<SpotPinDesignResponse['design'] | null> {
 
   isSaving.value = true
   errorMessage.value = ''
-  successMessage.value = ''
   try {
     const response = await $fetch<SpotPinDesignResponse>(`/api/maps/${props.mapId}/spots/${props.spotId}/design`, {
       method: 'PATCH',
@@ -119,7 +118,7 @@ async function save(): Promise<SpotPinDesignResponse['design'] | null> {
     })
     Object.assign(design, response.design)
     emit('updated', response.design)
-    successMessage.value = 'ピンデザインを保存しました。'
+    success('ピンデザインを保存しました', `pin-design-${props.spotId}`)
     return response.design
   }
   catch {
@@ -134,7 +133,6 @@ async function save(): Promise<SpotPinDesignResponse['design'] | null> {
 function reset() {
   Object.assign(design, normalizedInitialValue.value)
   errorMessage.value = ''
-  successMessage.value = ''
 }
 
 defineExpose({ isDirty: () => isDirty.value, reset, save })
@@ -239,7 +237,6 @@ defineExpose({ isDirty: () => isDirty.value, reset, save })
     </div>
 
     <p v-if="errorMessage" role="alert" class="mt-5 text-sm text-red-600">{{ errorMessage }}</p>
-    <p v-if="successMessage" role="status" class="mt-5 text-sm text-emerald-700">{{ successMessage }}</p>
     <div v-if="showSave" class="mt-6 flex justify-end"><button type="button" :disabled="isSaving" class="rounded-lg bg-terracotta-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60" @click="save">{{ isSaving ? '保存中…' : 'ピンデザインを保存' }}</button></div>
   </div>
   <UnsavedChangesGuard v-if="guardNavigation" :dirty="isDirty && !isSaving" />
