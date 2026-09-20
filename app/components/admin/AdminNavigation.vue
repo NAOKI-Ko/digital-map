@@ -17,7 +17,6 @@ const emit = defineEmits<{ navigate: [], toggle: [] }>()
 const route = useRoute()
 const { logout, user } = useAuth()
 const isLoggingOut = ref(false)
-const isContextOpen = ref(false)
 const { data: organizationData } = await useFetch('/api/organizations')
 const { data: mapData } = await useFetch<AdminMapListResponse>('/api/maps')
 const { data: assignedSpotData } = await useFetch<{ spots: Array<{ id: string }> }>('/api/spot-editor/spots')
@@ -38,29 +37,9 @@ const groupedNavigation = computed(() => groupOrder
   .map(id => ({ id, label: adminNavigationGroupLabels[id], items: navigation.value.filter(item => item.group === id) }))
   .filter(group => group.items.length))
 const railNavigation = computed(() => navigation.value.filter(item => item.rail))
-const contextLabel = computed(() => [activeOrganization.value?.name, currentMap.value?.name].filter(Boolean).join(' / ') || 'ワークスペースを選択')
 
 function isActive(item: AdminNavigationItem) {
   return isAdminNavigationItemActive(item, route.path, route.hash)
-}
-
-async function switchOrganization(event: Event) {
-  const select = event.target as HTMLSelectElement
-  const tenantId = select.value
-  if (!tenantId || tenantId === organizationData.value?.activeOrganizationId) return
-  if (route.path !== '/admin/dashboard') {
-    await navigateTo('/admin/dashboard')
-    if (route.path !== '/admin/dashboard') {
-      select.value = organizationData.value?.activeOrganizationId ?? ''
-      return
-    }
-  }
-  await $fetch('/api/organizations/active', { method: 'POST', body: { tenantId } })
-  await reloadNuxtApp({ path: '/admin/dashboard', force: true })
-}
-
-function closeContextOnEscape(event: KeyboardEvent) {
-  if (event.key === 'Escape') isContextOpen.value = false
 }
 
 onMounted(async () => {
@@ -68,9 +47,7 @@ onMounted(async () => {
     await $fetch('/api/organizations/active', { method: 'POST', body: { tenantId: organizations.value[0]!.id } })
     await reloadNuxtApp({ path: '/admin/dashboard', force: true })
   }
-  window.addEventListener('keydown', closeContextOnEscape)
 })
-onBeforeUnmount(() => window.removeEventListener('keydown', closeContextOnEscape))
 
 async function handleLogout() {
   isLoggingOut.value = true
@@ -79,7 +56,6 @@ async function handleLogout() {
 }
 
 function handleNavigate() {
-  isContextOpen.value = false
   emit('navigate')
 }
 </script>
@@ -87,7 +63,7 @@ function handleNavigate() {
 <template>
   <div class="flex h-full flex-col overflow-visible border-r border-stone-200 bg-stone-100 text-stone-800">
     <div class="flex min-h-[4.5rem] items-center border-b border-stone-200" :class="showLabels ? 'px-4' : 'justify-center px-2'">
-      <NuxtLink :to="currentMap ? `/admin/maps/${currentMap.id}` : '/admin/dashboard'" class="group relative flex min-h-11 items-center rounded-lg focus-visible:outline-stone-700" :class="showLabels ? 'gap-3' : 'justify-center px-3'" aria-label="Digital Map ホーム" @click="handleNavigate">
+      <NuxtLink :to="currentMap ? `/admin/maps/${currentMap.id}` : '/admin/dashboard'" class="group relative flex min-h-11 items-center rounded-lg" :class="showLabels ? 'gap-3' : 'justify-center px-3'" aria-label="Digital Map ホーム" @click="handleNavigate">
         <span class="grid size-9 shrink-0 place-items-center rounded-lg bg-terracotta-600 text-sm font-black text-white">D</span>
         <span v-if="showLabels" class="min-w-0">
           <span class="block text-[0.65rem] font-semibold tracking-[0.2em] text-stone-600">DIGITAL MAP</span>
@@ -98,32 +74,23 @@ function handleNavigate() {
     </div>
 
     <div class="relative border-b border-stone-200 p-2">
-      <div v-if="showLabels" class="space-y-3 rounded-xl bg-transparent p-3">
-        <label class="block text-[0.65rem] font-semibold uppercase tracking-wider text-stone-600">
-          ワークスペース
-          <select :value="organizationData?.activeOrganizationId" class="mt-1.5 min-h-11 w-full rounded-lg border border-stone-200 bg-white px-3 text-sm font-semibold text-stone-800" aria-label="ワークスペースを切り替える" @change="switchOrganization">
-            <option v-for="organization in organizations" :key="organization.id" :value="organization.id">{{ organization.name }}</option>
-          </select>
-        </label>
-        <div v-if="currentMap" class="block text-[0.65rem] font-semibold uppercase tracking-wider text-stone-600">
-          現在のマップ
-          <p class="mt-1.5 truncate rounded-lg border border-stone-200 bg-stone-50 px-3 py-3 text-sm font-semibold normal-case tracking-normal text-stone-800">{{ currentMap.name }}</p>
+      <div v-if="showLabels" class="space-y-4 px-3 py-4">
+        <div>
+          <p class="text-[0.65rem] font-semibold tracking-wider text-stone-500">ワークスペース</p>
+          <NuxtLink to="/admin/workspaces" class="mt-1 flex min-h-11 items-center gap-2 rounded-lg px-2 text-sm font-bold text-stone-900 transition-colors hover:bg-stone-200/60 motion-reduce:transition-none" aria-label="ワークスペースを切り替える" @click="handleNavigate">
+            <span class="min-w-0 flex-1 truncate">{{ activeOrganization?.name ?? 'ワークスペース未選択' }}</span>
+            <AdminIcon name="chevron" class="shrink-0 text-stone-500" />
+          </NuxtLink>
+        </div>
+        <div>
+          <p class="text-[0.65rem] font-semibold tracking-wider text-stone-500">現在のマップ</p>
+          <p class="mt-1 min-h-8 truncate px-2 py-1.5 text-sm font-semibold text-stone-700">{{ currentMap?.name ?? 'マップ未作成' }}</p>
         </div>
       </div>
-      <button v-else type="button" class="group relative flex min-h-11 w-full items-center justify-center rounded-lg text-stone-600 transition-colors hover:bg-stone-200/60 hover:text-stone-950 motion-reduce:transition-none" :aria-expanded="isContextOpen" aria-controls="admin-context-popover" :aria-label="contextLabel" :title="contextLabel" @click="isContextOpen = !isContextOpen">
+      <NuxtLink v-else to="/admin/workspaces" class="group relative flex min-h-11 w-full items-center justify-center rounded-lg text-stone-600 transition-colors hover:bg-stone-200/60 hover:text-stone-950 motion-reduce:transition-none" aria-label="ワークスペースを切り替える" title="ワークスペースを切り替える" @click="handleNavigate">
         <AdminIcon name="switch" />
-        <span class="admin-nav-tooltip">{{ contextLabel }}</span>
-      </button>
-      <div v-if="!showLabels && isContextOpen" id="admin-context-popover" class="absolute left-[4.25rem] top-2 z-50 w-72 rounded-xl border border-stone-200 bg-white p-4 text-stone-900 shadow-xl">
-        <p class="text-xs font-semibold text-stone-500">ワークスペース</p>
-        <select :value="organizationData?.activeOrganizationId" class="mt-1 min-h-11 w-full rounded-lg border border-stone-300 bg-white px-3 text-sm" aria-label="ワークスペースを切り替える" @change="switchOrganization">
-          <option v-for="organization in organizations" :key="organization.id" :value="organization.id">{{ organization.name }}</option>
-        </select>
-        <template v-if="currentMap">
-          <p class="mt-4 text-xs font-semibold text-stone-500">現在のマップ</p>
-          <p class="mt-1 rounded-lg bg-stone-50 px-3 py-3 text-sm font-semibold">{{ currentMap.name }}</p>
-        </template>
-      </div>
+        <span class="admin-nav-tooltip">ワークスペースを切り替える</span>
+      </NuxtLink>
     </div>
 
     <nav class="admin-navigation-scroll min-h-0 flex-1 overflow-y-auto px-2 py-3" aria-label="管理画面メニュー">
