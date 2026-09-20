@@ -43,12 +43,12 @@ describe('ジオリファレンス調整と解除', () => {
     expect(pageSource).toContain('基準点をリセット')
     expect(pageSource.indexOf('基準点をリセット')).toBeLessThan(pageSource.indexOf('<AddressGeocoder'))
     expect(pageSource).toContain('保存済みの設定はまだ変更されていません')
-    expect(pageSource).toContain('ジオリファレンスを解除')
+    expect(pageSource).toContain('マップの位置合わせを解除')
     expect(pageSource).toContain('<ConfirmDialog')
   })
 
   it('Spotがある保存前にx/y不変の意味を明示する', () => {
-    expect(pageSource).toContain('イラスト上のPIN位置は変わりません。実世界との対応のみ更新されます。')
+    expect(pageSource).toContain('イラスト上のピン位置は変わりません。実世界との対応のみ更新されます。')
   })
 
   it('イラストのzoom/panとoverlay opacity調整を提供する', () => {

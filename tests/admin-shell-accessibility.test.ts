@@ -14,10 +14,11 @@ describe('WU-41 admin shell contracts', () => {
   it('collapsed stateだけをpresentation preferenceとして保存する', () => {
     expect(layout).toContain("localStorage.setItem('adminSidebarExpanded'")
     expect(layout).not.toMatch(/localStorage\.setItem\([^)]*(?:role|permission|mapId|tenantId)/i)
-    expect(navigation).toContain("await navigateTo('/admin/dashboard')")
+    expect(navigation).toContain('to="/admin/workspaces"')
     expect(navigation).not.toContain('function switchMap')
     expect(navigation).toContain('ワークスペースを切り替える')
     expect(navigation).toContain('現在のマップ')
+    expect(navigation).not.toContain('<select')
   })
 
   it('rail tooltip/current semanticsとmobile dialog keyboard behaviorを持つ', () => {

@@ -16,9 +16,11 @@ describe('WU-50 UI alignment contracts', () => {
     expect(dashboard).not.toContain('v-for="map in maps"')
   })
 
-  it('workspace is the only top-level selector and real map stays disabled', () => {
+  it('workspace navigation replaces sidebar selectors and real map stays disabled', () => {
     expect(navigation).toContain('ワークスペースを切り替える')
     expect(navigation).not.toContain('Mapを切り替える')
+    expect(navigation).not.toContain('<select')
+    expect(navigation).toContain('/admin/workspaces')
     expect(navigation).toContain('item.disabled')
     expect(navigationModel).toContain("status: '準備中'")
   })

@@ -4,9 +4,9 @@ import { describe, expect, it } from 'vitest'
 const editorSource = readFileSync(new URL('../app/pages/admin/maps/[mapId]/editor.vue', import.meta.url), 'utf8')
 const detailSource = readFileSync(new URL('../app/pages/admin/maps/[mapId]/spots/[spotId]/index.vue', import.meta.url), 'utf8')
 
-describe('PIN管理workspace', () => {
-  it('Spot詳細はread-only summaryからPIN管理へ導き、編集UIを重複させない', () => {
-    expect(detailSource).toContain('PIN配置画面で編集')
+describe('ピン管理workspace', () => {
+  it('Spot詳細はread-only summaryからピン管理へ導き、編集UIを重複させない', () => {
+    expect(detailSource).toContain('ピン配置画面で編集')
     expect(detailSource).toContain('placeSpotId: data.spot.id')
     expect(detailSource).not.toContain('<PinDesignEditor')
     expect(detailSource).not.toContain('位置を再設定')
@@ -33,8 +33,8 @@ describe('PIN管理workspace', () => {
     expect(cancelFunction).not.toContain('$fetch')
   })
 
-  it('PIN配置解除には確認ダイアログがある', () => {
-    expect(editorSource).toContain('title="PIN配置を解除"')
+  it('ピン配置解除には確認ダイアログがある', () => {
+    expect(editorSource).toContain('title="ピン配置を解除"')
     expect(editorSource).toContain("method: 'DELETE'")
   })
 
@@ -56,9 +56,9 @@ describe('PIN管理workspace', () => {
     expect(editorSource).toContain(':placement-enabled="placementActive"')
   })
 
-  it('PIN design controlsをeditorへ集約する', () => {
+  it('ピン design controlsをeditorへ集約する', () => {
     expect(editorSource).toContain('<PinDesignEditor')
-    expect(editorSource).toContain('PINデザイン')
+    expect(editorSource).toContain('ピンデザイン')
     expect(editorSource).toContain(':show-save="false"')
     expect(editorSource).toContain('@changed="handlePinDesignChanged"')
     expect(editorSource).not.toContain('<details')

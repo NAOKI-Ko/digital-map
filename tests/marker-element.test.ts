@@ -136,12 +136,12 @@ describe('Marker DOM生成', () => {
     expect(draggable.attributes.get('aria-label')).toBe('テストスポットをドラッグして位置調整')
   })
 
-  it('移動候補は実PINデザインを維持し、候補badgeと専用labelを持つ', () => {
+  it('移動候補は実ピンデザインを維持し、候補badgeと専用labelを持つ', () => {
     const candidate = createSpotMarkerElement(baseSpot, { mode: 'edit', selected: true, draggable: true, candidate: 'move' }, fakeDocument as unknown as Pick<Document, 'createElement'>) as unknown as FakeElement
 
     expect(candidate.classList.contains('map-viewer-marker--candidate')).toBe(true)
     expect(candidate.classList.contains('map-viewer-marker--move-candidate')).toBe(true)
-    expect(candidate.attributes.get('aria-label')).toBe('テストスポットの移動先PINをドラッグして位置調整')
+    expect(candidate.attributes.get('aria-label')).toBe('テストスポットの移動先ピンをドラッグして位置調整')
     expect(candidate.children[0]).toMatchObject({ className: 'map-viewer-marker__candidate-badge', textContent: '移動先' })
     expect(candidate.children[2]?.className).toBe('map-viewer-marker__shape')
   })

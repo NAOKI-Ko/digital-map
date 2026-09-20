@@ -27,10 +27,10 @@ describe('イラストマップ作成セットアップ', () => {
     expect(createApiSource).toContain('defaultSpotFieldDefinitions')
   })
 
-  it('Category候補はopt-inで、任意ジオリファレンスを完了条件にしない', () => {
+  it('Category候補はopt-inで、任意の位置合わせを完了条件にしない', () => {
     for (const name of ['観光', '飲食', '買い物', '宿泊', '交通', 'トイレ', '駐車場']) expect(setupSource).toContain(name)
     expect(setupSource).toContain('自動追加はされません')
-    expect(setupSource).toContain('ジオリファレンスは任意')
+    expect(setupSource).toContain('マップの位置合わせは任意')
   })
 
   it('GEO Map用の永続モデルを追加しない', () => {
