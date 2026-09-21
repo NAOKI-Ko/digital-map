@@ -2,7 +2,7 @@
 
 ## Verdict
 
-NEEDS-DECISION — implementation, actual-data targets, authenticated browser QA, PostgreSQL migration/audits, unit/type/build and dependency security checks are complete locally. Clean-clone validation, GitHub Actions, commit/PR and `dev` merge are still required before PASS-READY.
+NEEDS-DECISION — implementation, actual-data targets, authenticated browser QA, PostgreSQL migration/audits, unit/type/build, dependency security and clean-clone checks are complete. GitHub Actions, PR and `dev` merge are still required before PASS-READY.
 
 ## Git state
 
@@ -33,7 +33,8 @@ NEEDS-DECISION — implementation, actual-data targets, authenticated browser QA
 - Authenticated browser matrix: PASS at 1440×900, 1280×800, 1024×768, 390×844 and 430×932 with no final console warnings/errors.
 - Production dependency audit at high severity: PASS (no known vulnerabilities).
 - Target visual inspection: PASS after overlap and empty-photo-frame corrections.
-- Clean clone and GitHub Actions status is recorded after the local evidence commit.
+- Clean clone install/typecheck/unit/build: PASS at local metadata commit `024931d`.
+- GitHub Actions: pending push.
 
 ## Open defects / limits
 

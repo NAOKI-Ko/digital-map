@@ -15,4 +15,5 @@
 | authenticated browser matrix | editor + picker at five requested viewport sizes | PASS |
 | PostgreSQL migrations | all 31 migrations on disposable database | PASS |
 | tenant/image/paper-map/default-field audits | disposable PostgreSQL database | PASS |
-| clean clone / GitHub Actions | requires commit and push | PENDING |
+| clean clone install/typecheck/unit/build | fresh `/private/tmp` clone at `024931d` | PASS |
+| GitHub Actions | requires push | PENDING |
