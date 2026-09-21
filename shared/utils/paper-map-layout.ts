@@ -40,9 +40,7 @@ export function resolvePaperLayout(config: PaperMapConfig, width: number, height
   const header = height * 0.12
   const footer = height * 0.07
   const content: PaperRect = { x: margin, y: margin + header, width: width - margin * 2, height: height - margin * 2 - header - footer }
-  const baseRatio = config.mapSize === 'large' ? 0.76 : config.mapSize === 'info' ? 0.48 : 0.62
-  const layoutAdjustment = config.layout === 'MAP_FOCUS' ? 0.06 : config.layout === 'GUIDE' ? -0.06 : 0
-  const mapRatio = Math.max(0.4, Math.min(0.82, baseRatio + layoutAdjustment))
+  const mapRatio = config.templateId === 'map-classic' ? 0.7 : config.templateId === 'spot-guide' ? 0.55 : 0.45
   if (config.orientation === 'landscape') {
     const mapFrame = { ...content, width: content.width * mapRatio }
     return { margin, header, footer, content, mapFrame, infoFrame: { x: mapFrame.x + mapFrame.width + margin * 0.55, y: content.y, width: content.width - mapFrame.width - margin * 0.55, height: content.height } }
