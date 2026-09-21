@@ -437,7 +437,7 @@ onBeforeUnmount(() => {
         </div>
       </div>
       <div data-pin-editor-workspace class="mt-3 grid min-h-0 items-stretch gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(360px,1fr)] xl:grid-cols-[minmax(0,7fr)_minmax(380px,3fr)]">
-        <section class="min-w-0" aria-label="地図操作">
+        <section class="min-w-0 lg:sticky lg:top-6 lg:self-start" aria-label="地図操作">
           <ClientOnly>
             <LazyMapViewer
               ref="mapViewer"
