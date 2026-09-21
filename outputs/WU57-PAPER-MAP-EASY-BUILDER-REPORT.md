@@ -31,9 +31,21 @@ Implemented the v1 workflow for creating a distribution-ready paper map in minut
 - fresh migration: PASS
 - schema/integrity audit: PASS
 - typecheck: PASS
-- tests: PASS (`570` passed, `16` skipped)
+- full PostgreSQL tests: PASS (`586` passed; no skipped tests)
 - production build: PASS
 - authenticated Browser QA: PASS
 - PDF matrix and rendered-page inspection: PASS
 
 Detailed evidence: `docs/qa/wu57-paper-map-easy-builder/README.md`
+
+## Integration
+
+- Base: `origin/dev @ ef864a6144c6fd0eede4c188b6dd996a245029c0`
+- Implementation: `9e0e3384` (product-contract commit: `7dd85af1`)
+- PR: `https://github.com/NAOKI-Ko/digital-map/pull/4`
+- Initial dev merge: `60ab6f50207b5fb2480bfa5dae1bed6f4b1fd2f4`
+- Initial post-merge Verify: PASS (`35591202619`)
+- Windows QA: not executed; it was not a gate and no Windows-only runtime behavior was introduced.
+- Open P0/P1/core P2 defects: 0
+- `main`: unchanged
+- Production: unchanged

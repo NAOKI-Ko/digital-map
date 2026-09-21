@@ -31,6 +31,19 @@ useHead(() => ({ title: `${name.value || '紙マップ編集'} | デジタルマ
 
 function toggleId(list: string[], id: string, checked: boolean) { checked ? list.push(id) : list.splice(list.indexOf(id), 1) }
 function changeOrder() { if (draft.value?.order === 'manual' && !draft.value.manualSpotIds.length) draft.value.manualSpotIds = spots.value.map(spot => spot.id) }
+function moveManualSpot(index: number, direction: -1 | 1) {
+  if (!draft.value) return
+  const target = index + direction
+  if (target < 0 || target >= draft.value.manualSpotIds.length) return
+  const values = [...draft.value.manualSpotIds]
+  ;[values[index], values[target]] = [values[target]!, values[index]!]
+  draft.value.manualSpotIds = values
+}
+function resetDraft() {
+  if (!data.value) return
+  name.value = data.value.paperMap.name
+  draft.value = structuredClone(data.value.paperMap.config)
+}
 function setViewport(mode: 'full' | 'fit_spots' | 'custom') { if (draft.value) draft.value.viewport = mode === 'custom' ? { mode, x: 0.1, y: 0.1, width: 0.8, height: 0.8 } : { mode } }
 function changeViewport(event: Event) { setViewport((event.target as HTMLSelectElement).value as 'full' | 'fit_spots' | 'custom') }
 function requestErrorMessage(error: unknown, fallback: string) {
@@ -72,7 +85,7 @@ async function downloadPdf() {
     <section v-if="status === 'pending'" class="mt-6 rounded-xl bg-white p-8 text-sm text-stone-600">編集画面を準備しています…</section>
     <section v-else-if="error || !data || !draft" class="mt-6 rounded-xl bg-red-50 p-8 text-sm text-red-700">紙マップを読み込めませんでした。</section>
     <template v-else>
-      <header class="mt-5 flex flex-wrap items-end justify-between gap-4"><div><p class="text-sm font-medium text-terracotta-700">Easy Builder</p><h1 class="mt-1 text-2xl font-bold">紙マップを仕上げる</h1><p class="mt-2 text-sm text-stone-600">右のプレビューを見ながら選ぶだけ。自由配置は不要です。</p></div><div class="flex gap-2"><button type="button" class="min-h-11 rounded-lg border border-stone-300 bg-white px-4 text-sm font-semibold" :disabled="downloading" @click="downloadPdf">{{ downloading ? 'PDF作成中…' : 'PDFをダウンロード' }}</button><button type="button" class="min-h-11 rounded-lg bg-terracotta-600 px-5 text-sm font-semibold text-white disabled:opacity-50" :disabled="saving || !dirty" @click="save">{{ saving ? '保存中…' : '保存' }}</button></div></header>
+      <header class="mt-5 flex flex-wrap items-end justify-between gap-4"><div><p class="text-sm font-medium text-terracotta-700">Easy Builder</p><h1 class="mt-1 text-2xl font-bold">紙マップを仕上げる</h1><p class="mt-2 text-sm text-stone-600">右のプレビューを見ながら選ぶだけ。自由配置は不要です。</p></div><div class="flex flex-wrap gap-2"><button type="button" class="min-h-11 rounded-lg px-4 text-sm font-semibold text-stone-700 disabled:opacity-50" :disabled="!dirty || saving" @click="resetDraft">変更を戻す</button><button type="button" class="min-h-11 rounded-lg border border-stone-300 bg-white px-4 text-sm font-semibold" :disabled="downloading" @click="downloadPdf">{{ downloading ? 'PDF作成中…' : 'PDFをダウンロード' }}</button><button type="button" class="min-h-11 rounded-lg bg-terracotta-600 px-5 text-sm font-semibold text-white disabled:opacity-50" :disabled="saving || !dirty" @click="save">{{ saving ? '保存中…' : '保存' }}</button></div></header>
       <p v-if="errorMessage" role="alert" class="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{{ errorMessage }}</p>
       <ul v-if="data.warnings.length" class="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900"><li v-for="warning in data.warnings" :key="warning">・{{ warning }}</li></ul>
       <div class="mt-6 grid items-start gap-6 lg:grid-cols-[22rem_minmax(0,1fr)]">
@@ -92,6 +105,7 @@ async function downloadPdf() {
             <label class="block text-sm font-semibold">情報量<select v-model="draft.density" class="mt-2 min-h-11 w-full rounded-lg border px-3 font-normal"><option value="names">名前だけ</option><option value="standard">標準</option><option value="detail">詳しく</option></select></label>
             <label class="block text-sm font-semibold">写真<select v-model="draft.photos" class="mt-2 min-h-11 w-full rounded-lg border px-3 font-normal"><option value="none">なし</option><option value="featured">主な写真</option><option value="all">できるだけ掲載</option></select></label>
             <label class="block text-sm font-semibold">並び順<select v-model="draft.order" class="mt-2 min-h-11 w-full rounded-lg border px-3 font-normal" @change="changeOrder"><option value="auto">おすすめ順</option><option value="name">名前順</option><option value="manual">手動順（保存順）</option></select></label>
+            <ol v-if="draft.order === 'manual'" class="max-h-56 space-y-1 overflow-auto rounded-lg bg-stone-50 p-2"><li v-for="(spotId, index) in draft.manualSpotIds" :key="spotId" class="flex items-center gap-2 rounded bg-white px-2 py-1 text-xs"><span class="min-w-0 flex-1 truncate">{{ index + 1 }}. {{ spots.find(spot => spot.id === spotId)?.name ?? '削除されたスポット' }}</span><button type="button" :disabled="index === 0" aria-label="上へ移動" class="size-8 rounded border disabled:opacity-30" @click="moveManualSpot(index, -1)">↑</button><button type="button" :disabled="index === draft.manualSpotIds.length - 1" aria-label="下へ移動" class="size-8 rounded border disabled:opacity-30" @click="moveManualSpot(index, 1)">↓</button></li></ol>
             <label class="block text-sm font-semibold">配色<select v-model="draft.theme" class="mt-2 min-h-11 w-full rounded-lg border px-3 font-normal"><option value="brand">ブランド</option><option value="simple">シンプル</option><option value="warm">あたたかい</option><option value="natural">自然</option></select></label>
             <label class="block text-sm font-semibold">元データ<select v-model="draft.sourceMode" class="mt-2 min-h-11 w-full rounded-lg border px-3 font-normal"><option value="LIVE">現在の編集内容</option><option value="PUBLISHED">現在の公開版</option></select></label>
             <label class="block text-sm font-semibold">表示範囲<select :value="draft.viewport.mode" class="mt-2 min-h-11 w-full rounded-lg border px-3 font-normal" @change="changeViewport"><option value="fit_spots">スポットに合わせる</option><option value="full">全体</option><option value="custom">範囲を指定</option></select></label>

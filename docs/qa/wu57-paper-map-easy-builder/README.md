@@ -15,7 +15,7 @@ Authoritative base: `origin/dev @ ef864a6144c6fd0eede4c188b6dd996a245029c0`
   - orphan paper maps: 0
   - invalid cross-map design requests: 0
 - Nuxt typecheck: PASS
-- Vitest: PASS (`86` files passed, `3` skipped; `570` tests passed, `16` skipped)
+- Vitest with PostgreSQL: PASS (`89` files; `586` tests; no skips)
 - Nuxt production build: PASS
 
 ## Browser QA
@@ -50,6 +50,13 @@ Artifacts:
 
 - `paper-map-a4-landscape.pdf`
 - `rendered/paper-map.png`
+
+Detailed matrices:
+
+- `VERIFICATION-MATRIX.md`
+- `VISUAL-QA.md`
+- `PDF-EVIDENCE.md`
+- `MIGRATION-EVIDENCE.md`
 
 ## Scope checks
 
