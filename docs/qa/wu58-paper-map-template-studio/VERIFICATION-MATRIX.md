@@ -16,4 +16,4 @@
 | PostgreSQL migrations | all 31 migrations on disposable database | PASS |
 | tenant/image/paper-map/default-field audits | disposable PostgreSQL database | PASS |
 | clean clone install/typecheck/unit/build | fresh `/private/tmp` clone at `024931d` | PASS |
-| GitHub Actions | requires push | PENDING |
+| GitHub Actions Verify | PR #6, head `f13be984283b07ced894afce8f4f0239d7510a66` | PASS |

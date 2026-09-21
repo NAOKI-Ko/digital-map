@@ -2,7 +2,7 @@
 
 ## Verdict
 
-NEEDS-DECISION — implementation, actual-data targets, authenticated browser QA, PostgreSQL migration/audits, unit/type/build, dependency security and clean-clone checks are complete. GitHub Actions, PR and `dev` merge are still required before PASS-READY.
+NEEDS-DECISION — implementation, actual-data targets, authenticated browser QA, PostgreSQL migration/audits, unit/type/build, dependency security, clean-clone and GitHub Actions checks are complete. PR #6 is ready to merge into `dev`; the merge remains before PASS-READY.
 
 ## Git state
 
@@ -10,7 +10,9 @@ NEEDS-DECISION — implementation, actual-data targets, authenticated browser QA
 - Branch: `feature/wu58-paper-map-template-studio-v2-20260922`
 - Implementation SHA: `402e8b3687ee0b6f26907619c5ec42317f24dc53`
 - Evidence SHA: `3f6d765c693a163240c499d4b695550130d8dddc`
-- PR/dev merge SHA: pending remote verification
+- PR: `https://github.com/NAOKI-Ko/digital-map/pull/6`
+- GitHub Actions verified head: `f13be984283b07ced894afce8f4f0239d7510a66`
+- dev merge SHA: pending
 - `main` and Production: unchanged
 
 ## Delivered
@@ -34,7 +36,7 @@ NEEDS-DECISION — implementation, actual-data targets, authenticated browser QA
 - Production dependency audit at high severity: PASS (no known vulnerabilities).
 - Target visual inspection: PASS after overlap and empty-photo-frame corrections.
 - Clean clone install/typecheck/unit/build: PASS at local metadata commit `024931d`.
-- GitHub Actions: pending push.
+- GitHub Actions Verify: PASS twice on PR head `f13be984`.
 
 ## Open defects / limits
 
