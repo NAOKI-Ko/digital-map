@@ -46,9 +46,10 @@ describe('WU-41 admin shell contracts', () => {
     expect(georeference).toContain('.resize()')
   })
 
-  it('公開CTAはsummaryのusable URLに限定し、PDFはPublish内に残る', () => {
+  it('公開CTAはsummaryのusable URLに限定し、紙マップは専用Builderへ案内する', () => {
     expect(home).toContain('v-if="data.map.publicUrl"')
     expect(home).not.toContain('未公開変更')
-    expect(publish).toContain('<PaperExportPanel')
+    expect(publish).toContain('/paper`')
+    expect(publish).toContain('紙マップをかんたん作成')
   })
 })

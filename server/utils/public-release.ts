@@ -212,3 +212,11 @@ export async function loadCurrentPublicSnapshot(slug: string, locale: unknown, s
   const map = isMapLocale(locale) && release.locales[locale] ? release.locales[locale] : release.locales.ja
   return { ...map, releaseId: pointer.releaseId ?? undefined }
 }
+
+export async function loadReadyPublicSnapshot(manifestKey: string, releaseId: string, locale: unknown, storage = getPublicStorage()) {
+  const manifest = await storage.get(manifestKey)
+  if (!manifest) throw new Error('READY_RELEASE_MANIFEST_MISSING')
+  const release = parseJson<{ locales: ReleaseLocales }>(manifest.bytes)
+  const map = isMapLocale(locale) && release.locales[locale] ? release.locales[locale] : release.locales.ja
+  return { ...map, releaseId }
+}

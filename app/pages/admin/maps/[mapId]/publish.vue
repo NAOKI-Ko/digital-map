@@ -1,18 +1,15 @@
 <script setup lang="ts">
 import PublicSharePanel from '~/components/admin/PublicSharePanel.vue'
-import PaperExportPanel from '~/components/admin/PaperExportPanel.vue'
 import { buildPublicMapUrl } from '~~/shared/utils/public-url'
 import { resolvePublicationToggleAction } from '~~/shared/utils/map-publication'
 import type { AdminMapResponse } from '~~/shared/types/map'
 import type { MapPublicationResponse } from '~~/shared/types/map-publication'
-import type { MapFloorListResponse } from '~~/shared/types/floor'
 
 definePageMeta({ layout: 'admin', middleware: 'auth' })
 
 const route = useRoute()
 const mapId = route.params.mapId as string
 const { data, error, status } = await useFetch<AdminMapResponse>(`/api/maps/${mapId}`)
-const { data: floorData } = await useFetch<MapFloorListResponse>(`/api/maps/${mapId}/floors`)
 const { data: releaseData, status: releaseStatus, refresh: refreshReleases } = await useFetch<{ currentReleaseId: string | null, releases: Array<{ id: string, createdAt: string, readyAt: string | null }> }>(`/api/maps/${mapId}/releases`)
 const isSaving = ref(false)
 const releaseDate = new Intl.DateTimeFormat('ja-JP', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Tokyo' })
@@ -191,8 +188,11 @@ async function rollbackRelease(releaseId: string) {
           </template>
         </ClientOnly>
       </div>
-      <div>
-        <PaperExportPanel :map-id="mapId" :floors="floorData?.floors ?? []" :is-published="data.map.isPublished" />
+      <div class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+        <p class="text-sm font-medium text-terracotta-700">紙で配る</p>
+        <h2 class="mt-1 text-xl font-bold text-stone-900">紙マップをかんたん作成</h2>
+        <p class="mt-2 text-sm leading-6 text-stone-600">用途を選ぶだけで、読みやすいレイアウトと掲載内容を自動提案します。</p>
+        <NuxtLink :to="`/admin/maps/${mapId}/paper`" class="mt-5 inline-flex min-h-11 items-center rounded-lg bg-terracotta-600 px-5 text-sm font-semibold text-white hover:bg-terracotta-700">紙マップを作る</NuxtLink>
       </div>
       </div>
     </template>
