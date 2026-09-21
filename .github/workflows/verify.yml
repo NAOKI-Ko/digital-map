@@ -44,6 +44,7 @@ jobs:
       - run: pnpm exec prisma migrate deploy
       - run: pnpm audit:tenant-data-foundation
       - run: pnpm audit:image-spatial-migration
+      - run: pnpm audit:paper-map-easy-builder
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm build

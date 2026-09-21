@@ -27,6 +27,9 @@ defineProps<{ name: AdminIconName | 'chevron' | 'collapse' | 'expand' | 'logout'
     <template v-else-if="name === 'publish'">
       <path stroke-linecap="round" stroke-linejoin="round" d="M12 15V3m0 0L8 7m4-4 4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7" />
     </template>
+    <template v-else-if="name === 'paper'">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M6 3.5h9l3 3V20.5H6zM15 3.5v4h3M9 12h6M9 15.5h6" />
+    </template>
     <template v-else-if="name === 'analytics'">
       <path stroke-linecap="round" d="M5 20V11M12 20V4M19 20v-6" />
     </template>
@@ -62,4 +65,3 @@ defineProps<{ name: AdminIconName | 'chevron' | 'collapse' | 'expand' | 'logout'
     </template>
   </svg>
 </template>
-

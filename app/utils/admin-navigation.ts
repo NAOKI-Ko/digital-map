@@ -9,6 +9,7 @@ export type AdminIconName =
   | 'home'
   | 'maps'
   | 'people'
+  | 'paper'
   | 'publish'
   | 'settings'
   | 'spot'
@@ -101,6 +102,10 @@ export function buildAdminNavigation(context: AdminNavigationContext): AdminNavi
       {
         id: 'publish', label: '公開', shortLabel: '公開', icon: 'publish', to: mapPath(context.mapId, '/publish'),
         group: 'operations', rail: true, activePaths: [mapPath(context.mapId, '/publish')],
+      },
+      {
+        id: 'paper', label: '紙マップ', shortLabel: '紙マップ', icon: 'paper', to: mapPath(context.mapId, '/paper'),
+        group: 'operations', rail: true, activePaths: [mapPath(context.mapId, '/paper')],
       },
       {
         id: 'analytics', label: 'アクセス状況', shortLabel: 'アクセス状況', icon: 'analytics', to: mapPath(context.mapId, '/analytics'),

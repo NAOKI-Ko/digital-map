@@ -80,6 +80,7 @@ model User {
   auditEvents           AuditEvent[]
   legalAcceptances      LegalAcceptance[]
   signupIntents         SignupIntent[]
+  paperMaps             PaperMap[]
   emailVerifiedAt       DateTime?
   isActive              Boolean                  @default(true)
   authVersion           Int                      @default(1)
@@ -268,10 +269,53 @@ model Map {
   categories           Category[]
   spotFieldDefinitions SpotFieldDefinition[]
   members              MapMember[]
+  paperMaps            PaperMap[]
+  paperDesignRequests  PaperDesignRequest[]
   createdAt            DateTime              @default(now())
   updatedAt            DateTime              @updatedAt
 
   @@index([seoImageAssetId])
+}
+
+model PaperMap {
+  id             String               @id @default(cuid())
+  mapId          String
+  map            Map                  @relation(fields: [mapId], references: [id], onDelete: Cascade)
+  name           String
+  configVersion  Int                  @default(1)
+  config         Json
+  createdById    String?
+  createdBy      User?                @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  designRequests PaperDesignRequest[]
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+
+  @@index([mapId, updatedAt])
+  @@index([createdById])
+}
+
+enum PaperDesignRequestStatus {
+  REQUESTED
+  CONTACTED
+  IN_PROGRESS
+  DELIVERED
+  CANCELLED
+}
+
+model PaperDesignRequest {
+  id           String                   @id @default(cuid())
+  mapId        String
+  map          Map                      @relation(fields: [mapId], references: [id], onDelete: Cascade)
+  paperMapId   String?
+  paperMap     PaperMap?                @relation(fields: [paperMapId], references: [id], onDelete: SetNull)
+  requestedBy  String
+  status       PaperDesignRequestStatus @default(REQUESTED)
+  requirements Json
+  createdAt    DateTime                 @default(now())
+  updatedAt    DateTime                 @updatedAt
+
+  @@index([mapId, createdAt])
+  @@index([paperMapId])
 }
 
 model PublicRelease {
