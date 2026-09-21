@@ -50,7 +50,9 @@ const emit = defineEmits<{
         :aria-label="label"
         class="dm-field-focus inline-flex min-h-11 w-full items-center justify-between gap-3 rounded-lg border border-stone-300 bg-white px-3 py-2 text-left text-sm text-stone-900 transition hover:border-stone-400 disabled:cursor-not-allowed disabled:bg-stone-100 disabled:text-stone-400"
       >
-        <SelectValue :placeholder="placeholder" />
+        <SelectValue :placeholder="placeholder">
+          {{ props.options.find(option => option.value === props.modelValue)?.label ?? props.placeholder }}
+        </SelectValue>
         <span aria-hidden="true" class="text-stone-500">⌄</span>
       </SelectTrigger>
       <SelectPortal>

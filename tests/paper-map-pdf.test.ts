@@ -15,9 +15,9 @@ const map: PublicMap = {
     spots: Array.from({ length: 12 }, (_, index) => ({ id: `spot-${index}`, floorId: 'floor-1', name: `見どころ ${index + 1}`, categories: [{ id: 'category-1', name: '見どころ', order: 0, iconType: 'PRESET', iconPresetId: 'place', iconImageUrl: null, iconAssetId: null }], importance: index < 2 ? 'featured' : 'normal', description: '歴史ある町並みの見どころです', x: 0.1 + (index % 4) * 0.22, y: 0.15 + Math.floor(index / 4) * 0.3, photos: [], informationFields: [], websiteAction: null, pinIconType: 'PRESET', pinIconId: 'place', pinIconImageUrl: null, pinColor: '#b4532a', pinSize: 'MEDIUM' })),
   }],
 }
-const source: PaperMapSource = { mode: 'LIVE', map, spotCount: 12, categoryCount: 1 }
+const source: PaperMapSource = { mode: 'LIVE', map, spotCount: 12, categoryCount: 1, photoCount: 0 }
 
-describe('paper map v1 PDF renderer', () => {
+describe('paper map v2 PDF renderer', () => {
   it.each([
     ['MAP_FOCUS', 'A4', 'landscape'],
     ['GUIDE', 'A4', 'portrait'],
