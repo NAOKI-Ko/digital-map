@@ -68,7 +68,7 @@ describe('WU-45 PIN editor modes', () => {
     expect(editorSource).toContain('xl:grid-cols-[minmax(0,7fr)_minmax(380px,3fr)]')
     expect(editorSource).toContain('<UiInspector')
     expect(editorSource).toContain('sm:grid-cols-[minmax(0,2fr)_minmax(12rem,1fr)]')
-    expect(editorSource).toContain('<section class="min-w-0" aria-label="地図操作">')
+    expect(editorSource).toContain('<section class="min-w-0 lg:sticky lg:top-6 lg:self-start" aria-label="地図操作">')
     expect(editorSource).toContain('<UiSelect')
     expect(editorSource).not.toContain('role="tablist" aria-label="編集フロア"')
   })
