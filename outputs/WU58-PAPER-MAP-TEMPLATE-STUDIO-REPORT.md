@@ -8,7 +8,9 @@ NEEDS-DECISION — implementation, actual-data targets, authenticated browser QA
 
 - Base SHA: `733707439ce3152ec0a7077df5c7d78874ff7be8`
 - Branch: `feature/wu58-paper-map-template-studio-v2-20260922`
-- Implementation/evidence/PR/dev merge SHA: not created
+- Implementation SHA: `402e8b3687ee0b6f26907619c5ec42317f24dc53`
+- Evidence SHA: `3f6d765c693a163240c499d4b695550130d8dddc`
+- PR/dev merge SHA: pending remote verification
 - `main` and Production: unchanged
 
 ## Delivered
@@ -31,7 +33,7 @@ NEEDS-DECISION — implementation, actual-data targets, authenticated browser QA
 - Authenticated browser matrix: PASS at 1440×900, 1280×800, 1024×768, 390×844 and 430×932 with no final console warnings/errors.
 - Production dependency audit at high severity: PASS (no known vulnerabilities).
 - Target visual inspection: PASS after overlap and empty-photo-frame corrections.
-- Clean clone and GitHub Actions remain pending because no commit or remote branch has been created.
+- Clean clone and GitHub Actions status is recorded after the local evidence commit.
 
 ## Open defects / limits
 
