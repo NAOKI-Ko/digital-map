@@ -1,0 +1,15 @@
+HTTP/2 200
+date: Tue, 22 Sep 2026 21:21:22 GMT
+content-type: text/html;charset=utf-8
+cf-ray: a3f45bdd6ef2d760-NRT
+cf-cache-status: DYNAMIC
+server: cloudflare
+x-robots-tag: none
+x-robots-tag: none
+content-security-policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://demotiles.maplibre.org https://tile.openstreetmap.org https://*.tile.openstreetmap.org; worker-src 'self' blob:
+permissions-policy: camera=(), microphone=(), geolocation=(self)
+referrer-policy: strict-origin-when-cross-origin
+x-content-type-options: nosniff
+x-frame-options: DENY
+x-powered-by: Nuxt
+x-request-id: af3d842f-db8c-4a2d-a77e-087af4602dab

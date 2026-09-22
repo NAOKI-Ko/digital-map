@@ -386,7 +386,8 @@ export function createEditorialRenderer(
         parts.push(txt(c.summary, r.x + 10, cy + 5, 9.5, 12.5, p.muted))
       }
     }
-    const fy = h - m - 54
+    const expandedQr = d.themeId === 'heritage' && config.paper === 'A3' && config.orientation === 'landscape' && slotVisible(config, 'qr') && source.publicUrlAvailable !== false && Boolean(source.map.slug)
+    const fy = h - m - (expandedQr ? 68 : 54)
     parts.push(
       `<path d="M ${m} ${fy - 9} H ${w - m}" stroke="${p.primary}" stroke-width="1.2"/>`,
     )
@@ -415,16 +416,16 @@ export function createEditorialRenderer(
       )
       parts.push(
         rect(
-          { x: w - m - 225, y: fy - 3, width: 225, height: 60 },
+          { x: w - m - (expandedQr ? 230 : 225), y: fy - 3, width: expandedQr ? 230 : 225, height: expandedQr ? 66 : 60 },
           p.secondary,
           p.radius,
         ),
       )
-      parts.push(image(qr, { x: w - m - 55, y: fy + 2, width: 50, height: 50 }))
+      parts.push(image(qr, { x: w - m - (expandedQr ? 65 : 55), y: fy + (expandedQr ? 1 : 2), width: expandedQr ? paperPrintTokens.qr : 50, height: expandedQr ? paperPrintTokens.qr : 50 }))
       parts.push(
         txt(
           editorialText(config.paperOriginal.qrLabel, 150, 9.5, 3),
-          w - m - 215,
+          w - m - (expandedQr ? 220 : 215),
           fy + 19,
           9.5,
           12.5,

@@ -53,7 +53,7 @@ export function paperMapWarnings(source: PaperMapSource, config: PaperMapConfig)
 
 export async function defaultNewPaperMapConfig(mapId: string, templateId: PaperTemplateId, designId?: PaperDesignId) {
   const source = await loadPaperMapSource(mapId, 'LIVE')
-  return { source, config: paperDesignConfig(designId ?? (templateId === 'map-classic' ? 'neutral-map' : templateId === 'photo-story' ? 'heritage-editorial' : recommendPaperDesign(source).id), source) }
+  return { source, config: paperDesignConfig(designId ?? (templateId === 'photo-story' ? 'heritage-editorial' : recommendPaperDesign(source).id), source) }
 }
 
 export function validatePaperMapReferences(source: PaperMapSource, config: PaperMapConfig) {

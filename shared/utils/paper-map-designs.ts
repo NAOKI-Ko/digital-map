@@ -59,6 +59,21 @@ export const paperDesignCatalog = [
   },
 ] as const
 export type PaperDesignId = (typeof paperDesignCatalog)[number]['id']
+export const offeredPaperDesignIds = ['heritage-map', 'heritage-editorial'] as const
+export type OfferedPaperDesignId = (typeof offeredPaperDesignIds)[number]
+export const offeredPaperDesignCatalog = paperDesignCatalog.filter(
+  (design): design is (typeof paperDesignCatalog)[number] & { id: OfferedPaperDesignId } =>
+    offeredPaperDesignIds.some(id => id === design.id),
+)
+export function isOfferedPaperDesignId(id: PaperDesignId): id is OfferedPaperDesignId {
+  return offeredPaperDesignIds.some(offered => offered === id)
+}
+export function canUsePaperDesign(config: PaperMapConfig, saved?: PaperMapConfig): boolean {
+  if (config.templateVersion !== 3) return true
+  const id = paperDesignId(config)
+  return isOfferedPaperDesignId(id)
+    || (saved?.templateVersion === 3 && paperDesignId(saved) === id)
+}
 export const paperDesignTokens = {
   heritage: {
     name: '歴史・まち歩き',
@@ -112,7 +127,7 @@ export const paperPrintTokens = {
   nameLeading: 14,
   metadata: 9,
   rule: 0.75,
-  qr: 50,
+  qr: 60,
   dpi: 240,
   jpegQuality: 94,
   gap: 16,
@@ -130,21 +145,9 @@ export function recommendPaperDesign(source: PaperMapSource) {
       id: 'heritage-map' as PaperDesignId,
       reason: '歴史・文化に関するカテゴリーがあるためおすすめ',
     }
-  if (/スキー|スノー|リフト/.test(names))
-    return {
-      id: 'alpine-map' as PaperDesignId,
-      reason: 'スキー関連のカテゴリーがあるためおすすめ',
-    }
-  if (/アトラクション|遊園|動物|水族/.test(names))
-    return {
-      id: 'leisure-guide' as PaperDesignId,
-      reason: 'レジャー関連のカテゴリーがあるためおすすめ',
-    }
   return {
-    id: (source.spotCount > 16
-      ? 'neutral-map'
-      : 'neutral-guide') as PaperDesignId,
-    reason: `公開・配置済み${source.spotCount}件を案内するデザインです`,
+    id: 'heritage-map' as PaperDesignId,
+    reason: `公開・配置済み${source.spotCount}件を地図とともに案内します`,
   }
 }
 export function designSuitability(id: PaperDesignId, source: PaperMapSource) {

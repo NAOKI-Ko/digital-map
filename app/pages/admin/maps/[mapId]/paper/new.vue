@@ -8,7 +8,7 @@ definePageMeta({ layout: 'admin', middleware: 'auth' })
 useHead({ title: '紙マップを作る' })
 const route = useRoute(), router = useRouter(), mapId = route.params.mapId as string
 const { data, error } = await useFetch<PaperMapListResponse>(`/api/maps/${mapId}/paper-maps`)
-const suitability = computed(() => data.value ? recommendPaperDesign(data.value.source) : { id: 'neutral-guide' as PaperDesignId, reason: '' })
+const suitability = computed(() => data.value ? recommendPaperDesign(data.value.source) : { id: 'heritage-map' as PaperDesignId, reason: '' })
 const chosen = ref<PaperDesignId>(suitability.value.id), busy = ref(false), previewBusy = ref(true), preview = ref<PaperPreviewResult | null>(null), errorMessage = ref('')
 const config = computed(() => data.value ? paperDesignConfig(chosen.value, data.value.source) : null)
 async function create() {

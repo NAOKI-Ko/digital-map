@@ -1,0 +1,23 @@
+{
+  "checks": [
+    "QA owner logged in",
+    "QA tenant active",
+    "new picker shows exactly two adopted designs",
+    "hidden designs absent in new flow",
+    "adopted design created",
+    "editor switcher shows exactly two adopted designs",
+    "mobile no document overflow",
+    "browser console/page errors zero"
+  ],
+  "errors": [],
+  "viewports": [
+    [
+      1440,
+      900
+    ],
+    [
+      390,
+      844
+    ]
+  ]
+}

@@ -1,0 +1,57 @@
+[
+  {
+    "file": "README.md",
+    "bytes": 4630,
+    "sha256": "90bbef7f4bc5b3531d38f32a81145f20aabd51c9ac00944581dc64d4d1b50ab9"
+  },
+  {
+    "file": "api-policy.json",
+    "bytes": 1948,
+    "sha256": "0a999d65aefc1de845167e71847b597575ccfa35b8a4aea53b2169c02be42746"
+  },
+  {
+    "file": "browser/editor-1440.png",
+    "bytes": 757112,
+    "sha256": "407b4b41ab034e7dac79ebbba267853b3000dbdf9be2a7dd900fe70ce7a18538"
+  },
+  {
+    "file": "browser/editor-390.png",
+    "bytes": 214624,
+    "sha256": "030e16a1522f2a40defed6be2fc4e54ba9710bfcea258ccecc2111f962626410"
+  },
+  {
+    "file": "browser/new-1440.png",
+    "bytes": 670952,
+    "sha256": "acb03d9a093f4b8758492cf78cfb9c065ddc3236a662d796bf58a3e0e89389a6"
+  },
+  {
+    "file": "browser/results.json",
+    "bytes": 432,
+    "sha256": "6d509b1a2da56098e0a3f851b0f761e2a4e11758fa2f9a38952e222adf2973f4"
+  },
+  {
+    "file": "heritage-A3-landscape.pdf",
+    "bytes": 3323552,
+    "sha256": "750324f5252eec0c9b04f4b981cf3cd4d192241aab3b6e67f7c4de68155040f1"
+  },
+  {
+    "file": "heritage-A4-editorial.pdf",
+    "bytes": 4464317,
+    "sha256": "69134318bcce6f313066f508c10c20c390ac8b5428002b1e21c53f4f6d73e965"
+  },
+  {
+    "file": "qr-decode.txt",
+    "bytes": 465,
+    "sha256": "98a9adcc905cdad645652b92044513a1831631c4f6564413b46f74bb637c19f7"
+  },
+  {
+    "file": "qr-link-head.txt",
+    "bytes": 854,
+    "sha256": "b6878eccb8e1ab72e93b22242d01e203d518dca86270ddeaf3d3383eb5f20297"
+  },
+  {
+    "file": "source-inventory.json",
+    "bytes": 3460,
+    "sha256": "0803fea2da4090217e8ea3836f6c7d46b18623bb2014720e5c6c4365be21c819"
+  }
+]

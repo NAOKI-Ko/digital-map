@@ -72,7 +72,7 @@ export function parsePaperMapConfig(value: unknown): PaperMapConfig {
 }
 
 export const paperMapConfigSchema = z.preprocess(value => parsePaperMapConfig(value), paperMapConfigV2Schema)
-export const paperMapCreateSchema = z.object({ name: z.string().trim().min(1).max(120).optional(), templateId: z.enum(paperTemplateIds).optional(), purpose: z.enum(paperMapPurposes).optional(), designId: z.enum(['heritage-map','heritage-editorial','leisure-guide','alpine-map','neutral-map','neutral-guide']).optional() }).refine(value => value.templateId || value.purpose || value.designId, 'テンプレートを選択してください。')
+export const paperMapCreateSchema = z.object({ name: z.string().trim().min(1).max(120).optional(), templateId: z.enum(paperTemplateIds).optional(), purpose: z.enum(paperMapPurposes).optional(), designId: z.enum(['heritage-map','heritage-editorial']).optional() }).refine(value => value.templateId || value.purpose || value.designId, 'テンプレートを選択してください。')
 export const paperMapUpdateSchema = z.object({ name: z.string().trim().min(1).max(120), config: paperMapConfigV2Schema })
 export const paperMapPdfSchema = z.object({ config: paperMapConfigV2Schema, previewToken: z.string().regex(/^[a-f0-9]{64}$/).optional() })
 export const paperDesignRequestSchema = z.object({ paperMapId: z.string().min(1).nullable().optional(), contactName: z.string().trim().min(1).max(100), contactEmail: z.email().max(254), organizationName: z.string().trim().max(120), desiredUse: z.string().trim().min(1).max(1000), desiredDate: z.string().trim().max(40) })

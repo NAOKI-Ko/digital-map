@@ -5,13 +5,15 @@ import { createHash } from 'node:crypto'
 import { PDFDocument } from 'pdf-lib'
 import sharp from 'sharp'
 import type { PaperMapSource } from '../shared/types/paper-map'
-import { parsePaperMapConfig } from '../shared/schemas/paper-map'
+import { paperMapCreateSchema, parsePaperMapConfig } from '../shared/schemas/paper-map'
 import {
   paperDesignCatalog,
   paperDesignConfig,
   switchPaperDesign,
   recommendPaperDesign,
   designSuitability,
+  offeredPaperDesignCatalog,
+  canUsePaperDesign,
 } from '../shared/utils/paper-map-designs'
 import { defaultPaperMapConfig } from '../shared/utils/paper-map-templates'
 import {
@@ -97,6 +99,19 @@ const options = {
 }
 const digest = (v: Uint8Array) => createHash('sha256').update(v).digest('hex')
 describe('version 3 bounded editorial design', () => {
+  it('offers only the two adopted designs while preserving saved experimental designs', () => {
+    expect(offeredPaperDesignCatalog.map(item => item.id)).toEqual(['heritage-map', 'heritage-editorial'])
+    for (const id of ['leisure-guide', 'alpine-map', 'neutral-map', 'neutral-guide'] as const) {
+      const config = paperDesignConfig(id, fixture(2))
+      expect(paperMapCreateSchema.safeParse({ designId: id }).success).toBe(false)
+      expect(canUsePaperDesign(config)).toBe(false)
+      expect(canUsePaperDesign(config, config)).toBe(true)
+      expect(canUsePaperDesign(config, paperDesignConfig('heritage-map', fixture(2)))).toBe(false)
+      expect(parsePaperMapConfig(config)).toEqual(config)
+    }
+    expect(paperMapCreateSchema.safeParse({ designId: 'heritage-map' }).success).toBe(true)
+    expect(paperMapCreateSchema.safeParse({ designId: 'heritage-editorial' }).success).toBe(true)
+  })
   it.each(paperDesignCatalog)(
     '$id preserves all spots within frames in all paper/orientation combinations',
     (design) => {
@@ -202,7 +217,7 @@ describe('version 3 bounded editorial design', () => {
       resolveEditorialDocument(s, c).pages[0]!.cards[0]!.summary.lines,
     ).toEqual([])
     expect(designSuitability('heritage-editorial', s)).toContain('写真が少')
-    expect(recommendPaperDesign(s).id).toMatch(/^neutral/)
+    expect(recommendPaperDesign(s).id).toBe('heritage-map')
   })
   it('does not silently omit hidden-guide map selection and never mutates geometry', () => {
     const s = fixture(100),
@@ -242,6 +257,19 @@ describe('version 3 bounded editorial design', () => {
     const b = paperMapPreviewToken(s, c)
     s.map.floors[0]!.spots[0]!.photos = ['/uploads/new.png']
     expect(paperMapPreviewToken(s, c)).not.toBe(b)
+  })
+  it('keeps the enlarged A3 QR clear of all source cards and within print margins', () => {
+    const source = fixture(48)
+    source.publicUrlAvailable = true
+    const config = paperDesignConfig('heritage-map', source)
+    const document = resolveEditorialDocument(source, config)
+    for (const page of document.pages) {
+      const qr = document.regions(page).find(region => region.slot === 'qr')!
+      expect(qr.x + qr.width).toBeLessThan(document.width)
+      expect(qr.y + qr.height).toBeLessThan(document.height)
+      expect(page.cards.every(card => card.rect.y + card.rect.height < qr.y)).toBe(true)
+    }
+    expect(document.pages.flatMap(page => page.cards)).toHaveLength(48)
   })
   it('deterministically renders shared pages and encodes a print-size JPEG PDF', async () => {
     const s = fixture(2),

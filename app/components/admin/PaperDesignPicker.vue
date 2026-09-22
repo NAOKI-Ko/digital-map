@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { PaperMapSource } from '~~/shared/types/paper-map'
 import {
-  paperDesignCatalog,
+  offeredPaperDesignCatalog,
   paperDesignConfig,
   recommendPaperDesign,
   designSuitability,
@@ -21,7 +21,7 @@ async function load() {
   const current = ++generation
   thumbs.value = {}
   failed.value = []
-  for (const d of paperDesignCatalog) {
+  for (const d of offeredPaperDesignCatalog) {
     if (current !== generation) return
     try {
       const r = await $fetch<{ image: string | null }>(
@@ -46,7 +46,7 @@ onBeforeUnmount(() => generation++)
 <template>
   <div class="grid grid-cols-2 gap-3" role="group" aria-label="デザインを選ぶ">
     <button
-      v-for="design in paperDesignCatalog"
+      v-for="design in offeredPaperDesignCatalog"
       :key="design.id"
       type="button"
       class="overflow-hidden rounded-xl border bg-white text-left transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-sky-700"

@@ -132,11 +132,12 @@ export function resolveEditorialDocument(
     (intro.lines.length ? intro.lines.length * 14 + 8 : 0) +
     (notice.lines.length ? notice.lines.length * 12 + 16 : 0) +
     22
+  const expandedQr = themeId === 'heritage' && config.paper === 'A3' && config.orientation === 'landscape' && slotVisible(config, 'qr') && source.publicUrlAvailable !== false && Boolean(source.map.slug)
   const content: PaperRect = {
     x: margin,
     y: margin + headerHeight,
     width: contentWidth,
-    height: height - margin * 2 - headerHeight - 68,
+    height: height - margin * 2 - headerHeight - (expandedQr ? 80 : 68),
   }
   const selected = selectPaperMapSpotsFromSource(source, config),
     numbers = new Map(selected.map((s, i) => [s.id, i + 1]))
@@ -434,10 +435,10 @@ export function resolveEditorialDocument(
     {
       slot: 'qr',
       label: 'Web案内を編集',
-      x: width - margin - 220,
-      y: height - margin - 60,
-      width: 220,
-      height: 60,
+      x: width - margin - (expandedQr ? 230 : 220),
+      y: height - margin - (expandedQr ? 72 : 60),
+      width: expandedQr ? 230 : 220,
+      height: expandedQr ? 72 : 60,
     },
   ]
   return {

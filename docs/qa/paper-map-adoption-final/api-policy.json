@@ -1,0 +1,100 @@
+{
+  "checks": [
+    {
+      "label": "isolated QA owner login",
+      "pass": true
+    },
+    {
+      "label": "QA tenant selected",
+      "pass": true
+    },
+    {
+      "label": "new leisure-guide rejected",
+      "pass": true
+    },
+    {
+      "label": "unsaved leisure-guide preview rejected",
+      "pass": true
+    },
+    {
+      "label": "new alpine-map rejected",
+      "pass": true
+    },
+    {
+      "label": "unsaved alpine-map preview rejected",
+      "pass": true
+    },
+    {
+      "label": "new neutral-map rejected",
+      "pass": true
+    },
+    {
+      "label": "unsaved neutral-map preview rejected",
+      "pass": true
+    },
+    {
+      "label": "new neutral-guide rejected",
+      "pass": true
+    },
+    {
+      "label": "unsaved neutral-guide preview rejected",
+      "pass": true
+    },
+    {
+      "label": "new heritage-map allowed",
+      "pass": true
+    },
+    {
+      "label": "heritage-map preview allowed",
+      "pass": true
+    },
+    {
+      "label": "new heritage-editorial allowed",
+      "pass": true
+    },
+    {
+      "label": "heritage-editorial preview allowed",
+      "pass": true
+    },
+    {
+      "label": "saved hidden design loads",
+      "pass": true
+    },
+    {
+      "label": "saved hidden design previews",
+      "pass": true
+    },
+    {
+      "label": "saved hidden design exports PDF",
+      "pass": true
+    },
+    {
+      "label": "saved hidden design edits",
+      "pass": true
+    },
+    {
+      "label": "switch to hidden design rejected",
+      "pass": true
+    },
+    {
+      "label": "hidden design via PDF rejected",
+      "pass": true
+    },
+    {
+      "label": "saved v2 design loads without migration",
+      "pass": true
+    },
+    {
+      "label": "saved v2 design edits without migration",
+      "pass": true
+    },
+    {
+      "label": "saved v2 design previews",
+      "pass": true
+    },
+    {
+      "label": "saved v2 design exports PDF",
+      "pass": true
+    }
+  ]
+}

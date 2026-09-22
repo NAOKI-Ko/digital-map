@@ -5,7 +5,7 @@ import { selectPaperMapSpotsFromSource } from '~~/shared/utils/paper-map-render'
 import type { EditorialRegion } from '~~/shared/utils/paper-map-editorial'
 import PaperMapLegacyPreview from './PaperMapLegacyPreview.vue'
 export interface PaperPreviewResult { previewToken?: string, image: string | null, page: number, pageCount: number, selectedCount: number, clippedCount: number, warnings: string[], source: PaperMapSource, width?: number, height?: number, regions?: EditorialRegion[] }
-const props = defineProps<{ mapId: string, config: PaperMapConfig, source: PaperMapSource, selectedSlot?: PaperSlotId | 'title' | null, selectedSpotId?: string }>()
+const props = defineProps<{ mapId: string, paperMapId?: string, config: PaperMapConfig, source: PaperMapSource, selectedSlot?: PaperSlotId | 'title' | null, selectedSpotId?: string }>()
 const emit = defineEmits<{ slotSelect: [slot: PaperSlotId | 'title'], resolved: [result: PaperPreviewResult], busy: [value: boolean], spotSelect: [id: string] }>()
 const result = ref<PaperPreviewResult | null>(null), pending = ref(false), message = ref(''), page = ref(0), zoom = ref(false)
 const accessibleSpots = computed(() => selectPaperMapSpotsFromSource(result.value?.source ?? props.source,props.config))
@@ -16,7 +16,7 @@ async function refresh() {
   if (props.config.templateVersion === 1) { pending.value = false; emit('busy', false); return }
   pending.value = true; emit('busy', true); message.value = ''
   try {
-    const next = await $fetch<PaperPreviewResult>(`/api/maps/${props.mapId}/paper-maps/preview`, { method: 'POST', body: { config: props.config, page: page.value } })
+    const next = await $fetch<PaperPreviewResult>(`/api/maps/${props.mapId}/paper-maps/preview`, { method: 'POST', body: { config: props.config, paperMapId: props.paperMapId, page: page.value } })
     if (request !== sequence) return
     result.value = next; emit('resolved', next)
   }
