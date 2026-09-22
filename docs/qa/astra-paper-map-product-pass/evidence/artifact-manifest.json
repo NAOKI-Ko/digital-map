@@ -1,0 +1,67 @@
+[
+  {
+    "file": "qa-fixtures-not-customer-data/README.md",
+    "bytes": 622,
+    "sha256": "d6eec79a8567198e34c8c2febc1a5cf0edd5267db79f3a5ee362eba0c55ecced"
+  },
+  {
+    "file": "qa-fixtures-not-customer-data/current-photo-story.pdf",
+    "bytes": 1321536,
+    "sha256": "c3ef86bd224587e12c0ddc191e4e4a3c5c71b07c6baf531e87feabaf15fa8fdc"
+  },
+  {
+    "file": "qa-fixtures-not-customer-data/current-map-classic.pdf",
+    "bytes": 1766889,
+    "sha256": "4eeb9808cd4474707cb65b94fc92e2c19aafc0daa53ca8d874d3bc3ab210d104"
+  },
+  {
+    "file": "qa-fixtures-not-customer-data/current-map-classic.png",
+    "bytes": 1705028,
+    "sha256": "c744ffad061cd10e1326615a5a93e0ae1308147ad15465a0787b9263fae0d70b"
+  },
+  {
+    "file": "qa-fixtures-not-customer-data/current-photo-story.png",
+    "bytes": 1067242,
+    "sha256": "589044467c8f0544b6f63e219ae6058aef2579db7ae9466bbc219b229f351ee4"
+  },
+  {
+    "file": "qa-fixtures-not-customer-data/astra-map-classic.pdf",
+    "bytes": 10343081,
+    "sha256": "86436b9bb8fa2d1c5fec7064017326cf13a1618ea497f3be733ad4bd5f799366"
+  },
+  {
+    "file": "qa-fixtures-not-customer-data/current-spot-guide.png",
+    "bytes": 1497087,
+    "sha256": "c6507ebaa5eee8990fe5169295be2ec58d88af445a6e60ed65a05145f15d2c55"
+  },
+  {
+    "file": "qa-fixtures-not-customer-data/astra-photo-story.pdf",
+    "bytes": 3228330,
+    "sha256": "acd3ed47c2e1c84895c363b073bcb8285539070fc933358e2e798163b9796937"
+  },
+  {
+    "file": "qa-fixtures-not-customer-data/current-spot-guide.pdf",
+    "bytes": 1643804,
+    "sha256": "7be40a72faab93d3fbd88a24054e3a5ba5cf90277bcfcb1dbdad15ba15f73190"
+  },
+  {
+    "file": "qa-fixtures-not-customer-data/astra-photo-story.png",
+    "bytes": 759590,
+    "sha256": "8f0de2a89d552df5daf0b698de898376579e051565f3b827af7b832651013521"
+  },
+  {
+    "file": "qa-fixtures-not-customer-data/astra-map-classic.png",
+    "bytes": 1717274,
+    "sha256": "c88b577deeb96f8f4068a5821a58608fe9e08d158f92594d339dda825e609b8b"
+  },
+  {
+    "file": "qa-fixtures-not-customer-data/astra-spot-guide.pdf",
+    "bytes": 3601316,
+    "sha256": "9baccb39efa57cd599114cb210dde1527cdaa00ec1b395b188525019edff813f"
+  },
+  {
+    "file": "qa-fixtures-not-customer-data/astra-spot-guide.png",
+    "bytes": 818197,
+    "sha256": "b2b471b8730894521ca2968ad72acfea827be7de06308625873f9fec4e793c70"
+  }
+]

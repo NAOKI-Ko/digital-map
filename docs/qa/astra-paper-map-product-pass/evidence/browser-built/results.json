@@ -1,0 +1,66 @@
+{
+  "results": [
+    {
+      "flow": "create",
+      "pass": true,
+      "url": "http://localhost:3018/admin/maps/demo-arimatsu-map/paper/cmucg8q0h0000l8u14wm6jd35"
+    },
+    {
+      "flow": "paper-original-save-reload",
+      "pass": true
+    },
+    {
+      "flow": "override-save-reload-hide-show-reset",
+      "pass": true
+    },
+    {
+      "flow": "custom-viewport-save",
+      "pass": true
+    },
+    {
+      "flow": "published-source-switch-refreshes-preview",
+      "pass": true
+    },
+    {
+      "flow": "browser-PDF-download",
+      "pass": true,
+      "filename": "有松（チーム内デモ） 紙マップ.pdf"
+    },
+    {
+      "flow": "responsive",
+      "width": 1440,
+      "height": 900,
+      "scrollWidth": 1440,
+      "pass": true
+    },
+    {
+      "flow": "responsive",
+      "width": 1280,
+      "height": 800,
+      "scrollWidth": 1280,
+      "pass": true
+    },
+    {
+      "flow": "responsive",
+      "width": 1024,
+      "height": 768,
+      "scrollWidth": 1024,
+      "pass": true
+    },
+    {
+      "flow": "responsive",
+      "width": 390,
+      "height": 844,
+      "scrollWidth": 390,
+      "pass": true
+    },
+    {
+      "flow": "responsive",
+      "width": 430,
+      "height": 932,
+      "scrollWidth": 430,
+      "pass": true
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,310 @@
+{
+  "base": "abddcb4b8262a2b4cd3a52b8703dfb4b155ff697",
+  "files": [
+    {
+      "path": "app/components/admin/PaperExportPanel.vue",
+      "bytes": 2974,
+      "sha256": "6c1de124bdafd7668ace58d6d700361ddfa66c876d1ad178e306eda63184a8ba"
+    },
+    {
+      "path": "app/components/admin/PaperMapPreview.vue",
+      "bytes": 7059,
+      "sha256": "8de355e1e5fc4b38e3c711bc52c034d0efcfbaf7194121a8cc19ca225a5ec7d0"
+    },
+    {
+      "path": "app/pages/admin/maps/[mapId]/paper/[paperMapId].vue",
+      "bytes": 16605,
+      "sha256": "5f28d980e050f754995a5353b5afaac649737f9f5b41e7573c2db3ce1df1e582"
+    },
+    {
+      "path": "app/pages/admin/maps/[mapId]/paper/index.vue",
+      "bytes": 7043,
+      "sha256": "dcd3f9b7c6cd117e94e5e8fd124479cd1e29577b0d2036adea3d3b77094f653d"
+    },
+    {
+      "path": "app/pages/admin/maps/[mapId]/paper/new.vue",
+      "bytes": 3640,
+      "sha256": "59a8f8fe11065acc788b6841d64f2c43cf30c7971c9d1d5d5063b28efc8fb958"
+    },
+    {
+      "path": "app/pages/admin/maps/[mapId]/paper/request.vue",
+      "bytes": 3378,
+      "sha256": "1db3d8a05a7a992ccf413fbc2bbf6ccd6f5fbe346d56ea75bc4d2133718863c5"
+    },
+    {
+      "path": "docs/design/paper-map-config-v2.md",
+      "bytes": 853,
+      "sha256": "65a5040ab1708008b3662963c3ab83e424326a8f89e86939c3c70089fa7947e4"
+    },
+    {
+      "path": "docs/design/paper-map-data-model.md",
+      "bytes": 1440,
+      "sha256": "5fa00a578765bb28bc7279bdbd823274a27c734b14b05302bc9b94e392ee2ae0"
+    },
+    {
+      "path": "docs/design/paper-map-easy-builder-wireframes.md",
+      "bytes": 1764,
+      "sha256": "c1e41baee2497343a9e71741909b28a2ae3bfb3810ff0c1a1a32c1e783e5b508"
+    },
+    {
+      "path": "docs/design/paper-map-layout-engine.md",
+      "bytes": 1663,
+      "sha256": "70e325bd9c02fc4a8e61a7dd8b36ae6704b19be845c328e4b55e7e420efc5171"
+    },
+    {
+      "path": "docs/design/paper-map-slot-contract.md",
+      "bytes": 550,
+      "sha256": "41d898a9648f5b72cc478f7d9131b0a27f398d9afbbf53dbacbfc72dfc7889f0"
+    },
+    {
+      "path": "docs/design/paper-map-template-catalog-v1.md",
+      "bytes": 756,
+      "sha256": "5079ad28edab85d669cc2fa444fdfc2baf03e16f3eb67cb119efb00236557cb4"
+    },
+    {
+      "path": "docs/product-contracts/paper-map-easy-builder-v1.md",
+      "bytes": 2180,
+      "sha256": "7355a511fe1a0fe9606653c7dfde64c80fb4c6ff3ed7fb779daf37ed40c69f8d"
+    },
+    {
+      "path": "docs/product-contracts/paper-map-template-studio-v2.md",
+      "bytes": 1262,
+      "sha256": "a3554d8dfc8de278ca99c184cefdf1b4c0ed83d21d04fb2cd12ca8219e303aca"
+    },
+    {
+      "path": "docs/qa/wu57-paper-map-easy-builder/MIGRATION-EVIDENCE.md",
+      "bytes": 823,
+      "sha256": "604a81fe2f9197cb6788fd37e549b78c401fe8ca88b6e08fbdd259f98a619981"
+    },
+    {
+      "path": "docs/qa/wu57-paper-map-easy-builder/PDF-EVIDENCE.md",
+      "bytes": 1013,
+      "sha256": "577b1dfd23a541453df38cbb1e01586797da90b760ef20c54143b1b7c26e3208"
+    },
+    {
+      "path": "docs/qa/wu57-paper-map-easy-builder/README.md",
+      "bytes": 3014,
+      "sha256": "31ebd61009e1dc92e35a8bd7fa1f5c01aaac563558e03aabeb8a8c0af7602042"
+    },
+    {
+      "path": "docs/qa/wu57-paper-map-easy-builder/VERIFICATION-MATRIX.md",
+      "bytes": 1586,
+      "sha256": "7fe4216445e1daa767095682a1f1d3133fe35f1c18a434ad4c078cdfa8ae9267"
+    },
+    {
+      "path": "docs/qa/wu57-paper-map-easy-builder/VISUAL-QA.md",
+      "bytes": 1593,
+      "sha256": "a3dcfe8a1faee8148aaf8e7d242eecd05fe51c69c9d73e14e600b6e549ac0a98"
+    },
+    {
+      "path": "docs/qa/wu57-paper-map-easy-builder/paper-map-a4-landscape.pdf",
+      "bytes": 252259,
+      "sha256": "1488ddb3b5a685879e084ad9b0247b429876db668d8fcc1a3861cf05741e6c00"
+    },
+    {
+      "path": "docs/qa/wu57-paper-map-easy-builder/rendered/paper-map.png",
+      "bytes": 121167,
+      "sha256": "dfe45661f182147d36be1a914cc98d273525e75b93a457d3bbaa2aa7f13dc9af"
+    },
+    {
+      "path": "docs/qa/wu58-paper-map-template-studio/BROWSER-QA.md",
+      "bytes": 1712,
+      "sha256": "08ac476243f157a9a8a6bbb07d7ca6366d94189caa586bd476a709e3c143ae11"
+    },
+    {
+      "path": "docs/qa/wu58-paper-map-template-studio/CONFIG-MIGRATION.md",
+      "bytes": 299,
+      "sha256": "dab42e6b7ca563444ad4da018e47cb28125044955fac0a8686e66b43b28d2750"
+    },
+    {
+      "path": "docs/qa/wu58-paper-map-template-studio/PDF-EVIDENCE.md",
+      "bytes": 392,
+      "sha256": "ae9f7ffb90c89cd127257fb948461145538e494b018260d15035fdca13034bff"
+    },
+    {
+      "path": "docs/qa/wu58-paper-map-template-studio/SOURCE-INVENTORY.md",
+      "bytes": 408,
+      "sha256": "81eab41a9206b5753b9fe669224779a88f929daf03621fb6d3c00f760b7ddec7"
+    },
+    {
+      "path": "docs/qa/wu58-paper-map-template-studio/TARGETS.md",
+      "bytes": 597,
+      "sha256": "c3bb93e3fcb50c8a8e80eaa8d3632bcbdd0218dd7d479bd5e664c378b266f6e0"
+    },
+    {
+      "path": "docs/qa/wu58-paper-map-template-studio/TEMPLATE-MATRIX.md",
+      "bytes": 491,
+      "sha256": "c1903f79b7e7a641d9371865f6704972da395e50bd471176d59ca0aed9df81f0"
+    },
+    {
+      "path": "docs/qa/wu58-paper-map-template-studio/VERIFICATION-MATRIX.md",
+      "bytes": 1171,
+      "sha256": "889d845e4ddcb8850a26468621be938e8caf37f3ce32e1c374f6ba9b3c3befc8"
+    },
+    {
+      "path": "docs/qa/wu58-paper-map-template-studio/VISUAL-QA.md",
+      "bytes": 547,
+      "sha256": "e1e5819c7923a182edfc9ddbc595d9eca35a99082661517553d6ea60d7ccf055"
+    },
+    {
+      "path": "docs/qa/wu58-paper-map-template-studio/targets/SOURCE-INVENTORY.md",
+      "bytes": 1263,
+      "sha256": "7dedcdb8855e665bfff9e054230b5dcf7306e844e768b98bc48ffe063cd844ae"
+    },
+    {
+      "path": "docs/qa/wu58-paper-map-template-studio/targets/map-classic.pdf",
+      "bytes": 1635196,
+      "sha256": "977ea619a2402ccdab8dd33e175d840b53db09eb72c9fc81fb81f888bcd52738"
+    },
+    {
+      "path": "docs/qa/wu58-paper-map-template-studio/targets/map-classic.png",
+      "bytes": 1836156,
+      "sha256": "e6a8341faa498505fd6654e5eb8fd720bb286922d961714f35dae27a3ea838ec"
+    },
+    {
+      "path": "docs/qa/wu58-paper-map-template-studio/targets/photo-story.pdf",
+      "bytes": 1662628,
+      "sha256": "3d173c763c680c531afd3d6b13f211afdf1ce568f754ee7b12d4380f6d1514d7"
+    },
+    {
+      "path": "docs/qa/wu58-paper-map-template-studio/targets/photo-story.png",
+      "bytes": 1872866,
+      "sha256": "e444e956e75207991d6ec34df151bfc338c16ed267f0a5418d3810ad79a42151"
+    },
+    {
+      "path": "docs/qa/wu58-paper-map-template-studio/targets/spot-guide.pdf",
+      "bytes": 1663712,
+      "sha256": "0a647ce3c1f60496acc8d6b6e1f5cf7a8c14007430af1e3e76141a320a1dd352"
+    },
+    {
+      "path": "docs/qa/wu58-paper-map-template-studio/targets/spot-guide.png",
+      "bytes": 1875802,
+      "sha256": "845c7db2ce738c4c0978ba0616f9100164c57984e15ed81d2777d0a14707b276"
+    },
+    {
+      "path": "outputs/WU57-PAPER-MAP-EASY-BUILDER-REPORT.md",
+      "bytes": 2015,
+      "sha256": "d51f6261c5dfec31fa5f209520047a4a3a5b4b6785c4545a2ed85c45ca436fb8"
+    },
+    {
+      "path": "outputs/WU58-PAPER-MAP-TEMPLATE-STUDIO-REPORT.md",
+      "bytes": 2884,
+      "sha256": "78acddd2498226b53a4b1088c50a101a6b7dd8cb836bcc2e77f8ac3715d5ef5a"
+    },
+    {
+      "path": "prisma/schema.prisma",
+      "bytes": 24681,
+      "sha256": "54af17c5fd5679c912def3dfa837d3db746d29ff98b237fc2697c58ab4f732d1"
+    },
+    {
+      "path": "scripts/audit-paper-map-easy-builder.ts",
+      "bytes": 2769,
+      "sha256": "a8169ea0552d733de1fce63d4ce821c68ba34b068f130a311d4eea3cebf3418e"
+    },
+    {
+      "path": "scripts/qa/render-wu58-targets.ts",
+      "bytes": 5802,
+      "sha256": "b7e12682b04c306783a8703771fd5088e6826e41d9306cd1c0e99d743dcede2b"
+    },
+    {
+      "path": "server/api/maps/[mapId]/paper-maps/[paperMapId].delete.ts",
+      "bytes": 744,
+      "sha256": "c027366aaf1f1c441288e703ba75819144e91060de2feed3f5c2092bfde1268e"
+    },
+    {
+      "path": "server/api/maps/[mapId]/paper-maps/[paperMapId].get.ts",
+      "bytes": 775,
+      "sha256": "53b67961c8842ccd0abfe231cbe1b454ac2d779ae65ac0a98794c27ddbf6a4de"
+    },
+    {
+      "path": "server/api/maps/[mapId]/paper-maps/[paperMapId].patch.ts",
+      "bytes": 1645,
+      "sha256": "35d77188b2d5c645625986bd6825542d6f0c5e90984663410ac4a10830285b34"
+    },
+    {
+      "path": "server/api/maps/[mapId]/paper-maps/[paperMapId]/duplicate.post.ts",
+      "bytes": 1407,
+      "sha256": "9691e962d8ee36be5de9c952ff4d5b14632649d84434b023f376502b003ba6e1"
+    },
+    {
+      "path": "server/api/maps/[mapId]/paper-maps/[paperMapId]/pdf.post.ts",
+      "bytes": 1730,
+      "sha256": "ac8192a442dc0f6b3317ff560349dff5b1bd5b5a870d6338a613b6cc34434e1b"
+    },
+    {
+      "path": "server/api/maps/[mapId]/paper-maps/index.get.ts",
+      "bytes": 557,
+      "sha256": "3e40c5a4063f6d9362f786e748d6dbdb56ffb417c1910c88037a6a2c70c2d61c"
+    },
+    {
+      "path": "server/api/maps/[mapId]/paper-maps/index.post.ts",
+      "bytes": 1594,
+      "sha256": "3af132a9d7f9787e4b7f5f5980fa64ecfdf232184245c879c4015e8647fc9901"
+    },
+    {
+      "path": "server/utils/map-pdf.ts",
+      "bytes": 10491,
+      "sha256": "055180883916dee6bd7522f280ccdea8d13daa3c911e81e2077b452f56d7f482"
+    },
+    {
+      "path": "server/utils/paper-map-pdf.ts",
+      "bytes": 12052,
+      "sha256": "bc042487c404dbd12a0295d04cc23603a58986c2ae68076ad1c2929424b07ef7"
+    },
+    {
+      "path": "server/utils/paper-map.ts",
+      "bytes": 5493,
+      "sha256": "01a18bb4dbb7b7487df56732bd447ebccb24133d4e5bd846220831911811e98a"
+    },
+    {
+      "path": "server/utils/public-map.ts",
+      "bytes": 11945,
+      "sha256": "1f0effe2d81a073ff72fbe6fe1740e2350a0a1a5b2042e587f0b3e0f20352f29"
+    },
+    {
+      "path": "shared/schemas/paper-map.ts",
+      "bytes": 7373,
+      "sha256": "f303f38479a1bec8fb79e55ea93d469be192e6aabce9a172a7d8e08814e8bba7"
+    },
+    {
+      "path": "shared/types/paper-map.ts",
+      "bytes": 812,
+      "sha256": "e58b87a784e0602ecfd7482e1efbd6f70c707a66f10ad9a0fe632ea3a0a36c8b"
+    },
+    {
+      "path": "shared/types/public-map.ts",
+      "bytes": 1685,
+      "sha256": "52555a0f3d3008171a84eac73777e585f86713010cc4124bd884f54c37793a3d"
+    },
+    {
+      "path": "shared/utils/paper-map-layout.ts",
+      "bytes": 3156,
+      "sha256": "133553810aba4109d4883c5b899acaef0f42ac0176d8bdfa3f8b89a83e2e3e78"
+    },
+    {
+      "path": "shared/utils/paper-map-recommendation.ts",
+      "bytes": 728,
+      "sha256": "0c3fa573685d64216f3218a0b3941e45a06435405f9206bc0840b879ccd14bae"
+    },
+    {
+      "path": "shared/utils/paper-map-render.ts",
+      "bytes": 5173,
+      "sha256": "7adabc9a76e77b161dc9b2211040983ca5789a695e427b810b48715ce8bf324d"
+    },
+    {
+      "path": "shared/utils/paper-map-templates.ts",
+      "bytes": 4912,
+      "sha256": "52005dfe5eccb8cf3200baa913cd268506863e5649b62ef6b7549c8cf1417194"
+    },
+    {
+      "path": "tests/paper-map-easy-builder.test.ts",
+      "bytes": 6011,
+      "sha256": "05131de26c93105b2c14c4f7006c2b8ca020c5aea8d54f49a72bc7ed4762bb5f"
+    },
+    {
+      "path": "tests/paper-map-pdf.test.ts",
+      "bytes": 2758,
+      "sha256": "ec8f21cabb3999d4a7c42e9344f171f677043d42785e696906324a4affdd8cbd"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "database": "/digital_map_astra_paper_20260922",
+  "kind": "repository demonstration fixture; not a verified customer map",
+  "mapId": "demo-arimatsu-map",
+  "slug": "team-demo-arimatsu",
+  "sourceMode": "LIVE",
+  "spotCount": 10,
+  "photoCount": 0,
+  "categoryCount": 6,
+  "positioned": 10,
+  "sha256": "e76ed8226bd5148f07a39a084b79a579387e2ab78b623d855368e0366739d448",
+  "floors": [
+    {
+      "id": "demo-arimatsu-floor",
+      "illustrationUrl": "/uploads/arimatsu-demo-map.png",
+      "imageWidth": 1448,
+      "imageHeight": 1086,
+      "decorations": 0
+    }
+  ]
+}
