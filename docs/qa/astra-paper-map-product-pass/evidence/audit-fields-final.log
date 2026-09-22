@@ -1,0 +1,57 @@
+$ node --import tsx scripts/qa/audit-default-spot-fields.ts
+{
+  "status": "PASS",
+  "maps": [
+    {
+      "slug": "publication-6cc6e65561124b999da4b71d3312e21c",
+      "totalFieldCount": 6,
+      "standardSemanticKeys": [
+        "description",
+        "address",
+        "hours",
+        "holiday",
+        "website",
+        "phone"
+      ],
+      "customCount": 0,
+      "valid": true,
+      "missingSemanticKeys": [],
+      "duplicateSemanticKeys": [],
+      "unexpectedStandardSemanticKeys": []
+    },
+    {
+      "slug": "publication-e3ebdfbb9b144198906c356b00d581d1",
+      "totalFieldCount": 6,
+      "standardSemanticKeys": [
+        "description",
+        "address",
+        "hours",
+        "holiday",
+        "website",
+        "phone"
+      ],
+      "customCount": 0,
+      "valid": true,
+      "missingSemanticKeys": [],
+      "duplicateSemanticKeys": [],
+      "unexpectedStandardSemanticKeys": []
+    },
+    {
+      "slug": "team-demo-arimatsu",
+      "totalFieldCount": 6,
+      "standardSemanticKeys": [
+        "description",
+        "address",
+        "hours",
+        "holiday",
+        "website",
+        "phone"
+      ],
+      "customCount": 0,
+      "valid": true,
+      "missingSemanticKeys": [],
+      "duplicateSemanticKeys": [],
+      "unexpectedStandardSemanticKeys": []
+    }
+  ]
+}

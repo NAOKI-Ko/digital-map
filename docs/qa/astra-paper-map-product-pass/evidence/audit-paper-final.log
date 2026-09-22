@@ -1,0 +1,19 @@
+$ node --import tsx scripts/audit-paper-map-easy-builder.ts
+{
+  "tables": {
+    "paperMap": "\"PaperMap\"",
+    "designRequest": "\"PaperDesignRequest\""
+  },
+  "statuses": [
+    "REQUESTED",
+    "CONTACTED",
+    "IN_PROGRESS",
+    "DELIVERED",
+    "CANCELLED"
+  ],
+  "orphanPaperMaps": 0,
+  "invalidRequests": 0,
+  "parsedConfigurations": 4,
+  "invalidConfigurations": [],
+  "status": "PASS"
+}
