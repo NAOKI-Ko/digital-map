@@ -2,7 +2,7 @@ import type { PaperMapConfig, PaperSlotId, PaperTemplateId } from '../schemas/pa
 
 export type PaperContentOwnership = 'SOURCE' | 'PAPER_OVERRIDE' | 'PAPER_ORIGINAL'
 export interface PaperTemplateSlot { id: PaperSlotId, kind: 'text' | 'map' | 'guide' | 'photos' | 'qr' | 'logo' | 'footer', defaultVisible: boolean, visibilityEditable: boolean, ownership: PaperContentOwnership, editable: boolean, maxLength?: number }
-export interface PaperTemplateDefinition { id: PaperTemplateId, version: 1 | 2, name: string, description: string, mapRatio: number, slots: readonly PaperTemplateSlot[] }
+export interface PaperTemplateDefinition { id: PaperTemplateId, version: 1 | 2 | 3, name: string, description: string, mapRatio: number, slots: readonly PaperTemplateSlot[] }
 
 const commonSlots = [
   { id: 'intro', kind: 'text', defaultVisible: false, visibilityEditable: true, ownership: 'PAPER_ORIGINAL', editable: true, maxLength: 600 },
@@ -22,7 +22,7 @@ const legacyPaperTemplateCatalog: readonly PaperTemplateDefinition[] = [
 export const paperTemplateCatalog: readonly PaperTemplateDefinition[] = legacyPaperTemplateCatalog.map(template => ({ ...template, version: 2 }))
 
 export function resolvePaperTemplate(id: PaperTemplateId, version: number) {
-  const template = [...legacyPaperTemplateCatalog, ...paperTemplateCatalog].find(item => item.id === id && item.version === version)
+  const template = [...legacyPaperTemplateCatalog, ...paperTemplateCatalog, ...paperTemplateCatalog.map(t => ({...t, version: 3 as const, slots: [...t.slots, ...(!t.slots.some(s => s.id === 'photoFeature') ? [{id: 'photoFeature' as const, kind: 'photos' as const, defaultVisible: true, visibilityEditable: true, ownership: 'SOURCE' as const, editable: false}] : []), {id: 'notice' as const, kind: 'text' as const, defaultVisible: false, visibilityEditable: true, ownership: 'PAPER_ORIGINAL' as const, editable: true, maxLength: 160}]}))].find(item => item.id === id && item.version === version)
   if (!template) throw new Error(`Unknown paper template version: ${id}@${version}`)
   return template
 }

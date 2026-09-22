@@ -23,7 +23,7 @@ describe('paper map Template Studio v2 contract', () => {
     const config = defaultPaperMapConfig('map-classic', 12, '有松')
     expect(paperMapConfigV2Schema.parse(config)).toEqual(config)
     expect(() => parsePaperMapConfig({ ...config, version: 3 })).toThrow()
-    expect(() => resolvePaperTemplate('map-classic', 3)).toThrow('Unknown paper template version')
+    expect(() => resolvePaperTemplate('map-classic', 4)).toThrow('Unknown paper template version')
   })
 
   it('creates complete bounded drafts and validates selection/crop/order', () => {

@@ -1,11 +1,15 @@
 <script setup lang="ts">
 import type { PaperMapConfig, PaperSlotId } from '~~/shared/schemas/paper-map'
 import type { PaperMapSource } from '~~/shared/types/paper-map'
+import { selectPaperMapSpotsFromSource } from '~~/shared/utils/paper-map-render'
+import type { EditorialRegion } from '~~/shared/utils/paper-map-editorial'
 import PaperMapLegacyPreview from './PaperMapLegacyPreview.vue'
-export interface PaperPreviewResult { previewToken?: string, image: string | null, page: number, pageCount: number, selectedCount: number, clippedCount: number, warnings: string[], source: PaperMapSource }
-const props = defineProps<{ mapId: string, config: PaperMapConfig, source: PaperMapSource, selectedSlot?: PaperSlotId | 'title' | null }>()
-const emit = defineEmits<{ slotSelect: [slot: PaperSlotId | 'title'], resolved: [result: PaperPreviewResult], busy: [value: boolean] }>()
+export interface PaperPreviewResult { previewToken?: string, image: string | null, page: number, pageCount: number, selectedCount: number, clippedCount: number, warnings: string[], source: PaperMapSource, width?: number, height?: number, regions?: EditorialRegion[] }
+const props = defineProps<{ mapId: string, config: PaperMapConfig, source: PaperMapSource, selectedSlot?: PaperSlotId | 'title' | null, selectedSpotId?: string }>()
+const emit = defineEmits<{ slotSelect: [slot: PaperSlotId | 'title'], resolved: [result: PaperPreviewResult], busy: [value: boolean], spotSelect: [id: string] }>()
 const result = ref<PaperPreviewResult | null>(null), pending = ref(false), message = ref(''), page = ref(0), zoom = ref(false)
+const accessibleSpots = computed(() => selectPaperMapSpotsFromSource(result.value?.source ?? props.source,props.config))
+function selectRegion(region: EditorialRegion) { if(region.spotId)emit('spotSelect',region.spotId);emit('slotSelect',region.slot) }
 let sequence = 0, timer: ReturnType<typeof setTimeout> | undefined
 async function refresh() {
   const request = ++sequence
@@ -36,7 +40,7 @@ onBeforeUnmount(() => { sequence++; clearTimeout(timer) })
     <p v-if="pending" role="status" class="mb-3 text-sm text-stone-600">紙面を更新しています…</p>
     <p v-if="message" role="alert" class="rounded-lg bg-red-50 p-4 text-sm text-red-800">{{ message }}</p>
     <div v-if="result?.image" class="overflow-auto" :class="zoom ? 'max-h-[72vh]' : ''">
-      <img :src="result.image" :alt="`${config.paperOriginal.title} ${result.page + 1}ページ目の印刷紙面`" class="mx-auto block bg-white shadow-lg" :class="[zoom ? 'w-[1000px] max-w-none' : 'max-h-[76vh] w-auto max-w-full', pending ? 'opacity-50' : '']">
+      <div class="relative mx-auto" :class="zoom ? 'w-[1000px]' : 'w-fit max-w-full'"><img :src="result.image" :alt="`${config.paperOriginal.title} ${result.page + 1}ページ目の印刷紙面`" class="mx-auto block bg-white shadow-lg" :class="[zoom ? 'w-[1000px] max-w-none' : 'max-h-[76vh] w-auto max-w-full', pending ? 'opacity-50' : '']"><button v-for="(region,index) in result.regions ?? []" :key="index" type="button" class="absolute rounded border-2 hover:border-sky-600 focus-visible:border-sky-700 focus-visible:outline-none" :class="selectedSlot===region.slot && (!region.spotId || region.spotId===selectedSpotId) ? 'border-sky-500/60 bg-sky-200/5' : 'border-transparent'" :style="{left:`${region.x/result.width!*100}%`,top:`${region.y/result.height!*100}%`,width:`${region.width/result.width!*100}%`,height:`${region.height/result.height!*100}%`}" :aria-label="region.label" :disabled="pending" @click="selectRegion(region)"><span class="sr-only">{{ region.label }}</span></button></div>
     </div>
     <p v-else-if="!pending && !message" class="p-8 text-center text-sm text-stone-600">公開・配置済みのスポットを登録すると、ここに紙面が表示されます。</p>
     <nav v-if="result && result.pageCount > 1" class="mt-4 flex items-center justify-center gap-4" aria-label="紙面のページ">
@@ -44,5 +48,6 @@ onBeforeUnmount(() => { sequence++; clearTimeout(timer) })
       <span class="text-sm">{{ result.page + 1 }} / {{ result.pageCount }}</span>
       <button type="button" class="min-h-11 rounded-lg bg-white px-4 text-sm disabled:opacity-40" :disabled="pending || result.page + 1 >= result.pageCount" @click="changePage(result.page + 1)">次のページ</button>
     </nav>
+    <details class="mt-4 rounded-lg bg-white/80 p-3 text-sm"><summary class="min-h-8 cursor-pointer font-semibold">紙面の文章を読む</summary><h2 class="mt-3 font-bold">{{ config.paperOriginal.title }}</h2><p>{{ config.paperOriginal.subtitle }}</p><p v-if="config.slotState.intro?.visible !== false">{{ config.paperOriginal.intro }}</p><p v-if="config.slotState.notice?.visible">{{ config.paperOriginal.notice }}</p><p v-if="config.slotState.footer?.visible !== false">{{ config.paperOriginal.footer }}</p><p v-if="config.slotState.qr?.visible !== false">{{ config.paperOriginal.qrLabel }}</p><ol class="mt-3 space-y-3"><li v-for="(spot,index) in accessibleSpots" :key="spot.id"><button type="button" class="min-h-11 text-left font-semibold underline" @click="emit('spotSelect',spot.id);emit('slotSelect','spotGuide')">{{ index+1 }}. {{ spot.name }}</button><p>{{ spot.categories.map(c=>c.name).join(' / ') }}</p><p v-if="config.slotState.spotGuide?.visible!==false && config.presentation.informationDensity==='detail'">{{ config.spotOverrides.find(s=>s.spotId===spot.id)?.summary || spot.description }}</p></li></ol></details>
   </section>
 </template>

@@ -1,9 +1,10 @@
 import { parsePaperMapConfig, type PaperMapConfig, type PaperTemplateId } from '~~/shared/schemas/paper-map'
 import type { PaperMapRecord, PaperMapSource, PaperMapSummary } from '~~/shared/types/paper-map'
 import type { PublicMap, PublicSpot } from '~~/shared/types/public-map'
+import { resolveEditorialDocument } from '~~/shared/utils/paper-map-editorial'
+import { paperDesignConfig, recommendPaperDesign, type PaperDesignId } from '~~/shared/utils/paper-map-designs'
 import { resolvePaperDocument } from '~~/shared/utils/paper-map-document'
 import { recommendedSpotLimit } from '~~/shared/utils/paper-map-recommendation'
-import { defaultPaperMapConfig as createDefaultPaperMapConfig } from '~~/shared/utils/paper-map-templates'
 import { resolvePaperRenderModel, selectPaperMapSpotsFromSource } from '~~/shared/utils/paper-map-render'
 import { getLivePublicMapById } from './public-map'
 import { loadReadyPublicSnapshot } from './public-release'
@@ -46,16 +47,18 @@ export function paperMapWarnings(source: PaperMapSource, config: PaperMapConfig)
   if (!selected.length) warnings.push('選択条件に一致する公開スポットがありません。')
   if (selected.length > recommendedSpotLimit(config)) warnings.push(`スポットが${selected.length}件あります。読みやすさの目安を超えているため、カテゴリーやスポットを絞ってください。`)
   if (config.selection.spotIds.some(id => !allIds.has(id)) || config.selection.categoryIds.some(id => !allCategoryIds.has(id)) || config.spotOverrides.some(item => !allIds.has(item.spotId))) warnings.push('保存後に削除された項目があります。現在存在する項目だけを出力します。')
-  warnings.push(...(config.templateVersion === 2 ? resolvePaperDocument(source, config) : resolvePaperRenderModel(source, config)).warnings.filter(warning => !warnings.includes(warning)))
+  warnings.push(...(config.templateVersion === 3 ? resolveEditorialDocument(source, config) : config.templateVersion === 2 ? resolvePaperDocument(source, config) : resolvePaperRenderModel(source, config)).warnings.filter(warning => !warnings.includes(warning)))
   return warnings
 }
 
-export async function defaultNewPaperMapConfig(mapId: string, templateId: PaperTemplateId) {
+export async function defaultNewPaperMapConfig(mapId: string, templateId: PaperTemplateId, designId?: PaperDesignId) {
   const source = await loadPaperMapSource(mapId, 'LIVE')
-  return { source, config: createDefaultPaperMapConfig(templateId, source.spotCount, source.map.name) }
+  return { source, config: paperDesignConfig(designId ?? (templateId === 'map-classic' ? 'neutral-map' : templateId === 'photo-story' ? 'heritage-editorial' : recommendPaperDesign(source).id), source) }
 }
 
 export function validatePaperMapReferences(source: PaperMapSource, config: PaperMapConfig) {
+  const spots = source.map.floors.flatMap(floor => floor.spots)
+  if (config.photoChoices?.some(choice => !spots.find(s => s.id === choice.spotId)?.photos.includes(choice.url))) throw createError({ statusCode: 422, statusMessage: '写真は同じスポットの登録済み写真から選択してください。' })
   const spotIds = new Set(source.map.floors.flatMap(floor => floor.spots.map(spot => spot.id)))
   const categoryIds = new Set(source.map.floors.flatMap(floor => floor.spots.flatMap(spot => spot.categories.map(category => category.id))))
   if (config.selection.spotIds.some(id => !spotIds.has(id)) || config.selection.categoryIds.some(id => !categoryIds.has(id)) || config.ordering.spotIds.some(id => !spotIds.has(id)) || config.spotOverrides.some(item => !spotIds.has(item.spotId))) throw createError({ statusCode: 422, statusMessage: 'このマップに存在しないスポットまたはカテゴリーは保存できません。' })
