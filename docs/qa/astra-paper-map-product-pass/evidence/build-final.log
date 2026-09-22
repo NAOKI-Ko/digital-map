@@ -122,7 +122,7 @@ node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/BrJ8BarH.js                1,05
 
 ℹ ✓ built in 5.17s
 
- WARN  [plugin builtin:vite-reporter] 
+ WARN  [plugin builtin:vite-reporter]
 (!) Some chunks are larger than 500 kB after minification. Consider:
 - Using dynamic import() to code-split the application
 - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
