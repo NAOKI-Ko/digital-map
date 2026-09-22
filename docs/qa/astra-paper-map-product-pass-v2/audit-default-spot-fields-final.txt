@@ -1,0 +1,108 @@
+$ node --import tsx scripts/qa/audit-default-spot-fields.ts
+{
+  "status": "PASS",
+  "maps": [
+    {
+      "slug": "astra-v2-arimatsu",
+      "totalFieldCount": 9,
+      "standardSemanticKeys": [
+        "description",
+        "address",
+        "hours",
+        "holiday",
+        "website",
+        "phone"
+      ],
+      "customCount": 3,
+      "valid": true,
+      "missingSemanticKeys": [],
+      "duplicateSemanticKeys": [],
+      "unexpectedStandardSemanticKeys": []
+    },
+    {
+      "slug": "publication-6cc6e65561124b999da4b71d3312e21c",
+      "totalFieldCount": 6,
+      "standardSemanticKeys": [
+        "description",
+        "address",
+        "hours",
+        "holiday",
+        "website",
+        "phone"
+      ],
+      "customCount": 0,
+      "valid": true,
+      "missingSemanticKeys": [],
+      "duplicateSemanticKeys": [],
+      "unexpectedStandardSemanticKeys": []
+    },
+    {
+      "slug": "publication-74b527c2dc9d4ed5912b15b31e3e16b1",
+      "totalFieldCount": 6,
+      "standardSemanticKeys": [
+        "description",
+        "address",
+        "hours",
+        "holiday",
+        "website",
+        "phone"
+      ],
+      "customCount": 0,
+      "valid": true,
+      "missingSemanticKeys": [],
+      "duplicateSemanticKeys": [],
+      "unexpectedStandardSemanticKeys": []
+    },
+    {
+      "slug": "publication-868636640eb94711ab90618897b01ff1",
+      "totalFieldCount": 6,
+      "standardSemanticKeys": [
+        "description",
+        "address",
+        "hours",
+        "holiday",
+        "website",
+        "phone"
+      ],
+      "customCount": 0,
+      "valid": true,
+      "missingSemanticKeys": [],
+      "duplicateSemanticKeys": [],
+      "unexpectedStandardSemanticKeys": []
+    },
+    {
+      "slug": "publication-e3ebdfbb9b144198906c356b00d581d1",
+      "totalFieldCount": 6,
+      "standardSemanticKeys": [
+        "description",
+        "address",
+        "hours",
+        "holiday",
+        "website",
+        "phone"
+      ],
+      "customCount": 0,
+      "valid": true,
+      "missingSemanticKeys": [],
+      "duplicateSemanticKeys": [],
+      "unexpectedStandardSemanticKeys": []
+    },
+    {
+      "slug": "team-demo-arimatsu",
+      "totalFieldCount": 6,
+      "standardSemanticKeys": [
+        "description",
+        "address",
+        "hours",
+        "holiday",
+        "website",
+        "phone"
+      ],
+      "customCount": 0,
+      "valid": true,
+      "missingSemanticKeys": [],
+      "duplicateSemanticKeys": [],
+      "unexpectedStandardSemanticKeys": []
+    }
+  ]
+}

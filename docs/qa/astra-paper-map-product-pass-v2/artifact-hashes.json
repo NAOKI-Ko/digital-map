@@ -35,27 +35,27 @@
     "sha256": "1e382a98e8bea43e808af08669a092367cf9b44a5396c941d3caf548e28cc643"
   },
   {
-    "path": "audit-default-spot-fields-final.log",
+    "path": "audit-default-spot-fields-final.txt",
     "bytes": 2524,
     "sha256": "42d7093e9e5724be631373d89bbfc1669073640213afc32813163dc7d1de1adc"
   },
   {
-    "path": "audit-dependencies.log",
+    "path": "audit-dependencies.txt",
     "bytes": 31,
     "sha256": "15950a68a7ed99c59779717acefdceb3f69cfd31bde67d2c954f2a3cea4d7955"
   },
   {
-    "path": "audit-image-spatial-migration.log",
+    "path": "audit-image-spatial-migration.txt",
     "bytes": 285,
     "sha256": "cad7af525f664bf26f70c692351a4867fdda9db94fe4b985097724df10331a09"
   },
   {
-    "path": "audit-paper-map-easy-builder.log",
+    "path": "audit-paper-map-easy-builder.txt",
     "bytes": 395,
     "sha256": "66f06c65979c1702d38236d1c7236dd50c121feeb20440c25cd88b6e39227b8e"
   },
   {
-    "path": "audit-tenant-data-foundation.log",
+    "path": "audit-tenant-data-foundation.txt",
     "bytes": 708,
     "sha256": "fa4e3004dd3690b942153552140a00cb0fe24fa260cf85146d40bd6f290fe423"
   },
@@ -145,7 +145,7 @@
     "sha256": "e3a2d4e23434413c0917b3e86be37a128f4583620a2e7a4970f5db79e13a2978"
   },
   {
-    "path": "build-final.log",
+    "path": "build-final.txt",
     "bytes": 66671,
     "sha256": "a7560c3ddb0999a701ebfe0750bdc36009e7e51c3f5d4c3c92e94a6b08366b08"
   },
@@ -165,7 +165,7 @@
     "sha256": "ad2ce4ba2f17461c4dc56b73386863fc05c5ea2deb3f8794677e3307a000f44c"
   },
   {
-    "path": "full-tests-final.log",
+    "path": "full-tests-final.txt",
     "bytes": 294,
     "sha256": "c5c14d8cfaeb0a22b3d00d8d497a7c8aadbb18489e7d5b873e0cd732281f1404"
   },
@@ -230,22 +230,22 @@
     "sha256": "11d6939edd2938cd474173bc1237ff4708c250877c83c294d1bea170c404c473"
   },
   {
-    "path": "prisma-validate.log",
+    "path": "prisma-validate.txt",
     "bytes": 160,
     "sha256": "7010b1a9a844be2a26416d9bb09f6d164fee6c3aaec071fce05de8a053aa7dd7"
   },
   {
-    "path": "qr-all-pages.log",
+    "path": "qr-all-pages.txt",
     "bytes": 471,
     "sha256": "594487713d8d8ddc5d0679a366578dbc49d8db6d2740c606fc14eb635c0e9021"
   },
   {
-    "path": "qr-decode.log",
+    "path": "qr-decode.txt",
     "bytes": 131,
     "sha256": "8f4c73991353d4de8fc5cbc90e4ee404a9f1c4e18423812f2bfbef5cfdd27de9"
   },
   {
-    "path": "reproduction.log",
+    "path": "reproduction.txt",
     "bytes": 155,
     "sha256": "7ae2ada20e9207dfe4d4a760e7f9a8d4e74d1159af24384c535c19bd818cf4c1"
   },
@@ -255,7 +255,7 @@
     "sha256": "01e499e8ccf69c28e6dfa06c6e3233c7c2c5f33e2bfea68cb7ef2b8dfc16c6fc"
   },
   {
-    "path": "typecheck-final.log",
+    "path": "typecheck-final.txt",
     "bytes": 72,
     "sha256": "b04318093d3c6a224924e1e0271a8bc6a61e8c039924343b3ff661710bd31028"
   }

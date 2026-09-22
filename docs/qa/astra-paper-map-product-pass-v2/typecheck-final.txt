@@ -1,0 +1,2 @@
+$ nuxt typecheck
+[nuxt:tailwindcss] ℹ Using default Tailwind CSS file
