@@ -24,7 +24,7 @@ describe('paper map v2 PDF renderer', () => {
     ['PHOTO_GUIDE', 'A3', 'portrait'],
     ['GUIDE', 'A3', 'landscape'],
   ] as const)('creates parseable %s %s %s output', async (purpose, paper, orientation) => {
-    const config = { ...recommendPaperMapConfig(purpose, 12, map.name), paper, orientation }
+    const config = { ...recommendPaperMapConfig(purpose, 12, map.name), paper, orientation, templateVersion: 1 as const }
     const bytes = await generatePaperMapPdf(source, config, { publicBaseUrl: 'https://maps.example.test', uploadDirectory: '/tmp/no-uploads', storage })
     const parsed = await PDFDocument.load(bytes)
     expect(parsed.getPageCount()).toBe(1)

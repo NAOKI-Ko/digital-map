@@ -3,7 +3,7 @@ import { z } from 'zod'
 export const paperMapPurposes = ['MAP_FOCUS', 'GUIDE', 'PHOTO_GUIDE'] as const
 export const paperMapLayouts = ['MAP_FOCUS', 'BALANCED', 'GUIDE'] as const
 export const paperTemplateIds = ['map-classic', 'spot-guide', 'photo-story'] as const
-export const paperSlotIds = ['intro', 'categoryLegend', 'spotGuide', 'photoFeature', 'qr', 'logo', 'footer'] as const
+export const paperSlotIds = ['intro', 'categoryLegend', 'spotGuide', 'photoFeature', 'qr', 'logo', 'footer', 'notice'] as const
 
 export type PaperTemplateId = typeof paperTemplateIds[number]
 export type PaperSlotId = typeof paperSlotIds[number]
@@ -33,14 +33,20 @@ export const paperMapConfigV1Schema = z.object({
 const slotStateSchema = z.partialRecord(z.enum(paperSlotIds), z.object({ visible: z.boolean(), modified: z.boolean().default(false) }))
 
 export const paperMapConfigV2Schema = z.object({
-  version: z.literal(2), templateId: z.enum(paperTemplateIds), templateVersion: z.literal(1), sourceMode: z.enum(['LIVE', 'PUBLISHED']), paper: z.enum(['A4', 'A3']), orientation: z.enum(['portrait', 'landscape']),
+  version: z.literal(2), templateId: z.enum(paperTemplateIds), templateVersion: z.union([z.literal(1), z.literal(2), z.literal(3)]), sourceMode: z.enum(['LIVE', 'PUBLISHED']), paper: z.enum(['A4', 'A3']), orientation: z.enum(['portrait', 'landscape']),
   selection: z.object({ mode: z.enum(['recommended', 'categories', 'spots']), categoryIds: uniqueIds, spotIds: uniqueIds }),
   ordering: z.object({ mode: z.enum(['auto', 'name', 'manual']), spotIds: uniqueIds }), viewport: viewportSchema,
-  paperOriginal: z.object({ title: z.string().trim().min(1, 'タイトルを入力してください。').max(120), subtitle: z.string().trim().max(240), intro: z.string().trim().max(600), qrLabel: z.string().trim().max(120), footer: z.string().trim().max(240) }),
+  paperOriginal: z.object({ title: z.string().trim().min(1, 'タイトルを入力してください。').max(120), subtitle: z.string().trim().max(240), intro: z.string().trim().max(600), qrLabel: z.string().trim().max(120), footer: z.string().trim().max(240), sectionHeading: z.string().trim().max(60).optional(), notice: z.string().trim().max(160).optional() }),
   slotState: slotStateSchema,
+  design: z.object({ themeId: z.enum(['heritage', 'leisure', 'alpine', 'neutral']), themeVersion: z.literal(1), systemVersion: z.literal(1) }).optional(),
+  photoChoices: z.array(z.object({ spotId: z.string().min(1), url: z.string().min(1).max(1024) })).max(200).refine(v => new Set(v.map(p => p.spotId)).size === v.length, '同じスポットの写真は1枚選択してください。').optional(),
   spotOverrides: z.array(z.object({ spotId: z.string().min(1), summary: z.string().trim().min(1).max(400).optional() })).max(200).refine(values => new Set(values.map(value => value.spotId)).size === values.length, '同じスポットの紙面用文章を重複して保存できません。'),
   presentation: z.object({ theme: z.enum(['brand', 'simple', 'warm', 'natural']), photoMode: z.enum(['none', 'featured', 'all']), informationDensity: z.enum(['names', 'standard', 'detail']) }),
-}).superRefine((value, context) => validateSelectionAndViewport({ selectionMode: value.selection.mode, categoryIds: value.selection.categoryIds, spotIds: value.selection.spotIds, order: value.ordering.mode, manualSpotIds: value.ordering.spotIds, viewport: value.viewport }, context))
+}).superRefine((value, context) => {
+  if (value.templateVersion === 3 && (!value.design || !({heritage:['map-classic','photo-story'],leisure:['photo-story'],alpine:['map-classic'],neutral:['map-classic','spot-guide']}[value.design.themeId].includes(value.templateId)))) context.addIssue({code:'custom',path:['design'],message:'対応するデザインを選択してください。'});
+  if (value.templateVersion !== 3 && value.design) context.addIssue({code:'custom',path:['design'],message:'旧版に新しいデザインは指定できません。'});
+  validateSelectionAndViewport({ selectionMode: value.selection.mode, categoryIds: value.selection.categoryIds, spotIds: value.selection.spotIds, order: value.ordering.mode, manualSpotIds: value.ordering.spotIds, viewport: value.viewport }, context)
+})
 
 export type PaperMapConfigV1 = z.infer<typeof paperMapConfigV1Schema>
 export type PaperMapConfig = z.infer<typeof paperMapConfigV2Schema>
@@ -66,7 +72,7 @@ export function parsePaperMapConfig(value: unknown): PaperMapConfig {
 }
 
 export const paperMapConfigSchema = z.preprocess(value => parsePaperMapConfig(value), paperMapConfigV2Schema)
-export const paperMapCreateSchema = z.object({ name: z.string().trim().min(1).max(120).optional(), templateId: z.enum(paperTemplateIds).optional(), purpose: z.enum(paperMapPurposes).optional() }).refine(value => value.templateId || value.purpose, 'テンプレートを選択してください。')
+export const paperMapCreateSchema = z.object({ name: z.string().trim().min(1).max(120).optional(), templateId: z.enum(paperTemplateIds).optional(), purpose: z.enum(paperMapPurposes).optional(), designId: z.enum(['heritage-map','heritage-editorial']).optional() }).refine(value => value.templateId || value.purpose || value.designId, 'テンプレートを選択してください。')
 export const paperMapUpdateSchema = z.object({ name: z.string().trim().min(1).max(120), config: paperMapConfigV2Schema })
-export const paperMapPdfSchema = z.object({ config: paperMapConfigV2Schema })
+export const paperMapPdfSchema = z.object({ config: paperMapConfigV2Schema, previewToken: z.string().regex(/^[a-f0-9]{64}$/).optional() })
 export const paperDesignRequestSchema = z.object({ paperMapId: z.string().min(1).nullable().optional(), contactName: z.string().trim().min(1).max(100), contactEmail: z.email().max(254), organizationName: z.string().trim().max(120), desiredUse: z.string().trim().min(1).max(1000), desiredDate: z.string().trim().max(40) })

@@ -1,0 +1,5 @@
+{
+  "equal": true,
+  "normalizedOnly": "DB-generated category IDs and information-field definition IDs removed for comparison; all factual values, spot/floor IDs, ordering and geometry retained",
+  "sha256": "e07738e60a161c4e8c7e51bf061ad7a10c8d7aaece60e662b93ae998b1b901e4"
+}

@@ -1,0 +1,32 @@
+[
+  {
+    "template": "astra-map-classic",
+    "pages": 1,
+    "embeddedImages": 1,
+    "size": [
+      3508,
+      2480
+    ],
+    "pixelIdentical": true
+  },
+  {
+    "template": "astra-spot-guide",
+    "pages": 1,
+    "embeddedImages": 1,
+    "size": [
+      2480,
+      3508
+    ],
+    "pixelIdentical": true
+  },
+  {
+    "template": "astra-photo-story",
+    "pages": 1,
+    "embeddedImages": 1,
+    "size": [
+      2480,
+      3508
+    ],
+    "pixelIdentical": true
+  }
+]

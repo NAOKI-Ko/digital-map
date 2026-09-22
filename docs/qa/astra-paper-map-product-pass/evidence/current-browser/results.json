@@ -1,0 +1,27 @@
+{
+  "widths": [
+    {
+      "width": 1440,
+      "scrollWidth": 1440
+    },
+    {
+      "width": 1280,
+      "scrollWidth": 1280
+    },
+    {
+      "width": 1024,
+      "scrollWidth": 1024
+    },
+    {
+      "width": 390,
+      "scrollWidth": 390
+    },
+    {
+      "width": 430,
+      "scrollWidth": 430
+    }
+  ],
+  "errors": [],
+  "url": "http://localhost:3019/admin/maps/demo-arimatsu-map/paper/cmucfqp580000v2u1w799a70v",
+  "download": true
+}

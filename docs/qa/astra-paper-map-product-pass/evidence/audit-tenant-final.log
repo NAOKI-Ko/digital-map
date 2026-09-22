@@ -1,0 +1,27 @@
+$ node --import tsx scripts/audit-tenant-data-foundation.ts
+{
+  "counts": {
+    "tenants": 4,
+    "maps": 3,
+    "spots": 10,
+    "categories": 6,
+    "spotCategories": 10
+  },
+  "anomalies": {
+    "spotsWithoutTenant": [],
+    "categoriesWithoutTenant": [],
+    "spotFloorTenantMismatch": [],
+    "categoryMapTenantMismatch": [],
+    "spotCategoryTenantMismatch": [],
+    "invalidRealCoordinates": [],
+    "multiMapTenants": [],
+    "invalidMapViews": [],
+    "partialImageCoordinates": [],
+    "outsideImageCoordinates": []
+  },
+  "policy": {
+    "hardOneTenantOneMapClaimed": true,
+    "multiMapTenantCount": 0
+  }
+}
+Tenant data foundation audit passed; hard one-Map-per-Tenant policy has zero blockers.

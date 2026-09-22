@@ -23,7 +23,7 @@ describe('paper map Template Studio v2 contract', () => {
     const config = defaultPaperMapConfig('map-classic', 12, '有松')
     expect(paperMapConfigV2Schema.parse(config)).toEqual(config)
     expect(() => parsePaperMapConfig({ ...config, version: 3 })).toThrow()
-    expect(() => resolvePaperTemplate('map-classic', 2)).toThrow('Unknown paper template version')
+    expect(() => resolvePaperTemplate('map-classic', 4)).toThrow('Unknown paper template version')
   })
 
   it('creates complete bounded drafts and validates selection/crop/order', () => {
@@ -59,7 +59,7 @@ describe('paper map Template Studio v2 contract', () => {
     const image = containRect(1000, 500, { x: 100, y: 100, width: 400, height: 400 })
     expect(image).toEqual({ x: 100, y: 200, width: 400, height: 200 })
     expect(viewportPoint({ x: .5, y: .5 }, { x: 0, y: 0, width: 1, height: 1 }, image)).toEqual({ x: 300, y: 300 })
-    const config = defaultPaperMapConfig('map-classic', 2, '地図')
+    const config = defaultPaperMapConfig('map-classic', 2, '地図', 1)
     expect(resolveViewport(config, [{ x: .4, y: .4 }, { x: .6, y: .6 }]).x).toBeCloseTo(.32)
     const guide = { ...defaultPaperMapConfig('spot-guide', 2, '案内'), orientation: 'landscape' as const }
     expect(resolvePaperLayout(config, 1000, 700).mapFrame.width).toBeGreaterThan(resolvePaperLayout(guide, 1000, 700).mapFrame.width)

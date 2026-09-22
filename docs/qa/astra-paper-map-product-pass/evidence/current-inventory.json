@@ -1,0 +1,21 @@
+{
+  "database": "/digital_map_current_paper_20260922",
+  "kind": "repository demonstration fixture; not a verified customer map",
+  "mapId": "demo-arimatsu-map",
+  "slug": "team-demo-arimatsu",
+  "sourceMode": "LIVE",
+  "spotCount": 10,
+  "photoCount": 0,
+  "categoryCount": 6,
+  "positioned": 10,
+  "sha256": "2a7174e7660b7da4b564b92011dba4634872131546ffe88adcbe8f78d20c8c1a",
+  "floors": [
+    {
+      "id": "demo-arimatsu-floor",
+      "illustrationUrl": "/uploads/arimatsu-demo-map.png",
+      "imageWidth": 1448,
+      "imageHeight": 1086,
+      "decorations": 0
+    }
+  ]
+}

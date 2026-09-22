@@ -1,0 +1,116 @@
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+Datasource "db": PostgreSQL database "digital_map_current_paper_20260922", schema "public" at "127.0.0.1:5432"
+
+31 migrations found in prisma/migrations
+
+Applying migration `20260720000000_init`
+Applying migration `20260721000000_nullable_spot_coordinates`
+Applying migration `20260721010000_rectangle_georeference`
+Applying migration `20260721020000_two_point_georeference`
+Applying migration `20260721030000_require_image_dimensions`
+Applying migration `20260723000000_remove_is_outdoor`
+Applying migration `20260824000000_add_category_domain`
+Applying migration `20260824010000_remove_legacy_spot_category`
+Applying migration `20260824020000_add_spot_importance`
+Applying migration `20260824030000_add_map_branding`
+Applying migration `20260825000000_add_category_icon`
+Applying migration `20260913010000_image_spatial_model`
+Applying migration `20260913020000_tenant_media_library`
+Applying migration `20260913030000_spot_field_definitions`
+Applying migration `20260913040000_floor_decorations`
+Applying migration `20260913050000_spot_pin_size`
+Applying migration `20260913060000_organization_map_rbac`
+Applying migration `20260914010000_auth_lifecycle`
+Applying migration `20260914020000_spot_editor_revisions`
+Applying migration `20260914030000_audit_events`
+Applying migration `20260914040000_mail_delivery`
+Applying migration `20260914050000_security_rate_limits`
+Applying migration `20260914060000_ja_en_translations`
+Applying migration `20260914070000_media_variants`
+Applying migration `20260914080000_public_releases`
+Applying migration `20260914090000_public_analytics`
+Applying migration `20260914100000_map_seo`
+Applying migration `20260914110000_self_service_onboarding`
+Applying migration `20260920010000_tenant_data_foundation`
+Applying migration `20260920020000_map_tenant_unique`
+Applying migration `20260921010000_paper_map_easy_builder`
+
+┌─────────────────────────────────────────────────────────┐
+│  Update available 7.10.0 -> 8.0.0-rc.15                 │
+│                                                         │
+│  This is a major update - please follow the guide at    │
+│  https://pris.ly/d/major-version-upgrade                │
+│                                                         │
+│  Run the following to update                            │
+│    npm i --save-dev prisma@latest                       │
+│    npm i @prisma/client@latest                          │
+└─────────────────────────────────────────────────────────┘
+The following migration(s) have been applied:
+
+migrations/
+  └─ 20260720000000_init/
+    └─ migration.sql
+  └─ 20260721000000_nullable_spot_coordinates/
+    └─ migration.sql
+  └─ 20260721010000_rectangle_georeference/
+    └─ migration.sql
+  └─ 20260721020000_two_point_georeference/
+    └─ migration.sql
+  └─ 20260721030000_require_image_dimensions/
+    └─ migration.sql
+  └─ 20260723000000_remove_is_outdoor/
+    └─ migration.sql
+  └─ 20260824000000_add_category_domain/
+    └─ migration.sql
+  └─ 20260824010000_remove_legacy_spot_category/
+    └─ migration.sql
+  └─ 20260824020000_add_spot_importance/
+    └─ migration.sql
+  └─ 20260824030000_add_map_branding/
+    └─ migration.sql
+  └─ 20260825000000_add_category_icon/
+    └─ migration.sql
+  └─ 20260913010000_image_spatial_model/
+    └─ migration.sql
+  └─ 20260913020000_tenant_media_library/
+    └─ migration.sql
+  └─ 20260913030000_spot_field_definitions/
+    └─ migration.sql
+  └─ 20260913040000_floor_decorations/
+    └─ migration.sql
+  └─ 20260913050000_spot_pin_size/
+    └─ migration.sql
+  └─ 20260913060000_organization_map_rbac/
+    └─ migration.sql
+  └─ 20260914010000_auth_lifecycle/
+    └─ migration.sql
+  └─ 20260914020000_spot_editor_revisions/
+    └─ migration.sql
+  └─ 20260914030000_audit_events/
+    └─ migration.sql
+  └─ 20260914040000_mail_delivery/
+    └─ migration.sql
+  └─ 20260914050000_security_rate_limits/
+    └─ migration.sql
+  └─ 20260914060000_ja_en_translations/
+    └─ migration.sql
+  └─ 20260914070000_media_variants/
+    └─ migration.sql
+  └─ 20260914080000_public_releases/
+    └─ migration.sql
+  └─ 20260914090000_public_analytics/
+    └─ migration.sql
+  └─ 20260914100000_map_seo/
+    └─ migration.sql
+  └─ 20260914110000_self_service_onboarding/
+    └─ migration.sql
+  └─ 20260920010000_tenant_data_foundation/
+    └─ migration.sql
+  └─ 20260920020000_map_tenant_unique/
+    └─ migration.sql
+  └─ 20260921010000_paper_map_easy_builder/
+    └─ migration.sql
+
+All migrations have been successfully applied.

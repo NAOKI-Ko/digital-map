@@ -1,0 +1,35 @@
+[
+  {
+    "name": "current-map-classic",
+    "bytes": 1766889,
+    "pdfMs": 199
+  },
+  {
+    "name": "astra-map-classic",
+    "bytes": 10343081,
+    "pages": 1,
+    "pdfMs": 1170
+  },
+  {
+    "name": "current-spot-guide",
+    "bytes": 1643804,
+    "pdfMs": 161
+  },
+  {
+    "name": "astra-spot-guide",
+    "bytes": 3601316,
+    "pages": 1,
+    "pdfMs": 932
+  },
+  {
+    "name": "current-photo-story",
+    "bytes": 1321536,
+    "pdfMs": 143
+  },
+  {
+    "name": "astra-photo-story",
+    "bytes": 3228330,
+    "pages": 1,
+    "pdfMs": 910
+  }
+]

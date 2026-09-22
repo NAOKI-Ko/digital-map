@@ -15,6 +15,6 @@ export interface PaperMapSummary {
 }
 
 export interface PaperMapRecord extends PaperMapSummary { config: PaperMapConfig }
-export interface PaperMapSource { mode: 'LIVE' | 'PUBLISHED', map: PublicMap, spotCount: number, categoryCount: number, photoCount: number }
+export interface PaperMapSource { mode: 'LIVE' | 'PUBLISHED', publicUrlAvailable?: boolean, map: PublicMap, spotCount: number, categoryCount: number, photoCount: number }
 export interface PaperMapListResponse { paperMaps: PaperMapSummary[], source: PaperMapSource }
 export interface PaperMapResponse { paperMap: PaperMapRecord, source: PaperMapSource, warnings: string[] }

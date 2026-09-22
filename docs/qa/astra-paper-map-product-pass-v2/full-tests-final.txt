@@ -1,0 +1,10 @@
+$ vitest run
+
+ RUN  v4.1.11 /Users/naoki/Documents/Codex/2026-09-22/naoki-ko-digital-map-paper-map/work/digital-map
+
+
+ Test Files  91 passed (91)
+      Tests  619 passed (619)
+   Start at  20:47:34
+   Duration  3.52s (transform 2.62s, setup 0ms, import 5.71s, tests 12.43s, environment 499ms)
+

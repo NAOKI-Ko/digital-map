@@ -1,0 +1,96 @@
+{
+  "results": [
+    {
+      "label": "anonymous preview denied",
+      "pass": true
+    },
+    {
+      "label": "editor preview access",
+      "pass": true
+    },
+    {
+      "label": "member preview access",
+      "pass": true
+    },
+    {
+      "label": "spot preview access",
+      "pass": true
+    },
+    {
+      "label": "other preview access",
+      "pass": true
+    },
+    {
+      "label": "create Paper only",
+      "pass": true
+    },
+    {
+      "label": "valid preview",
+      "pass": true
+    },
+    {
+      "label": "preview contains 10 spots and image",
+      "pass": true
+    },
+    {
+      "label": "unconfirmed PDF denied",
+      "pass": true
+    },
+    {
+      "label": "confirmed PDF delivered",
+      "pass": true
+    },
+    {
+      "label": "paper override saved",
+      "pass": true
+    },
+    {
+      "label": "Paper create/preview/PDF/save never mutate source",
+      "pass": true
+    },
+    {
+      "label": "foreign references rejected",
+      "pass": true
+    },
+    {
+      "label": "unknown template rejected",
+      "pass": true
+    },
+    {
+      "label": "disposable READY snapshot prepared",
+      "pass": true
+    },
+    {
+      "label": "LIVE refreshes current source",
+      "pass": true
+    },
+    {
+      "label": "PUBLISHED preserves immutable source",
+      "pass": true
+    },
+    {
+      "label": "published preview identifies release",
+      "pass": true
+    },
+    {
+      "label": "stale source PDF denied",
+      "pass": true
+    },
+    {
+      "label": "stopped map can use READY snapshot",
+      "pass": true
+    },
+    {
+      "label": "stopped public map QR omitted",
+      "pass": true
+    },
+    {
+      "label": "duplicate Paper",
+      "pass": true
+    },
+    {
+      "label": "delete duplicate Paper",
+      "pass": true
+    }
+  ]
+}

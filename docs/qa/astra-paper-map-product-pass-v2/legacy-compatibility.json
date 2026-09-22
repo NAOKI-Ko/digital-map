@@ -1,0 +1,9 @@
+{
+  "exactBase": "abddcb4b8262a2b4cd3a52b8703dfb4b155ff697",
+  "comparison": "original base renderer vs preserved version 1 renderer, same 20-Spot source/config/options, rasterized by Poppler at 150dpi",
+  "pixelIdentical": true,
+  "dimensions": [
+    2481,
+    1754
+  ]
+}

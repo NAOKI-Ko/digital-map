@@ -1,0 +1,90 @@
+{
+  "results": [
+    {
+      "flow": "rendered-picker-switch-before-save",
+      "pass": true
+    },
+    {
+      "flow": "create",
+      "pass": true,
+      "url": "http://localhost:3019/admin/maps/astra-v2-real-map/paper/cmuclliq30002p6u1aligfpjj"
+    },
+    {
+      "flow": "paper-original-save-reload",
+      "pass": true
+    },
+    {
+      "flow": "override-save-reload-hide-show-reset",
+      "pass": true
+    },
+    {
+      "flow": "same-Spot-photo-save-reload",
+      "pass": true
+    },
+    {
+      "flow": "custom-viewport-save",
+      "pass": true
+    },
+    {
+      "flow": "keyboard-viewport",
+      "pass": true
+    },
+    {
+      "flow": "spot-order",
+      "pass": true
+    },
+    {
+      "flow": "published-source-switch-refreshes-preview",
+      "pass": true
+    },
+    {
+      "flow": "explicit-design-switch",
+      "pass": true
+    },
+    {
+      "flow": "browser-PDF-download",
+      "pass": true,
+      "filename": "有松マップ 紙マップ.pdf"
+    },
+    {
+      "flow": "responsive",
+      "width": 1440,
+      "height": 900,
+      "scrollWidth": 1440,
+      "pass": true
+    },
+    {
+      "flow": "responsive",
+      "width": 1280,
+      "height": 800,
+      "scrollWidth": 1280,
+      "pass": true
+    },
+    {
+      "flow": "responsive",
+      "width": 1024,
+      "height": 768,
+      "scrollWidth": 1024,
+      "pass": true
+    },
+    {
+      "flow": "responsive",
+      "width": 390,
+      "height": 844,
+      "scrollWidth": 390,
+      "pass": true
+    },
+    {
+      "flow": "responsive",
+      "width": 430,
+      "height": 932,
+      "scrollWidth": 430,
+      "pass": true
+    },
+    {
+      "flow": "keyboard-spot-text-selection",
+      "pass": true
+    }
+  ],
+  "errors": []
+}

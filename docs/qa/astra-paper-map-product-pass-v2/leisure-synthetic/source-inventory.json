@@ -1,0 +1,360 @@
+{
+  "kind": "SYNTHETIC FIXTURE",
+  "sourceHash": "690a3fdb04fbdf6312603621bc0301be72f92127692dcb6416f447867ef0e823",
+  "originalExportHash": null,
+  "mode": "LIVE",
+  "title": "QA レジャー・デザイン検証",
+  "organizationName": "SYNTHETIC QA · 実在しない検証データ",
+  "sourcePublicUrlAvailable": false,
+  "limitations": "All locations, names, descriptions, categories, coordinates and images are clearly synthetic QA values; no real customer/brand; no trails or routes added.",
+  "fieldOwnership": {
+    "SOURCE": [
+      "map illustration",
+      "existing decorations and geometry",
+      "Spot name",
+      "description",
+      "categories",
+      "same-Spot managed photos",
+      "logo",
+      "slug"
+    ],
+    "PAPER_ORIGINAL": {
+      "title": "QA レジャー・デザイン検証",
+      "subtitle": "",
+      "intro": "",
+      "qrLabel": "詳しい情報はWebマップで",
+      "footer": "",
+      "sectionHeading": "スポット案内",
+      "notice": ""
+    },
+    "PAPER_OVERRIDE": [],
+    "TEMPLATE": [
+      "numbers corresponding to selected spots",
+      "fixed nonsemantic theme graphics",
+      "page numbers",
+      "generic section heading"
+    ]
+  },
+  "metrics": {
+    "id": "leisure-synthetic",
+    "kind": "SYNTHETIC FIXTURE",
+    "sourceHash": "690a3fdb04fbdf6312603621bc0301be72f92127692dcb6416f447867ef0e823",
+    "pages": 2,
+    "pdfBytes": 1863793,
+    "previewMs": 143,
+    "pdfMs": 385,
+    "size": {
+      "format": "png",
+      "mediaType": "image/png",
+      "size": 359073,
+      "width": 2480,
+      "height": 1754,
+      "space": "srgb",
+      "channels": 3,
+      "depth": "uchar",
+      "density": 150,
+      "isProgressive": false,
+      "isPalette": false,
+      "bitsPerSample": 8,
+      "hasProfile": false,
+      "hasAlpha": false,
+      "autoOrient": {
+        "width": 2480,
+        "height": 1754
+      }
+    },
+    "warnings": [
+      "Webマップが公開されていないため、QRは掲載しません。",
+      "全2ページです。すべてのページを確認してください。"
+    ]
+  },
+  "config": {
+    "version": 2,
+    "templateId": "photo-story",
+    "templateVersion": 3,
+    "sourceMode": "LIVE",
+    "paper": "A3",
+    "orientation": "landscape",
+    "selection": {
+      "mode": "recommended",
+      "categoryIds": [],
+      "spotIds": []
+    },
+    "ordering": {
+      "mode": "auto",
+      "spotIds": []
+    },
+    "viewport": {
+      "mode": "full"
+    },
+    "paperOriginal": {
+      "title": "QA レジャー・デザイン検証",
+      "subtitle": "",
+      "intro": "",
+      "qrLabel": "詳しい情報はWebマップで",
+      "footer": "",
+      "sectionHeading": "スポット案内",
+      "notice": ""
+    },
+    "slotState": {
+      "intro": {
+        "visible": false,
+        "modified": false
+      },
+      "categoryLegend": {
+        "visible": true,
+        "modified": false
+      },
+      "spotGuide": {
+        "visible": true,
+        "modified": false
+      },
+      "qr": {
+        "visible": true,
+        "modified": false
+      },
+      "logo": {
+        "visible": true,
+        "modified": false
+      },
+      "footer": {
+        "visible": true,
+        "modified": false
+      },
+      "photoFeature": {
+        "visible": true,
+        "modified": false
+      },
+      "notice": {
+        "visible": false,
+        "modified": false
+      }
+    },
+    "spotOverrides": [],
+    "presentation": {
+      "theme": "brand",
+      "photoMode": "all",
+      "informationDensity": "detail"
+    },
+    "design": {
+      "themeId": "leisure",
+      "themeVersion": 1,
+      "systemVersion": 1
+    },
+    "photoChoices": []
+  },
+  "assets": [
+    {
+      "url": "/uploads/leisure-0.png",
+      "bytes": 46307,
+      "sha256": "8c86e02ec53f29ec49d7318aae7fd1e5a502eb7d563d30b4ef8edcf3dbf6bca3",
+      "kind": "SYNTHETIC FIXTURE / neutral locally authored QA graphic"
+    },
+    {
+      "url": "/uploads/leisure-1.png",
+      "bytes": 45968,
+      "sha256": "c0d16902a8e5c914b948553ffefa91c8666f7643bfc3d6bc6b89f215d0e073a1",
+      "kind": "SYNTHETIC FIXTURE / neutral locally authored QA graphic"
+    },
+    {
+      "url": "/uploads/leisure-2.png",
+      "bytes": 46246,
+      "sha256": "214073a095c0b5365df16d65ddff49cb3dd14641f2b55a4dc7bd571fba30dae3",
+      "kind": "SYNTHETIC FIXTURE / neutral locally authored QA graphic"
+    },
+    {
+      "url": "/uploads/leisure-3.png",
+      "bytes": 47331,
+      "sha256": "262ac37525fb781a828116ac62d1e0973038907405308a238cd3d7d3fc6da1df",
+      "kind": "SYNTHETIC FIXTURE / neutral locally authored QA graphic"
+    },
+    {
+      "url": "/uploads/leisure-map.png",
+      "bytes": 89894,
+      "sha256": "48790e7ace2efa28b5d9d065b9325a4cc9d45202187f80e4155d4e7bdf4ceba8",
+      "kind": "SYNTHETIC FIXTURE / neutral locally authored QA graphic"
+    }
+  ],
+  "spots": [
+    {
+      "id": "qa-leisure-0",
+      "name": "QA スポット 01",
+      "x": 0.1423611111111111,
+      "y": 0.2222222222222222,
+      "descriptionSha256": "4ad5ff9c721680939fe1c9c0c4bcee8a065d1d3035f9dfa54b480203dfb08001",
+      "categories": [
+        "QA カテゴリー 1"
+      ],
+      "photos": [
+        "/uploads/leisure-0.png",
+        "/uploads/leisure-1.png"
+      ],
+      "eligiblePublicFields": []
+    },
+    {
+      "id": "qa-leisure-1",
+      "name": "QA スポット 02",
+      "x": 0.3645833333333333,
+      "y": 0.2222222222222222,
+      "descriptionSha256": "4ad5ff9c721680939fe1c9c0c4bcee8a065d1d3035f9dfa54b480203dfb08001",
+      "categories": [
+        "QA カテゴリー 2"
+      ],
+      "photos": [
+        "/uploads/leisure-1.png",
+        "/uploads/leisure-2.png"
+      ],
+      "eligiblePublicFields": []
+    },
+    {
+      "id": "qa-leisure-2",
+      "name": "QA スポット 03",
+      "x": 0.5868055555555556,
+      "y": 0.2222222222222222,
+      "descriptionSha256": "4ad5ff9c721680939fe1c9c0c4bcee8a065d1d3035f9dfa54b480203dfb08001",
+      "categories": [
+        "QA カテゴリー 3"
+      ],
+      "photos": [
+        "/uploads/leisure-2.png",
+        "/uploads/leisure-3.png"
+      ],
+      "eligiblePublicFields": []
+    },
+    {
+      "id": "qa-leisure-3",
+      "name": "QA スポット 04",
+      "x": 0.8090277777777778,
+      "y": 0.2222222222222222,
+      "descriptionSha256": "4ad5ff9c721680939fe1c9c0c4bcee8a065d1d3035f9dfa54b480203dfb08001",
+      "categories": [
+        "QA カテゴリー 1"
+      ],
+      "photos": [
+        "/uploads/leisure-3.png",
+        "/uploads/leisure-0.png"
+      ],
+      "eligiblePublicFields": []
+    },
+    {
+      "id": "qa-leisure-4",
+      "name": "QA スポット 05",
+      "x": 0.1423611111111111,
+      "y": 0.4722222222222222,
+      "descriptionSha256": "4ad5ff9c721680939fe1c9c0c4bcee8a065d1d3035f9dfa54b480203dfb08001",
+      "categories": [
+        "QA カテゴリー 2"
+      ],
+      "photos": [
+        "/uploads/leisure-0.png",
+        "/uploads/leisure-1.png"
+      ],
+      "eligiblePublicFields": []
+    },
+    {
+      "id": "qa-leisure-5",
+      "name": "QA スポット 06",
+      "x": 0.3645833333333333,
+      "y": 0.4722222222222222,
+      "descriptionSha256": "4ad5ff9c721680939fe1c9c0c4bcee8a065d1d3035f9dfa54b480203dfb08001",
+      "categories": [
+        "QA カテゴリー 3"
+      ],
+      "photos": [
+        "/uploads/leisure-1.png",
+        "/uploads/leisure-2.png"
+      ],
+      "eligiblePublicFields": []
+    },
+    {
+      "id": "qa-leisure-6",
+      "name": "QA スポット 07",
+      "x": 0.5868055555555556,
+      "y": 0.4722222222222222,
+      "descriptionSha256": "4ad5ff9c721680939fe1c9c0c4bcee8a065d1d3035f9dfa54b480203dfb08001",
+      "categories": [
+        "QA カテゴリー 1"
+      ],
+      "photos": [
+        "/uploads/leisure-2.png",
+        "/uploads/leisure-3.png"
+      ],
+      "eligiblePublicFields": []
+    },
+    {
+      "id": "qa-leisure-7",
+      "name": "QA スポット 08",
+      "x": 0.8090277777777778,
+      "y": 0.4722222222222222,
+      "descriptionSha256": "4ad5ff9c721680939fe1c9c0c4bcee8a065d1d3035f9dfa54b480203dfb08001",
+      "categories": [
+        "QA カテゴリー 2"
+      ],
+      "photos": [
+        "/uploads/leisure-3.png",
+        "/uploads/leisure-0.png"
+      ],
+      "eligiblePublicFields": []
+    },
+    {
+      "id": "qa-leisure-8",
+      "name": "QA スポット 09",
+      "x": 0.1423611111111111,
+      "y": 0.7222222222222222,
+      "descriptionSha256": "4ad5ff9c721680939fe1c9c0c4bcee8a065d1d3035f9dfa54b480203dfb08001",
+      "categories": [
+        "QA カテゴリー 3"
+      ],
+      "photos": [
+        "/uploads/leisure-0.png",
+        "/uploads/leisure-1.png"
+      ],
+      "eligiblePublicFields": []
+    },
+    {
+      "id": "qa-leisure-9",
+      "name": "QA スポット 10",
+      "x": 0.3645833333333333,
+      "y": 0.7222222222222222,
+      "descriptionSha256": "4ad5ff9c721680939fe1c9c0c4bcee8a065d1d3035f9dfa54b480203dfb08001",
+      "categories": [
+        "QA カテゴリー 1"
+      ],
+      "photos": [
+        "/uploads/leisure-1.png",
+        "/uploads/leisure-2.png"
+      ],
+      "eligiblePublicFields": []
+    },
+    {
+      "id": "qa-leisure-10",
+      "name": "QA スポット 11",
+      "x": 0.5868055555555556,
+      "y": 0.7222222222222222,
+      "descriptionSha256": "4ad5ff9c721680939fe1c9c0c4bcee8a065d1d3035f9dfa54b480203dfb08001",
+      "categories": [
+        "QA カテゴリー 2"
+      ],
+      "photos": [
+        "/uploads/leisure-2.png",
+        "/uploads/leisure-3.png"
+      ],
+      "eligiblePublicFields": []
+    },
+    {
+      "id": "qa-leisure-11",
+      "name": "QA スポット 12",
+      "x": 0.8090277777777778,
+      "y": 0.7222222222222222,
+      "descriptionSha256": "4ad5ff9c721680939fe1c9c0c4bcee8a065d1d3035f9dfa54b480203dfb08001",
+      "categories": [
+        "QA カテゴリー 3"
+      ],
+      "photos": [
+        "/uploads/leisure-3.png",
+        "/uploads/leisure-0.png"
+      ],
+      "eligiblePublicFields": []
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "base": "abddcb4b8262a2b4cd3a52b8703dfb4b155ff697",
+  "previousAstra": "7218f755d9dc0d2cb9f1ae19ec17dc1bdd6b2da8",
+  "implementation": "1dd5482b8d75baed5ff00c3632eb260acde45a30",
+  "branch": "experiment/astra-paper-map-product-pass-20260922",
+  "PR": "https://github.com/NAOKI-Ko/digital-map/pull/7",
+  "draft": true
+}

@@ -1,0 +1,647 @@
+{
+  "kind": "REAL QA SOURCE",
+  "sourceHash": "a93f9d5d3d7f2eebd35bea98dbee565d64c1a0e713a0b40414e813edefa06fcc",
+  "originalExportHash": "d56fffcaca05485c57c3542f63a5b43fac9c8d6ef6078a778f45b7f6894a910c",
+  "mode": "LIVE",
+  "title": "有松マップ",
+  "organizationName": "有松マップ｜ふぉん",
+  "sourcePublicUrlAvailable": true,
+  "limitations": "QA coordinates are existing source coordinates, not verified geography; existing assigned photos are reused between Spots, not verified on-location photographs.",
+  "fieldOwnership": {
+    "SOURCE": [
+      "map illustration",
+      "existing decorations and geometry",
+      "Spot name",
+      "description",
+      "categories",
+      "same-Spot managed photos",
+      "logo",
+      "slug"
+    ],
+    "PAPER_ORIGINAL": {
+      "title": "有松マップ",
+      "subtitle": "",
+      "intro": "",
+      "qrLabel": "詳しい情報はWebマップで",
+      "footer": "",
+      "sectionHeading": "スポット案内",
+      "notice": ""
+    },
+    "PAPER_OVERRIDE": [],
+    "TEMPLATE": [
+      "numbers corresponding to selected spots",
+      "fixed nonsemantic theme graphics",
+      "page numbers",
+      "generic section heading"
+    ]
+  },
+  "metrics": {
+    "id": "heritage-A3-landscape",
+    "kind": "REAL QA SOURCE",
+    "sourceHash": "a93f9d5d3d7f2eebd35bea98dbee565d64c1a0e713a0b40414e813edefa06fcc",
+    "pages": 1,
+    "pdfBytes": 3315695,
+    "previewMs": 708,
+    "pdfMs": 831,
+    "size": {
+      "format": "png",
+      "mediaType": "image/png",
+      "size": 4199634,
+      "width": 2480,
+      "height": 1754,
+      "space": "srgb",
+      "channels": 3,
+      "depth": "uchar",
+      "density": 150,
+      "isProgressive": false,
+      "isPalette": false,
+      "bitsPerSample": 8,
+      "hasProfile": false,
+      "hasAlpha": false,
+      "autoOrient": {
+        "width": 2480,
+        "height": 1754
+      }
+    },
+    "warnings": [
+      "1か所の長文を省略しています。紙専用の文章で調整できます。"
+    ]
+  },
+  "config": {
+    "version": 2,
+    "templateId": "map-classic",
+    "templateVersion": 3,
+    "sourceMode": "LIVE",
+    "paper": "A3",
+    "orientation": "landscape",
+    "selection": {
+      "mode": "recommended",
+      "categoryIds": [],
+      "spotIds": []
+    },
+    "ordering": {
+      "mode": "auto",
+      "spotIds": []
+    },
+    "viewport": {
+      "mode": "full"
+    },
+    "paperOriginal": {
+      "title": "有松マップ",
+      "subtitle": "",
+      "intro": "",
+      "qrLabel": "詳しい情報はWebマップで",
+      "footer": "",
+      "sectionHeading": "スポット案内",
+      "notice": ""
+    },
+    "slotState": {
+      "intro": {
+        "visible": false,
+        "modified": false
+      },
+      "categoryLegend": {
+        "visible": true,
+        "modified": false
+      },
+      "spotGuide": {
+        "visible": true,
+        "modified": false
+      },
+      "qr": {
+        "visible": true,
+        "modified": false
+      },
+      "logo": {
+        "visible": true,
+        "modified": false
+      },
+      "footer": {
+        "visible": true,
+        "modified": false
+      },
+      "photoFeature": {
+        "visible": true,
+        "modified": false
+      },
+      "notice": {
+        "visible": false,
+        "modified": false
+      }
+    },
+    "spotOverrides": [],
+    "presentation": {
+      "theme": "brand",
+      "photoMode": "all",
+      "informationDensity": "detail"
+    },
+    "design": {
+      "themeId": "heritage",
+      "themeVersion": 1,
+      "systemVersion": 1
+    },
+    "photoChoices": []
+  },
+  "assets": [
+    {
+      "url": "/uploads/cmubrptlo00000svax097dq0b-display-0a4ded87-ba90-4dcd-b902-73694eb91509.webp",
+      "bytes": 131594,
+      "sha256": "2c8da17b1ec2ed51f87193436d8c4355edd9257c547f7179a04840393fa30979"
+    },
+    {
+      "url": "/uploads/cmubrptuj00030svao4gx6lkn-display-02eb333c-f54a-4984-97f0-5bbf7b7f4810.webp",
+      "bytes": 307108,
+      "sha256": "31224b37fedc9ec1f8eca6e63552a47906accc7f94419db19731e4916b1c0f0a"
+    },
+    {
+      "url": "/uploads/cmubrpu4z00060svabnbphc10-display-31a4a94c-ea45-4934-afe2-77e5c02acd76.webp",
+      "bytes": 157948,
+      "sha256": "356e3a64910292fba09100979b93ef6cbb4a5f5d1f9f1fb410d8eeb6200f0ea9"
+    },
+    {
+      "url": "/uploads/cmubrpukb000c0svaluih3if7-display-793224e3-aa69-4f76-8e07-deb2ef9cfb9f.webp",
+      "bytes": 24352,
+      "sha256": "e11efc2205ac46c6e891b33d3da20e52298759d55a6b73657c6deec053adbce1"
+    },
+    {
+      "url": "/uploads/cmubrpurr000f0sva712799v0-display-7ba5aeed-dbea-4ff2-b610-7f354b5902cb.webp",
+      "bytes": 172156,
+      "sha256": "4895e9da1b5c7b22d2fb92041108f169b623bf79160bfac00b01556b87121036"
+    },
+    {
+      "url": "/uploads/cmubrpv0y000i0svaiv6u29j0-thumb-1db5c7af-c0b3-4976-9df0-834919917b78.webp",
+      "bytes": 6692,
+      "sha256": "0d4995d1d0b4565c9bce2ba71a4cb111b7cb0db35009bcbdc7225219b500abae"
+    },
+    {
+      "url": "/uploads/cmubrpv2t000k0svas05jj7e8-thumb-f93cb01f-6b76-4c4e-93ad-9defd3cf61ca.webp",
+      "bytes": 12314,
+      "sha256": "0f72404a991260a9eb18a360d645c4c8a270210b72736f4ea60ea9c892d8fe38"
+    },
+    {
+      "url": "/uploads/cmubrpv4t000m0sva12sb0wgc-thumb-a0e42c54-58bf-44de-a645-fe9932c6f5fb.webp",
+      "bytes": 6210,
+      "sha256": "18a37f1e76687e8246954099a35df938ac644f00c68051e2334833ea3a72e8ef"
+    },
+    {
+      "url": "/uploads/cmubrpv6k000o0svahj3qt1th-thumb-2b7d80b2-214c-4f6d-8b49-a7098545ff77.webp",
+      "bytes": 6738,
+      "sha256": "cfd0a5e0eb82c18cad21a7c9e3e2a39d8786fb7ee185ac7cfbae1a458ccb067e"
+    },
+    {
+      "url": "/uploads/cmubrpv8a000q0svagvxiuqa3-thumb-8b1d8f77-7d88-46d5-bac6-f7eed8dfd4d9.webp",
+      "bytes": 9184,
+      "sha256": "ff14e9bf0ecab62d7fda743d307bfb1747f8f17ab66ecfaf58ce4af62d554e3e"
+    },
+    {
+      "url": "/uploads/cmubrpva6000s0svak19h6s8l-thumb-cc89d516-5ef2-44c5-bd7e-2189fd0c032a.webp",
+      "bytes": 8810,
+      "sha256": "61ca64f2db72d0b89177df2fa0324c67e37e7aabe8e06aac8e1ffddba4184250"
+    },
+    {
+      "url": "/uploads/cmubrpvc4000u0svatbwxj0lr-thumb-b2f2a7ef-698d-408e-b91f-0e51f1334d61.webp",
+      "bytes": 18932,
+      "sha256": "5da45d79c5f7488052e530390f815565e604ba5e982b246f7b3dd7890664fc89"
+    },
+    {
+      "url": "/uploads/qa-arimatsu-fon-map.png",
+      "bytes": 4055723,
+      "sha256": "bbcdc37460f481b959097ea68674facff617003eda5fe2eb2d418e91625f6b43"
+    }
+  ],
+  "spots": [
+    {
+      "id": "cmubo9yn4000n68valy3vyx5d",
+      "name": "まり木綿",
+      "x": 0.31,
+      "y": 0.42,
+      "descriptionSha256": "2519e5fc00c949fa9344d2261cd3efd4bebf44d2bd1c64b2fb3c4454baa132c6",
+      "categories": [
+        "ショップ"
+      ],
+      "photos": [
+        "/uploads/cmubrpukb000c0svaluih3if7-display-793224e3-aa69-4f76-8e07-deb2ef9cfb9f.webp",
+        "/uploads/cmubrpu4z00060svabnbphc10-display-31a4a94c-ea45-4934-afe2-77e5c02acd76.webp"
+      ],
+      "eligiblePublicFields": [
+        {
+          "label": "住所",
+          "type": "single_line_text"
+        },
+        {
+          "label": "営業時間",
+          "type": "multiline_text"
+        },
+        {
+          "label": "定休日",
+          "type": "multiline_text"
+        }
+      ]
+    },
+    {
+      "id": "cmubo9ynb000p68va2uwteos9",
+      "name": "カフェ庄九郎",
+      "x": 0.5,
+      "y": 0.55,
+      "descriptionSha256": "378e9fae9568902bd0eb7399633f373ed66c2a7fadc4a7dfb44fa1f7bd5fd6a5",
+      "categories": [
+        "グルメ"
+      ],
+      "photos": [
+        "/uploads/cmubrpurr000f0sva712799v0-display-7ba5aeed-dbea-4ff2-b610-7f354b5902cb.webp"
+      ],
+      "eligiblePublicFields": [
+        {
+          "label": "住所",
+          "type": "single_line_text"
+        },
+        {
+          "label": "営業時間",
+          "type": "multiline_text"
+        },
+        {
+          "label": "定休日",
+          "type": "multiline_text"
+        }
+      ]
+    },
+    {
+      "id": "cmubo9yn1000m68va7aoj69bu",
+      "name": "井桁屋",
+      "x": 0.25,
+      "y": 0.36,
+      "descriptionSha256": "90b2009e9bd9aa8f4ec35be31135c8c11bc958ee2886da0c73cbd45811d0ba01",
+      "categories": [
+        "ショップ"
+      ],
+      "photos": [
+        "/uploads/cmubrpu4z00060svabnbphc10-display-31a4a94c-ea45-4934-afe2-77e5c02acd76.webp",
+        "/uploads/cmubrpukb000c0svaluih3if7-display-793224e3-aa69-4f76-8e07-deb2ef9cfb9f.webp"
+      ],
+      "eligiblePublicFields": [
+        {
+          "label": "住所",
+          "type": "single_line_text"
+        },
+        {
+          "label": "営業時間",
+          "type": "multiline_text"
+        },
+        {
+          "label": "定休日",
+          "type": "multiline_text"
+        }
+      ]
+    },
+    {
+      "id": "cmubo9yn7000o68vageam0wb0",
+      "name": "寿限無茶屋",
+      "x": 0.43,
+      "y": 0.49,
+      "descriptionSha256": "0312ba12818bb8577ea4747fd5fe92b2ac2eb77857f6f409e2214a254e1e48d7",
+      "categories": [
+        "グルメ"
+      ],
+      "photos": [
+        "/uploads/cmubrpurr000f0sva712799v0-display-7ba5aeed-dbea-4ff2-b610-7f354b5902cb.webp"
+      ],
+      "eligiblePublicFields": [
+        {
+          "label": "住所",
+          "type": "single_line_text"
+        },
+        {
+          "label": "営業時間",
+          "type": "multiline_text"
+        },
+        {
+          "label": "定休日",
+          "type": "multiline_text"
+        }
+      ]
+    },
+    {
+      "id": "cmubo9ymo000e68vadn9u81lx",
+      "name": "小塚邸",
+      "x": 0.65,
+      "y": 0.51,
+      "descriptionSha256": "20c3581cba80cffa55bc414ba542761c84ac9b3a8415be48386d1fd216bbbb36",
+      "categories": [
+        "歴史・文化"
+      ],
+      "photos": [
+        "/uploads/cmubrptlo00000svax097dq0b-display-0a4ded87-ba90-4dcd-b902-73694eb91509.webp"
+      ],
+      "eligiblePublicFields": [
+        {
+          "label": "住所",
+          "type": "single_line_text"
+        }
+      ]
+    },
+    {
+      "id": "cmubo9ymn000d68va4kbvlqmf",
+      "name": "岡家住宅",
+      "x": 0.59,
+      "y": 0.47,
+      "descriptionSha256": "88ffe92a243ca7dee3fb8a55b39d028623d9113930e08e990d204e279f77b70a",
+      "categories": [
+        "歴史・文化"
+      ],
+      "photos": [
+        "/uploads/cmubrptlo00000svax097dq0b-display-0a4ded87-ba90-4dcd-b902-73694eb91509.webp",
+        "/uploads/cmubrpu4z00060svabnbphc10-display-31a4a94c-ea45-4934-afe2-77e5c02acd76.webp"
+      ],
+      "eligiblePublicFields": [
+        {
+          "label": "住所",
+          "type": "single_line_text"
+        },
+        {
+          "label": "営業時間",
+          "type": "multiline_text"
+        },
+        {
+          "label": "定休日",
+          "type": "multiline_text"
+        }
+      ]
+    },
+    {
+      "id": "cmubo9ymk000b68vauoaplx2y",
+      "name": "常夜燈",
+      "x": 0.47,
+      "y": 0.4,
+      "descriptionSha256": "27850d9271500ab3911c5e4ae340df677a804c6bd7b19265acbba11cc54f73f3",
+      "categories": [
+        "歴史・文化"
+      ],
+      "photos": [],
+      "eligiblePublicFields": [
+        {
+          "label": "住所",
+          "type": "single_line_text"
+        }
+      ]
+    },
+    {
+      "id": "cmubo9ymy000l68varduh2xli",
+      "name": "戦評の松",
+      "x": 0.85,
+      "y": 0.84,
+      "descriptionSha256": "762d7cc6fd80bbf4af251c949e24d8052578e7e6c2ddb5b75ce80426f781d505",
+      "categories": [
+        "歴史・文化"
+      ],
+      "photos": [],
+      "eligiblePublicFields": [
+        {
+          "label": "住所",
+          "type": "single_line_text"
+        }
+      ]
+    },
+    {
+      "id": "cmubo9ymg000968vahxbrk9sz",
+      "name": "有松・鳴海絞会館",
+      "x": 0.34,
+      "y": 0.33,
+      "descriptionSha256": "6da4dd7e37791dda494b2b1d7fadcd83b1ada69087d6d264e404bdc985909a19",
+      "categories": [
+        "有松絞り"
+      ],
+      "photos": [
+        "/uploads/cmubrpukb000c0svaluih3if7-display-793224e3-aa69-4f76-8e07-deb2ef9cfb9f.webp",
+        "/uploads/cmubrpu4z00060svabnbphc10-display-31a4a94c-ea45-4934-afe2-77e5c02acd76.webp"
+      ],
+      "eligiblePublicFields": [
+        {
+          "label": "住所",
+          "type": "single_line_text"
+        },
+        {
+          "label": "営業時間",
+          "type": "multiline_text"
+        },
+        {
+          "label": "定休日",
+          "type": "multiline_text"
+        }
+      ]
+    },
+    {
+      "id": "cmubo9ymp000f68va8omzrtjf",
+      "name": "有松天満社",
+      "x": 0.56,
+      "y": 0.23,
+      "descriptionSha256": "7798d053df806f31937a9f09ee96053fa0374ee55e8057656bc596b8dc2b5481",
+      "categories": [
+        "寺社"
+      ],
+      "photos": [
+        "/uploads/cmubrptuj00030svao4gx6lkn-display-02eb333c-f54a-4984-97f0-5bbf7b7f4810.webp",
+        "/uploads/cmubrptlo00000svax097dq0b-display-0a4ded87-ba90-4dcd-b902-73694eb91509.webp"
+      ],
+      "eligiblePublicFields": [
+        {
+          "label": "住所",
+          "type": "single_line_text"
+        }
+      ]
+    },
+    {
+      "id": "cmubo9ymd000768vabymdxfaz",
+      "name": "有松山車会館",
+      "x": 0.2,
+      "y": 0.24,
+      "descriptionSha256": "dbc713c5da0037364b12a9c9d980ee21b56e9b2226c12794702272428252e889",
+      "categories": [
+        "歴史・文化"
+      ],
+      "photos": [
+        "/uploads/cmubrptlo00000svax097dq0b-display-0a4ded87-ba90-4dcd-b902-73694eb91509.webp"
+      ],
+      "eligiblePublicFields": [
+        {
+          "label": "住所",
+          "type": "single_line_text"
+        },
+        {
+          "label": "営業時間",
+          "type": "multiline_text"
+        },
+        {
+          "label": "定休日",
+          "type": "multiline_text"
+        }
+      ]
+    },
+    {
+      "id": "cmubo9yms000h68va2jrt8ge2",
+      "name": "有松神社",
+      "x": 0.76,
+      "y": 0.6,
+      "descriptionSha256": "f0aa54e6df531034df076f311f7577aeed225d54e28560c31cb9ba72931d1584",
+      "categories": [
+        "寺社"
+      ],
+      "photos": [
+        "/uploads/cmubrptuj00030svao4gx6lkn-display-02eb333c-f54a-4984-97f0-5bbf7b7f4810.webp"
+      ],
+      "eligiblePublicFields": [
+        {
+          "label": "住所",
+          "type": "single_line_text"
+        }
+      ]
+    },
+    {
+      "id": "cmubo9ylp000668va9gy61rqi",
+      "name": "有松駅",
+      "x": 0.12,
+      "y": 0.14,
+      "descriptionSha256": "c69911c0cc2126e1253f8c75400485a3e29bd5a08f3870af02773211ddb17c52",
+      "categories": [
+        "交通"
+      ],
+      "photos": [],
+      "eligiblePublicFields": [
+        {
+          "label": "住所",
+          "type": "single_line_text"
+        }
+      ]
+    },
+    {
+      "id": "cmubo9ymi000a68vap6he7f1r",
+      "name": "服部邸",
+      "x": 0.41,
+      "y": 0.37,
+      "descriptionSha256": "2dd7852083c6ea83d5643e5bff245da9b7acc170a71b28d8d45f3030bafef9c2",
+      "categories": [
+        "歴史・文化"
+      ],
+      "photos": [
+        "/uploads/cmubrptlo00000svax097dq0b-display-0a4ded87-ba90-4dcd-b902-73694eb91509.webp"
+      ],
+      "eligiblePublicFields": [
+        {
+          "label": "住所",
+          "type": "single_line_text"
+        }
+      ]
+    },
+    {
+      "id": "cmubo9ymt000i68vamoceccw3",
+      "name": "桶狭間古戦場公園",
+      "x": 0.83,
+      "y": 0.69,
+      "descriptionSha256": "3adcff4d2a84a3d2e0170fe32ac660b0aa59fe616c0c9f06348988cdaa8f7877",
+      "categories": [
+        "歴史・文化"
+      ],
+      "photos": [
+        "/uploads/cmubrptlo00000svax097dq0b-display-0a4ded87-ba90-4dcd-b902-73694eb91509.webp"
+      ],
+      "eligiblePublicFields": [
+        {
+          "label": "住所",
+          "type": "single_line_text"
+        }
+      ]
+    },
+    {
+      "id": "cmubo9ymw000k68vaebgyccjg",
+      "name": "桶狭間神明社",
+      "x": 0.91,
+      "y": 0.78,
+      "descriptionSha256": "7e0e012a08c3992a973d7fbe84ad1cb863914b10e98de161853e77cf5f336d2d",
+      "categories": [
+        "寺社"
+      ],
+      "photos": [
+        "/uploads/cmubrptuj00030svao4gx6lkn-display-02eb333c-f54a-4984-97f0-5bbf7b7f4810.webp"
+      ],
+      "eligiblePublicFields": [
+        {
+          "label": "住所",
+          "type": "single_line_text"
+        }
+      ]
+    },
+    {
+      "id": "cmubo9ymr000g68va0o5is7rj",
+      "name": "祇園寺",
+      "x": 0.71,
+      "y": 0.55,
+      "descriptionSha256": "35706d5826cf883d22521abe50e4278cd31ce0a50df33c82f8f5077c8e749f75",
+      "categories": [
+        "寺社"
+      ],
+      "photos": [
+        "/uploads/cmubrptuj00030svao4gx6lkn-display-02eb333c-f54a-4984-97f0-5bbf7b7f4810.webp"
+      ],
+      "eligiblePublicFields": [
+        {
+          "label": "住所",
+          "type": "single_line_text"
+        }
+      ]
+    },
+    {
+      "id": "cmubo9yme000868vaj6v3h6s7",
+      "name": "竹田庄九郎碑",
+      "x": 0.27,
+      "y": 0.29,
+      "descriptionSha256": "ee16848bcd15c90c77ad156c9bcb979a485da460aee7a4fd0f0220aa0065da03",
+      "categories": [
+        "有松絞り"
+      ],
+      "photos": [],
+      "eligiblePublicFields": [
+        {
+          "label": "住所",
+          "type": "single_line_text"
+        }
+      ]
+    },
+    {
+      "id": "cmubo9yml000c68vazvjujz92",
+      "name": "竹田邸",
+      "x": 0.53,
+      "y": 0.44,
+      "descriptionSha256": "cc1cfeb9543dad6c1975cbf0b209c651fa741ff0073250b1db39095a5f7188e0",
+      "categories": [
+        "歴史・文化"
+      ],
+      "photos": [
+        "/uploads/cmubrptlo00000svax097dq0b-display-0a4ded87-ba90-4dcd-b902-73694eb91509.webp"
+      ],
+      "eligiblePublicFields": [
+        {
+          "label": "住所",
+          "type": "single_line_text"
+        }
+      ]
+    },
+    {
+      "id": "cmubo9ymu000j68vai8fvxp6i",
+      "name": "長福寺",
+      "x": 0.87,
+      "y": 0.74,
+      "descriptionSha256": "07d1ea084debf1308ea85abc8e54f97503fe7ec04f59499ad6922fef757a7e70",
+      "categories": [
+        "寺社"
+      ],
+      "photos": [
+        "/uploads/cmubrptuj00030svao4gx6lkn-display-02eb333c-f54a-4984-97f0-5bbf7b7f4810.webp"
+      ],
+      "eligiblePublicFields": [
+        {
+          "label": "住所",
+          "type": "single_line_text"
+        }
+      ]
+    }
+  ]
+}

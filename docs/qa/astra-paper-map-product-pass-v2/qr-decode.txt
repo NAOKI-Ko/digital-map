@@ -1,0 +1,2 @@
+qr-control.png ["https://example.com"]
+qr-print-1.png ["https://examine-anime-bathroom-attraction.trycloudflare.com/arimatsu-fon"]
