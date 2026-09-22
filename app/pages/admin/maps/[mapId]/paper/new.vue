@@ -1,29 +1,42 @@
 <script setup lang="ts">
+import PaperMapPreview, { type PaperPreviewResult } from '~/components/admin/PaperMapPreview.vue'
 import type { PaperTemplateId } from '~~/shared/schemas/paper-map'
 import type { PaperMapListResponse, PaperMapResponse } from '~~/shared/types/paper-map'
-import { paperTemplateCatalog, templateSuitability } from '~~/shared/utils/paper-map-templates'
-
+import { defaultPaperMapConfig, paperTemplateCatalog, templateSuitability } from '~~/shared/utils/paper-map-templates'
 definePageMeta({ layout: 'admin', middleware: 'auth' })
+useHead({ title: '紙マップを作る' })
 const route = useRoute(), router = useRouter(), mapId = route.params.mapId as string
-const { data } = await useFetch<PaperMapListResponse>(`/api/maps/${mapId}/paper-maps`)
-const busy = ref<PaperTemplateId | null>(null), errorMessage = ref('')
+const { data, error } = await useFetch<PaperMapListResponse>(`/api/maps/${mapId}/paper-maps`)
 const suitability = computed(() => templateSuitability({ spotCount: data.value?.source.spotCount ?? 0, photoCount: data.value?.source.photoCount ?? 0 }))
-async function create(templateId: PaperTemplateId) {
-  busy.value = templateId; errorMessage.value = ''
-  try { const response = await $fetch<PaperMapResponse>(`/api/maps/${mapId}/paper-maps`, { method: 'POST', body: { templateId } }); await router.push(`/admin/maps/${mapId}/paper/${response.paperMap.id}`) }
+const chosen = ref<PaperTemplateId>(suitability.value.recommended), busy = ref(false), previewBusy = ref(true), preview = ref<PaperPreviewResult | null>(null), errorMessage = ref('')
+const config = computed(() => defaultPaperMapConfig(chosen.value, data.value?.source.spotCount ?? 0, data.value?.source.map.name ?? ''))
+async function create() {
+  busy.value = true; errorMessage.value = ''
+  try { const response = await $fetch<PaperMapResponse>(`/api/maps/${mapId}/paper-maps`, { method: 'POST', body: { templateId: chosen.value } }); await router.push(`/admin/maps/${mapId}/paper/${response.paperMap.id}`) }
   catch { errorMessage.value = '紙マップを作成できませんでした。公開できるスポットを確認してください。' }
-  finally { busy.value = null }
+  finally { busy.value = false }
 }
 </script>
-
 <template>
-  <div class="max-w-6xl"><NuxtLink :to="`/admin/maps/${mapId}/paper`" class="text-sm font-semibold text-stone-600">← 紙マップ一覧</NuxtLink>
-    <header class="mt-6"><p class="text-sm font-medium text-terracotta-700">テンプレートから完成形へ</p><h1 class="mt-1 text-3xl font-bold">どんな紙マップにしますか？</h1><p class="mt-2 text-sm text-stone-600">レイアウトはデザイナーが調整済み。選ぶと既存のマップ情報がすぐに流し込まれます。</p></header>
-    <div class="mt-8 grid gap-5 md:grid-cols-3">
-      <button v-for="template in paperTemplateCatalog" :key="template.id" type="button" class="group min-h-80 overflow-hidden rounded-2xl border border-stone-200 bg-white text-left shadow-sm transition hover:-translate-y-0.5 hover:border-terracotta-400 hover:shadow-lg disabled:opacity-60" :disabled="Boolean(busy)" @click="create(template.id)">
-        <div class="relative h-40 bg-[#f5efe7] p-4"><div class="h-full rounded-sm bg-white p-3 shadow"><div class="h-2 w-1/2 rounded bg-stone-800"/><div class="mt-2 flex h-[calc(100%-1rem)] gap-2" :class="template.id === 'map-classic' ? 'flex-row' : 'flex-col'"><div class="rounded border border-terracotta-300 bg-[linear-gradient(135deg,#e8dfd0_25%,#f8f4ed_25%,#f8f4ed_50%,#e8dfd0_50%,#e8dfd0_75%,#f8f4ed_75%)] bg-[length:12px_12px]" :class="template.id === 'map-classic' ? 'w-2/3' : template.id === 'spot-guide' ? 'h-1/2' : 'h-2/5'"/><div class="flex-1 space-y-1"><span v-for="n in template.id === 'photo-story' ? 4 : 6" :key="n" class="block h-1.5 rounded bg-stone-200"/></div></div></div><span v-if="suitability.recommended === template.id" class="absolute right-3 top-3 rounded-full bg-terracotta-600 px-3 py-1 text-xs font-bold text-white">おすすめ</span></div>
-        <div class="p-5"><h2 class="text-xl font-bold">{{ template.name }}</h2><p class="mt-2 text-sm leading-6 text-stone-600">{{ template.description }}</p><p v-if="suitability.recommended === template.id" class="mt-3 text-xs font-semibold text-terracotta-700">{{ suitability.reason }}</p><span class="mt-5 block text-sm font-bold text-terracotta-700">{{ busy === template.id ? '作成中…' : 'このテンプレートで作る →' }}</span></div>
-      </button>
-    </div><p v-if="errorMessage" role="alert" class="mt-5 rounded-lg bg-red-50 p-4 text-sm text-red-700">{{ errorMessage }}</p>
+  <div class="max-w-[1400px]">
+    <NuxtLink :to="`/admin/maps/${mapId}/paper`" class="text-sm font-semibold text-stone-600">← 紙マップ一覧</NuxtLink>
+    <header class="my-6"><p class="text-sm font-semibold text-terracotta-700">Digital Map から、そのまま紙へ</p><h1 class="mt-2 text-3xl font-bold">配りたい紙面を選ぶ</h1><p class="mt-3 text-sm text-stone-600">登録済みの情報で組版しました。文章や配置を作り直す必要はありません。</p></header>
+    <p v-if="error" role="alert" class="rounded-lg bg-red-50 p-4">元のマップ情報を読み込めませんでした。ページを再読み込みしてください。</p>
+    <div v-if="data" class="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
+      <PaperMapPreview :map-id="mapId" :config="config" :source="data.source" @resolved="preview = $event" @busy="previewBusy = $event" />
+      <aside class="space-y-4 lg:sticky lg:top-5">
+        <div class="rounded-xl border border-stone-200 bg-white p-4"><p class="text-xs font-semibold text-stone-500">元データ · 現在の編集内容</p><p class="mt-2 font-semibold">{{ data.source.map.name }}</p><p class="mt-1 text-sm text-stone-600">公開・配置済み {{ data.source.spotCount }}件 / 写真あり {{ data.source.photoCount }}件</p></div>
+        <div class="space-y-2" role="group" aria-label="紙面の種類">
+          <button v-for="template in paperTemplateCatalog" :key="template.id" type="button" class="w-full rounded-xl border p-4 text-left transition" :class="chosen === template.id ? 'border-terracotta-600 bg-terracotta-50' : 'border-stone-200 bg-white'" :aria-pressed="chosen === template.id" @click="chosen = template.id">
+            <span class="font-bold">{{ template.name }}</span><span v-if="suitability.recommended === template.id" class="ml-2 text-xs font-semibold text-terracotta-700">おすすめ</span><span class="mt-1 block text-sm text-stone-600">{{ template.description }}</span>
+          </button>
+        </div>
+        <p class="text-xs leading-5 text-stone-500">{{ suitability.reason }}。紙面用の文章や掲載範囲は、作成後に調整できます。</p>
+        <ul v-if="preview?.warnings.length" class="space-y-2 rounded-xl bg-amber-50 p-4 text-sm text-amber-900"><li v-for="warning in preview.warnings" :key="warning">{{ warning }}</li></ul>
+        <button type="button" class="min-h-12 w-full rounded-xl bg-terracotta-600 px-5 py-3 font-bold text-white disabled:opacity-40" :disabled="busy || previewBusy || !preview?.image" @click="create">{{ busy ? '作成中…' : 'この紙面で作る' }}</button>
+        <NuxtLink v-if="!data.source.spotCount" :to="`/admin/maps/${mapId}/spots`" class="block text-sm font-semibold text-terracotta-700">スポットの公開と位置を確認 →</NuxtLink>
+        <p v-if="errorMessage" role="alert" class="text-sm text-red-700">{{ errorMessage }}</p>
+      </aside>
+    </div>
   </div>
 </template>

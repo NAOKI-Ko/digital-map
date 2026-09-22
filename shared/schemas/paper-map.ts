@@ -33,7 +33,7 @@ export const paperMapConfigV1Schema = z.object({
 const slotStateSchema = z.partialRecord(z.enum(paperSlotIds), z.object({ visible: z.boolean(), modified: z.boolean().default(false) }))
 
 export const paperMapConfigV2Schema = z.object({
-  version: z.literal(2), templateId: z.enum(paperTemplateIds), templateVersion: z.literal(1), sourceMode: z.enum(['LIVE', 'PUBLISHED']), paper: z.enum(['A4', 'A3']), orientation: z.enum(['portrait', 'landscape']),
+  version: z.literal(2), templateId: z.enum(paperTemplateIds), templateVersion: z.union([z.literal(1), z.literal(2)]), sourceMode: z.enum(['LIVE', 'PUBLISHED']), paper: z.enum(['A4', 'A3']), orientation: z.enum(['portrait', 'landscape']),
   selection: z.object({ mode: z.enum(['recommended', 'categories', 'spots']), categoryIds: uniqueIds, spotIds: uniqueIds }),
   ordering: z.object({ mode: z.enum(['auto', 'name', 'manual']), spotIds: uniqueIds }), viewport: viewportSchema,
   paperOriginal: z.object({ title: z.string().trim().min(1, 'タイトルを入力してください。').max(120), subtitle: z.string().trim().max(240), intro: z.string().trim().max(600), qrLabel: z.string().trim().max(120), footer: z.string().trim().max(240) }),
@@ -68,5 +68,5 @@ export function parsePaperMapConfig(value: unknown): PaperMapConfig {
 export const paperMapConfigSchema = z.preprocess(value => parsePaperMapConfig(value), paperMapConfigV2Schema)
 export const paperMapCreateSchema = z.object({ name: z.string().trim().min(1).max(120).optional(), templateId: z.enum(paperTemplateIds).optional(), purpose: z.enum(paperMapPurposes).optional() }).refine(value => value.templateId || value.purpose, 'テンプレートを選択してください。')
 export const paperMapUpdateSchema = z.object({ name: z.string().trim().min(1).max(120), config: paperMapConfigV2Schema })
-export const paperMapPdfSchema = z.object({ config: paperMapConfigV2Schema })
+export const paperMapPdfSchema = z.object({ config: paperMapConfigV2Schema, previewToken: z.string().regex(/^[a-f0-9]{64}$/).optional() })
 export const paperDesignRequestSchema = z.object({ paperMapId: z.string().min(1).nullable().optional(), contactName: z.string().trim().min(1).max(100), contactEmail: z.email().max(254), organizationName: z.string().trim().max(120), desiredUse: z.string().trim().min(1).max(1000), desiredDate: z.string().trim().max(40) })

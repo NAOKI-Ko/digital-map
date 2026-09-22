@@ -2,7 +2,7 @@ import type { PaperMapConfig, PaperSlotId, PaperTemplateId } from '../schemas/pa
 
 export type PaperContentOwnership = 'SOURCE' | 'PAPER_OVERRIDE' | 'PAPER_ORIGINAL'
 export interface PaperTemplateSlot { id: PaperSlotId, kind: 'text' | 'map' | 'guide' | 'photos' | 'qr' | 'logo' | 'footer', defaultVisible: boolean, visibilityEditable: boolean, ownership: PaperContentOwnership, editable: boolean, maxLength?: number }
-export interface PaperTemplateDefinition { id: PaperTemplateId, version: 1, name: string, description: string, mapRatio: number, slots: readonly PaperTemplateSlot[] }
+export interface PaperTemplateDefinition { id: PaperTemplateId, version: 1 | 2, name: string, description: string, mapRatio: number, slots: readonly PaperTemplateSlot[] }
 
 const commonSlots = [
   { id: 'intro', kind: 'text', defaultVisible: false, visibilityEditable: true, ownership: 'PAPER_ORIGINAL', editable: true, maxLength: 600 },
@@ -13,14 +13,16 @@ const commonSlots = [
   { id: 'footer', kind: 'footer', defaultVisible: true, visibilityEditable: true, ownership: 'PAPER_ORIGINAL', editable: true, maxLength: 240 },
 ] as const satisfies readonly PaperTemplateSlot[]
 
-export const paperTemplateCatalog: readonly PaperTemplateDefinition[] = [
+const legacyPaperTemplateCatalog: readonly PaperTemplateDefinition[] = [
   { id: 'map-classic', version: 1, name: '地図を主役に', description: '地図を大きく見せたい方向け', mapRatio: 0.7, slots: commonSlots },
   { id: 'spot-guide', version: 1, name: 'スポットガイド', description: '地図とスポット情報をバランスよく', mapRatio: 0.55, slots: commonSlots },
   { id: 'photo-story', version: 1, name: '写真でめぐる', description: '写真を使って見どころを紹介', mapRatio: 0.45, slots: [...commonSlots, { id: 'photoFeature', kind: 'photos', defaultVisible: true, visibilityEditable: true, ownership: 'SOURCE', editable: false }] },
 ]
 
+export const paperTemplateCatalog: readonly PaperTemplateDefinition[] = legacyPaperTemplateCatalog.map(template => ({ ...template, version: 2 }))
+
 export function resolvePaperTemplate(id: PaperTemplateId, version: number) {
-  const template = paperTemplateCatalog.find(item => item.id === id && item.version === version)
+  const template = [...legacyPaperTemplateCatalog, ...paperTemplateCatalog].find(item => item.id === id && item.version === version)
   if (!template) throw new Error(`Unknown paper template version: ${id}@${version}`)
   return template
 }
@@ -32,17 +34,17 @@ export function templateSuitability(input: { spotCount: number, photoCount: numb
   return { recommended, reason, photoCoverage }
 }
 
-export function defaultPaperMapConfig(templateId: PaperTemplateId, spotCount: number, title: string): PaperMapConfig {
-  const template = resolvePaperTemplate(templateId, 1)
+export function defaultPaperMapConfig(templateId: PaperTemplateId, spotCount: number, title: string, version: 1 | 2 = 2): PaperMapConfig {
+  const template = resolvePaperTemplate(templateId, version)
   const slotState = Object.fromEntries(template.slots.map(slot => [slot.id, { visible: slot.defaultVisible, modified: false }]))
-  return { version: 2, templateId, templateVersion: 1, sourceMode: 'LIVE', paper: spotCount > 40 ? 'A3' : 'A4', orientation: templateId === 'map-classic' ? 'landscape' : 'portrait', selection: { mode: 'recommended', categoryIds: [], spotIds: [] }, ordering: { mode: 'auto', spotIds: [] }, viewport: { mode: 'fit_spots' }, paperOriginal: { title, subtitle: '', intro: '', qrLabel: '詳しい情報はWebマップで', footer: '' }, slotState, spotOverrides: [], presentation: { theme: 'brand', photoMode: templateId === 'photo-story' ? 'featured' : 'none', informationDensity: spotCount > 40 ? 'names' : 'detail' } }
+  return { version: 2, templateId, templateVersion: version, sourceMode: 'LIVE', paper: spotCount > (version === 2 ? 16 : 40) ? 'A3' : 'A4', orientation: templateId === 'map-classic' ? 'landscape' : 'portrait', selection: { mode: 'recommended', categoryIds: [], spotIds: [] }, ordering: { mode: 'auto', spotIds: [] }, viewport: { mode: version === 2 ? 'full' : 'fit_spots' }, paperOriginal: { title, subtitle: '', intro: '', qrLabel: '詳しい情報はWebマップで', footer: '' }, slotState, spotOverrides: [], presentation: { theme: 'brand', photoMode: templateId === 'photo-story' ? (version === 2 ? 'all' : 'featured') : 'none', informationDensity: spotCount > 40 || (version === 2 && templateId === 'map-classic') ? 'names' : 'detail' } }
 }
 
 export function switchPaperTemplate(config: PaperMapConfig, templateId: PaperTemplateId): PaperMapConfig {
-  const destination = resolvePaperTemplate(templateId, 1)
+  const destination = resolvePaperTemplate(templateId, 2)
   const slotState = { ...config.slotState }
   for (const slot of destination.slots) if (!slotState[slot.id]?.modified) slotState[slot.id] = { visible: slot.defaultVisible, modified: false }
-  return { ...config, templateId, templateVersion: 1, slotState, presentation: { ...config.presentation, photoMode: templateId === 'photo-story' && config.presentation.photoMode === 'none' ? 'featured' : config.presentation.photoMode } }
+  return { ...config, templateId, templateVersion: 2, slotState, presentation: { ...config.presentation, photoMode: templateId === 'photo-story' && config.presentation.photoMode === 'none' ? 'featured' : config.presentation.photoMode } }
 }
 
 export function slotVisible(config: PaperMapConfig, slotId: PaperSlotId) {
