@@ -1,0 +1,141 @@
+[
+  {
+    "id": "heritage-A3-landscape",
+    "kind": "REAL QA SOURCE",
+    "sourceHash": "a93f9d5d3d7f2eebd35bea98dbee565d64c1a0e713a0b40414e813edefa06fcc",
+    "pages": 1,
+    "pdfBytes": 3315695,
+    "previewMs": 708,
+    "pdfMs": 831,
+    "size": {
+      "format": "png",
+      "mediaType": "image/png",
+      "size": 4199634,
+      "width": 2480,
+      "height": 1754,
+      "space": "srgb",
+      "channels": 3,
+      "depth": "uchar",
+      "density": 150,
+      "isProgressive": false,
+      "isPalette": false,
+      "bitsPerSample": 8,
+      "hasProfile": false,
+      "hasAlpha": false,
+      "autoOrient": {
+        "width": 2480,
+        "height": 1754
+      }
+    },
+    "warnings": [
+      "1か所の長文を省略しています。紙専用の文章で調整できます。"
+    ]
+  },
+  {
+    "id": "heritage-A4-editorial",
+    "kind": "REAL QA SOURCE",
+    "sourceHash": "a93f9d5d3d7f2eebd35bea98dbee565d64c1a0e713a0b40414e813edefa06fcc",
+    "pages": 4,
+    "pdfBytes": 4464316,
+    "previewMs": 242,
+    "pdfMs": 952,
+    "size": {
+      "format": "png",
+      "mediaType": "image/png",
+      "size": 1881950,
+      "width": 1240,
+      "height": 1754,
+      "space": "srgb",
+      "channels": 3,
+      "depth": "uchar",
+      "density": 150,
+      "isProgressive": false,
+      "isPalette": false,
+      "bitsPerSample": 8,
+      "hasProfile": false,
+      "hasAlpha": false,
+      "autoOrient": {
+        "width": 1240,
+        "height": 1754
+      }
+    },
+    "warnings": [
+      "全4ページです。すべてのページを確認してください。"
+    ]
+  },
+  {
+    "id": "leisure-synthetic",
+    "kind": "SYNTHETIC FIXTURE",
+    "sourceHash": "690a3fdb04fbdf6312603621bc0301be72f92127692dcb6416f447867ef0e823",
+    "pages": 2,
+    "pdfBytes": 1863793,
+    "previewMs": 143,
+    "pdfMs": 385,
+    "size": {
+      "format": "png",
+      "mediaType": "image/png",
+      "size": 359073,
+      "width": 2480,
+      "height": 1754,
+      "space": "srgb",
+      "channels": 3,
+      "depth": "uchar",
+      "density": 150,
+      "isProgressive": false,
+      "isPalette": false,
+      "bitsPerSample": 8,
+      "hasProfile": false,
+      "hasAlpha": false,
+      "autoOrient": {
+        "width": 2480,
+        "height": 1754
+      }
+    },
+    "warnings": [
+      "Webマップが公開されていないため、QRは掲載しません。",
+      "全2ページです。すべてのページを確認してください。"
+    ]
+  },
+  {
+    "id": "alpine-synthetic",
+    "kind": "SYNTHETIC FIXTURE",
+    "sourceHash": "ef45476fa6489f3091f71880216ca0671c92510a4f4b3923768e1dfe639e2226",
+    "pages": 1,
+    "pdfBytes": 954460,
+    "previewMs": 99,
+    "pdfMs": 169,
+    "size": {
+      "format": "png",
+      "mediaType": "image/png",
+      "size": 395734,
+      "width": 2480,
+      "height": 1754,
+      "space": "srgb",
+      "channels": 3,
+      "depth": "uchar",
+      "density": 150,
+      "isProgressive": false,
+      "isPalette": false,
+      "bitsPerSample": 8,
+      "hasProfile": false,
+      "hasAlpha": false,
+      "autoOrient": {
+        "width": 2480,
+        "height": 1754
+      }
+    },
+    "warnings": [
+      "Webマップが公開されていないため、QRは掲載しません。"
+    ]
+  },
+  {
+    "id": "current-dev-A3",
+    "pdfBytes": 3164059,
+    "pdfMs": 294
+  },
+  {
+    "id": "prior-astra-A3",
+    "pdfBytes": 20560661,
+    "pdfMs": 2042
+  }
+]

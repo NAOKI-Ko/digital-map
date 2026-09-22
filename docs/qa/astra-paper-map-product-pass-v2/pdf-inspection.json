@@ -1,0 +1,206 @@
+[
+  {
+    "id": "alpine-synthetic",
+    "pages": [
+      {
+        "page": 1,
+        "widthPt": 1190.5511811023623,
+        "heightPt": 841.8897637795277,
+        "imageSizes": [
+          [
+            3969,
+            2806
+          ]
+        ],
+        "maeRGB": 1.244,
+        "psnrDb": 31.69
+      }
+    ],
+    "metadata": {
+      "/Producer": "pdf-lib (https://github.com/Hopding/pdf-lib)",
+      "/ModDate": "D:20260922111920Z",
+      "/Creator": "Digital Map",
+      "/CreationDate": "D:20260922111920Z",
+      "/Title": "QA マウンテン・デザイン検証",
+      "/Subject": "Paper map-classic@3 / alpine@1 / system 1"
+    }
+  },
+  {
+    "id": "current-dev-A3",
+    "pages": [
+      {
+        "page": 1,
+        "widthPt": 1190.5511811023623,
+        "heightPt": 841.8897637795277,
+        "imageSizes": [
+          [
+            4961,
+            3508
+          ]
+        ]
+      }
+    ],
+    "metadata": {
+      "/Producer": "pdf-lib (https://github.com/Hopding/pdf-lib)",
+      "/ModDate": "D:20260922111920Z",
+      "/Creator": "Digital Map",
+      "/CreationDate": "D:20260922111920Z",
+      "/Title": "有松マップ",
+      "/Subject": "Digital Map Paper Template map-classic@1"
+    }
+  },
+  {
+    "id": "heritage-A3-landscape",
+    "pages": [
+      {
+        "page": 1,
+        "widthPt": 1190.5511811023623,
+        "heightPt": 841.8897637795277,
+        "imageSizes": [
+          [
+            3969,
+            2806
+          ]
+        ],
+        "maeRGB": 5.325,
+        "psnrDb": 25.54
+      }
+    ],
+    "metadata": {
+      "/Producer": "pdf-lib (https://github.com/Hopding/pdf-lib)",
+      "/ModDate": "D:20260922111916Z",
+      "/Creator": "Digital Map",
+      "/CreationDate": "D:20260922111916Z",
+      "/Title": "有松マップ",
+      "/Subject": "Paper map-classic@3 / heritage@1 / system 1"
+    }
+  },
+  {
+    "id": "heritage-A4-editorial",
+    "pages": [
+      {
+        "page": 1,
+        "widthPt": 595.2755905511812,
+        "heightPt": 841.8897637795277,
+        "imageSizes": [
+          [
+            1984,
+            2806
+          ]
+        ],
+        "maeRGB": 3.667,
+        "psnrDb": 27.62
+      },
+      {
+        "page": 2,
+        "widthPt": 595.2755905511812,
+        "heightPt": 841.8897637795277,
+        "imageSizes": [
+          [
+            1984,
+            2806
+          ]
+        ],
+        "maeRGB": 2.75,
+        "psnrDb": 27.92
+      },
+      {
+        "page": 3,
+        "widthPt": 595.2755905511812,
+        "heightPt": 841.8897637795277,
+        "imageSizes": [
+          [
+            1984,
+            2806
+          ]
+        ],
+        "maeRGB": 2.688,
+        "psnrDb": 28.04
+      },
+      {
+        "page": 4,
+        "widthPt": 595.2755905511812,
+        "heightPt": 841.8897637795277,
+        "imageSizes": [
+          [
+            1984,
+            2806
+          ]
+        ],
+        "maeRGB": 2.986,
+        "psnrDb": 28.53
+      }
+    ],
+    "metadata": {
+      "/Producer": "pdf-lib (https://github.com/Hopding/pdf-lib)",
+      "/ModDate": "D:20260922111917Z",
+      "/Creator": "Digital Map",
+      "/CreationDate": "D:20260922111917Z",
+      "/Title": "有松マップ",
+      "/Subject": "Paper photo-story@3 / heritage@1 / system 1"
+    }
+  },
+  {
+    "id": "leisure-synthetic",
+    "pages": [
+      {
+        "page": 1,
+        "widthPt": 1190.5511811023623,
+        "heightPt": 841.8897637795277,
+        "imageSizes": [
+          [
+            3969,
+            2806
+          ]
+        ],
+        "maeRGB": 1.273,
+        "psnrDb": 31.92
+      },
+      {
+        "page": 2,
+        "widthPt": 1190.5511811023623,
+        "heightPt": 841.8897637795277,
+        "imageSizes": [
+          [
+            3969,
+            2806
+          ]
+        ],
+        "maeRGB": 1.449,
+        "psnrDb": 30.61
+      }
+    ],
+    "metadata": {
+      "/Producer": "pdf-lib (https://github.com/Hopding/pdf-lib)",
+      "/ModDate": "D:20260922111919Z",
+      "/Creator": "Digital Map",
+      "/CreationDate": "D:20260922111919Z",
+      "/Title": "QA レジャー・デザイン検証",
+      "/Subject": "Paper photo-story@3 / leisure@1 / system 1"
+    }
+  },
+  {
+    "id": "prior-astra-A3",
+    "pages": [
+      {
+        "page": 1,
+        "widthPt": 1190.5511811023623,
+        "heightPt": 841.8897637795277,
+        "imageSizes": [
+          [
+            4961,
+            3508
+          ]
+        ]
+      }
+    ],
+    "metadata": {
+      "/Producer": "pdf-lib (https://github.com/Hopding/pdf-lib)",
+      "/ModDate": "D:20260922111920Z",
+      "/Creator": "Digital Map",
+      "/CreationDate": "D:20260922111920Z",
+      "/Title": "有松マップ",
+      "/Subject": "Digital Map Paper Template map-classic@2"
+    }
+  }
+]

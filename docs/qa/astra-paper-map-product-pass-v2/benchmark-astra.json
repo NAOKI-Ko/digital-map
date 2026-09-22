@@ -1,0 +1,38 @@
+[
+  {
+    "version": 2,
+    "bytes": 20560658,
+    "pdfMs": [
+      2146,
+      2053,
+      1954
+    ],
+    "previewMs": [
+      363,
+      374,
+      374
+    ],
+    "medianPdfMs": 2053,
+    "medianPreviewMs": 374,
+    "rssSnapshotMB": 800,
+    "maxRSSKB": 781328
+  },
+  {
+    "version": 3,
+    "bytes": 3315695,
+    "pdfMs": [
+      797,
+      755,
+      729
+    ],
+    "previewMs": [
+      511,
+      468,
+      469
+    ],
+    "medianPdfMs": 755,
+    "medianPreviewMs": 469,
+    "rssSnapshotMB": 1007,
+    "maxRSSKB": 991184
+  }
+]

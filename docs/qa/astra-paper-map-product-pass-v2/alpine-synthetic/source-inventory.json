@@ -1,0 +1,359 @@
+{
+  "kind": "SYNTHETIC FIXTURE",
+  "sourceHash": "ef45476fa6489f3091f71880216ca0671c92510a4f4b3923768e1dfe639e2226",
+  "originalExportHash": null,
+  "mode": "LIVE",
+  "title": "QA マウンテン・デザイン検証",
+  "organizationName": "SYNTHETIC QA · 実在しない検証データ",
+  "sourcePublicUrlAvailable": false,
+  "limitations": "All locations, names, descriptions, categories, coordinates and images are clearly synthetic QA values; no real customer/brand; no trails or routes added.",
+  "fieldOwnership": {
+    "SOURCE": [
+      "map illustration",
+      "existing decorations and geometry",
+      "Spot name",
+      "description",
+      "categories",
+      "same-Spot managed photos",
+      "logo",
+      "slug"
+    ],
+    "PAPER_ORIGINAL": {
+      "title": "QA マウンテン・デザイン検証",
+      "subtitle": "",
+      "intro": "",
+      "qrLabel": "詳しい情報はWebマップで",
+      "footer": "",
+      "sectionHeading": "スポット案内",
+      "notice": ""
+    },
+    "PAPER_OVERRIDE": [],
+    "TEMPLATE": [
+      "numbers corresponding to selected spots",
+      "fixed nonsemantic theme graphics",
+      "page numbers",
+      "generic section heading"
+    ]
+  },
+  "metrics": {
+    "id": "alpine-synthetic",
+    "kind": "SYNTHETIC FIXTURE",
+    "sourceHash": "ef45476fa6489f3091f71880216ca0671c92510a4f4b3923768e1dfe639e2226",
+    "pages": 1,
+    "pdfBytes": 954460,
+    "previewMs": 99,
+    "pdfMs": 169,
+    "size": {
+      "format": "png",
+      "mediaType": "image/png",
+      "size": 395734,
+      "width": 2480,
+      "height": 1754,
+      "space": "srgb",
+      "channels": 3,
+      "depth": "uchar",
+      "density": 150,
+      "isProgressive": false,
+      "isPalette": false,
+      "bitsPerSample": 8,
+      "hasProfile": false,
+      "hasAlpha": false,
+      "autoOrient": {
+        "width": 2480,
+        "height": 1754
+      }
+    },
+    "warnings": [
+      "Webマップが公開されていないため、QRは掲載しません。"
+    ]
+  },
+  "config": {
+    "version": 2,
+    "templateId": "map-classic",
+    "templateVersion": 3,
+    "sourceMode": "LIVE",
+    "paper": "A3",
+    "orientation": "landscape",
+    "selection": {
+      "mode": "recommended",
+      "categoryIds": [],
+      "spotIds": []
+    },
+    "ordering": {
+      "mode": "auto",
+      "spotIds": []
+    },
+    "viewport": {
+      "mode": "full"
+    },
+    "paperOriginal": {
+      "title": "QA マウンテン・デザイン検証",
+      "subtitle": "",
+      "intro": "",
+      "qrLabel": "詳しい情報はWebマップで",
+      "footer": "",
+      "sectionHeading": "スポット案内",
+      "notice": ""
+    },
+    "slotState": {
+      "intro": {
+        "visible": false,
+        "modified": false
+      },
+      "categoryLegend": {
+        "visible": true,
+        "modified": false
+      },
+      "spotGuide": {
+        "visible": true,
+        "modified": false
+      },
+      "qr": {
+        "visible": true,
+        "modified": false
+      },
+      "logo": {
+        "visible": true,
+        "modified": false
+      },
+      "footer": {
+        "visible": true,
+        "modified": false
+      },
+      "photoFeature": {
+        "visible": true,
+        "modified": false
+      },
+      "notice": {
+        "visible": false,
+        "modified": false
+      }
+    },
+    "spotOverrides": [],
+    "presentation": {
+      "theme": "brand",
+      "photoMode": "all",
+      "informationDensity": "detail"
+    },
+    "design": {
+      "themeId": "alpine",
+      "themeVersion": 1,
+      "systemVersion": 1
+    },
+    "photoChoices": []
+  },
+  "assets": [
+    {
+      "url": "/uploads/alpine-0.png",
+      "bytes": 43229,
+      "sha256": "0c1c879270aa605d98b1340ae23f0e9748bf4d9891a79ad5fea3a4f4bd9be106",
+      "kind": "SYNTHETIC FIXTURE / neutral locally authored QA graphic"
+    },
+    {
+      "url": "/uploads/alpine-1.png",
+      "bytes": 44364,
+      "sha256": "3af6d7fc4847a75b71e9a4d77a8ad008ee214d13ebf202d1e3ecd5804f488e36",
+      "kind": "SYNTHETIC FIXTURE / neutral locally authored QA graphic"
+    },
+    {
+      "url": "/uploads/alpine-2.png",
+      "bytes": 45796,
+      "sha256": "5e87a085f0384fcc356e142db6476419e521bf8cd25da92b60124a33196d5307",
+      "kind": "SYNTHETIC FIXTURE / neutral locally authored QA graphic"
+    },
+    {
+      "url": "/uploads/alpine-3.png",
+      "bytes": 46858,
+      "sha256": "d73d8869474411a51b196493875202a165b11718ab0c64a9c42b8d1dbb98fbef",
+      "kind": "SYNTHETIC FIXTURE / neutral locally authored QA graphic"
+    },
+    {
+      "url": "/uploads/alpine-map.png",
+      "bytes": 73408,
+      "sha256": "39e59462f56f4b5f3c86914b1bbd5fd4e593f57054a49358884284ed40b84d3e",
+      "kind": "SYNTHETIC FIXTURE / neutral locally authored QA graphic"
+    }
+  ],
+  "spots": [
+    {
+      "id": "qa-alpine-0",
+      "name": "QA スポット 01",
+      "x": 0.1423611111111111,
+      "y": 0.2222222222222222,
+      "descriptionSha256": "4ad5ff9c721680939fe1c9c0c4bcee8a065d1d3035f9dfa54b480203dfb08001",
+      "categories": [
+        "QA カテゴリー 1"
+      ],
+      "photos": [
+        "/uploads/alpine-0.png",
+        "/uploads/alpine-1.png"
+      ],
+      "eligiblePublicFields": []
+    },
+    {
+      "id": "qa-alpine-1",
+      "name": "QA スポット 02",
+      "x": 0.3645833333333333,
+      "y": 0.2222222222222222,
+      "descriptionSha256": "4ad5ff9c721680939fe1c9c0c4bcee8a065d1d3035f9dfa54b480203dfb08001",
+      "categories": [
+        "QA カテゴリー 2"
+      ],
+      "photos": [
+        "/uploads/alpine-1.png",
+        "/uploads/alpine-2.png"
+      ],
+      "eligiblePublicFields": []
+    },
+    {
+      "id": "qa-alpine-2",
+      "name": "QA スポット 03",
+      "x": 0.5868055555555556,
+      "y": 0.2222222222222222,
+      "descriptionSha256": "4ad5ff9c721680939fe1c9c0c4bcee8a065d1d3035f9dfa54b480203dfb08001",
+      "categories": [
+        "QA カテゴリー 3"
+      ],
+      "photos": [
+        "/uploads/alpine-2.png",
+        "/uploads/alpine-3.png"
+      ],
+      "eligiblePublicFields": []
+    },
+    {
+      "id": "qa-alpine-3",
+      "name": "QA スポット 04",
+      "x": 0.8090277777777778,
+      "y": 0.2222222222222222,
+      "descriptionSha256": "4ad5ff9c721680939fe1c9c0c4bcee8a065d1d3035f9dfa54b480203dfb08001",
+      "categories": [
+        "QA カテゴリー 1"
+      ],
+      "photos": [
+        "/uploads/alpine-3.png",
+        "/uploads/alpine-0.png"
+      ],
+      "eligiblePublicFields": []
+    },
+    {
+      "id": "qa-alpine-4",
+      "name": "QA スポット 05",
+      "x": 0.1423611111111111,
+      "y": 0.4722222222222222,
+      "descriptionSha256": "4ad5ff9c721680939fe1c9c0c4bcee8a065d1d3035f9dfa54b480203dfb08001",
+      "categories": [
+        "QA カテゴリー 2"
+      ],
+      "photos": [
+        "/uploads/alpine-0.png",
+        "/uploads/alpine-1.png"
+      ],
+      "eligiblePublicFields": []
+    },
+    {
+      "id": "qa-alpine-5",
+      "name": "QA スポット 06",
+      "x": 0.3645833333333333,
+      "y": 0.4722222222222222,
+      "descriptionSha256": "4ad5ff9c721680939fe1c9c0c4bcee8a065d1d3035f9dfa54b480203dfb08001",
+      "categories": [
+        "QA カテゴリー 3"
+      ],
+      "photos": [
+        "/uploads/alpine-1.png",
+        "/uploads/alpine-2.png"
+      ],
+      "eligiblePublicFields": []
+    },
+    {
+      "id": "qa-alpine-6",
+      "name": "QA スポット 07",
+      "x": 0.5868055555555556,
+      "y": 0.4722222222222222,
+      "descriptionSha256": "4ad5ff9c721680939fe1c9c0c4bcee8a065d1d3035f9dfa54b480203dfb08001",
+      "categories": [
+        "QA カテゴリー 1"
+      ],
+      "photos": [
+        "/uploads/alpine-2.png",
+        "/uploads/alpine-3.png"
+      ],
+      "eligiblePublicFields": []
+    },
+    {
+      "id": "qa-alpine-7",
+      "name": "QA スポット 08",
+      "x": 0.8090277777777778,
+      "y": 0.4722222222222222,
+      "descriptionSha256": "4ad5ff9c721680939fe1c9c0c4bcee8a065d1d3035f9dfa54b480203dfb08001",
+      "categories": [
+        "QA カテゴリー 2"
+      ],
+      "photos": [
+        "/uploads/alpine-3.png",
+        "/uploads/alpine-0.png"
+      ],
+      "eligiblePublicFields": []
+    },
+    {
+      "id": "qa-alpine-8",
+      "name": "QA スポット 09",
+      "x": 0.1423611111111111,
+      "y": 0.7222222222222222,
+      "descriptionSha256": "4ad5ff9c721680939fe1c9c0c4bcee8a065d1d3035f9dfa54b480203dfb08001",
+      "categories": [
+        "QA カテゴリー 3"
+      ],
+      "photos": [
+        "/uploads/alpine-0.png",
+        "/uploads/alpine-1.png"
+      ],
+      "eligiblePublicFields": []
+    },
+    {
+      "id": "qa-alpine-9",
+      "name": "QA スポット 10",
+      "x": 0.3645833333333333,
+      "y": 0.7222222222222222,
+      "descriptionSha256": "4ad5ff9c721680939fe1c9c0c4bcee8a065d1d3035f9dfa54b480203dfb08001",
+      "categories": [
+        "QA カテゴリー 1"
+      ],
+      "photos": [
+        "/uploads/alpine-1.png",
+        "/uploads/alpine-2.png"
+      ],
+      "eligiblePublicFields": []
+    },
+    {
+      "id": "qa-alpine-10",
+      "name": "QA スポット 11",
+      "x": 0.5868055555555556,
+      "y": 0.7222222222222222,
+      "descriptionSha256": "4ad5ff9c721680939fe1c9c0c4bcee8a065d1d3035f9dfa54b480203dfb08001",
+      "categories": [
+        "QA カテゴリー 2"
+      ],
+      "photos": [
+        "/uploads/alpine-2.png",
+        "/uploads/alpine-3.png"
+      ],
+      "eligiblePublicFields": []
+    },
+    {
+      "id": "qa-alpine-11",
+      "name": "QA スポット 12",
+      "x": 0.8090277777777778,
+      "y": 0.7222222222222222,
+      "descriptionSha256": "4ad5ff9c721680939fe1c9c0c4bcee8a065d1d3035f9dfa54b480203dfb08001",
+      "categories": [
+        "QA カテゴリー 3"
+      ],
+      "photos": [
+        "/uploads/alpine-3.png",
+        "/uploads/alpine-0.png"
+      ],
+      "eligiblePublicFields": []
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "results": [
+    {
+      "label": "login paper-owner@qa.invalid",
+      "pass": true
+    },
+    {
+      "label": "anonymous denied",
+      "pass": true
+    },
+    {
+      "label": "login paper-other@qa.invalid",
+      "pass": true
+    },
+    {
+      "label": "other tenant denied",
+      "pass": true
+    },
+    {
+      "label": "create with design",
+      "pass": true
+    },
+    {
+      "label": "explicit version 3 saved",
+      "pass": true
+    },
+    {
+      "label": "real source preview",
+      "pass": true
+    },
+    {
+      "label": "20 source spots and accessible regions",
+      "pass": true
+    },
+    {
+      "label": "PDF requires preview confirmation",
+      "pass": true
+    },
+    {
+      "label": "confirmed PDF",
+      "pass": true
+    },
+    {
+      "label": "same-Spot photo and override saved",
+      "pass": true
+    },
+    {
+      "label": "changed photo/override token denied",
+      "pass": true
+    },
+    {
+      "label": "other Spot photo rejected",
+      "pass": true
+    },
+    {
+      "label": "reset saved",
+      "pass": true
+    },
+    {
+      "label": "create/edit/photo/reset/PDF preserve source byte-for-byte",
+      "pass": true
+    }
+  ]
+}

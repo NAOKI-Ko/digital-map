@@ -1,0 +1,27 @@
+{
+  "scope": "Local disposable actual-data copy only; Windows QA never mutated",
+  "removedAssets": [
+    "/uploads/cmubrpvc4000u0svatbwxj0lr-thumb-b2f2a7ef-698d-408e-b91f-0e51f1334d61.webp",
+    "/uploads/qa-arimatsu-fon-map.png",
+    "/uploads/cmubrpukb000c0svaluih3if7-display-793224e3-aa69-4f76-8e07-deb2ef9cfb9f.webp",
+    "/uploads/cmubrpu4z00060svabnbphc10-display-31a4a94c-ea45-4934-afe2-77e5c02acd76.webp",
+    "/uploads/cmubrpv8a000q0svagvxiuqa3-thumb-8b1d8f77-7d88-46d5-bac6-f7eed8dfd4d9.webp",
+    "/uploads/cmubrpurr000f0sva712799v0-display-7ba5aeed-dbea-4ff2-b610-7f354b5902cb.webp",
+    "/uploads/cmubrpva6000s0svak19h6s8l-thumb-cc89d516-5ef2-44c5-bd7e-2189fd0c032a.webp",
+    "/uploads/cmubrptlo00000svax097dq0b-display-0a4ded87-ba90-4dcd-b902-73694eb91509.webp",
+    "/uploads/cmubrpv0y000i0svaiv6u29j0-thumb-1db5c7af-c0b3-4976-9df0-834919917b78.webp",
+    "/uploads/cmubrpv2t000k0svas05jj7e8-thumb-f93cb01f-6b76-4c4e-93ad-9defd3cf61ca.webp",
+    "/uploads/cmubrptuj00030svao4gx6lkn-display-02eb333c-f54a-4984-97f0-5bbf7b7f4810.webp",
+    "/uploads/cmubrpv4t000m0sva12sb0wgc-thumb-a0e42c54-58bf-44de-a645-fe9932c6f5fb.webp",
+    "/uploads/cmubrpv6k000o0svahj3qt1th-thumb-2b7d80b2-214c-4f6d-8b49-a7098545ff77.webp"
+  ],
+  "removedFiles": [
+    "../v2/source/uploads",
+    "../v2/source/arimatsu.json",
+    "../v2/heritage-A3-landscape-source.json",
+    "../v2/heritage-A4-editorial-source.json",
+    "../qa-public/public/maps/astra-v2-arimatsu"
+  ],
+  "removedFixtureMap": true,
+  "retained": "Final PDFs/PNGs, source/asset hashes and permitted inventories; synthetic QA fixtures; pre-existing first-pass fixture; empty QA tenant and local append-only audit events (no Windows audit data)"
+}
