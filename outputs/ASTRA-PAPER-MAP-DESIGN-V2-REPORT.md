@@ -80,7 +80,7 @@ DesktopはInspectorとPreviewを並べ、選択slot/Spotを枠で示す。Mobile
 
 ## 16. Automated QA
 
-**91 files / 618 tests PASS**。全組合せ、全件掲載、境界、Source不変、同一Spot写真、欠損fallback、長い日本語、version、reactive draft変更、determinism等を含む。typecheck/build/Prisma validate PASS。Paper/geometry/Tenant/default fields監査PASS。依存auditは既知脆弱性0。
+**91 files / 619 tests PASS**。全組合せ、全件掲載、境界、Source不変、同一Spot写真、欠損fallback、長い日本語、version、reactive draft変更、determinism等を含む。typecheck/build/Prisma validate PASS。Paper/geometry/Tenant/default fields監査PASS。依存auditは既知脆弱性0。
 
 API回帰23チェック＋新版15assertions。RBAC/Tenant拒否、LIVE/PUBLISHED、READY固定、公開停止時QR省略、stale拒否、paper編集後Source digest一致。全てローカル専用DB。既存v1 PDFは指定baseと同じSource/configで150dpi画像が画素一致。v2 rendererは前回headから変更なし。
 
@@ -109,7 +109,7 @@ Preview画像のtitle/page label、named slot、keyboard選択、ページ操作
 | 編集自由度 | slot/紙文/選択/viewport | 同枠組み、名前付きInspector | notice/見出し/写真/順序/クリックslot。DTP化なし |
 | Preview/PDF一致度 | 別描画・文字/overflow差 | 共通SVG＋lossless raster | 共通plan/SVG、JPEGにより容量削減。画素完全一致ではない |
 | モバイル | 設定が先 | Preview先・固定bar | 同左＋文書テキスト/keyboard/写真。5幅QA |
-| 実装複雑性 | 小さいが描画重複 | legacy＋新版renderer | さらにversion3と6限定designを追加。21 files +1629/-49行（設計・tests含む）、QA負担は増加 |
+| 実装複雑性 | 小さいが描画重複 | legacy＋新版renderer | さらにversion3と6限定designを追加。新renderer・slot連携・catalog契約・回帰testsによりコードとQA負担は増加 |
 | 将来の保守性 | Preview/PDF別々の修正 | plan共有、物理寸法 | bounded catalogと契約tests。ただし3世代renderer、font/codec/負荷維持が必要 |
 
 ## 21. 採用すべき範囲

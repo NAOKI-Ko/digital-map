@@ -8,7 +8,7 @@ import type { PaperMapSource } from '../../shared/types/paper-map'
 import { paperDesignCatalog, paperDesignConfig, type PaperDesignId } from '../../shared/utils/paper-map-designs'
 import { createEditorialRenderer, generateEditorialPdf } from '../../server/utils/paper-map-editorial-renderer'
 
-const args = new Map(process.argv.slice(2).reduce<string[][]>((pairs, value, index, all) => {
+const args = new Map(process.argv.slice(2).reduce<Array<[string, string]>>((pairs, value, index, all) => {
   if (index % 2 === 0) pairs.push([value, all[index + 1] ?? ''])
   return pairs
 }, []))

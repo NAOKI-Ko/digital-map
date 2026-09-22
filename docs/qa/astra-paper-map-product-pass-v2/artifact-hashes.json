@@ -1,8 +1,8 @@
 [
   {
     "path": "QA.md",
-    "bytes": 8944,
-    "sha256": "6a80cb013a39885b1f1d9299fa646cd6c94fbed742ab6d4e7cc55be39765feed"
+    "bytes": 9317,
+    "sha256": "2a0513a53f1c2ae2a2d32c941993657eec2e01afe6563a106f315162991e1ff9"
   },
   {
     "path": "REPRODUCE.md",
@@ -36,8 +36,8 @@
   },
   {
     "path": "audit-default-spot-fields-final.txt",
-    "bytes": 2524,
-    "sha256": "42d7093e9e5724be631373d89bbfc1669073640213afc32813163dc7d1de1adc"
+    "bytes": 2551,
+    "sha256": "d4fef019fc95f3a1809799a3b932f25ac14137eff730a4a61215528afc3405f2"
   },
   {
     "path": "audit-dependencies.txt",
@@ -147,7 +147,7 @@
   {
     "path": "build-final.txt",
     "bytes": 66671,
-    "sha256": "a7560c3ddb0999a701ebfe0750bdc36009e7e51c3f5d4c3c92e94a6b08366b08"
+    "sha256": "2da66eaae510531c6576182cb72b074cc2cd5d9efa1a02b410d9ed2e7107465f"
   },
   {
     "path": "cleanup.json",
@@ -167,7 +167,7 @@
   {
     "path": "full-tests-final.txt",
     "bytes": 294,
-    "sha256": "c5c14d8cfaeb0a22b3d00d8d497a7c8aadbb18489e7d5b873e0cd732281f1404"
+    "sha256": "de87bd8c7e651a4dd7987b1e3a5b00920763579a62bdef3cee7b965f4a51bc8c"
   },
   {
     "path": "heritage-A3-landscape/all-pages.jpg",

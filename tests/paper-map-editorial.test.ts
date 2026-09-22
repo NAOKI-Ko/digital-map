@@ -225,6 +225,14 @@ describe('version 3 bounded editorial design', () => {
     }
     expect(editorialText('長い文章'.repeat(50), 70, 9.5, 3).clipped).toBe(true)
   })
+  it('reports removed saved references even when other selected spots remain', () => {
+    const source = fixture(2), config = paperDesignConfig('heritage-map', source)
+    config.selection = { mode: 'spots', categoryIds: [], spotIds: ['qa-0', 'removed-spot'] }
+    config.ordering = { mode: 'manual', spotIds: ['removed-spot', 'qa-0'] }
+    const document = resolveEditorialDocument(source, config)
+    expect(document.pages.flatMap(page => page.cards).map(card => card.spot.id)).toEqual(['qa-0'])
+    expect(document.warnings.join()).toContain('元データから削除')
+  })
   it('source, photo, and Paper Original changes invalidate freshness confirmation', () => {
     const s = fixture(1),
       c = paperDesignConfig('heritage-map', s),

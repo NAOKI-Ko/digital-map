@@ -4,7 +4,7 @@ $ vitest run
 
 
  Test Files  91 passed (91)
-      Tests  618 passed (618)
-   Start at  20:20:54
-   Duration  4.83s (transform 4.00s, setup 0ms, import 8.55s, tests 17.98s, environment 686ms)
+      Tests  619 passed (619)
+   Start at  20:47:34
+   Duration  3.52s (transform 2.62s, setup 0ms, import 5.71s, tests 12.43s, environment 499ms)
 

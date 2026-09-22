@@ -165,6 +165,16 @@ export function resolveEditorialDocument(
   )
   const pages: EditorialPage[] = [],
     warnings: string[] = []
+  const sourceSpots = source.map.floors.flatMap(floor => floor.spots)
+  const sourceSpotIds = new Set(sourceSpots.map(spot => spot.id))
+  const sourceCategoryIds = new Set(sourceSpots.flatMap(spot => spot.categories.map(category => category.id)))
+  if (config.selection.spotIds.some(id => !sourceSpotIds.has(id))
+    || config.selection.categoryIds.some(id => !sourceCategoryIds.has(id))
+    || config.ordering.spotIds.some(id => !sourceSpotIds.has(id))
+    || config.spotOverrides.some(item => !sourceSpotIds.has(item.spotId))
+    || config.photoChoices?.some(item => !sourceSpotIds.has(item.spotId))) {
+    warnings.push('保存後に元データから削除された項目があります。現在存在する項目だけを出力します。')
+  }
   let clippedCount = [title, subtitle, intro, notice].filter(
     (t) => t.clipped,
   ).length

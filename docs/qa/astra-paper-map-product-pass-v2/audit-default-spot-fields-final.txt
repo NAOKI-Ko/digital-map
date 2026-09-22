@@ -3,8 +3,8 @@ $ node --import tsx scripts/qa/audit-default-spot-fields.ts
   "status": "PASS",
   "maps": [
     {
-      "slug": "astra-v2-arimatsu",
-      "totalFieldCount": 9,
+      "slug": "publication-3318452948d44d97a2857e0689961466",
+      "totalFieldCount": 6,
       "standardSemanticKeys": [
         "description",
         "address",
@@ -13,7 +13,7 @@ $ node --import tsx scripts/qa/audit-default-spot-fields.ts
         "website",
         "phone"
       ],
-      "customCount": 3,
+      "customCount": 0,
       "valid": true,
       "missingSemanticKeys": [],
       "duplicateSemanticKeys": [],

@@ -44,7 +44,7 @@ QR: CoreImage decoded all4 A4 PDF page PNGs at150dpi. A3 did not decode at150dpi
 
 ## Automated verification
 
-- 91 test files / **618 tests passed**, including DB integration tests on disposable database. Added16 v3 tests: 6 designs × A3/A4 × portrait/landscape, full pagination/no overlap, version contract, deterministic render, missing map refusal, optional asset fallback, same-Spot photo choice, stale fallback, original/override/source isolation, source geometry unchanged, Japanese punctuation, reactive Vue draft switching.
+- 91 test files / **619 tests passed**, including DB integration tests on disposable database. Added17 v3 tests: 6 designs × A3/A4 × portrait/landscape, full pagination/no overlap, version contract, deterministic render, missing map refusal, optional asset fallback, same-Spot photo choice, stale fallback, original/override/source isolation, source geometry unchanged, Japanese punctuation, reactive Vue draft switching.
 - `pnpm typecheck`, `pnpm build`, `pnpm prisma:validate`: passed.
 - `pnpm audit --prod`: no known vulnerabilities.
 - Paper Map, spatial migration, Tenant foundation, default Spot fields audits: passed. Full tests leave a publication fixture without default fields; the existing fixture preparation helper restored only that disposable DB's standard fields before the final field audit. The original failure log is retained locally; no production repair was run.
@@ -75,3 +75,5 @@ Same host, same20 Spot DTO, same A3 landscape;3 fresh-render calls per version, 
 Final PDF size -83.9%, generation -63.2% versus prior Astra; +4.8% size and2.1× time versus Current dev. Physical body sizes were not reduced. Preview PNG stays150dpi; codec/resampling differences are explicitly expected. PDF/Preview share layout, source and SVG; pixels are not identical. `pdf-inspection.json` records per-page dimensions, MAE and PSNR, not a semantic-parity guarantee. Core geometry/version/determinism and visible pages are separately checked.
 
 Process memory samples rose578MB(base)→800MB(v2)→1007MB(v3 in the same v2/v3 benchmark process). The latter is cumulative/cache-retaining, not a clean isolated v3 peak, so no cross-version memory-win claim. Server-side PNG Preview payload and six thumbnail renders are further performance costs. Caching/worker limits/vector text should be evaluated before a broad rollout; old outputs must remain versioned.
+
+Final hardening adds an explicit warning when a saved selection/order/override/photo reference has disappeared from Source; it never fills the missing Spot. The added regression makes619 tests. It changes no document geometry/encoding or normal-data target output. The final offline proof helper was also executed on the synthetic leisure fixture (2 pages,1863793 bytes).
