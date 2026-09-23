@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 100">
+  <title>検証用素材：地面の模様</title>
+  <ellipse cx="80" cy="50" rx="70" ry="42" fill="#a7b49b" fill-opacity=".25" stroke="#61765d" stroke-width="4" stroke-dasharray="12 8"/>
+  <path d="M25 57 Q80 16 135 57 M34 67 Q80 40 126 67" fill="none" stroke="#7d9771" stroke-width="5" stroke-opacity=".55"/>
+</svg>

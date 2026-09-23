@@ -1,0 +1,913 @@
+{
+  "map": {
+    "id": "cmu9s675a0004ssu1b14j9snq",
+    "name": "有松マップ",
+    "slug": "arimatsu-fon",
+    "locale": "ja",
+    "defaultLocale": "ja",
+    "enabledLocales": [
+      "ja"
+    ],
+    "seo": {
+      "title": "有松マップ",
+      "description": "",
+      "imageUrl": "https://examine-anime-bathroom-attraction.trycloudflare.com/api/public-assets/arimatsu-fon/releases/cmuctzt340006hwva5blp7bow/assets/2c8da17b1ec2ed51f87193436d8c4355edd9257c547f7179a04840393fa30979.webp"
+    },
+    "organizationName": "有松マップ｜ふぉん",
+    "logoUrl": "https://examine-anime-bathroom-attraction.trycloudflare.com/api/public-assets/arimatsu-fon/releases/cmuctzt340006hwva5blp7bow/assets/5da45d79c5f7488052e530390f815565e604ba5e982b246f7b3dd7890664fc89.webp",
+    "websiteUrl": null,
+    "snsUrl": null,
+    "floors": [
+      {
+        "id": "cmu9s675h000bssu1qjc0297q",
+        "name": "有松・桶狭間",
+        "illustrationUrl": "/__qa__/arimatsu/map-illustration.png",
+        "imageWidth": 1448,
+        "imageHeight": 1086,
+        "order": 0,
+        "refAImageX": 0.038314176245210725,
+        "refAImageY": 0.033205619412515965,
+        "refALat": 35.06912258387551,
+        "refALng": 136.96684317481913,
+        "refBImageX": 0.8409961685823755,
+        "refBImageY": 0.9731800766283524,
+        "refBLat": 35.06355742961577,
+        "refBLng": 136.97447378024134,
+        "spots": [
+          {
+            "id": "cmubo9yn4000n68valy3vyx5d",
+            "floorId": "cmu9s675h000bssu1qjc0297q",
+            "name": "まり木綿",
+            "categories": [
+              {
+                "id": "cmubo9ylk000468vaprl3hg50",
+                "name": "ショップ",
+                "order": 4,
+                "iconType": "custom",
+                "iconPresetId": null,
+                "iconImageUrl": "/__qa__/arimatsu/ff14e9bf0ecab62d7fda743d307bfb1747f8f17ab66ecfaf58ce4af62d554e3e.webp",
+                "iconAssetId": "cmubrpv8a000q0svagvxiuqa3"
+              }
+            ],
+            "importance": "normal",
+            "description": "伝統技法を現代的な色柄へ展開した絞り商品を扱うショップ。町歩きの土産選びにも向いています。",
+            "x": 0.31,
+            "y": 0.42,
+            "photos": [
+              "https://examine-anime-bathroom-attraction.trycloudflare.com/api/public-assets/arimatsu-fon/releases/cmuctzt340006hwva5blp7bow/assets/e11efc2205ac46c6e891b33d3da20e52298759d55a6b73657c6deec053adbce1.webp",
+              "https://examine-anime-bathroom-attraction.trycloudflare.com/api/public-assets/arimatsu-fon/releases/cmuctzt340006hwva5blp7bow/assets/356e3a64910292fba09100979b93ef6cbb4a5f5d1f9f1fb410d8eeb6200f0ea9.webp"
+            ],
+            "informationFields": [
+              {
+                "id": "cmu9yxiwn0001zovawp6uhxjn",
+                "label": "住所",
+                "type": "single_line_text",
+                "value": "名古屋市緑区有松1901",
+                "href": null
+              },
+              {
+                "id": "cmu9yxiwn0002zovav11fds4e",
+                "label": "営業時間",
+                "type": "multiline_text",
+                "value": "月・金 10:00～16:00／土・日 10:00～17:00",
+                "href": null
+              },
+              {
+                "id": "cmu9yxiwn0003zovateit9axi",
+                "label": "定休日",
+                "type": "multiline_text",
+                "value": "火・水・木曜日（営業日は要確認）",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "kanji:買",
+            "pinIconImageUrl": null,
+            "pinColor": "#6D28D9",
+            "pinSize": "medium"
+          },
+          {
+            "id": "cmubo9ynb000p68va2uwteos9",
+            "floorId": "cmu9s675h000bssu1qjc0297q",
+            "name": "カフェ庄九郎",
+            "categories": [
+              {
+                "id": "cmubo9yll000568va9nki337p",
+                "name": "グルメ",
+                "order": 5,
+                "iconType": "custom",
+                "iconPresetId": null,
+                "iconImageUrl": "/__qa__/arimatsu/61ca64f2db72d0b89177df2fa0324c67e37e7aabe8e06aac8e1ffddba4184250.webp",
+                "iconAssetId": "cmubrpva6000s0svak19h6s8l"
+              }
+            ],
+            "importance": "featured",
+            "description": "有松の歴史的な家屋を活かしたカフェ。町家の雰囲気とともに甘味や飲み物を楽しめる休憩スポットです。",
+            "x": 0.5,
+            "y": 0.55,
+            "photos": [
+              "https://examine-anime-bathroom-attraction.trycloudflare.com/api/public-assets/arimatsu-fon/releases/cmuctzt340006hwva5blp7bow/assets/4895e9da1b5c7b22d2fb92041108f169b623bf79160bfac00b01556b87121036.webp"
+            ],
+            "informationFields": [
+              {
+                "id": "cmu9yxiwn0001zovawp6uhxjn",
+                "label": "住所",
+                "type": "single_line_text",
+                "value": "名古屋市緑区有松1804",
+                "href": null
+              },
+              {
+                "id": "cmu9yxiwn0002zovav11fds4e",
+                "label": "営業時間",
+                "type": "multiline_text",
+                "value": "11:00～16:00／17:00～20:00",
+                "href": null
+              },
+              {
+                "id": "cmu9yxiwn0003zovateit9axi",
+                "label": "定休日",
+                "type": "multiline_text",
+                "value": "月曜日",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "custom",
+            "pinIconId": null,
+            "pinIconImageUrl": "/__qa__/arimatsu/61ca64f2db72d0b89177df2fa0324c67e37e7aabe8e06aac8e1ffddba4184250.webp",
+            "pinColor": "#B45309",
+            "pinSize": "large"
+          },
+          {
+            "id": "cmubo9yn1000m68va7aoj69bu",
+            "floorId": "cmu9s675h000bssu1qjc0297q",
+            "name": "井桁屋",
+            "categories": [
+              {
+                "id": "cmubo9ylk000468vaprl3hg50",
+                "name": "ショップ",
+                "order": 4,
+                "iconType": "custom",
+                "iconPresetId": null,
+                "iconImageUrl": "/__qa__/arimatsu/ff14e9bf0ecab62d7fda743d307bfb1747f8f17ab66ecfaf58ce4af62d554e3e.webp",
+                "iconAssetId": "cmubrpv8a000q0svagvxiuqa3"
+              }
+            ],
+            "importance": "normal",
+            "description": "有松の町並みで絞り商品を扱う店舗として観光案内に掲載される立ち寄り先。素材や模様の違いを見比べられます。",
+            "x": 0.25,
+            "y": 0.36,
+            "photos": [
+              "https://examine-anime-bathroom-attraction.trycloudflare.com/api/public-assets/arimatsu-fon/releases/cmuctzt340006hwva5blp7bow/assets/356e3a64910292fba09100979b93ef6cbb4a5f5d1f9f1fb410d8eeb6200f0ea9.webp",
+              "https://examine-anime-bathroom-attraction.trycloudflare.com/api/public-assets/arimatsu-fon/releases/cmuctzt340006hwva5blp7bow/assets/e11efc2205ac46c6e891b33d3da20e52298759d55a6b73657c6deec053adbce1.webp"
+            ],
+            "informationFields": [
+              {
+                "id": "cmu9yxiwn0001zovawp6uhxjn",
+                "label": "住所",
+                "type": "single_line_text",
+                "value": "名古屋市緑区有松2313",
+                "href": null
+              },
+              {
+                "id": "cmu9yxiwn0002zovav11fds4e",
+                "label": "営業時間",
+                "type": "multiline_text",
+                "value": "10:00～17:00",
+                "href": null
+              },
+              {
+                "id": "cmu9yxiwn0003zovateit9axi",
+                "label": "定休日",
+                "type": "multiline_text",
+                "value": "不定休",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "illustration",
+            "pinIconId": null,
+            "pinIconImageUrl": "/__qa__/arimatsu/ff14e9bf0ecab62d7fda743d307bfb1747f8f17ab66ecfaf58ce4af62d554e3e.webp",
+            "pinColor": "#6D28D9",
+            "pinSize": "large"
+          },
+          {
+            "id": "cmubo9yn7000o68vageam0wb0",
+            "floorId": "cmu9s675h000bssu1qjc0297q",
+            "name": "寿限無茶屋",
+            "categories": [
+              {
+                "id": "cmubo9yll000568va9nki337p",
+                "name": "グルメ",
+                "order": 5,
+                "iconType": "custom",
+                "iconPresetId": null,
+                "iconImageUrl": "/__qa__/arimatsu/61ca64f2db72d0b89177df2fa0324c67e37e7aabe8e06aac8e1ffddba4184250.webp",
+                "iconAssetId": "cmubrpva6000s0svak19h6s8l"
+              }
+            ],
+            "importance": "normal",
+            "description": "歴史ある町並みの中で手打ち麺を楽しめる飲食スポット。散策途中の昼食や休憩に利用できます。",
+            "x": 0.43,
+            "y": 0.49,
+            "photos": [
+              "https://examine-anime-bathroom-attraction.trycloudflare.com/api/public-assets/arimatsu-fon/releases/cmuctzt340006hwva5blp7bow/assets/4895e9da1b5c7b22d2fb92041108f169b623bf79160bfac00b01556b87121036.webp"
+            ],
+            "informationFields": [
+              {
+                "id": "cmu9yxiwn0001zovawp6uhxjn",
+                "label": "住所",
+                "type": "single_line_text",
+                "value": "名古屋市緑区有松2339",
+                "href": null
+              },
+              {
+                "id": "cmu9yxiwn0002zovav11fds4e",
+                "label": "営業時間",
+                "type": "multiline_text",
+                "value": "11:00～15:00／17:00～21:00",
+                "href": null
+              },
+              {
+                "id": "cmu9yxiwn0003zovateit9axi",
+                "label": "定休日",
+                "type": "multiline_text",
+                "value": "木曜日",
+                "href": null
+              }
+            ],
+            "websiteAction": {
+              "label": "Webサイト",
+              "url": "http://www.mc.ccnw.ne.jp/jyugemu/"
+            },
+            "pinIconType": "preset",
+            "pinIconId": "kanji:食",
+            "pinIconImageUrl": null,
+            "pinColor": "#B45309",
+            "pinSize": "medium"
+          },
+          {
+            "id": "cmubo9ymo000e68vadn9u81lx",
+            "floorId": "cmu9s675h000bssu1qjc0297q",
+            "name": "小塚邸",
+            "categories": [
+              {
+                "id": "cmubo9yl7000068va28krjrg3",
+                "name": "歴史・文化",
+                "order": 0,
+                "iconType": "custom",
+                "iconPresetId": null,
+                "iconImageUrl": "/__qa__/arimatsu/0d4995d1d0b4565c9bce2ba71a4cb111b7cb0db35009bcbdc7225219b500abae.webp",
+                "iconAssetId": "cmubrpv0y000i0svaiv6u29j0"
+              }
+            ],
+            "importance": "normal",
+            "description": "旧東海道沿いに残る有松の伝統的な町家。通りの景観を形づくる歴史的建造物のひとつです。",
+            "x": 0.65,
+            "y": 0.51,
+            "photos": [
+              "https://examine-anime-bathroom-attraction.trycloudflare.com/api/public-assets/arimatsu-fon/releases/cmuctzt340006hwva5blp7bow/assets/2c8da17b1ec2ed51f87193436d8c4355edd9257c547f7179a04840393fa30979.webp"
+            ],
+            "informationFields": [
+              {
+                "id": "cmu9yxiwn0001zovawp6uhxjn",
+                "label": "住所",
+                "type": "single_line_text",
+                "value": "名古屋市緑区有松806番地",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "kanji:観",
+            "pinIconImageUrl": null,
+            "pinColor": "#8B5E3C",
+            "pinSize": "medium"
+          },
+          {
+            "id": "cmubo9ymn000d68va4kbvlqmf",
+            "floorId": "cmu9s675h000bssu1qjc0297q",
+            "name": "岡家住宅",
+            "categories": [
+              {
+                "id": "cmubo9yl7000068va28krjrg3",
+                "name": "歴史・文化",
+                "order": 0,
+                "iconType": "custom",
+                "iconPresetId": null,
+                "iconImageUrl": "/__qa__/arimatsu/0d4995d1d0b4565c9bce2ba71a4cb111b7cb0db35009bcbdc7225219b500abae.webp",
+                "iconAssetId": "cmubrpv0y000i0svaiv6u29j0"
+              }
+            ],
+            "importance": "featured",
+            "description": "江戸時代末期の絞問屋の建築形態をよく残す町家。奥行きのある敷地構成と商家の佇まいを伝えます。",
+            "x": 0.59,
+            "y": 0.47,
+            "photos": [
+              "https://examine-anime-bathroom-attraction.trycloudflare.com/api/public-assets/arimatsu-fon/releases/cmuctzt340006hwva5blp7bow/assets/2c8da17b1ec2ed51f87193436d8c4355edd9257c547f7179a04840393fa30979.webp",
+              "https://examine-anime-bathroom-attraction.trycloudflare.com/api/public-assets/arimatsu-fon/releases/cmuctzt340006hwva5blp7bow/assets/356e3a64910292fba09100979b93ef6cbb4a5f5d1f9f1fb410d8eeb6200f0ea9.webp"
+            ],
+            "informationFields": [
+              {
+                "id": "cmu9yxiwn0001zovawp6uhxjn",
+                "label": "住所",
+                "type": "single_line_text",
+                "value": "名古屋市緑区有松809番地1ほか",
+                "href": null
+              },
+              {
+                "id": "cmu9yxiwn0002zovav11fds4e",
+                "label": "営業時間",
+                "type": "multiline_text",
+                "value": "10:30～15:30",
+                "href": null
+              },
+              {
+                "id": "cmu9yxiwn0003zovateit9axi",
+                "label": "定休日",
+                "type": "multiline_text",
+                "value": "土曜日・日曜日・年末年始",
+                "href": null
+              }
+            ],
+            "websiteAction": {
+              "label": "Webサイト",
+              "url": "https://www.city.nagoya.jp/kankou/rekishi/1017246/1017247.html"
+            },
+            "pinIconType": "preset",
+            "pinIconId": "kanji:観",
+            "pinIconImageUrl": null,
+            "pinColor": "#8B5E3C",
+            "pinSize": "large"
+          },
+          {
+            "id": "cmubo9ymk000b68vauoaplx2y",
+            "floorId": "cmu9s675h000bssu1qjc0297q",
+            "name": "常夜燈",
+            "categories": [
+              {
+                "id": "cmubo9yl7000068va28krjrg3",
+                "name": "歴史・文化",
+                "order": 0,
+                "iconType": "custom",
+                "iconPresetId": null,
+                "iconImageUrl": "/__qa__/arimatsu/0d4995d1d0b4565c9bce2ba71a4cb111b7cb0db35009bcbdc7225219b500abae.webp",
+                "iconAssetId": "cmubrpv0y000i0svaiv6u29j0"
+              }
+            ],
+            "importance": "normal",
+            "description": "旧東海道の往来と地域の信仰を今に伝える石造の常夜燈。町歩きの小さな目印です。",
+            "x": 0.47,
+            "y": 0.4,
+            "photos": [],
+            "informationFields": [
+              {
+                "id": "cmu9yxiwn0001zovawp6uhxjn",
+                "label": "住所",
+                "type": "single_line_text",
+                "value": "旧東海道沿い・有松地区",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "kanji:観",
+            "pinIconImageUrl": null,
+            "pinColor": "#8B5E3C",
+            "pinSize": "small"
+          },
+          {
+            "id": "cmubo9ymy000l68varduh2xli",
+            "floorId": "cmu9s675h000bssu1qjc0297q",
+            "name": "戦評の松",
+            "categories": [
+              {
+                "id": "cmubo9yl7000068va28krjrg3",
+                "name": "歴史・文化",
+                "order": 0,
+                "iconType": "custom",
+                "iconPresetId": null,
+                "iconImageUrl": "/__qa__/arimatsu/0d4995d1d0b4565c9bce2ba71a4cb111b7cb0db35009bcbdc7225219b500abae.webp",
+                "iconAssetId": "cmubrpv0y000i0svaiv6u29j0"
+              }
+            ],
+            "importance": "normal",
+            "description": "桶狭間の戦いにまつわる伝承を伝える史跡。歴史散策ルートの目印として確認できます。",
+            "x": 0.85,
+            "y": 0.84,
+            "photos": [],
+            "informationFields": [
+              {
+                "id": "cmu9yxiwn0001zovawp6uhxjn",
+                "label": "住所",
+                "type": "single_line_text",
+                "value": "桶狭間古戦場周辺",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "kanji:観",
+            "pinIconImageUrl": null,
+            "pinColor": "#8B5E3C",
+            "pinSize": "small"
+          },
+          {
+            "id": "cmubo9ymg000968vahxbrk9sz",
+            "floorId": "cmu9s675h000bssu1qjc0297q",
+            "name": "有松・鳴海絞会館",
+            "categories": [
+              {
+                "id": "cmubo9yli000168vam5ryqpog",
+                "name": "有松絞り",
+                "order": 1,
+                "iconType": "custom",
+                "iconPresetId": null,
+                "iconImageUrl": "/__qa__/arimatsu/0f72404a991260a9eb18a360d645c4c8a270210b72736f4ea60ea9c892d8fe38.webp",
+                "iconAssetId": "cmubrpv2t000k0svas05jj7e8"
+              }
+            ],
+            "importance": "featured",
+            "description": "有松・鳴海絞りの歴史、技法、製品に触れられる施設。実演や展示を通して伝統産業を立体的に学べます。",
+            "x": 0.34,
+            "y": 0.33,
+            "photos": [
+              "https://examine-anime-bathroom-attraction.trycloudflare.com/api/public-assets/arimatsu-fon/releases/cmuctzt340006hwva5blp7bow/assets/e11efc2205ac46c6e891b33d3da20e52298759d55a6b73657c6deec053adbce1.webp",
+              "https://examine-anime-bathroom-attraction.trycloudflare.com/api/public-assets/arimatsu-fon/releases/cmuctzt340006hwva5blp7bow/assets/356e3a64910292fba09100979b93ef6cbb4a5f5d1f9f1fb410d8eeb6200f0ea9.webp"
+            ],
+            "informationFields": [
+              {
+                "id": "cmu9yxiwn0001zovawp6uhxjn",
+                "label": "住所",
+                "type": "single_line_text",
+                "value": "名古屋市緑区有松3008",
+                "href": null
+              },
+              {
+                "id": "cmu9yxiwn0002zovav11fds4e",
+                "label": "営業時間",
+                "type": "multiline_text",
+                "value": "9:30～17:00（実演は16:30まで）",
+                "href": null
+              },
+              {
+                "id": "cmu9yxiwn0003zovateit9axi",
+                "label": "定休日",
+                "type": "multiline_text",
+                "value": "絞りまつり翌日・年末年始・臨時休館あり",
+                "href": null
+              }
+            ],
+            "websiteAction": {
+              "label": "Webサイト",
+              "url": "http://www.shibori-kaikan.com/"
+            },
+            "pinIconType": "custom",
+            "pinIconId": null,
+            "pinIconImageUrl": "/__qa__/arimatsu/0f72404a991260a9eb18a360d645c4c8a270210b72736f4ea60ea9c892d8fe38.webp",
+            "pinColor": "#315B49",
+            "pinSize": "large"
+          },
+          {
+            "id": "cmubo9ymp000f68va8omzrtjf",
+            "floorId": "cmu9s675h000bssu1qjc0297q",
+            "name": "有松天満社",
+            "categories": [
+              {
+                "id": "cmubo9ylj000268vaj3xpsgwy",
+                "name": "寺社",
+                "order": 2,
+                "iconType": "custom",
+                "iconPresetId": null,
+                "iconImageUrl": "/__qa__/arimatsu/18a37f1e76687e8246954099a35df938ac644f00c68051e2334833ea3a72e8ef.webp",
+                "iconAssetId": "cmubrpv4t000m0sva12sb0wgc"
+              }
+            ],
+            "importance": "featured",
+            "description": "有松の町並みを見下ろす高台に鎮座する神社。石段と緑に囲まれ、散策途中の静かな立ち寄り先です。",
+            "x": 0.56,
+            "y": 0.23,
+            "photos": [
+              "https://examine-anime-bathroom-attraction.trycloudflare.com/api/public-assets/arimatsu-fon/releases/cmuctzt340006hwva5blp7bow/assets/31224b37fedc9ec1f8eca6e63552a47906accc7f94419db19731e4916b1c0f0a.webp",
+              "https://examine-anime-bathroom-attraction.trycloudflare.com/api/public-assets/arimatsu-fon/releases/cmuctzt340006hwva5blp7bow/assets/2c8da17b1ec2ed51f87193436d8c4355edd9257c547f7179a04840393fa30979.webp"
+            ],
+            "informationFields": [
+              {
+                "id": "cmu9yxiwn0001zovawp6uhxjn",
+                "label": "住所",
+                "type": "single_line_text",
+                "value": "名古屋市緑区鳴海町米塚10",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "illustration",
+            "pinIconId": null,
+            "pinIconImageUrl": "/__qa__/arimatsu/18a37f1e76687e8246954099a35df938ac644f00c68051e2334833ea3a72e8ef.webp",
+            "pinColor": "#9A3412",
+            "pinSize": "large"
+          },
+          {
+            "id": "cmubo9ymd000768vabymdxfaz",
+            "floorId": "cmu9s675h000bssu1qjc0297q",
+            "name": "有松山車会館",
+            "categories": [
+              {
+                "id": "cmubo9yl7000068va28krjrg3",
+                "name": "歴史・文化",
+                "order": 0,
+                "iconType": "custom",
+                "iconPresetId": null,
+                "iconImageUrl": "/__qa__/arimatsu/0d4995d1d0b4565c9bce2ba71a4cb111b7cb0db35009bcbdc7225219b500abae.webp",
+                "iconAssetId": "cmubrpv0y000i0svaiv6u29j0"
+              }
+            ],
+            "importance": "featured",
+            "description": "有松に伝わる三台の山車と祭礼文化を紹介する施設。町歩きの前に地域の歴史を知る立ち寄り先です。",
+            "x": 0.2,
+            "y": 0.24,
+            "photos": [
+              "https://examine-anime-bathroom-attraction.trycloudflare.com/api/public-assets/arimatsu-fon/releases/cmuctzt340006hwva5blp7bow/assets/2c8da17b1ec2ed51f87193436d8c4355edd9257c547f7179a04840393fa30979.webp"
+            ],
+            "informationFields": [
+              {
+                "id": "cmu9yxiwn0001zovawp6uhxjn",
+                "label": "住所",
+                "type": "single_line_text",
+                "value": "名古屋市緑区有松2338",
+                "href": null
+              },
+              {
+                "id": "cmu9yxiwn0002zovav11fds4e",
+                "label": "営業時間",
+                "type": "multiline_text",
+                "value": "10:00～16:00",
+                "href": null
+              },
+              {
+                "id": "cmu9yxiwn0003zovateit9axi",
+                "label": "定休日",
+                "type": "multiline_text",
+                "value": "月～金・年末年始（臨時休館あり）",
+                "href": null
+              }
+            ],
+            "websiteAction": {
+              "label": "Webサイト",
+              "url": "https://www.nagoya-info.jp/spot/detail/78/"
+            },
+            "pinIconType": "illustration",
+            "pinIconId": null,
+            "pinIconImageUrl": "/__qa__/arimatsu/0d4995d1d0b4565c9bce2ba71a4cb111b7cb0db35009bcbdc7225219b500abae.webp",
+            "pinColor": "#8B5E3C",
+            "pinSize": "large"
+          },
+          {
+            "id": "cmubo9yms000h68va2jrt8ge2",
+            "floorId": "cmu9s675h000bssu1qjc0297q",
+            "name": "有松神社",
+            "categories": [
+              {
+                "id": "cmubo9ylj000268vaj3xpsgwy",
+                "name": "寺社",
+                "order": 2,
+                "iconType": "custom",
+                "iconPresetId": null,
+                "iconImageUrl": "/__qa__/arimatsu/18a37f1e76687e8246954099a35df938ac644f00c68051e2334833ea3a72e8ef.webp",
+                "iconAssetId": "cmubrpv4t000m0sva12sb0wgc"
+              }
+            ],
+            "importance": "normal",
+            "description": "有松の歴史散策路に含まれる神社。地域の暮らしと信仰に触れられる小さな立ち寄り先です。",
+            "x": 0.76,
+            "y": 0.6,
+            "photos": [
+              "https://examine-anime-bathroom-attraction.trycloudflare.com/api/public-assets/arimatsu-fon/releases/cmuctzt340006hwva5blp7bow/assets/31224b37fedc9ec1f8eca6e63552a47906accc7f94419db19731e4916b1c0f0a.webp"
+            ],
+            "informationFields": [
+              {
+                "id": "cmu9yxiwn0001zovawp6uhxjn",
+                "label": "住所",
+                "type": "single_line_text",
+                "value": "有松地区・旧東海道周辺",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "kanji:観",
+            "pinIconImageUrl": null,
+            "pinColor": "#9A3412",
+            "pinSize": "medium"
+          },
+          {
+            "id": "cmubo9ylp000668va9gy61rqi",
+            "floorId": "cmu9s675h000bssu1qjc0297q",
+            "name": "有松駅",
+            "categories": [
+              {
+                "id": "cmubo9ylj000368vaoq5hs5t8",
+                "name": "交通",
+                "order": 3,
+                "iconType": "custom",
+                "iconPresetId": null,
+                "iconImageUrl": "/__qa__/arimatsu/cfd0a5e0eb82c18cad21a7c9e3e2a39d8786fb7ee185ac7cfbae1a458ccb067e.webp",
+                "iconAssetId": "cmubrpv6k000o0svahj3qt1th"
+              }
+            ],
+            "importance": "normal",
+            "description": "名鉄名古屋本線の駅。有松の町並み散策へ向かう玄関口で、駅前から旧東海道方面へ歩いて回れます。",
+            "x": 0.12,
+            "y": 0.14,
+            "photos": [],
+            "informationFields": [
+              {
+                "id": "cmu9yxiwn0001zovawp6uhxjn",
+                "label": "住所",
+                "type": "single_line_text",
+                "value": "名古屋市緑区有松2102番地",
+                "href": null
+              }
+            ],
+            "websiteAction": {
+              "label": "Webサイト",
+              "url": "https://www.meitetsu.co.jp/train/station_info/line01/station/1146.html"
+            },
+            "pinIconType": "custom",
+            "pinIconId": null,
+            "pinIconImageUrl": "/__qa__/arimatsu/cfd0a5e0eb82c18cad21a7c9e3e2a39d8786fb7ee185ac7cfbae1a458ccb067e.webp",
+            "pinColor": "#475569",
+            "pinSize": "large"
+          },
+          {
+            "id": "cmubo9ymi000a68vap6he7f1r",
+            "floorId": "cmu9s675h000bssu1qjc0297q",
+            "name": "服部邸",
+            "categories": [
+              {
+                "id": "cmubo9yl7000068va28krjrg3",
+                "name": "歴史・文化",
+                "order": 0,
+                "iconType": "custom",
+                "iconPresetId": null,
+                "iconImageUrl": "/__qa__/arimatsu/0d4995d1d0b4565c9bce2ba71a4cb111b7cb0db35009bcbdc7225219b500abae.webp",
+                "iconAssetId": "cmubrpv0y000i0svaiv6u29j0"
+              }
+            ],
+            "importance": "normal",
+            "description": "旧東海道沿いに残る絞商の町家。落ち着いた外観から、有松の商家文化と町並みの連続性を感じられます。",
+            "x": 0.41,
+            "y": 0.37,
+            "photos": [
+              "https://examine-anime-bathroom-attraction.trycloudflare.com/api/public-assets/arimatsu-fon/releases/cmuctzt340006hwva5blp7bow/assets/2c8da17b1ec2ed51f87193436d8c4355edd9257c547f7179a04840393fa30979.webp"
+            ],
+            "informationFields": [
+              {
+                "id": "cmu9yxiwn0001zovawp6uhxjn",
+                "label": "住所",
+                "type": "single_line_text",
+                "value": "旧東海道沿い・有松地区",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "kanji:観",
+            "pinIconImageUrl": null,
+            "pinColor": "#8B5E3C",
+            "pinSize": "medium"
+          },
+          {
+            "id": "cmubo9ymt000i68vamoceccw3",
+            "floorId": "cmu9s675h000bssu1qjc0297q",
+            "name": "桶狭間古戦場公園",
+            "categories": [
+              {
+                "id": "cmubo9yl7000068va28krjrg3",
+                "name": "歴史・文化",
+                "order": 0,
+                "iconType": "custom",
+                "iconPresetId": null,
+                "iconImageUrl": "/__qa__/arimatsu/0d4995d1d0b4565c9bce2ba71a4cb111b7cb0db35009bcbdc7225219b500abae.webp",
+                "iconAssetId": "cmubrpv0y000i0svaiv6u29j0"
+              }
+            ],
+            "importance": "featured",
+            "description": "桶狭間の戦いにまつわる史跡を保存する公園。史跡案内を見ながら地域の歴史を学べます。",
+            "x": 0.83,
+            "y": 0.69,
+            "photos": [
+              "https://examine-anime-bathroom-attraction.trycloudflare.com/api/public-assets/arimatsu-fon/releases/cmuctzt340006hwva5blp7bow/assets/2c8da17b1ec2ed51f87193436d8c4355edd9257c547f7179a04840393fa30979.webp"
+            ],
+            "informationFields": [
+              {
+                "id": "cmu9yxiwn0001zovawp6uhxjn",
+                "label": "住所",
+                "type": "single_line_text",
+                "value": "名古屋市緑区桶狭間北3丁目",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "kanji:観",
+            "pinIconImageUrl": null,
+            "pinColor": "#8B5E3C",
+            "pinSize": "large"
+          },
+          {
+            "id": "cmubo9ymw000k68vaebgyccjg",
+            "floorId": "cmu9s675h000bssu1qjc0297q",
+            "name": "桶狭間神明社",
+            "categories": [
+              {
+                "id": "cmubo9ylj000268vaj3xpsgwy",
+                "name": "寺社",
+                "order": 2,
+                "iconType": "custom",
+                "iconPresetId": null,
+                "iconImageUrl": "/__qa__/arimatsu/18a37f1e76687e8246954099a35df938ac644f00c68051e2334833ea3a72e8ef.webp",
+                "iconAssetId": "cmubrpv4t000m0sva12sb0wgc"
+              }
+            ],
+            "importance": "normal",
+            "description": "桶狭間地区の歴史散策路に含まれる神社。周辺の史跡とつないで歩けます。",
+            "x": 0.91,
+            "y": 0.78,
+            "photos": [
+              "https://examine-anime-bathroom-attraction.trycloudflare.com/api/public-assets/arimatsu-fon/releases/cmuctzt340006hwva5blp7bow/assets/31224b37fedc9ec1f8eca6e63552a47906accc7f94419db19731e4916b1c0f0a.webp"
+            ],
+            "informationFields": [
+              {
+                "id": "cmu9yxiwn0001zovawp6uhxjn",
+                "label": "住所",
+                "type": "single_line_text",
+                "value": "名古屋市緑区桶狭間神明1520",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "kanji:観",
+            "pinIconImageUrl": null,
+            "pinColor": "#9A3412",
+            "pinSize": "medium"
+          },
+          {
+            "id": "cmubo9ymr000g68va0o5is7rj",
+            "floorId": "cmu9s675h000bssu1qjc0297q",
+            "name": "祇園寺",
+            "categories": [
+              {
+                "id": "cmubo9ylj000268vaj3xpsgwy",
+                "name": "寺社",
+                "order": 2,
+                "iconType": "custom",
+                "iconPresetId": null,
+                "iconImageUrl": "/__qa__/arimatsu/18a37f1e76687e8246954099a35df938ac644f00c68051e2334833ea3a72e8ef.webp",
+                "iconAssetId": "cmubrpv4t000m0sva12sb0wgc"
+              }
+            ],
+            "importance": "normal",
+            "description": "有松の歴史散策路に含まれる寺院。旧東海道の町並みとあわせて地域の歴史をたどれます。",
+            "x": 0.71,
+            "y": 0.55,
+            "photos": [
+              "https://examine-anime-bathroom-attraction.trycloudflare.com/api/public-assets/arimatsu-fon/releases/cmuctzt340006hwva5blp7bow/assets/31224b37fedc9ec1f8eca6e63552a47906accc7f94419db19731e4916b1c0f0a.webp"
+            ],
+            "informationFields": [
+              {
+                "id": "cmu9yxiwn0001zovawp6uhxjn",
+                "label": "住所",
+                "type": "single_line_text",
+                "value": "有松地区・旧東海道周辺",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "kanji:観",
+            "pinIconImageUrl": null,
+            "pinColor": "#9A3412",
+            "pinSize": "medium"
+          },
+          {
+            "id": "cmubo9yme000868vaj6v3h6s7",
+            "floorId": "cmu9s675h000bssu1qjc0297q",
+            "name": "竹田庄九郎碑",
+            "categories": [
+              {
+                "id": "cmubo9yli000168vam5ryqpog",
+                "name": "有松絞り",
+                "order": 1,
+                "iconType": "custom",
+                "iconPresetId": null,
+                "iconImageUrl": "/__qa__/arimatsu/0f72404a991260a9eb18a360d645c4c8a270210b72736f4ea60ea9c892d8fe38.webp",
+                "iconAssetId": "cmubrpv2t000k0svas05jj7e8"
+              }
+            ],
+            "importance": "normal",
+            "description": "有松絞りの開祖とされる竹田庄九郎を顕彰する碑。絞りの歴史をたどる散策の要所です。",
+            "x": 0.27,
+            "y": 0.29,
+            "photos": [],
+            "informationFields": [
+              {
+                "id": "cmu9yxiwn0001zovawp6uhxjn",
+                "label": "住所",
+                "type": "single_line_text",
+                "value": "有松天満社周辺（名古屋市緑区鳴海町）",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "kanji:観",
+            "pinIconImageUrl": null,
+            "pinColor": "#315B49",
+            "pinSize": "small"
+          },
+          {
+            "id": "cmubo9yml000c68vazvjujz92",
+            "floorId": "cmu9s675h000bssu1qjc0297q",
+            "name": "竹田邸",
+            "categories": [
+              {
+                "id": "cmubo9yl7000068va28krjrg3",
+                "name": "歴史・文化",
+                "order": 0,
+                "iconType": "custom",
+                "iconPresetId": null,
+                "iconImageUrl": "/__qa__/arimatsu/0d4995d1d0b4565c9bce2ba71a4cb111b7cb0db35009bcbdc7225219b500abae.webp",
+                "iconAssetId": "cmubrpv0y000i0svaiv6u29j0"
+              }
+            ],
+            "importance": "normal",
+            "description": "有松の伝統的な町並みを構成する絞商の町家。格子や屋根まわりなど通りから見える意匠も見どころです。",
+            "x": 0.53,
+            "y": 0.44,
+            "photos": [
+              "https://examine-anime-bathroom-attraction.trycloudflare.com/api/public-assets/arimatsu-fon/releases/cmuctzt340006hwva5blp7bow/assets/2c8da17b1ec2ed51f87193436d8c4355edd9257c547f7179a04840393fa30979.webp"
+            ],
+            "informationFields": [
+              {
+                "id": "cmu9yxiwn0001zovawp6uhxjn",
+                "label": "住所",
+                "type": "single_line_text",
+                "value": "旧東海道沿い・有松地区",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "kanji:観",
+            "pinIconImageUrl": null,
+            "pinColor": "#8B5E3C",
+            "pinSize": "medium"
+          },
+          {
+            "id": "cmubo9ymu000j68vai8fvxp6i",
+            "floorId": "cmu9s675h000bssu1qjc0297q",
+            "name": "長福寺",
+            "categories": [
+              {
+                "id": "cmubo9ylj000268vaj3xpsgwy",
+                "name": "寺社",
+                "order": 2,
+                "iconType": "custom",
+                "iconPresetId": null,
+                "iconImageUrl": "/__qa__/arimatsu/18a37f1e76687e8246954099a35df938ac644f00c68051e2334833ea3a72e8ef.webp",
+                "iconAssetId": "cmubrpv4t000m0sva12sb0wgc"
+              }
+            ],
+            "importance": "normal",
+            "description": "桶狭間の戦いに関わる史跡を伝える寺院。古戦場周辺の歴史散策とあわせて訪れたい場所です。",
+            "x": 0.87,
+            "y": 0.74,
+            "photos": [
+              "https://examine-anime-bathroom-attraction.trycloudflare.com/api/public-assets/arimatsu-fon/releases/cmuctzt340006hwva5blp7bow/assets/31224b37fedc9ec1f8eca6e63552a47906accc7f94419db19731e4916b1c0f0a.webp"
+            ],
+            "informationFields": [
+              {
+                "id": "cmu9yxiwn0001zovawp6uhxjn",
+                "label": "住所",
+                "type": "single_line_text",
+                "value": "名古屋市緑区桶狭間427",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "kanji:観",
+            "pinIconImageUrl": null,
+            "pinColor": "#9A3412",
+            "pinSize": "medium"
+          }
+        ],
+        "decorations": []
+      }
+    ],
+    "releaseId": "cmuctzt340006hwva5blp7bow"
+  }
+}

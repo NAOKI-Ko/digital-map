@@ -69,12 +69,12 @@ describe('MapViewerのカメラ制約', () => {
     expect(JSON.stringify(style)).not.toContain('openstreetmap')
   })
 
-  it('閲覧モードへdesign.md 4.2のpitch/bearing制約を渡す', () => {
+  it('比較実装の閲覧モードへ暫定pitch/bearing制約を渡す', () => {
     const options = createMapViewerOptions('map', 'view')
 
     expect(options).toMatchObject({
       bearing: 0,
-      pitch: 45,
+      pitch: 20,
       minPitch: 0,
       maxPitch: 70,
       dragRotate: true,

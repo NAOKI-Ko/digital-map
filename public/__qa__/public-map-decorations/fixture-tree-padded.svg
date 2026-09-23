@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320">
+  <title>検証用素材：大きな透明余白を持つ木</title>
+  <g transform="translate(112 84) scale(.8)">
+    <path d="M54 150 V91 H66 V150" fill="#725236"/>
+    <circle cx="60" cy="72" r="45" fill="#6f9a6e" stroke="#355c45" stroke-width="5"/>
+    <circle cx="39" cy="85" r="25" fill="#8eb181"/><circle cx="82" cy="83" r="27" fill="#81a97c"/>
+    <circle cx="60" cy="72" r="45" fill="none" stroke="#355c45" stroke-width="5"/>
+  </g>
+</svg>

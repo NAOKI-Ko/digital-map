@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 160">
+  <title>検証用素材：建物を示す抽象図形</title>
+  <path d="M22 69 L90 22 L158 69 L148 77 L90 38 L32 77 Z" fill="#574f49"/>
+  <path d="M35 74 L90 39 L145 74 V150 H35 Z" fill="#c4ad8c" stroke="#5e554b" stroke-width="5"/>
+  <path d="M73 150 V100 H107 V150" fill="#786653"/>
+  <path d="M43 88 H66 V111 H43 Z M115 88 H138 V111 H115 Z" fill="#edf1e8" stroke="#5e554b" stroke-width="3"/>
+</svg>

@@ -9,7 +9,7 @@ export type MapViewerMode = 'view' | 'edit'
 export const VIEWER_CAMERA_CONSTRAINTS = {
   view: {
     bearing: 0,
-    pitch: 45,
+    pitch: 20,
     minPitch: 0,
     maxPitch: 70,
     dragRotate: true,
@@ -275,12 +275,47 @@ export function useMapCamera(
     // A previous Floor's relative constraints must not affect this Floor's camera calculation.
     instance.setMinZoom(ABSOLUTE_ZOOM_LIMITS.minZoom)
     instance.setMaxZoom(ABSOLUTE_ZOOM_LIMITS.maxZoom)
-    return instance.cameraForBounds([bounds.southwest, bounds.northeast], {
-      padding,
-      bearing: 0,
-      pitch: 0,
-      maxZoom: 20,
-    })
+    if (options.mode === 'edit') {
+      return instance.cameraForBounds([bounds.southwest, bounds.northeast], {
+        padding,
+        bearing: 0,
+        pitch: 0,
+        maxZoom: 20,
+      })
+    }
+
+    // cameraForBounds computes a level-map rectangle. At pitch it can leave the
+    // illustrated floor's near edge outside the viewport, so fit the projected
+    // four corners against the actual MapLibre camera instead.
+    const previous = {
+      center: instance.getCenter(),
+      zoom: instance.getZoom(),
+      bearing: instance.getBearing(),
+      pitch: instance.getPitch(),
+    }
+    const center = getFloorCenter(corners)
+    const width = container.value?.clientWidth ?? 0
+    const height = container.value?.clientHeight ?? 0
+    const coordinates = toImageCoordinates(corners)
+    let low: number = ABSOLUTE_ZOOM_LIMITS.minZoom
+    let high: number = 20
+    try {
+      for (let index = 0; index < 19; index += 1) {
+        const zoom = (low + high) / 2
+        instance.jumpTo({ center: [center.lng, center.lat], zoom, bearing: 0, pitch: previous.pitch })
+        const projected = coordinates.map(coordinate => instance.project(coordinate))
+        const fits = projected.every(point => point.x >= padding
+          && point.x <= width - padding
+          && point.y >= padding
+          && point.y <= height - padding)
+        if (fits) low = zoom
+        else high = zoom
+      }
+    }
+    finally {
+      instance.jumpTo(previous)
+    }
+    return { center: [center.lng, center.lat] as [number, number], zoom: low }
   }
 
   function updateFloorZoomConstraints(corners: FloorCorners, preserveInitialZoom = false, initialZoom?: number) {
@@ -333,6 +368,35 @@ export function useMapCamera(
     })
   }
 
+  function showWholeFloor() {
+    const instance = map.value
+    const corners = getFloorCorners(options.floor.value)
+    if (!instance || !corners || options.mode !== 'view') return
+    // The explicit overview is an entire-image fit, never the initial mobile cover.
+    instance.jumpTo({ bearing: 0, pitch: 0 })
+    const result = updateFloorZoomConstraints(corners)
+    if (!result) return
+    instance.easeTo({
+      center: result.camera.center,
+      zoom: result.targetZoom,
+      bearing: 0,
+      pitch: 0,
+      duration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 350,
+    })
+  }
+
+  function comparePitch(pitch: 0 | 20 | 45, fit: boolean, baseline?: MapViewerCameraState) {
+    const instance = map.value
+    const corners = getFloorCorners(options.floor.value)
+    if (!instance || !corners || options.mode !== 'view') return
+    if (!fit && baseline) {
+      instance.jumpTo({ center: [baseline.center.lng, baseline.center.lat], zoom: baseline.zoom, bearing: 0, pitch })
+      return
+    }
+    instance.jumpTo({ bearing: 0, pitch })
+    fitFloorBounds(corners, false)
+  }
+
   function resize() {
     const instance = map.value
     if (!instance) return
@@ -372,6 +436,8 @@ export function useMapCamera(
 
   return {
     fitFloorBounds,
+    showWholeFloor,
+    comparePitch,
     getState,
     resetFloorCamera,
     resize,
