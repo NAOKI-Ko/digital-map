@@ -78,6 +78,8 @@ const { floorError, geolocationAreaMessage, isReady, mapError } = viewer
 defineExpose({
   focusSpot: viewer.focusSpot,
   resize: viewer.resize,
+  ensureSpotVisible: viewer.ensureSpotVisible,
+  compareCamera: viewer.compareCamera,
 })
 </script>
 
@@ -137,7 +139,7 @@ defineExpose({
 }
 
 .map-viewer-marker--dimmed {
-  opacity: 0.36;
+  opacity: 0.72;
 }
 
 .map-viewer-marker--strongly-dimmed {
@@ -181,13 +183,13 @@ defineExpose({
 
 .map-viewer-marker__ground-shadow {
   position: absolute;
-  bottom: -0.25rem;
+  bottom: -0.125rem;
   left: 50%;
-  width: 1.625rem;
-  height: 0.5rem;
+  width: 1.25rem;
+  height: 0.375rem;
   border-radius: 50%;
-  background: rgb(37 48 58 / 28%);
-  filter: blur(2px);
+  background: rgb(37 48 58 / 25%);
+  filter: blur(1.5px);
   opacity: 1;
   pointer-events: none;
   transform: translateX(-50%);
@@ -279,6 +281,57 @@ defineExpose({
     inset -3px -3px 6px rgb(0 0 0 / 25%),
     inset 2px 2px 4px rgb(255 255 255 / 35%);
   scale: calc(var(--marker-size-scale, 1) * 1.12);
+}
+
+/* Public PINs keep a small raised edge and a fixed tip. The visual scale never changes the marker anchor. */
+.public-map-viewer .map-viewer-marker__shape {
+  border-width: 2px;
+  background-image: linear-gradient(145deg, var(--pin-color-light), var(--pin-color) 64%, var(--pin-color-dark));
+  box-shadow: 0 3px 5px rgb(37 48 58 / 28%), inset 0 1px 2px rgb(255 255 255 / 32%);
+}
+
+.public-map-viewer .map-viewer-marker__illustration {
+  filter: drop-shadow(0 3px 3px rgb(37 48 58 / 38%));
+}
+
+.public-map-viewer .map-viewer-marker--featured::after {
+  content: '';
+  position: absolute;
+  bottom: 2.3rem;
+  left: calc(50% + 1.05rem);
+  width: 0.625rem;
+  height: 0.625rem;
+  border: 2px solid white;
+  border-radius: 50%;
+  background: #25483c;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 32%);
+  pointer-events: none;
+}
+
+.public-map-viewer .map-viewer-marker--selected .map-viewer-marker__shape {
+  outline: 2px solid #25483c;
+  outline-offset: 2px;
+  box-shadow: 0 4px 7px rgb(37 48 58 / 34%), inset 0 1px 2px rgb(255 255 255 / 32%);
+  scale: calc(var(--marker-size-scale, 1) * 1.08);
+}
+
+.public-map-viewer .map-viewer-marker--selected .map-viewer-marker__illustration {
+  outline: 2px solid #25483c;
+  outline-offset: 2px;
+  border-radius: 0.25rem;
+  filter: drop-shadow(0 3px 4px rgb(37 48 58 / 42%));
+  scale: calc(var(--marker-size-scale, 1) * 1.08);
+}
+
+.public-map-viewer .map-viewer-marker:focus-visible {
+  outline: 3px solid #b45309;
+  outline-offset: 2px;
+  border-radius: 0.5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .public-map-viewer .map-viewer-marker__shape,
+  .public-map-viewer .map-viewer-marker__illustration { transition: none; }
 }
 
 .map-viewer-marker--selected .map-viewer-marker__illustration,

@@ -5,11 +5,13 @@ import { getDecorationRenderCoordinates } from '~~/lib/decoration'
 import type { MapViewerCameraState, MapViewerDecoration, MapViewerFloor, MapViewerSpot } from '~~/shared/types/map-viewer'
 import { createSpotMarkerElement } from '~/utils/marker-element'
 import { applyMarkerDensityPresentation, getMarkerDensityPresentation } from '~/utils/marker-density'
+import { getMinimalSpotPan, needsHeadingReset } from '~/utils/public-map-exploration'
 import {
   createMapViewerOptions,
   createOneShotLocationCameraPolicy,
   getMapViewerCameraState,
   useMapCamera,
+  VIEWER_CAMERA_CONSTRAINTS,
   type MapViewerMode,
 } from './useMapCamera'
 import { useMapGeolocation } from './useMapGeolocation'
@@ -105,6 +107,11 @@ export class MapNavigationControl implements IControl {
   private container: HTMLElement | null = null
   private updateCompass: (() => void) | null = null
 
+  constructor(
+    private readonly homePitch: number = VIEWER_CAMERA_CONSTRAINTS.view.pitch,
+    private readonly showWholeFloor?: () => void,
+  ) {}
+
   onAdd(map: MapLibreMap) {
     this.map = map
     const container = document.createElement('div')
@@ -113,22 +120,29 @@ export class MapNavigationControl implements IControl {
     const zoomOut = createControlButton('縮小', '−', () => this.map?.zoomOut())
     zoomIn.className = 'map-viewer-zoom-control'
     zoomOut.className = 'map-viewer-zoom-control'
-    const compass = createControlButton('方位をリセット', 'N', () => this.map?.easeTo({ bearing: 0, pitch: 0 }))
+    const compass = createControlButton('向きを戻す', 'N', () => this.map?.easeTo({ bearing: 0, pitch: this.homePitch, duration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 250 }))
     compass.className = 'map-viewer-compass'
-    this.updateCompass = () => { compass.hidden = Math.abs(map.getBearing()) < 1 }
+    this.updateCompass = () => { compass.hidden = !needsHeadingReset(map.getBearing(), map.getPitch(), this.homePitch) }
+    const overview = this.showWholeFloor ? createControlButton('地図全体を表示', '□', this.showWholeFloor) : null
+    if (overview) overview.className = 'map-viewer-overview-control'
     container.append(
       zoomIn,
       zoomOut,
       compass,
+      ...(overview ? [overview] : []),
     )
     map.on('rotate', this.updateCompass)
+    map.on('pitch', this.updateCompass)
     this.updateCompass()
     this.container = container
     return container
   }
 
   onRemove(map: MapLibreMap) {
-    if (this.updateCompass) map.off('rotate', this.updateCompass)
+    if (this.updateCompass) {
+      map.off('rotate', this.updateCompass)
+      map.off('pitch', this.updateCompass)
+    }
     this.updateCompass = null
     this.container?.remove()
     this.container = null
@@ -177,6 +191,7 @@ export function useMapViewer(
   let decorationLayers: Array<{ sourceId: string, layerId: string }> = []
   let containerResizeObserver: ResizeObserver | null = null
   let focusSpotTimer: number | null = null
+  let comparisonBaseline: MapViewerCameraState | null = null
 
   const mapCamera = useMapCamera(container, map, {
     mode: options.mode,
@@ -196,7 +211,7 @@ export function useMapViewer(
     mode: options.mode,
     map,
     maplibre,
-    createBaseControls: () => [new MapNavigationControl()],
+    createBaseControls: () => [new MapNavigationControl(VIEWER_CAMERA_CONSTRAINTS[options.mode].pitch, options.mode === 'view' ? mapCamera.showWholeFloor : undefined)],
     createControlGroup: controls => new HorizontalMapControlGroup(controls),
     onExplicitRequest: () => locationCameraPolicy.beginRequest(),
     onOutsideResult: result => locationCameraPolicy.consumeOutsideResult(result.firstForRequest),
@@ -220,6 +235,7 @@ export function useMapViewer(
         if (map.value !== instance) return
         isReady.value = true
         showFloor(options.floor.value, false)
+        comparisonBaseline = mapCamera.getState()
         if (options.initialCamera) mapCamera.restore(options.initialCamera)
         syncSpotMarkers()
         instance.on('zoom', syncMarkerDensity)
@@ -385,6 +401,32 @@ export function useMapViewer(
     return true
   }
 
+  function ensureSpotVisible(spotId: string, panel: DOMRect | null) {
+    const instance = map.value
+    const frame = container.value
+    const spot = options.spots.value.find(item => item.id === spotId)
+    const position = spot && imageToRenderCoordinates(options.floor.value, spot)
+    if (!instance || !frame || !position || !panel || options.mode !== 'view') return false
+
+    const frameRect = frame.getBoundingClientRect()
+    const point = instance.project([position.lng, position.lat])
+    const [dx, dy] = getMinimalSpotPan(
+      point,
+      { width: frameRect.width, height: frameRect.height },
+      { left: panel.left - frameRect.left, top: panel.top - frameRect.top },
+    )
+    if (Math.abs(dx) < 1 && Math.abs(dy) < 1) return false
+    // MapLibre panBy moves the camera center; the projected PIN moves in the
+    // opposite screen direction from the requested camera offset.
+    instance.panBy([-dx, -dy], { duration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 250 })
+    return true
+  }
+
+  function compareCamera(pitch: 0 | 20 | 45, fit: boolean) {
+    if (options.mode !== 'view') return
+    mapCamera.comparePitch(pitch, fit, comparisonBaseline ?? undefined)
+  }
+
   function removeFloorImage() {
     const instance = map.value
     if (!instance) return
@@ -514,5 +556,7 @@ export function useMapViewer(
     syncMarkerDensity,
     syncDraftMarker,
     focusSpot,
+    ensureSpotVisible,
+    compareCamera,
   }
 }

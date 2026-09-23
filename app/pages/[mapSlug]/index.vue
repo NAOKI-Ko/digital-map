@@ -12,6 +12,7 @@ import type { PublicMapResponse } from '~~/shared/types/public-map'
 import { messages, normalizeLocale } from '~~/shared/i18n/messages'
 import { recordMapViewOnce, sendPublicAnalytics } from '~/utils/public-analytics'
 import { buildLocaleLinks, buildPublicLocaleUrl } from '~~/shared/utils/seo'
+import { createPublicMapDecorationFixture } from '~/utils/public-map-decoration-fixture'
 
 const LazyMapViewer = defineAsyncComponent(() => import('~/components/map/MapViewer.vue'))
 
@@ -27,6 +28,9 @@ const selectedFloorId = ref('')
 const overlay = ref<PublicOverlay>(null)
 const selectedSpotId = computed(() => selectedSpotIdFromOverlay(overlay.value))
 const selectedCategoryIds = ref<string[]>([])
+const mapViewerRef = ref<{ ensureSpotVisible: (spotId: string, panel: DOMRect | null) => boolean, compareCamera: (pitch: 0 | 20 | 45, fit: boolean) => void } | null>(null)
+const cameraComparisonEnabled = computed(() => import.meta.dev && route.query.cameraCompare === '1')
+const cameraComparisonMode = ref<'same' | 'fit'>('same')
 const floorSelectorOpen = computed(() => overlay.value?.type === 'floor')
 const infoOpen = computed(() => overlay.value?.type === 'info')
 let spotTrigger: HTMLElement | null = null
@@ -49,12 +53,17 @@ const selectedSpot = computed(() => (
   selectedFloor.value?.spots.find(spot => spot.id === selectedSpotId.value)
   ?? null
 ))
+const displayedDecorations = computed(() => (
+  import.meta.dev && route.query.decorationFixture === '1'
+    ? [...(selectedFloor.value?.decorations ?? []), ...createPublicMapDecorationFixture()]
+    : selectedFloor.value?.decorations ?? []
+))
 const categories = computed(() => (
   collectSpotCategories(selectedFloor.value?.spots ?? [])
 ))
 const visibleSpots = computed(() => filterSpotsByCategoryIds(selectedFloor.value?.spots ?? [], selectedCategoryIds.value))
 const showFloorSelector = computed(() => shouldShowFloorSelector(data.value?.map.floors.length ?? 0))
-const appModalOpen = computed(() => overlay.value !== null)
+const appModalOpen = computed(() => overlay.value?.type === 'floor' || overlay.value?.type === 'info')
 const publicBaseUrl = useRuntimeConfig().public.publicBaseUrl as string
 const localeUrl = (locale: 'ja' | 'en') => buildPublicLocaleUrl(publicBaseUrl, mapSlug.value, locale)
 const absoluteImage = computed(() => data.value?.map.seo.imageUrl ? new URL(data.value.map.seo.imageUrl, publicBaseUrl).toString() : undefined)
@@ -103,7 +112,18 @@ function selectSpot(spot: MapViewerSpot) {
     .find(element => element.dataset.spotId === spot.id) ?? null
   spotTriggerId = spot.id
   overlay.value = { type: 'spot', spotId: spot.id }
-  if (data.value?.map.id) sendPublicAnalytics({ type: 'SPOT_VIEW', mapId: data.value.map.id, spotId: spot.id })
+  void nextTick(() => ensureSelectedSpotVisible())
+  if (data.value?.map.id && mapSlug.value !== '__qa_arimatsu') sendPublicAnalytics({ type: 'SPOT_VIEW', mapId: data.value.map.id, spotId: spot.id })
+}
+
+function ensureSelectedSpotVisible() {
+  if (!selectedSpotId.value) return
+  const panel = document.querySelector<HTMLElement>('.spot-detail-sheet')?.getBoundingClientRect() ?? null
+  mapViewerRef.value?.ensureSpotVisible(selectedSpotId.value, panel)
+}
+
+function compareCamera(pitch: 0 | 20 | 45) {
+  mapViewerRef.value?.compareCamera(pitch, cameraComparisonMode.value === 'fit')
 }
 
 function closeSpot(source: 'pointer' | 'other' = 'other') {
@@ -192,7 +212,7 @@ async function switchLocale(locale: 'ja' | 'en') {
 
 onMounted(() => {
   if (!route.query.lang && data.value?.map.enabledLocales.includes('en') && navigator.language.toLowerCase().startsWith('en')) void switchLocale('en')
-  if (data.value?.map.id && data.value.map.releaseId) recordMapViewOnce(data.value.map.id, data.value.map.releaseId)
+  if (data.value?.map.id && data.value.map.releaseId && mapSlug.value !== '__qa_arimatsu') recordMapViewOnce(data.value.map.id, data.value.map.releaseId)
 })
 onBeforeUnmount(clearPendingSpotClose)
 </script>
@@ -230,7 +250,7 @@ onBeforeUnmount(clearPendingSpotClose)
         </nav>
       </header>
 
-      <section class="public-map-stage relative h-[100dvh] min-h-0 md:h-[calc(100dvh-3.5rem)]" :class="{ 'public-map-locked': appModalOpen }">
+      <section class="public-map-stage relative h-[100dvh] min-h-0 md:h-[calc(100dvh-3.5rem)]" :class="{ 'public-map-locked': appModalOpen, 'public-map-has-spot': Boolean(selectedSpot) }">
         <div v-show="!appModalOpen" class="pointer-events-none absolute inset-0 z-20 md:hidden" aria-label="公開マップ操作">
           <div v-if="showFloorSelector" class="pointer-events-auto absolute left-[calc(env(safe-area-inset-left)+0.75rem)] top-[calc(env(safe-area-inset-top)+0.75rem)] max-w-[40vw]">
           <button type="button" class="flex h-11 max-w-full items-center gap-2 rounded-full border border-white/70 bg-white/85 px-4 text-sm font-bold shadow-sm backdrop-blur" aria-haspopup="dialog" :aria-expanded="floorSelectorOpen" @click="openFloorSelector">
@@ -251,7 +271,7 @@ onBeforeUnmount(clearPendingSpotClose)
         </div>
 
         <div
-          v-show="!appModalOpen"
+          v-show="!appModalOpen && !selectedSpot"
           class="pointer-events-none absolute bottom-[calc(env(safe-area-inset-bottom)+2rem)] left-[calc(env(safe-area-inset-left)+0.75rem)] right-[calc(env(safe-area-inset-right)+0.75rem)] z-20 md:left-1/2 md:right-auto md:w-[min(50vw,44rem)] md:-translate-x-1/2"
         >
           <div class="pointer-events-auto">
@@ -261,10 +281,11 @@ onBeforeUnmount(clearPendingSpotClose)
 
         <ClientOnly>
           <LazyMapViewer
+            ref="mapViewerRef"
             class="h-full"
             :floor="selectedFloor"
             :spots="visibleSpots"
-            :decorations="selectedFloor.decorations"
+            :decorations="displayedDecorations"
             mode="view"
             :selected-spot-id="selectedSpotId"
             :prioritize-visible-spots="selectedCategoryIds.length > 0"
@@ -278,6 +299,15 @@ onBeforeUnmount(clearPendingSpotClose)
           </template>
         </ClientOnly>
 
+        <div v-if="cameraComparisonEnabled" class="absolute bottom-24 left-3 z-30 rounded-xl bg-white/95 p-3 text-xs shadow-lg" aria-label="開発用カメラ比較">
+          <p class="mb-2 font-bold">開発用カメラ比較</p>
+          <label class="mr-2"><input v-model="cameraComparisonMode" type="radio" value="same"> center/zoom固定</label>
+          <label><input v-model="cameraComparisonMode" type="radio" value="fit"> 角度別fit</label>
+          <div class="mt-2 flex gap-2">
+            <button v-for="pitch in ([0, 20, 45] as const)" :key="pitch" type="button" class="rounded border border-stone-300 px-3 py-2" @click="compareCamera(pitch)">{{ pitch }}°</button>
+          </div>
+        </div>
+
         <ClientOnly>
           <MapOperationHint :storage-key="`digital-map:operation-hint:${data.map.slug}`" />
         </ClientOnly>
@@ -287,6 +317,7 @@ onBeforeUnmount(clearPendingSpotClose)
         v-if="selectedSpot"
         :spot="selectedSpot"
         @close="closeSpot"
+        @expanded-change="() => nextTick(ensureSelectedSpotVisible)"
       />
       <PublicFloorSelector v-if="floorSelectorOpen" :floors="data.map.floors" :model-value="selectedFloorId" @select="selectFloor" @close="overlay = null" />
       <PublicMapInfo v-if="infoOpen" :map-name="data.map.name" :organization-name="data.map.organizationName" :logo-url="data.map.logoUrl" :website-url="data.map.websiteUrl" :sns-url="data.map.snsUrl" :official-label="t.official" @close="overlay = null" />
@@ -297,5 +328,11 @@ onBeforeUnmount(clearPendingSpotClose)
 <style scoped>
 :deep(.maplibregl-map) {
   border-radius: 0;
+}
+
+@media (min-width: 768px) {
+  .public-map-has-spot :deep(.maplibregl-ctrl-top-right) {
+    right: calc(min(32rem, 100vw - 2.5rem) + 2rem);
+  }
 }
 </style>

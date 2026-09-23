@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle } from 'reka-ui'
+import { DialogContent, DialogPortal, DialogRoot, DialogTitle } from 'reka-ui'
 import { useBottomSheetGesture, type BottomSheetState } from '~/composables/useBottomSheetGesture'
 import type { PublicSpot } from '~~/shared/types/public-map'
 
@@ -53,14 +53,14 @@ function preventAutomaticCloseFocus(event: Event) {
   event.preventDefault()
 }
 
-function handlePointerDismiss(event: Event) {
-  event.preventDefault()
-  requestClose('pointer')
-}
-
 function handleKeyboardDismiss(event: Event) {
   event.preventDefault()
   requestClose('other')
+}
+
+function handlePointerDismiss(event: Event) {
+  // Keep the sheet open while a pointer gesture starts on the map behind it.
+  event.preventDefault()
 }
 
 function addBodyTouchMoveListener() {
@@ -93,14 +93,13 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <DialogRoot :open="true">
+  <DialogRoot :open="true" :modal="false">
     <DialogPortal>
-      <DialogOverlay class="fixed inset-0 z-40 bg-black/[0.14]" />
       <DialogContent
         class="spot-detail-sheet fixed inset-x-0 z-50 flex min-h-0 w-full flex-col overflow-hidden rounded-t-[20px] bg-white shadow-xl outline-none transition-transform ease-out"
         :style="[viewportStyle, sheetMotionStyle]"
         :aria-describedby="undefined"
-        aria-modal="true"
+        aria-modal="false"
         @open-auto-focus="focusHeading"
         @close-auto-focus="preventAutomaticCloseFocus"
         @escape-key-down="handleKeyboardDismiss"
