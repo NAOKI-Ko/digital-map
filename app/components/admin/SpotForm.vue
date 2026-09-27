@@ -185,7 +185,7 @@ function cancel() {
 
 
 
-    <p class="text-xs text-stone-500">写真・ピンの見た目・公開状態は、スポット保存後にそれぞれの欄で設定できます。</p>
+    <p class="text-xs text-stone-500">写真・ピンの見た目・公開対象の設定は、スポット保存後にそれぞれの欄で変更できます。</p>
     <UiFormActions sticky-mobile>
       <UiButton variant="secondary" :disabled="isSubmitting" @click="cancel">キャンセル</UiButton>
       <UiButton type="submit" :busy="isSubmitting" :disabled="isSubmitting || !meta.dirty || floors.length === 0">

@@ -204,8 +204,8 @@ async function saveEnglishName(category: CategorySummary) {
 
 <template>
   <div class="max-w-4xl">
-    <NuxtLink :to="`/admin/maps/${mapId}/settings`" class="text-sm font-medium text-stone-600 hover:text-stone-900">← マップ設定に戻る</NuxtLink>
-    <header class="mt-5"><p class="text-sm font-medium text-terracotta-700">マップ設定</p><h1 class="mt-1 text-3xl font-bold text-stone-900">カテゴリー管理</h1><p class="mt-2 text-sm text-stone-600">カテゴリー名・アイコン・並び順を一元管理します。カテゴリーアイコンはスポットのピンデザインには影響しません。</p></header>
+    <NuxtLink :to="`/admin/maps/${mapId}`" class="text-sm font-medium text-stone-600 hover:text-stone-900">← マップのホームに戻る</NuxtLink>
+    <header class="mt-5"><p class="text-sm font-medium text-terracotta-700">マップ / カテゴリー</p><h1 class="mt-1 text-3xl font-bold text-stone-900">カテゴリー管理</h1><p class="mt-2 text-sm text-stone-600">スポットの分類を一元管理します。スポット情報項目はイラストマップ内で管理します。カテゴリーアイコンはスポットのピンデザインには影響しません。</p></header>
     <SaveFeedback class="mt-6" :state="saveState" :message="message" />
     <details class="mt-6 border-y border-stone-200 py-4" :open="!data?.categories.length"><summary class="w-fit cursor-pointer text-sm font-semibold text-terracotta-700">＋ カテゴリーを追加</summary><form class="mt-4 space-y-4" @submit.prevent="createCategory">
       <div><label for="new-category-name" class="text-sm font-semibold text-stone-800">新しいカテゴリー名</label><input id="new-category-name" v-model="newName" maxlength="50" required class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5" placeholder="カテゴリー名"></div>

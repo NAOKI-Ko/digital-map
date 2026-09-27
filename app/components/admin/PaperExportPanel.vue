@@ -27,7 +27,7 @@ async function download() {
 <template>
   <section class="border-t border-stone-200 pt-5">
     <h2 class="text-lg font-bold text-stone-900">紙マップPDF</h2>
-    <p class="mt-2 text-sm leading-6 text-stone-600">公開中は現在の公開リリースを使用します。未公開時は「未公開プレビュー」と表示し、QRコードを掲載しません。</p>
+    <p class="mt-2 text-sm leading-6 text-stone-600">マップが公開中のときは公開中の内容を使います。非公開のときは編集中の内容を使い、紙面に「未公開プレビュー」と表示してQRコードを載せません。</p>
     <div v-if="floors.length" class="mt-5 grid gap-4 sm:grid-cols-2">
       <label class="text-sm font-semibold">用紙<UiSelect v-model="paper" class="mt-1" label="用紙" :options="[{ value: 'A4', label: 'A4' }, { value: 'A3', label: 'A3' }]" /></label>
       <label class="text-sm font-semibold">向き<UiSelect v-model="orientation" class="mt-1" label="向き" :options="[{ value: 'landscape', label: '横' }, { value: 'portrait', label: '縦' }]" /></label>

@@ -30,7 +30,7 @@ const successMessage = ref('')
 const saveState = ref<'idle' | 'saving' | 'success' | 'error'>('idle')
 const { success } = useToast()
 const removeConfirmOpen = ref(false)
-const cameFromEditor = computed(() => route.query.from === 'editor')
+const cameFromEditor = computed(() => route.query.from === 'editor' && Boolean(floor.value))
 const backPath = computed(() => cameFromEditor.value
   ? { path: `/admin/maps/${mapId}/editor`, query: { floorId } }
   : `/admin/maps/${mapId}/floors`)

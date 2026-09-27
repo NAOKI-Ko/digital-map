@@ -39,7 +39,7 @@ async function approve(revision: ReviewRevision) {
     success('変更申請を承認しました', 'revision-operation')
   } catch (error: any) {
     operationError.value = error?.statusCode === 409 || error?.response?.status === 409
-      ? '公開中のスポットが更新されたため承認できません。内容を確認して却下してください。'
+      ? '申請後にスポットの編集内容が更新されたため承認できません。内容を確認して却下してください。'
       : '承認に失敗しました。時間をおいて再度お試しください。'
   } finally {
     processingId.value = null
@@ -72,9 +72,9 @@ async function reject() {
 
 <template>
   <section class="max-w-4xl">
-    <AdminSubnavigation :map-id="mapId" area="spot" />
-    <NuxtLink :to="`/admin/maps/${mapId}/spots`" class="text-sm underline">← スポット一覧へ</NuxtLink>
-    <h1 class="mt-5 text-2xl font-bold">承認待ちの変更</h1>
+    <NuxtLink :to="`/admin/maps/${mapId}`" class="text-sm underline">← マップのホームに戻る</NuxtLink>
+    <p class="mt-5 text-sm font-medium text-terracotta-700">チーム / 承認待ち</p>
+    <h1 class="mt-1 text-2xl font-bold">承認待ちの変更</h1>
     <p v-if="loadError" role="alert" class="mt-4 rounded bg-red-50 p-4 text-red-800">承認待ちの変更を読み込めませんでした。</p>
     <p v-if="operationError" role="alert" class="mt-4 rounded bg-red-50 p-4 text-red-800">{{ operationError }}</p>
     <div class="mt-6 space-y-4">

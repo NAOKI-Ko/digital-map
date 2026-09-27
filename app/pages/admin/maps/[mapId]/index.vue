@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { MapHomeSummaryResponse } from '~~/shared/types/map-home'
+import { mapVisibilityLabel } from '~/utils/admin-publication-copy'
 
 definePageMeta({ layout: 'admin', middleware: 'auth' })
 const route = useRoute()
@@ -36,10 +37,12 @@ function formatDateTime(value: string) {
       </AdminPageHeader>
 
       <div class="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
-        <span class="inline-flex items-center gap-2 font-semibold" :class="data.map.isPublished ? 'text-emerald-800' : 'text-stone-600'"><span class="size-2 rounded-full" :class="data.map.isPublished ? 'bg-emerald-500' : 'bg-stone-400'" />{{ data.map.isPublished ? '公開中' : '下書き' }}</span>
+        <span class="inline-flex items-center gap-2 font-semibold" :class="data.map.isPublished ? 'text-emerald-800' : 'text-stone-600'"><span class="size-2 rounded-full" :class="data.map.isPublished ? 'bg-emerald-500' : 'bg-stone-400'" />{{ mapVisibilityLabel(data.map.isPublished) }}</span>
         <span class="text-stone-300" aria-hidden="true">|</span>
         <span class="text-stone-500">{{ data.map.lastPublishedAt ? `最終公開 ${formatDateTime(data.map.lastPublishedAt)}` : 'まだ公開されていません' }}</span>
+        <NuxtLink :to="`/admin/maps/${mapId}/publish`" class="font-semibold text-terracotta-700">公開を管理する →</NuxtLink>
       </div>
+      <p v-if="data.map.isPublished" class="mt-2 text-xs text-stone-600">編集中の変更は、次に「編集中の内容を公開する」まで閲覧者の表示に反映されません。</p>
 
       <section class="mt-6 grid grid-cols-2 divide-x divide-stone-200 border-y border-stone-200 py-2 lg:grid-cols-4" aria-label="マップの概要">
         <AdminMetricCard label="スポット" :value="data.metrics.spotCount" hint="登録済み" />

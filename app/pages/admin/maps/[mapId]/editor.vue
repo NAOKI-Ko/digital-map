@@ -5,7 +5,7 @@ import PinDesignEditor from '~/components/admin/PinDesignEditor.vue'
 import UnsavedChangesGuard from '~/components/admin/UnsavedChangesGuard.vue'
 import { defineAsyncComponent } from 'vue'
 import ConfirmDialog from '~/components/ui/ConfirmDialog.vue'
-import { resolveMapEditorReturnContext } from '~/utils/map-editor-camera'
+import { createMapEditorReturnQuery, resolveMapEditorReturnContext } from '~/utils/map-editor-camera'
 import { createLatestRequestGate } from '~/utils/latest-request'
 import { applySelectedPinDesignDraft, isPositionEditing, needsPinEditorDiscardConfirmation, toPositionUpdatePayload, type PinEditorMode } from '~/utils/pin-editor-state'
 import { createPinEditorOperationGate, type PinEditorOperationContext } from '~/utils/pin-editor-operation'
@@ -39,6 +39,10 @@ const returnContext = resolveMapEditorReturnContext(
 const selectedFloorId = ref(requestedFloorId)
 const position = ref<ImagePosition | null>(null)
 const initialCamera = ref<MapViewerCameraState | null>(returnContext)
+const currentCamera = ref<MapViewerCameraState | null>(returnContext)
+const spotNewLocation = computed(() => currentCamera.value
+  ? { path: `/admin/maps/${mapId}/spots/new`, query: { from: 'editor', ...createMapEditorReturnQuery({ floorId: selectedFloorId.value, ...currentCamera.value }) } }
+  : { path: `/admin/maps/${mapId}/spots/new`, query: { from: 'editor', floorId: selectedFloorId.value } })
 const selectedFloor = computed(() => data.value?.floors.find(floor => floor.id === selectedFloorId.value))
 const floorOptions = computed(() => data.value?.floors.map(floor => ({ value: floor.id, label: floor.name })) ?? [])
 const selectedFloorSpots = computed(() => spotData.value?.spots.filter(spot => spot.floorId === selectedFloorId.value) ?? [])
@@ -95,6 +99,7 @@ watch(() => data.value?.floors, (floors) => {
 }, { immediate: true })
 
 watch(selectedFloorId, () => {
+  currentCamera.value = null
   operationGate.invalidate()
   addressRequestGate.invalidate()
   isSearchingAddress.value = false
@@ -306,7 +311,7 @@ async function unplaceSpot() {
   try {
     await $fetch<SpotPositionResponse>(`/api/maps/${mapId}/spots/${spot.id}/position`, { method: 'DELETE' })
     if (operationGate.isCurrent(operation)) unplaceConfirmOpen.value = false
-    await finishSuccessfulSave('ピン配置を解除しました。公開中だった場合は下書きへ戻しました。', operation)
+    await finishSuccessfulSave('ピン配置を解除しました。公開対象だった場合は公開対象外にしました。', operation)
   }
   catch {
     if (operationGate.isCurrent(operation)) moveStatus.value = 'ピン配置を解除できませんでした。'
@@ -316,7 +321,8 @@ async function unplaceSpot() {
   }
 }
 
-function handleCameraChanged(_value: MapViewerCameraState) {
+function handleCameraChanged(value: MapViewerCameraState) {
+  currentCamera.value = value
   if (!initialCamera.value) return
 
   initialCamera.value = null
@@ -467,6 +473,7 @@ onBeforeUnmount(() => {
           />
         </div>
       </div>
+      <div class="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm font-semibold"><NuxtLink :to="spotNewLocation" class="text-terracotta-700">このフロアにスポットを作る →</NuxtLink><NuxtLink :to="{ path: `/admin/maps/${mapId}/floors/${selectedFloorId}/georeference`, query: { from: 'editor' } }" class="text-stone-600">このフロアの位置合わせを開く →</NuxtLink></div>
       <div data-pin-editor-workspace class="mt-3 grid min-h-0 items-stretch gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(360px,1fr)] xl:grid-cols-[minmax(0,7fr)_minmax(380px,3fr)]">
         <section class="min-w-0 lg:sticky lg:top-6 lg:self-start" aria-label="地図操作">
           <ClientOnly>
@@ -503,7 +510,7 @@ onBeforeUnmount(() => {
               <p class="mt-1 text-xs text-stone-500">{{ placementSpot.floorName }}<span v-if="placementSpot.categories.length"> / {{ placementSpot.categories.map(category => category.name).join('・') }}</span></p>
               <div v-if="placementMode === 'idle'" class="mt-3 flex flex-wrap gap-2 text-xs font-semibold">
                 <span class="rounded-full bg-stone-100 px-2.5 py-1 text-stone-700">{{ placementSpotIsPositioned ? '配置済み' : '未配置' }}</span>
-                <span class="rounded-full px-2.5 py-1" :class="placementSpot.isPublished ? 'bg-emerald-100 text-emerald-800' : 'bg-stone-100 text-stone-600'">{{ placementSpot.isPublished ? '公開中' : '下書き' }}</span>
+                <span class="rounded-full px-2.5 py-1" :class="placementSpot.isPublished ? 'bg-emerald-100 text-emerald-800' : 'bg-stone-100 text-stone-600'">{{ placementSpot.isPublished ? '公開対象' : '公開対象外' }}</span>
                 <span class="rounded-full bg-stone-100 px-2.5 py-1 text-stone-700">サイズ: {{ ({ small: '小', medium: '中', large: '大' })[placementSpot.pinSize] }}</span>
                 <span class="rounded-full bg-stone-100 px-2.5 py-1 text-stone-700">{{ placementSpot.importance === 'featured' ? '注目ピン' : '通常ピン' }}</span>
               </div>
@@ -556,7 +563,7 @@ onBeforeUnmount(() => {
           </template>
         </UiInspector>
       </div>
-      <ConfirmDialog :open="unplaceConfirmOpen" title="ピン配置を解除" message="スポット情報とカテゴリーは残したまま、イラスト上の配置を解除します。公開中の場合は下書きへ戻ります。" confirm-label="配置を解除する" destructive :busy="unplacing" @cancel="unplaceConfirmOpen = false" @confirm="unplaceSpot" />
+      <ConfirmDialog :open="unplaceConfirmOpen" title="ピン配置を解除" message="スポット情報とカテゴリーは残したまま、イラスト上の配置を解除します。公開対象だった場合は公開対象外になります。すでに公開中の内容は次のマップ公開まで変わりません。" confirm-label="配置を解除する" destructive :busy="unplacing" @cancel="unplaceConfirmOpen = false" @confirm="unplaceSpot" />
       <ConfirmDialog :open="discardConfirmOpen" title="未保存の変更があります" message="保存していない位置またはピンデザインの変更を破棄して切り替えますか？" confirm-label="変更を破棄" cancel-label="編集を続ける" destructive @cancel="keepEditing" @confirm="discardAndContinue" />
       <UnsavedChangesGuard :dirty="pageDirty && !positionSaving && !designSaving" />
     </template>

@@ -82,7 +82,7 @@ watch(() => props.publicUrl, () => {
         </div>
 
         <p v-if="!isPublished" class="mt-5 rounded-lg bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-800">
-          現在は下書きです。このURLとQRコードは発行できますが、マップを公開するまで閲覧者には表示されません。
+          現在マップは非公開です。このURLとQRコードは発行できますが、再公開するまで閲覧者はマップを表示できません。
         </p>
       </div>
 

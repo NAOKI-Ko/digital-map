@@ -62,7 +62,7 @@ async function downloadPdf(item: PaperMapSummary) {
 <template>
   <div class="max-w-6xl">
     <header class="flex flex-wrap items-end justify-between gap-4">
-      <div><p class="text-sm font-medium text-terracotta-700">紙で配る</p><h1 class="mt-1 text-3xl font-bold text-stone-900">紙マップ</h1><p class="mt-2 max-w-2xl text-sm leading-6 text-stone-600">デザイン済みテンプレートを選ぶと、既存マップ情報がすぐに流し込まれます。</p></div>
+      <div><p class="text-sm font-medium text-terracotta-700">紙で配る</p><h1 class="mt-1 text-3xl font-bold text-stone-900">紙マップ</h1><p class="mt-2 max-w-2xl text-sm leading-6 text-stone-600">新しい紙マップは編集中の内容から作成します。デザイン済みテンプレートを選ぶと、既存マップ情報がすぐに流し込まれます。</p></div>
       <NuxtLink :to="`/admin/maps/${mapId}/paper/new`" class="inline-flex min-h-11 items-center rounded-lg bg-terracotta-600 px-5 text-sm font-semibold text-white hover:bg-terracotta-700">新しい紙マップを作る</NuxtLink>
     </header>
     <section class="mt-7 rounded-2xl border border-terracotta-200 bg-terracotta-50 p-5"><h2 class="font-bold text-stone-900">おすすめ：{{ recommendedTemplate.name }}</h2><p class="mt-1 text-sm text-stone-700">{{ suitability.reason }}</p><div class="mt-4 flex flex-wrap gap-3"><button type="button" class="min-h-11 rounded-lg bg-terracotta-600 px-5 text-sm font-bold text-white disabled:opacity-50" :disabled="busy || !data?.source.spotCount" @click="quickCreate">おすすめで紙マップを作る</button><NuxtLink :to="`/admin/maps/${mapId}/paper/new`" class="inline-flex min-h-11 items-center rounded-lg border border-stone-300 bg-white px-5 text-sm font-bold text-stone-800">テンプレートを選ぶ</NuxtLink></div></section>
