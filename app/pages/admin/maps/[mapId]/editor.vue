@@ -78,6 +78,9 @@ const addressSearchStatus = ref('')
 const isSearchingAddress = ref(false)
 const addressRequestGate = createLatestRequestGate()
 const positionSaving = ref(false)
+const designSaving = ref(false)
+const saveState = ref<'idle' | 'saving' | 'success' | 'error'>('idle')
+const saveMessage = ref('')
 const unplacing = ref(false)
 const operationGate = createPinEditorOperationGate(() => ({
   spotId: placementSpotId.value,
@@ -172,6 +175,7 @@ const pageDirty = computed(() => Boolean(
 ))
 
 function requestTransition(action: () => void) {
+  if (positionSaving.value || designSaving.value || unplacing.value) return
   if (!hasPendingChanges()) {
     action()
     return
@@ -210,16 +214,24 @@ async function savePosition() {
   if (!placementSpot.value || !position.value || positionSaving.value) return
   const operation = operationGate.begin()
   positionSaving.value = true
+  saveState.value = 'saving'
+  saveMessage.value = ''
   moveStatus.value = '位置を保存しています…'
   try {
     await $fetch<SpotPositionResponse>(`/api/maps/${mapId}/spots/${placementSpot.value.id}/position`, {
       method: 'PATCH',
       body: toPositionUpdatePayload(position.value),
     })
-    await finishSuccessfulSave('スポットの位置を保存しました。', operation)
+    await finishSuccessfulSave('', operation)
+    saveState.value = 'success'
+    saveMessage.value = 'スポットの位置を保存しました。'
   }
   catch {
-    if (operationGate.isCurrent(operation)) moveStatus.value = '位置を保存できませんでした。'
+    if (operationGate.isCurrent(operation)) {
+      moveStatus.value = ''
+      saveState.value = 'error'
+      saveMessage.value = '位置を保存できませんでした。候補位置は保持しています。'
+    }
   }
   finally {
     positionSaving.value = false
@@ -227,20 +239,39 @@ async function savePosition() {
 }
 
 async function saveDesign() {
-  if (!placementSpot.value || !designEditing.value) return
+  if (!placementSpot.value || !designEditing.value || designSaving.value || !pageDirty.value) return
   const operation = operationGate.begin()
+  designSaving.value = true
+  saveState.value = 'saving'
+  saveMessage.value = ''
   moveStatus.value = 'ピンデザインを保存しています…'
-  const savedDesign = await pinDesignEditorRef.value?.save()
-  if (!savedDesign) {
-    if (operationGate.isCurrent(operation)) moveStatus.value = 'ピンデザインを保存できませんでした。入力内容を保持しています。'
-    return
+  try {
+    const savedDesign = await pinDesignEditorRef.value?.save()
+    if (!savedDesign) {
+      if (operationGate.isCurrent(operation)) {
+        moveStatus.value = ''
+        saveState.value = 'error'
+        saveMessage.value = 'ピンデザインを保存できませんでした。入力内容を保持しています。'
+      }
+      return
+    }
+    if (!operationGate.isCurrent(operation)) {
+      await refreshSpots()
+      return
+    }
+    pendingPinDesign.value = savedDesign
+    await finishSuccessfulSave('', operation)
+    saveState.value = 'success'
+    saveMessage.value = 'ピンデザインを保存しました。'
   }
-  if (!operationGate.isCurrent(operation)) {
-    await refreshSpots()
-    return
+  catch {
+    if (operationGate.isCurrent(operation)) {
+      moveStatus.value = ''
+      saveState.value = 'error'
+      saveMessage.value = 'ピンデザインを保存できませんでした。入力内容を保持しています。'
+    }
   }
-  pendingPinDesign.value = savedDesign
-  await finishSuccessfulSave('ピンデザインを保存しました。', operation)
+  finally { designSaving.value = false }
 }
 
 function cancelPositionEditing() {
@@ -461,6 +492,7 @@ onBeforeUnmount(() => {
         </section>
         <UiInspector class="overflow-hidden rounded-xl border border-stone-200" :title="designEditing ? 'ピンデザインを編集' : placementActive ? 'ピン位置を編集' : '詳細設定'">
           <SaveFeedback v-if="route.query.saved === 'spot-created'" class="mt-3" state="success" message="スポットを登録しました。" />
+          <SaveFeedback class="mt-3" :state="saveState" :message="saveMessage" />
           <SpotCombobox v-if="placementMode === 'idle'" :model-value="placementSpotIsPositioned ? '' : placementSpotId" :spots="unpositionedFloorSpots" @update:model-value="selectUnpositionedSpot" />
 
           <section class="mt-6 border-t border-stone-200 pt-5" aria-live="polite">
@@ -517,8 +549,8 @@ onBeforeUnmount(() => {
           <template v-if="designEditing || placementActive" #footer>
             <p v-if="moveStatus" role="status" class="mb-3 text-xs leading-5 text-stone-600">{{ moveStatus }}</p>
             <UiFormActions>
-              <UiButton variant="secondary" :disabled="positionSaving" @click="requestTransition(designEditing ? cancelDesignEditing : cancelPositionEditing)">キャンセル</UiButton>
-              <UiButton v-if="designEditing" @click="saveDesign">デザインを保存</UiButton>
+              <UiButton variant="secondary" :disabled="positionSaving || designSaving" @click="requestTransition(designEditing ? cancelDesignEditing : cancelPositionEditing)">キャンセル</UiButton>
+              <UiButton v-if="designEditing" :busy="designSaving" :disabled="designSaving || !pageDirty" @click="saveDesign">{{ designSaving ? '保存中…' : 'デザインを保存' }}</UiButton>
               <UiButton v-else :busy="positionSaving" :disabled="!position || positionSaving" @click="savePosition">{{ positionSaving ? '保存中…' : 'この位置を保存' }}</UiButton>
             </UiFormActions>
           </template>
@@ -526,7 +558,7 @@ onBeforeUnmount(() => {
       </div>
       <ConfirmDialog :open="unplaceConfirmOpen" title="ピン配置を解除" message="スポット情報とカテゴリーは残したまま、イラスト上の配置を解除します。公開中の場合は下書きへ戻ります。" confirm-label="配置を解除する" destructive :busy="unplacing" @cancel="unplaceConfirmOpen = false" @confirm="unplaceSpot" />
       <ConfirmDialog :open="discardConfirmOpen" title="未保存の変更があります" message="保存していない位置またはピンデザインの変更を破棄して切り替えますか？" confirm-label="変更を破棄" cancel-label="編集を続ける" destructive @cancel="keepEditing" @confirm="discardAndContinue" />
-      <UnsavedChangesGuard :dirty="pageDirty" />
+      <UnsavedChangesGuard :dirty="pageDirty && !positionSaving && !designSaving" />
     </template>
   </div>
 </template>

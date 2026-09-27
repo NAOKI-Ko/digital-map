@@ -7,14 +7,17 @@ const props = withDefaults(defineProps<{
   initialName?: string
   isSubmitting?: boolean
   submitLabel?: string
+  guardNavigation?: boolean
 }>(), {
   initialName: '',
   isSubmitting: false,
   submitLabel: '保存する',
+  guardNavigation: true,
 })
 
 const emit = defineEmits<{
   submit: [input: MapNameInput]
+  dirtyChange: [dirty: boolean]
 }>()
 
 const { defineField, errors, handleSubmit, meta, resetForm, setErrors } = useForm<MapNameInput>({
@@ -22,11 +25,14 @@ const { defineField, errors, handleSubmit, meta, resetForm, setErrors } = useFor
 })
 
 const [name, nameAttrs] = defineField('name')
+watch(() => meta.value.dirty, dirty => emit('dirtyChange', dirty), { immediate: true })
+function restoreSaved() { resetForm({ values: { name: props.initialName } }) }
 
-watch(
-  () => props.initialName,
-  value => resetForm({ values: { name: value } }),
-)
+watch(() => props.initialName, value => {
+  if (!meta.value.dirty) resetForm({ values: { name: value } })
+})
+function acceptSaved(name: string) { resetForm({ values: { name } }) }
+defineExpose({ restoreSaved, acceptSaved })
 
 const submit = handleSubmit((values) => {
   const result = mapNameSchema.safeParse(values)
@@ -71,12 +77,12 @@ const submit = handleSubmit((values) => {
     <div class="flex justify-end">
       <button
         type="submit"
-        :disabled="isSubmitting"
+        :disabled="isSubmitting || !meta.dirty"
         class="rounded-lg bg-terracotta-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-terracotta-700 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {{ isSubmitting ? '保存中…' : submitLabel }}
       </button>
     </div>
   </form>
-  <UnsavedChangesGuard :dirty="meta.dirty && !isSubmitting" />
+  <UnsavedChangesGuard v-if="guardNavigation" :dirty="meta.dirty && !isSubmitting" />
 </template>

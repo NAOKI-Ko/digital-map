@@ -4,6 +4,7 @@ import SpotPhotoManager from '~/components/admin/SpotPhotoManager.vue'
 import SpotPublishPanel from '~/components/admin/SpotPublishPanel.vue'
 import SpotForm from '~/components/admin/SpotForm.vue'
 import DuplicateSpotDialog from '~/components/admin/DuplicateSpotDialog.vue'
+import UnsavedChangesGuard from '~/components/admin/UnsavedChangesGuard.vue'
 import type { SpotFormInput } from '~~/shared/schemas/spot'
 import type { AdminSpotResponse } from '~~/shared/types/spot'
 import type { SpotDuplicateMatch, SpotDuplicateResponse } from '~~/shared/types/spot-duplicate'
@@ -11,6 +12,7 @@ import type { SpotDuplicateMatch, SpotDuplicateResponse } from '~~/shared/types/
 definePageMeta({ layout: 'admin', middleware: 'auth' })
 
 const route = useRoute()
+const spotFormRef = useTemplateRef<{ acceptSaved: (value: SpotFormInput) => void }>('spotForm')
 const mapId = route.params.mapId as string
 const spotId = route.params.spotId as string
 const returnTo = computed(() => typeof route.query.returnTo === 'string' && route.query.returnTo.startsWith(`/admin/maps/${mapId}/spots`) ? route.query.returnTo : `/admin/maps/${mapId}/spots`)
@@ -28,8 +30,20 @@ const english = reactive({
   holidayText: data.value?.spot.englishTranslation?.holidayText ?? '',
   customValues: { ...(data.value?.spot.englishTranslation?.customValues ?? {}) },
 })
+const savedEnglish = ref(JSON.stringify(english))
+const englishDirty = computed(() => JSON.stringify(english) !== savedEnglish.value)
+const spotFormDirty = ref(false)
 const englishState = ref<'idle' | 'saving' | 'success' | 'error'>('idle')
 const englishMessage = ref('')
+watch(() => data.value?.spot.englishTranslation, value => {
+  if (englishDirty.value) return
+  Object.assign(english, {
+    name: value?.name ?? '', description: value?.description ?? '', address: value?.address ?? '',
+    hoursText: value?.hoursText ?? '', holidayText: value?.holidayText ?? '',
+    customValues: { ...(value?.customValues ?? {}) },
+  })
+  savedEnglish.value = JSON.stringify(english)
+}, { immediate: true })
 
 const initialValue = computed<SpotFormInput | undefined>(() => data.value
   ? {
@@ -54,6 +68,7 @@ const initialValue = computed<SpotFormInput | undefined>(() => data.value
 useHead(() => ({ title: `${data.value?.spot.name ?? 'スポット編集'} | デジタルマップ` }))
 
 async function updateSpot(input: SpotFormInput) {
+  if (isSubmitting.value) return
   isSubmitting.value = true
   submitError.value = ''
   successMessage.value = ''
@@ -82,6 +97,7 @@ async function persistSpot(input: SpotFormInput) {
   successMessage.value = ''
   try {
     data.value = await $fetch<AdminSpotResponse>(`/api/maps/${mapId}/spots/${spotId}`, { method: 'PATCH', body: input })
+    spotFormRef.value?.acceptSaved(initialValue.value ?? input)
     successMessage.value = 'スポット情報を保存しました。'
   }
   catch {
@@ -98,19 +114,23 @@ function cancelDuplicateWarning() {
 }
 
 function continueWithDuplicate() {
+  if (isSubmitting.value) return
   const input = pendingInput.value
   cancelDuplicateWarning()
   if (input) void persistSpot(input)
 }
 
 function cancelForm() {
-  void navigateTo(returnTo.value)
+  spotFormDirty.value = false
 }
 
 async function saveEnglish() {
+  if (englishState.value === 'saving' || !englishDirty.value) return
   englishState.value = 'saving'
+  englishMessage.value = ''
   try {
     await $fetch(`/api/maps/${mapId}/spots/${spotId}/translations`, { method: 'PATCH', body: english })
+    savedEnglish.value = JSON.stringify(english)
     englishState.value = 'success'
     englishMessage.value = '英語訳を保存しました。'
   }
@@ -139,7 +159,7 @@ async function saveEnglish() {
       <SaveFeedback class="mt-6" :state="isSubmitting ? 'saving' : submitError ? 'error' : successMessage ? 'success' : 'idle'" :message="submitError || successMessage" />
       <section class="mt-6 border-t border-stone-200 pt-5">
         <ClientOnly>
-          <SpotForm :floors="data.floors" :categories="data.categories" :fields="data.fields" :initial-value="initialValue" :is-submitting="isSubmitting" @submit="updateSpot" @cancel="cancelForm" />
+          <SpotForm ref="spotForm" :floors="data.floors" :categories="data.categories" :fields="data.fields" :initial-value="initialValue" :is-submitting="isSubmitting" :guard-navigation="false" @dirty-change="spotFormDirty = $event" @submit="updateSpot" @cancel="cancelForm" />
           <template #fallback>
             <p class="text-sm text-stone-600">フォームを読み込んでいます…</p>
           </template>
@@ -155,7 +175,7 @@ async function saveEnglish() {
           <label class="text-sm font-semibold">Hours<input v-model="english.hoursText" class="mt-1 w-full rounded border px-3 py-2"></label>
           <label class="text-sm font-semibold">Holiday<input v-model="english.holidayText" class="mt-1 w-full rounded border px-3 py-2"></label>
           <label v-for="field in data.fields.filter(field => field.kind === 'custom' && ['single_line_text', 'multiline_text'].includes(field.type))" :key="field.id" class="text-sm font-semibold">{{ field.label }} (English)<input v-model="english.customValues[field.id]" class="mt-1 w-full rounded border px-3 py-2"></label>
-          <div class="sm:col-span-2"><SaveFeedback :state="englishState" :message="englishMessage" /><button class="mt-3 rounded bg-stone-900 px-4 py-2 text-sm font-semibold text-white">英語訳を保存</button></div>
+          <div class="sm:col-span-2"><SaveFeedback :state="englishState" :message="englishMessage" /><button :disabled="englishState === 'saving' || !englishDirty" class="mt-3 rounded bg-stone-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">{{ englishState === 'saving' ? '保存中…' : '英語訳を保存' }}</button></div>
         </form>
       </section>
       <details class="mt-6 border-t border-stone-200 pt-5"><summary class="mb-4 w-fit cursor-pointer text-base font-semibold">写真を管理</summary>
@@ -176,6 +196,7 @@ async function saveEnglish() {
         />
       </section>
       <DuplicateSpotDialog :open="duplicateMatches.length > 0" :matches="duplicateMatches" @cancel="cancelDuplicateWarning" @continue="continueWithDuplicate" />
+      <UnsavedChangesGuard :dirty="(spotFormDirty || englishDirty) && !isSubmitting && englishState !== 'saving'" />
     </template>
   </div>
 </template>

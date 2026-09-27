@@ -14,6 +14,7 @@ const props = withDefaults(defineProps<{
   initialValue?: SpotFormInput
   isSubmitting?: boolean
   submitLabel?: string
+  guardNavigation?: boolean
 }>(), {
   initialValue: () => ({
     floorId: '',
@@ -35,16 +36,19 @@ const props = withDefaults(defineProps<{
   fields: () => [],
   isSubmitting: false,
   submitLabel: '保存する',
+  guardNavigation: true,
 })
 
 const emit = defineEmits<{
   submit: [input: SpotFormInput]
   cancel: []
+  dirtyChange: [dirty: boolean]
 }>()
 
 const { defineField, errors, handleSubmit, meta, resetForm, setErrors } = useForm<SpotFormInput>({
   initialValues: props.initialValue,
 })
+watch(() => meta.value.dirty, dirty => emit('dirtyChange', dirty), { immediate: true })
 
 const [floorId] = defineField('floorId')
 const [name, nameAttrs] = defineField('name')
@@ -76,7 +80,11 @@ function updateCustomBoolean(fieldId: string, event: Event) {
   customValues.value[fieldId] = (event.target as HTMLInputElement).checked
 }
 
-watch(() => props.initialValue, value => resetForm({ values: value }), { deep: true })
+watch(() => props.initialValue, value => {
+  if (!meta.value.dirty) resetForm({ values: value })
+}, { deep: true })
+function acceptSaved(value: SpotFormInput) { resetForm({ values: value }) }
+defineExpose({ acceptSaved })
 
 const submit = handleSubmit((values) => {
   const enabledCustomIds = new Set(enabledFields.value.filter(field => field.kind === 'custom').map(field => field.id))
@@ -180,10 +188,10 @@ function cancel() {
     <p class="text-xs text-stone-500">写真・ピンの見た目・公開状態は、スポット保存後にそれぞれの欄で設定できます。</p>
     <UiFormActions sticky-mobile>
       <UiButton variant="secondary" :disabled="isSubmitting" @click="cancel">キャンセル</UiButton>
-      <UiButton type="submit" :busy="isSubmitting" :disabled="isSubmitting || floors.length === 0">
+      <UiButton type="submit" :busy="isSubmitting" :disabled="isSubmitting || !meta.dirty || floors.length === 0">
         {{ isSubmitting ? '保存中…' : submitLabel }}
       </UiButton>
     </UiFormActions>
   </form>
-  <UnsavedChangesGuard :dirty="meta.dirty && !isSubmitting" />
+  <UnsavedChangesGuard v-if="guardNavigation" :dirty="meta.dirty && !isSubmitting" />
 </template>

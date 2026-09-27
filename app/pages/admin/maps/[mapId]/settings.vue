@@ -3,6 +3,7 @@ import ConfirmDialog from '~/components/ui/ConfirmDialog.vue'
 import SaveFeedback from '~/components/ui/SaveFeedback.vue'
 import UiDialog from '~/components/ui/UiDialog.vue'
 import UiSelect from '~/components/ui/UiSelect.vue'
+import UnsavedChangesGuard from '~/components/admin/UnsavedChangesGuard.vue'
 import MapNameForm from '~/components/admin/MapNameForm.vue'
 import MediaPicker from '~/components/admin/MediaPicker.vue'
 import { mapLanguageLabel, mapLanguageOptions } from '~~/shared/constants/map-languages'
@@ -17,6 +18,10 @@ definePageMeta({
 })
 
 const route = useRoute()
+const mapNameForm = useTemplateRef<{ restoreSaved: () => void, acceptSaved: (name: string) => void }>('mapNameForm')
+const mapNameDirty = ref(false)
+const pendingSectionPath = ref('')
+const sectionDiscardOpen = ref(false)
 const mapId = route.params.mapId as string
 const settingSections = computed(() => [
   { id: 'basic', label: '基本情報' },
@@ -59,12 +64,62 @@ const branding = reactive({
   websiteUrl: data.value?.map.websiteUrl ?? '',
   snsUrl: data.value?.map.snsUrl ?? '',
 })
+const savedTranslation = ref(JSON.stringify(translation))
+const savedSeo = ref(JSON.stringify(seo))
+const savedBranding = ref(JSON.stringify(branding))
+const translationDirty = computed(() => JSON.stringify(translation) !== savedTranslation.value)
+const seoDirty = computed(() => JSON.stringify(seo) !== savedSeo.value)
+const brandingDirty = computed(() => JSON.stringify(branding) !== savedBranding.value)
+const pageDirty = computed(() => mapNameDirty.value || translationDirty.value || seoDirty.value || brandingDirty.value)
+const isDeleting = ref(false)
+
+watch(() => data.value?.map, value => {
+  if (!value) return
+  if (!translationDirty.value) {
+    Object.assign(translation, { name: value.englishTranslation?.name ?? '', description: value.englishTranslation?.description ?? '' })
+    savedTranslation.value = JSON.stringify(translation)
+  }
+  if (!seoDirty.value) {
+    Object.assign(seo, { title: value.seoTitle ?? '', description: value.seoDescription ?? '', imageAssetId: value.seoImageAssetId ?? null })
+    savedSeo.value = JSON.stringify(seo)
+  }
+  if (!brandingDirty.value) {
+    Object.assign(branding, { organizationName: value.organizationName ?? '', logoUrl: value.logoUrl ?? '', logoAssetId: value.logoAssetId ?? null, websiteUrl: value.websiteUrl ?? '', snsUrl: value.snsUrl ?? '' })
+    savedBranding.value = JSON.stringify(branding)
+  }
+}, { immediate: true })
+
+onBeforeRouteUpdate(to => {
+  if (to.path !== route.path || to.hash === route.hash || !pageDirty.value) return true
+  pendingSectionPath.value = to.fullPath
+  sectionDiscardOpen.value = true
+  return false
+})
+
+function discardSectionDrafts() {
+  mapNameForm.value?.restoreSaved()
+  if (data.value) {
+    const value = data.value.map
+    Object.assign(translation, { name: value.englishTranslation?.name ?? '', description: value.englishTranslation?.description ?? '' })
+    Object.assign(seo, { title: value.seoTitle ?? '', description: value.seoDescription ?? '', imageAssetId: value.seoImageAssetId ?? null })
+    Object.assign(branding, { organizationName: value.organizationName ?? '', logoUrl: value.logoUrl ?? '', logoAssetId: value.logoAssetId ?? null, websiteUrl: value.websiteUrl ?? '', snsUrl: value.snsUrl ?? '' })
+  }
+  savedTranslation.value = JSON.stringify(translation)
+  savedSeo.value = JSON.stringify(seo)
+  savedBranding.value = JSON.stringify(branding)
+  mapNameDirty.value = false
+  const destination = pendingSectionPath.value
+  pendingSectionPath.value = ''
+  sectionDiscardOpen.value = false
+  if (destination) void navigateTo(destination)
+}
 
 useHead(() => ({
   title: `${data.value?.map.name ?? 'マップ設定'} | デジタルマップ`,
 }))
 
 async function saveMap(input: MapNameInput) {
+  if (isSubmitting.value || !mapNameDirty.value) return
   isSubmitting.value = true
   submitError.value = ''
   successMessage.value = ''
@@ -75,6 +130,7 @@ async function saveMap(input: MapNameInput) {
       body: input,
     })
     data.value = response
+    mapNameForm.value?.acceptSaved(response.map.name)
     successMessage.value = 'マップ名を保存しました。'
   }
   catch {
@@ -91,6 +147,7 @@ function useUploadedLogo(image: UploadedImage) {
 }
 
 async function saveBranding() {
+  if (isBrandingSaving.value || !brandingDirty.value) return
   isBrandingSaving.value = true
   brandingError.value = ''
   brandingMessage.value = ''
@@ -103,6 +160,7 @@ async function saveBranding() {
       Object.entries(response.branding).map(([key, value]) => [key, value ?? '']),
     ))
     Object.assign(data.value!.map, response.branding)
+    savedBranding.value = JSON.stringify(branding)
     brandingMessage.value = '公開ヘッダーの団体情報を保存しました。'
   }
   catch (error: any) {
@@ -114,16 +172,20 @@ async function saveBranding() {
 }
 
 async function deleteMap() {
+  if (isDeleting.value) return
   deleteDialogOpen.value = false
   deleteError.value = ''
+  isDeleting.value = true
   try {
     await $fetch(`/api/maps/${mapId}`, { method: 'DELETE' })
     await navigateTo('/admin/dashboard')
   }
   catch (error: any) { deleteError.value = error?.data?.statusMessage ?? 'マップを削除できませんでした。' }
+  finally { isDeleting.value = false }
 }
 
 async function saveTranslation() {
+  if (translationState.value === 'saving' || !translationDirty.value) return
   translationState.value = 'saving'
   translationMessage.value = ''
   try {
@@ -131,6 +193,7 @@ async function saveTranslation() {
       method: 'PATCH',
       body: { ...translation, englishEnabled: enabledLocales.value.includes('en') },
     })
+    savedTranslation.value = JSON.stringify(translation)
     translationState.value = 'success'
     translationMessage.value = '英語訳を保存しました。'
   }
@@ -141,6 +204,7 @@ async function saveTranslation() {
 }
 
 async function persistLanguages(nextLocales: MapLocale[], success: string) {
+  if (languageState.value === 'saving') return false
   languageState.value = 'saving'
   languageMessage.value = ''
   try {
@@ -177,8 +241,9 @@ async function removeLanguage(locale: MapLocale) {
 }
 
 async function saveSeo() {
+  if (seoState.value === 'saving' || !seoDirty.value) return
   seoState.value = 'saving'
-  try { await $fetch(`/api/maps/${mapId}/seo`, { method: 'PATCH', body: seo }); seoState.value = 'success'; seoMessage.value = 'SEO設定を保存しました。次回の公開内容に反映されます。' }
+  try { await $fetch(`/api/maps/${mapId}/seo`, { method: 'PATCH', body: seo }); savedSeo.value = JSON.stringify(seo); seoState.value = 'success'; seoMessage.value = 'SEO設定を保存しました。次回の公開内容に反映されます。' }
   catch { seoState.value = 'error'; seoMessage.value = 'SEO設定を保存できませんでした。' }
 }
 </script>
@@ -233,8 +298,11 @@ async function saveSeo() {
         </div>
         <SaveFeedback class="mb-6" :state="isSubmitting ? 'saving' : submitError ? 'error' : successMessage ? 'success' : 'idle'" :message="submitError || successMessage" />
         <MapNameForm
+          ref="mapNameForm"
           :initial-name="data.map.name"
           :is-submitting="isSubmitting"
+          :guard-navigation="false"
+          @dirty-change="mapNameDirty = $event"
           @submit="saveMap"
         />
       </section>
@@ -266,7 +334,7 @@ async function saveSeo() {
             <label class="block text-sm font-semibold">マップ名（英語）<input v-model="translation.name" maxlength="100" class="mt-1 w-full rounded-lg border border-stone-300 px-3 py-2.5"></label>
             <label class="block text-sm font-semibold">説明文（英語）<textarea v-model="translation.description" maxlength="2000" rows="4" class="mt-1 w-full rounded-lg border border-stone-300 px-3 py-2.5" /></label>
           <SaveFeedback :state="translationState" :message="translationMessage" />
-          <button class="rounded-lg bg-stone-900 px-5 py-2.5 text-sm font-semibold text-white" :disabled="translationState === 'saving'">英語訳を保存</button>
+          <button class="rounded-lg bg-stone-900 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50" :disabled="translationState === 'saving' || !translationDirty">英語訳を保存</button>
         </form>
 
         <UiDialog :open="languageDialogOpen" title="言語を追加" description="このマップの項目名で使用する言語を選択します。" max-width="sm" @close="languageDialogOpen = false">
@@ -280,7 +348,7 @@ async function saveSeo() {
         </UiDialog>
       </section>
 
-      <section id="seo" v-show="activeSection === 'seo'" class="settings-section"><h2 class="text-lg font-bold">検索・シェア表示</h2><p class="mt-1 text-sm text-stone-600">空欄の場合は公開中のマップ情報を使用します。</p><form class="mt-5 space-y-4" @submit.prevent="saveSeo"><label class="block text-sm font-semibold">検索結果のタイトル<input v-model="seo.title" maxlength="100" class="mt-1 w-full rounded border px-3 py-2"></label><label class="block text-sm font-semibold">説明文<textarea v-model="seo.description" maxlength="300" rows="3" class="mt-1 w-full rounded border px-3 py-2" /></label><details class="rounded-lg border border-stone-200 p-4"><summary class="cursor-pointer text-sm font-semibold">シェア画像を選択・変更</summary><MediaPicker class="mt-4" :map-id="mapId" label="代表画像" usage="seo" @selected="seo.imageAssetId = $event.assetId" /></details><SaveFeedback :state="seoState" :message="seoMessage" /><button class="rounded bg-stone-900 px-4 py-2 text-sm font-semibold text-white">SEO設定を保存</button></form></section>
+      <section id="seo" v-show="activeSection === 'seo'" class="settings-section"><h2 class="text-lg font-bold">検索・シェア表示</h2><p class="mt-1 text-sm text-stone-600">空欄の場合は公開中のマップ情報を使用します。</p><form class="mt-5 space-y-4" @submit.prevent="saveSeo"><label class="block text-sm font-semibold">検索結果のタイトル<input v-model="seo.title" maxlength="100" class="mt-1 w-full rounded border px-3 py-2"></label><label class="block text-sm font-semibold">説明文<textarea v-model="seo.description" maxlength="300" rows="3" class="mt-1 w-full rounded border px-3 py-2" /></label><details class="rounded-lg border border-stone-200 p-4"><summary class="cursor-pointer text-sm font-semibold">シェア画像を選択・変更</summary><MediaPicker class="mt-4" :map-id="mapId" label="代表画像" usage="seo" @selected="seo.imageAssetId = $event.assetId" /></details><SaveFeedback :state="seoState" :message="seoMessage" /><button :disabled="seoState === 'saving' || !seoDirty" class="rounded bg-stone-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">SEO設定を保存</button></form></section>
 
       <section id="public" v-show="activeSection === 'public'" class="settings-section">
         <div>
@@ -314,7 +382,7 @@ async function saveSeo() {
           </div>
           <SaveFeedback :state="isBrandingSaving ? 'saving' : brandingError ? 'error' : brandingMessage ? 'success' : 'idle'" :message="brandingError || brandingMessage" />
           <div class="flex justify-end">
-            <button type="submit" :disabled="isBrandingSaving" class="rounded-lg bg-stone-900 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60">{{ isBrandingSaving ? '保存中…' : '団体情報を保存' }}</button>
+            <button type="submit" :disabled="isBrandingSaving || !brandingDirty" class="rounded-lg bg-stone-900 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60">{{ isBrandingSaving ? '保存中…' : '団体情報を保存' }}</button>
           </div>
         </form>
       </section>
@@ -329,9 +397,11 @@ async function saveSeo() {
         <h2 class="text-lg font-bold text-red-900">マップの削除</h2>
         <p class="mt-2 text-sm text-stone-600">マップと配下のデータを削除します。編集者はこの操作を実行できません。</p>
         <p v-if="deleteError" class="mt-3 text-sm text-red-700">{{ deleteError }}</p>
-        <button class="mt-5 rounded-lg border border-red-300 px-4 py-2.5 text-sm font-semibold text-red-700" @click="deleteDialogOpen = true">マップを削除</button>
+        <button :disabled="isDeleting" class="mt-5 rounded-lg border border-red-300 px-4 py-2.5 text-sm font-semibold text-red-700 disabled:opacity-50" @click="deleteDialogOpen = true">マップを削除</button>
       </section>
-      <ConfirmDialog :open="deleteDialogOpen" title="マップを削除" message="このマップと配下のデータを削除します。この操作は取り消せません。" confirm-label="削除する" destructive @cancel="deleteDialogOpen = false" @confirm="deleteMap" />
+      <ConfirmDialog :open="deleteDialogOpen" title="マップを削除" message="このマップと配下のデータを削除します。この操作は取り消せません。" confirm-label="削除する" destructive :busy="isDeleting" @cancel="deleteDialogOpen = false" @confirm="deleteMap" />
+      <ConfirmDialog :open="sectionDiscardOpen" title="未保存の設定があります" message="保存していない設定を破棄して別の設定項目へ移動しますか？" confirm-label="破棄して移動" cancel-label="編集を続ける" destructive @cancel="sectionDiscardOpen = false; pendingSectionPath = ''" @confirm="discardSectionDrafts" />
+      <UnsavedChangesGuard :dirty="pageDirty && !isSubmitting && !isBrandingSaving && translationState !== 'saving' && seoState !== 'saving'" />
 
         </div>
       </div>
