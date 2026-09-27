@@ -47,12 +47,15 @@ describe('WU-52 product contracts', () => {
     expect(moved.preview.rows[0]?.messages.some(message => message.message.includes('フロア変更はCSVではできません'))).toBe(true)
   })
 
-  it('uses local decoration drafts and only commits from gesture end', () => {
+  it('keeps decoration gestures local until explicit geometry Save', () => {
     const source = readFileSync(new URL('../app/pages/admin/maps/[mapId]/floors/[floorId]/decorations.vue', import.meta.url), 'utf8')
-    expect(source).toContain('type DecorationDraft')
+    expect(source).toContain('type DecorationGeometryDraft')
     expect(source).toContain('requestAnimationFrame(render)')
     expect(source).toContain("window.addEventListener('pointerup', end)")
-    expect(source).toContain('void commit(next, start)')
+    expect(source).toContain('@click="saveGeometry"')
+    expect(source).toContain('body: { x: next.x, y: next.y, width: next.width, rotation: next.rotation }')
+    expect(source).toContain('body: { order: Math.max(0, item.order + delta) }')
+    expect(source).not.toContain('void commit(next, start)')
     expect(source).not.toContain('type="range"')
     expect(source).not.toContain('インスタンス削除')
   })
