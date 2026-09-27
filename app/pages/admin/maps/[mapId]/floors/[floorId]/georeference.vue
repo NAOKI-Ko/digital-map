@@ -2,6 +2,8 @@
 import AddressGeocoder from '~/components/admin/AddressGeocoder.vue'
 import GeoReferenceWizard from '~/components/admin/GeoReferenceWizard.vue'
 import ConfirmDialog from '~/components/ui/ConfirmDialog.vue'
+import SaveFeedback from '~/components/ui/SaveFeedback.vue'
+import UnsavedChangesGuard from '~/components/admin/UnsavedChangesGuard.vue'
 import { createEmptyGeoReferenceDraft, isGeoReferenceDraftComplete } from '~/composables/useGeoReference'
 import { getGeoReferenceValidationError, isGeoReferenced, type CompleteFloorGeoReference, type LatLng } from '~~/lib/geo'
 import type { MapFloorListResponse, MapFloorResponse } from '~~/shared/types/floor'
@@ -19,10 +21,13 @@ const floorId = route.params.floorId as string
 const { data, error, status } = await useFetch<MapFloorListResponse>(`/api/maps/${mapId}/floors`)
 const floor = computed(() => data.value?.floors.find(item => item.id === floorId))
 const draft = ref<GeoReferenceDraft>(createEmptyGeoReferenceDraft())
+const savedDraft = ref<GeoReferenceDraft>(createEmptyGeoReferenceDraft())
+const isDirty = computed(() => JSON.stringify(draft.value) !== JSON.stringify(savedDraft.value))
 const wizard = useTemplateRef<{ focusLocation: (position: LatLng) => void }>('wizard')
 const isSaving = ref(false)
 const saveError = ref('')
 const successMessage = ref('')
+const saveState = ref<'idle' | 'saving' | 'success' | 'error'>('idle')
 const { success } = useToast()
 const removeConfirmOpen = ref(false)
 const cameFromEditor = computed(() => route.query.from === 'editor')
@@ -51,8 +56,8 @@ const validationError = computed(() => completeGeoReference.value
   : null)
 
 watch(floor, (value) => {
-  if (!value) return
-  draft.value = {
+  if (!value || isDirty.value) return
+  const next = {
     refAImageX: value.refAImageX,
     refAImageY: value.refAImageY,
     refALat: value.refALat,
@@ -62,6 +67,8 @@ watch(floor, (value) => {
     refBLat: value.refBLat,
     refBLng: value.refBLng,
   }
+  savedDraft.value = { ...next }
+  draft.value = { ...next }
 }, { immediate: true })
 
 useHead(() => ({
@@ -75,11 +82,19 @@ function focusSearchResult(result: GeocodeResult) {
 function resetEditingPoints() {
   draft.value = createEmptyGeoReferenceDraft()
   saveError.value = ''
-  successMessage.value = '編集中の基準点をリセットしました。保存済みの設定はまだ変更されていません。'
+  saveState.value = 'idle'
+  successMessage.value = '編集中の基準点を空にしました。保存済みの設定は変更されていません。'
+}
+
+function cancelDraft() {
+  draft.value = { ...savedDraft.value }
+  saveError.value = ''
+  saveState.value = 'idle'
+  successMessage.value = '保存済みの基準点に戻しました。'
 }
 
 async function removeGeoReference() {
-  if (!floor.value) return
+  if (!floor.value || isSaving.value) return
   isSaving.value = true
   saveError.value = ''
   successMessage.value = ''
@@ -91,6 +106,7 @@ async function removeGeoReference() {
       data.value = { floors: data.value.floors.map(item => item.id === floorId ? response.floor : item) }
     }
     draft.value = createEmptyGeoReferenceDraft()
+    savedDraft.value = createEmptyGeoReferenceDraft()
     removeConfirmOpen.value = false
     success('マップの位置合わせを解除しました。イラスト上のピン位置は変更していません', `georeference-${floorId}`)
   }
@@ -103,12 +119,13 @@ async function removeGeoReference() {
 }
 
 async function save() {
-  if (!floor.value || !isGeoReferenceDraftComplete(draft.value)) return
+  if (!floor.value || isSaving.value || !isDirty.value || !isGeoReferenceDraftComplete(draft.value)) return
   if (validationError.value) {
     saveError.value = validationError.value
     return
   }
   isSaving.value = true
+  saveState.value = 'saving'
   saveError.value = ''
   successMessage.value = ''
 
@@ -117,15 +134,17 @@ async function save() {
       method: 'PATCH',
       body: draft.value,
     })
+    savedDraft.value = { ...draft.value }
     if (data.value) {
       data.value = {
         floors: data.value.floors.map(item => item.id === floorId ? response.floor : item),
       }
     }
-    success('2つの基準点を保存しました', `georeference-${floorId}`)
+    saveState.value = 'success'
   }
   catch (error) {
     saveError.value = getErrorMessage(error)
+    saveState.value = 'error'
   }
   finally {
     isSaving.value = false
@@ -155,7 +174,7 @@ function getErrorMessage(error: unknown) {
           <p class="mt-2 text-sm text-stone-600">イラストと実地図で同じ目印を2組選ぶと、位置・向き・大きさを自動計算します。</p>
           <p class="mt-2 text-sm text-stone-500">設定しない場合もイラスト表示とピン配置は利用できますが、このフロアでは現在地機能が使えません。</p>
         </div>
-        <button type="button" :disabled="isSaving" class="rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-sm font-semibold text-stone-700 shadow-sm hover:bg-stone-50 disabled:opacity-60" @click="resetEditingPoints">基準点をリセット</button>
+        <button type="button" :disabled="isSaving" class="rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-sm font-semibold text-stone-700 shadow-sm hover:bg-stone-50 disabled:opacity-60" @click="resetEditingPoints">編集中の基準点を空にする</button>
       </header>
 
       <section class="mt-6">
@@ -179,18 +198,21 @@ function getErrorMessage(error: unknown) {
         <p class="mt-5 text-xs leading-5 text-stone-500">デフォルメが強いイラストほど、選んだ2点以外の場所ではズレが大きくなる場合があります。正確なナビゲーションではなく、現在地の目安として利用します。</p>
       </section>
 
-      <div v-if="saveError" role="alert" class="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{{ saveError }}</div>
-      <div v-else-if="validationError" role="alert" class="mt-4 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-800">{{ validationError }}</div>
+      <SaveFeedback class="mt-4" :state="saveState" :message="saveError || (saveState === 'success' ? '2つの基準点を保存しました。' : '')" />
+       <div v-if="validationError" role="alert" class="mt-4 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-800">{{ validationError }}</div>
+       <div v-if="saveError && saveState !== 'error'" role="alert" class="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-800">{{ saveError }}</div>
       <div v-if="successMessage" role="status" class="mt-4 rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{{ successMessage }}</div>
       <div class="mt-5 flex flex-wrap justify-end gap-3">
         <NuxtLink v-if="cameFromEditor" :to="backPath" class="rounded-lg border border-stone-300 bg-white px-5 py-2.5 text-sm font-semibold text-stone-700 hover:bg-stone-50">ピン配置エディタに戻る</NuxtLink>
+        <button type="button" :disabled="isSaving || !isDirty" class="rounded-lg border border-stone-300 bg-white px-5 py-2.5 text-sm font-semibold disabled:opacity-50" @click="cancelDraft">変更を破棄</button>
         <button v-if="hasSavedGeoReference" type="button" :disabled="isSaving" class="rounded-lg px-5 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-50 disabled:opacity-60" @click="removeConfirmOpen = true">位置合わせを解除</button>
-        <button type="button" :disabled="isSaving || !isGeoReferenceDraftComplete(draft) || Boolean(validationError)" class="rounded-lg bg-terracotta-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60" @click="save">
+        <button type="button" :disabled="isSaving || !isDirty || !isGeoReferenceDraftComplete(draft) || Boolean(validationError)" class="rounded-lg bg-terracotta-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60" @click="save">
           {{ isSaving ? '保存中…' : 'この内容で保存' }}
         </button>
       </div>
       <p v-if="floor.spotCount > 0" class="mt-3 text-right text-sm font-semibold text-amber-700">イラスト上のピン位置は変わりません。実世界との対応のみ更新されます。</p>
-      <ConfirmDialog :open="removeConfirmOpen" title="マップの位置合わせを解除" message="保存済みの実世界との対応を解除します。スポットやイラスト上のピン位置は削除・変更されません。" confirm-label="解除する" destructive :busy="isSaving" @cancel="removeConfirmOpen = false" @confirm="removeGeoReference" />
+       <ConfirmDialog :open="removeConfirmOpen" title="マップの位置合わせを解除" :message="`保存済みの実世界との対応を解除します。スポットやイラスト上のピン位置は削除・変更されません。${isDirty ? '編集中の基準点も破棄されます。' : ''}`" confirm-label="解除する" destructive :busy="isSaving" @cancel="removeConfirmOpen = false" @confirm="removeGeoReference" />
+      <UnsavedChangesGuard :dirty="isDirty && !isSaving" />
     </template>
   </div>
 </template>

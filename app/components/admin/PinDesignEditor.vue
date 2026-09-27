@@ -103,6 +103,7 @@ function useCustomImage(image: UploadedImage) {
 }
 
 async function save(): Promise<SpotPinDesignResponse['design'] | null> {
+  if (isSaving.value || !isDirty.value) return null
   const result = pinDesignSchema.safeParse(design)
   if (!result.success) {
     errorMessage.value = result.error.issues[0]?.message ?? 'ピンデザインを確認してください。'
@@ -118,7 +119,7 @@ async function save(): Promise<SpotPinDesignResponse['design'] | null> {
     })
     Object.assign(design, response.design)
     emit('updated', response.design)
-    success('ピンデザインを保存しました', `pin-design-${props.spotId}`)
+    if (props.showSave) success('ピンデザインを保存しました', `pin-design-${props.spotId}`)
     return response.design
   }
   catch {

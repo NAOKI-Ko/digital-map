@@ -4,6 +4,7 @@ import UiAlertDialog from '~/components/ui/UiAlertDialog.vue'
 import UiDialog from '~/components/ui/UiDialog.vue'
 import UiSelect from '~/components/ui/UiSelect.vue'
 import UiSwitch from '~/components/ui/UiSwitch.vue'
+import UnsavedChangesGuard from '~/components/admin/UnsavedChangesGuard.vue'
 import { mapLanguageLabel } from '~~/shared/constants/map-languages'
 import type { MapLocale } from '~~/shared/constants/map-languages'
 import { customSpotFieldTypes } from '~~/shared/constants/spot-fields'
@@ -47,6 +48,14 @@ const defaultLocale = computed<MapLocale>(() => data.value?.defaultLocale ?? 'ja
 const enabledLocales = computed<MapLocale[]>(() => data.value?.enabledLocales ?? ['ja'])
 const isBusy = computed(() => saveState.value === 'saving')
 const isDirty = computed(() => !!draft.value && !!originalDraft.value && JSON.stringify(draft.value) !== JSON.stringify(originalDraft.value))
+const emptyNewField = () => ({ label: '', translations: {}, type: 'single_line_text', enabled: true, publicVisible: true, required: false })
+const newFieldDirty = computed(() => JSON.stringify(newField) !== JSON.stringify(emptyNewField()))
+
+function closeAddDialog() {
+  if (isBusy.value) return
+  addDialogOpen.value = false
+  Object.assign(newField, emptyNewField())
+}
 
 function cloneField(field: SpotFieldDefinitionItem) {
   return { ...field, translations: field.translations.map(item => ({ ...item })) }
@@ -132,7 +141,7 @@ function setNewFieldEnabled(value: boolean) {
 }
 
 async function saveActive(continuePending = false) {
-  if (!draft.value || !originalDraft.value) return false
+  if (!draft.value || !originalDraft.value || isBusy.value || !isDirty.value) return false
   message.value = ''
   saveState.value = 'saving'
   const current = draft.value
@@ -165,6 +174,7 @@ async function saveActive(continuePending = false) {
 }
 
 async function createCustomField() {
+  if (isBusy.value) return
   message.value = ''
   saveState.value = 'saving'
   try {
@@ -193,7 +203,7 @@ async function createCustomField() {
 
 async function remove() {
   const field = deleteTarget.value
-  if (!field || field.kind !== 'custom' || field.valueCount > 0) return
+  if (!field || field.kind !== 'custom' || field.valueCount > 0 || isBusy.value) return
   saveState.value = 'saving'
   try {
     const deleteUrl: string = `/api/maps/${mapId}/spot-fields/${field.id}`
@@ -358,7 +368,7 @@ function dropOn(targetId: string) {
 
     <p v-if="fields.length === 0" class="mt-6 rounded-xl border border-dashed border-stone-300 p-8 text-center text-sm text-stone-600">項目がありません。「項目を追加」から作成してください。</p>
 
-    <UiDialog :open="addDialogOpen" title="カスタム項目を追加" description="スポットで入力する新しい情報項目を作成します。" max-width="sm" @close="addDialogOpen = false">
+    <UiDialog :open="addDialogOpen" title="カスタム項目を追加" description="スポットで入力する新しい情報項目を作成します。" max-width="sm" @close="closeAddDialog">
       <form class="space-y-4" @submit.prevent="createCustomField">
         <div class="max-h-72 space-y-3 overflow-y-auto pr-1">
           <label class="block text-sm font-semibold text-stone-700">
@@ -377,13 +387,14 @@ function dropOn(targetId: string) {
           <UiSwitch v-model="newField.required" label="必須" />
         </div>
         <div class="flex flex-col-reverse gap-2 pt-2 sm:flex-row sm:justify-end">
-          <button type="button" :disabled="isBusy" class="min-h-11 rounded-lg border border-stone-300 px-4 text-sm font-semibold" @click="addDialogOpen = false">キャンセル</button>
+          <button type="button" :disabled="isBusy" class="min-h-11 rounded-lg border border-stone-300 px-4 text-sm font-semibold" @click="closeAddDialog">キャンセル</button>
           <button :disabled="isBusy" class="min-h-11 rounded-lg bg-terracotta-600 px-4 text-sm font-semibold text-white disabled:opacity-50">{{ isBusy ? '追加中…' : '追加' }}</button>
         </div>
       </form>
     </UiDialog>
 
     <UiAlertDialog :open="dirtyDialogOpen" title="編集中の変更があります" message="変更を保存して続けるか、破棄するか選んでください。" confirm-label="保存して続ける" secondary-label="破棄して続ける" :busy="isBusy" @confirm="saveActive(true)" @secondary="discardAndContinue" @cancel="dirtyDialogOpen = false; pendingAction = null" />
-    <UiAlertDialog :open="deleteTarget !== null" title="カスタム項目を削除" :message="deleteTarget ? `「${deleteTarget.label}」を削除します。元に戻せません。` : ''" confirm-label="削除する" destructive :busy="isBusy" @confirm="remove" @cancel="deleteTarget = null" />
+    <UiAlertDialog :open="deleteTarget !== null" title="カスタム項目を削除" :message="deleteTarget ? `「${deleteTarget.label}」を削除します。元に戻せません。${isDirty ? '編集中の変更も破棄されます。' : ''}` : ''" confirm-label="削除する" destructive :busy="isBusy" @confirm="remove" @cancel="deleteTarget = null" />
+    <UnsavedChangesGuard :dirty="(isDirty || newFieldDirty) && !isBusy" />
   </div>
 </template>

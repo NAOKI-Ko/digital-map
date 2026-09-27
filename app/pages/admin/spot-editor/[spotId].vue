@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import SaveFeedback from '~/components/ui/SaveFeedback.vue'
+import UnsavedChangesGuard from '~/components/admin/UnsavedChangesGuard.vue'
 import type { SpotRevisionPayload } from '~~/shared/schemas/spot-revision'
 import type { ImageUploadResponse } from '~~/shared/types/upload'
 
@@ -40,25 +42,29 @@ const form = reactive<Record<EditableTextKey, string>>({
   holidayText: '',
 })
 const photoAssetIds = ref<string[]>([])
-const message = ref('')
 const operationError = ref('')
+const uploadError = ref('')
+const saveState = ref<'idle' | 'saving' | 'success' | 'error'>('idle')
+const savedSnapshot = ref('')
 const saving = ref(false)
 const uploading = ref(false)
 const { success } = useToast()
+const isDirty = computed(() => Boolean(savedSnapshot.value) && JSON.stringify({ form, photoAssetIds: photoAssetIds.value }) !== savedSnapshot.value)
 
 watch(() => data.value, (response) => {
   const source = response?.revision?.payload ?? response?.spot
-  if (!source) return
+  if (!source || isDirty.value) return
   for (const field of editableFields) form[field.key] = source[field.key] ?? ''
   photoAssetIds.value = response?.revision?.photos.map(photo => photo.assetId)
     ?? response?.spot.photos.map(photo => photo.assetId)
     ?? []
+  savedSnapshot.value = JSON.stringify({ form, photoAssetIds: photoAssetIds.value })
 }, { immediate: true })
 
 async function save() {
-  if (saving.value || data.value?.blockedByPreviousAssignee) return
+  if (saving.value || uploading.value || !isDirty.value || data.value?.blockedByPreviousAssignee) return
   operationError.value = ''
-  message.value = ''
+  saveState.value = 'saving'
   saving.value = true
   try {
     await $fetch(`/api/spot-editor/spots/${spotId}/revision`, {
@@ -75,11 +81,13 @@ async function save() {
         photoAssetIds: photoAssetIds.value,
       },
     })
-    success('承認待ちとして保存しました', `spot-revision-${spotId}`)
+    savedSnapshot.value = JSON.stringify({ form, photoAssetIds: photoAssetIds.value })
+    saveState.value = 'success'
     await refresh()
   }
   catch {
     operationError.value = '保存できませんでした。担当状況を確認して再度お試しください。'
+    saveState.value = 'error'
   }
   finally {
     saving.value = false
@@ -93,13 +101,15 @@ async function upload(event: Event) {
   const body = new FormData()
   body.append('file', file)
   uploading.value = true
+  uploadError.value = ''
   operationError.value = ''
   try {
     const result = await $fetch<ImageUploadResponse>(`/api/spot-editor/spots/${spotId}/photos`, { method: 'POST', body })
     if (!photoAssetIds.value.includes(result.image.assetId)) photoAssetIds.value.push(result.image.assetId)
+    success('写真をアップロードしました。変更申請へ反映するには保存してください。', `spot-photo-${spotId}`)
   }
   catch {
-    operationError.value = '写真をアップロードできませんでした。ファイルを確認して再度お試しください。'
+    uploadError.value = '写真をアップロードできませんでした。ファイルを確認して再度お試しください。'
   }
   finally {
     uploading.value = false
@@ -115,7 +125,8 @@ async function upload(event: Event) {
     <p v-if="loadError" role="alert" class="mt-4 rounded bg-red-50 p-4 text-red-800">このスポットを編集する権限がないか、担当から外れています。</p>
     <template v-else>
       <p v-if="data?.blockedByPreviousAssignee" class="mt-4 rounded bg-amber-50 p-4">前の担当者による承認待ちの変更申請があるため、確認が完了するまで新しい編集は保存できません。</p>
-      <p v-if="operationError" role="alert" class="mt-4 rounded bg-red-50 p-4 text-red-800">{{ operationError }}</p>
+      <SaveFeedback class="mt-4" :state="saveState" :message="operationError || (saveState === 'success' ? '承認待ちの変更を保存しました。' : '')" />
+      <p v-if="uploadError" role="alert" class="mt-4 rounded bg-red-50 p-4 text-red-800">{{ uploadError }}</p>
       <form class="mt-6 space-y-4 rounded-xl bg-white p-6" @submit.prevent="save">
         <label v-for="field in editableFields" :key="field.key" class="block text-sm font-semibold">
           {{ field.key }}
@@ -129,8 +140,9 @@ async function upload(event: Event) {
           </label>
           <p class="mt-2 text-xs">選択中: {{ photoAssetIds.length }}件（Tenant Media Libraryの閲覧はできません）</p>
         </div>
-        <button :disabled="data?.blockedByPreviousAssignee || saving || uploading" class="rounded bg-stone-900 px-4 py-3 font-semibold text-white disabled:opacity-40">{{ saving ? '保存中…' : '承認待ちとして保存' }}</button>
+        <button :disabled="data?.blockedByPreviousAssignee || saving || uploading || !isDirty" class="rounded bg-stone-900 px-4 py-3 font-semibold text-white disabled:opacity-40">{{ saving ? '保存中…' : '承認待ちとして保存' }}</button>
       </form>
+      <UnsavedChangesGuard :dirty="isDirty && !saving" />
     </template>
   </section>
 </template>
