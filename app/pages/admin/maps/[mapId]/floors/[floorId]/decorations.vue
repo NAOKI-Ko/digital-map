@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import MediaPicker from '~/components/admin/MediaPicker.vue'
 import ConfirmDialog from '~/components/ui/ConfirmDialog.vue'
+import UiAlertDialog from '~/components/ui/UiAlertDialog.vue'
+import SaveFeedback from '~/components/ui/SaveFeedback.vue'
+import UnsavedChangesGuard from '~/components/admin/UnsavedChangesGuard.vue'
 import type { MapFloorListResponse } from '~~/shared/types/floor'
 import type { FloorDecorationItem, FloorDecorationListResponse, FloorDecorationResponse } from '~~/shared/types/decoration'
 import type { UploadedImage } from '~~/shared/types/upload'
 
-type DecorationDraft = Pick<FloorDecorationItem, 'id' | 'x' | 'y' | 'width' | 'rotation' | 'order'>
+type DecorationGeometryDraft = Pick<FloorDecorationItem, 'id' | 'x' | 'y' | 'width' | 'rotation'>
 type InteractionKind = 'move' | 'resize' | 'rotate'
 
 definePageMeta({ layout: 'admin', middleware: 'auth' })
@@ -19,8 +22,15 @@ const [{ data: floorData }, { data }] = await Promise.all([
 const floor = computed(() => floorData.value?.floors.find(item => item.id === floorId))
 const items = ref<FloorDecorationItem[]>([])
 const selectedId = ref<string | null>(null)
-const draft = ref<DecorationDraft | null>(null)
+const draft = ref<DecorationGeometryDraft | null>(null)
 const saveError = ref('')
+const saveState = ref<'idle' | 'saving' | 'success' | 'error'>('idle')
+const saving = ref(false)
+const commandBusy = ref(false)
+const transitionOpen = ref(false)
+const pickerKey = ref(0)
+let pendingAdd = false
+let pendingAction: (() => void | Promise<void>) | null = null
 const deleteTarget = ref<FloorDecorationItem | null>(null)
 const deleting = ref(false)
 const { success } = useToast()
@@ -32,10 +42,55 @@ watch(() => data.value?.decorations, (decorations) => {
 }, { immediate: true })
 
 const selected = computed(() => items.value.find(item => item.id === selectedId.value) ?? null)
+const dirty = computed(() => {
+  const saved = selected.value
+  const candidate = draft.value
+  return Boolean(saved && candidate && (candidate.x !== saved.x || candidate.y !== saved.y || candidate.width !== saved.width || candidate.rotation !== saved.rotation))
+})
+
+function geometry(item: FloorDecorationItem): DecorationGeometryDraft {
+  return { id: item.id, x: item.x, y: item.y, width: item.width, rotation: item.rotation }
+}
 
 function select(item: FloorDecorationItem) {
+  if (selectedId.value === item.id && draft.value) return
   selectedId.value = item.id
-  draft.value = { id: item.id, x: item.x, y: item.y, width: item.width, rotation: item.rotation, order: item.order }
+  draft.value = geometry(item)
+  saveState.value = 'idle'
+  saveError.value = ''
+}
+
+function discard() {
+  if (selected.value) draft.value = geometry(selected.value)
+  saveState.value = 'idle'
+  saveError.value = ''
+}
+
+function requestTransition(action: () => void | Promise<void>) {
+  if (saving.value || commandBusy.value) return
+  if (!dirty.value) { void action(); return }
+  pendingAction = action
+  transitionOpen.value = true
+}
+
+function stay() {
+  transitionOpen.value = false
+  pendingAction = null
+  if (pendingAdd) { pickerKey.value++; pendingAdd = false }
+}
+function continueAfterResolution() {
+  const action = pendingAction
+  transitionOpen.value = false
+  pendingAction = null
+  pendingAdd = false
+  if (action) void action()
+}
+function discardAndContinue() { discard(); continueAfterResolution() }
+async function saveAndContinue() {
+  if (!await saveGeometry()) return
+  saveState.value = 'idle'
+  success('装飾の位置と形を保存しました', 'decoration-save')
+  continueAfterResolution()
 }
 
 function displayState(item: FloorDecorationItem): FloorDecorationItem {
@@ -46,10 +101,18 @@ function replaceCanonical(item: FloorDecorationItem) {
   const index = items.value.findIndex(candidate => candidate.id === item.id)
   if (index >= 0) items.value[index] = { ...item }
   else items.value.push({ ...item })
-  if (selectedId.value === item.id) draft.value = { id: item.id, x: item.x, y: item.y, width: item.width, rotation: item.rotation, order: item.order }
+  if (selectedId.value === item.id) draft.value = geometry(item)
 }
 
 async function addDecoration(image: UploadedImage) {
+  if (saving.value || commandBusy.value) {
+    pickerKey.value++
+    saveError.value = '処理が終わってから装飾を追加してください。'
+    return
+  }
+  if (dirty.value) { pendingAdd = true; requestTransition(() => addDecoration(image)); return }
+  commandBusy.value = true
+  saveState.value = 'idle'
   saveError.value = ''
   try {
     const response = await $fetch<FloorDecorationResponse>(`/api/maps/${mapId}/floors/${floorId}/decorations`, { method: 'POST', body: { assetId: image.assetId, x: 0.5, y: 0.5, width: 0.2, rotation: 0 } })
@@ -58,24 +121,28 @@ async function addDecoration(image: UploadedImage) {
     success('装飾を追加しました', 'decoration-save')
   } catch {
     saveError.value = '装飾を追加できませんでした。時間をおいて再度お試しください。'
-  }
+  } finally { commandBusy.value = false }
 }
 
-async function commit(next: DecorationDraft, snapshot: DecorationDraft, toastMessage = '装飾を保存しました') {
+async function saveGeometry(): Promise<boolean> {
+  if (!draft.value || !dirty.value || saving.value || commandBusy.value) return false
+  const next = { ...draft.value }
+  saving.value = true
+  saveState.value = 'saving'
   saveError.value = ''
   try {
     const response = await $fetch<FloorDecorationResponse>(`/api/maps/${mapId}/floors/${floorId}/decorations/${next.id}`, {
       method: 'PATCH',
-      body: { x: next.x, y: next.y, width: next.width, rotation: next.rotation, order: next.order },
+      body: { x: next.x, y: next.y, width: next.width, rotation: next.rotation },
     })
     replaceCanonical(response.decoration)
-    success(toastMessage, 'decoration-save')
+    saveState.value = 'success'
+    return true
   } catch {
-    draft.value = { ...snapshot }
-    const canonical = items.value.find(item => item.id === snapshot.id)
-    if (canonical) Object.assign(canonical, snapshot)
-    saveError.value = '装飾を保存できませんでした。操作前の状態へ戻しました。'
-  }
+    saveState.value = 'error'
+    saveError.value = '装飾を保存できませんでした。変更は保持しています。再試行できます。'
+    return false
+  } finally { saving.value = false }
 }
 
 function normalizedRotation(value: number) {
@@ -95,7 +162,8 @@ function clampedCenter(nextX: number, nextY: number, width: number, rotation: nu
 }
 
 function startInteraction(event: PointerEvent, item: FloorDecorationItem, kind: InteractionKind) {
-  if (event.button !== 0) return
+  if (event.button !== 0 || saving.value || commandBusy.value) return
+  if (selectedId.value !== item.id && dirty.value) { requestTransition(() => select(item)); return }
   activeCleanup?.()
   select(item)
   const start = { ...draft.value! }
@@ -111,7 +179,6 @@ function startInteraction(event: PointerEvent, item: FloorDecorationItem, kind: 
   const captureTarget = event.currentTarget as HTMLElement
   captureTarget.setPointerCapture?.(event.pointerId)
   let latest = event
-  let moved = false
 
   const render = () => {
     frame = 0
@@ -133,7 +200,6 @@ function startInteraction(event: PointerEvent, item: FloorDecorationItem, kind: 
   const move = (nextEvent: PointerEvent) => {
     if (nextEvent.pointerId !== event.pointerId) return
     latest = nextEvent
-    moved ||= Math.hypot(nextEvent.clientX - startPointerX, nextEvent.clientY - startPointerY) > 1
     if (!frame) frame = requestAnimationFrame(render)
   }
   const cleanup = () => {
@@ -147,9 +213,7 @@ function startInteraction(event: PointerEvent, item: FloorDecorationItem, kind: 
   const end = (endEvent: PointerEvent) => {
     if (endEvent.pointerId !== event.pointerId) return
     if (frame) render()
-    const next = { ...(draft.value ?? start) }
     cleanup()
-    if (moved && JSON.stringify(next) !== JSON.stringify(start)) void commit(next, start)
   }
   const cancel = (cancelEvent: PointerEvent) => {
     if (cancelEvent.pointerId !== event.pointerId) return
@@ -165,9 +229,10 @@ function startInteraction(event: PointerEvent, item: FloorDecorationItem, kind: 
 function onKeyboard(event: KeyboardEvent, item: FloorDecorationItem, kind: InteractionKind) {
   if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)) return
   event.preventDefault()
+  if (saving.value || commandBusy.value) return
+  if (selectedId.value !== item.id && dirty.value) { requestTransition(() => select(item)); return }
   select(item)
-  const snapshot = { ...draft.value! }
-  const next = { ...snapshot }
+  const next = { ...draft.value! }
   const direction = ['ArrowLeft', 'ArrowDown'].includes(event.key) ? -1 : 1
   const amount = event.shiftKey ? 0.05 : 0.01
   if (kind === 'move') {
@@ -179,24 +244,31 @@ function onKeyboard(event: KeyboardEvent, item: FloorDecorationItem, kind: Inter
     Object.assign(next, clampedCenter(next.x, next.y, next.width, next.rotation, item))
   } else next.rotation = normalizedRotation(next.rotation + (event.shiftKey ? 15 : 1) * direction)
   draft.value = next
-  void commit(next, snapshot)
 }
 
 async function duplicate(item: FloorDecorationItem) {
+  if (dirty.value) { requestTransition(() => duplicate(item)); return }
+  if (commandBusy.value) return
+  item = items.value.find(candidate => candidate.id === item.id) ?? item
+  commandBusy.value = true
+  saveState.value = 'idle'
   saveError.value = ''
   try {
-    const current = displayState(item)
-    const response = await $fetch<FloorDecorationResponse>(`/api/maps/${mapId}/floors/${floorId}/decorations`, { method: 'POST', body: { assetId: item.assetId, x: Math.min(1, current.x + 0.03), y: Math.min(1, current.y + 0.03), width: current.width, rotation: current.rotation } })
+    const response = await $fetch<FloorDecorationResponse>(`/api/maps/${mapId}/floors/${floorId}/decorations`, { method: 'POST', body: { assetId: item.assetId, x: Math.min(1, item.x + 0.03), y: Math.min(1, item.y + 0.03), width: item.width, rotation: item.rotation } })
     replaceCanonical(response.decoration)
     select(response.decoration)
     success('装飾を複製しました', 'decoration-save')
   } catch {
     saveError.value = '装飾を複製できませんでした。'
-  }
+  } finally { commandBusy.value = false }
+}
+
+function requestDelete(item: FloorDecorationItem) {
+  requestTransition(() => { deleteTarget.value = item })
 }
 
 async function removeConfirmed() {
-  if (!deleteTarget.value) return
+  if (!deleteTarget.value || deleting.value || commandBusy.value) return
   deleting.value = true
   saveError.value = ''
   try {
@@ -215,12 +287,22 @@ async function removeConfirmed() {
 }
 
 async function moveLayer(item: FloorDecorationItem, delta: number) {
-  select(item)
-  const snapshot = { ...draft.value! }
-  const next = { ...snapshot, order: Math.max(0, snapshot.order + delta) }
-  draft.value = next
-  await commit(next, snapshot, '並び順を変更しました')
+  if (dirty.value) { requestTransition(() => moveLayer(item, delta)); return }
+  if (commandBusy.value) return
+  item = items.value.find(candidate => candidate.id === item.id) ?? item
+  commandBusy.value = true
+  saveState.value = 'idle'
+  saveError.value = ''
+  try {
+    const response = await $fetch<FloorDecorationResponse>(`/api/maps/${mapId}/floors/${floorId}/decorations/${item.id}`, { method: 'PATCH', body: { order: Math.max(0, item.order + delta) } })
+    replaceCanonical(response.decoration)
+    success('並び順を変更しました', 'decoration-save')
+  } catch {
+    saveError.value = '並び順を変更できませんでした。'
+  } finally { commandBusy.value = false }
 }
+
+function clearSelection() { requestTransition(() => { selectedId.value = null; draft.value = null; saveState.value = 'idle'; saveError.value = '' }) }
 
 onBeforeUnmount(() => activeCleanup?.())
 </script>
@@ -236,7 +318,7 @@ onBeforeUnmount(() => activeCleanup?.())
         data-decoration-surface
         class="relative select-none overflow-hidden rounded-xl border bg-stone-100 touch-none"
         :style="{ aspectRatio: `${floor.imageWidth}/${floor.imageHeight}` }"
-        @pointerdown.self="selectedId = null; draft = null"
+        @pointerdown.self="clearSelection"
       >
         <img :src="floor.illustrationUrl" alt="" class="pointer-events-none absolute inset-0 size-full object-contain">
         <div
@@ -275,17 +357,25 @@ onBeforeUnmount(() => activeCleanup?.())
         </div>
       </div>
       <aside class="space-y-5">
-        <MediaPicker :map-id="mapId" label="装飾画像" usage="decoration" @selected="addDecoration" />
+        <MediaPicker :key="pickerKey" :map-id="mapId" label="装飾画像" usage="decoration" @selected="addDecoration" />
         <section v-if="selected" class="rounded-xl border bg-white p-4">
-          <h2 class="font-bold">選択中の操作</h2>
+          <h2 class="font-bold">選択中の装飾</h2>
+          <p class="mt-2 text-sm text-stone-600">ドラッグ、角のハンドル、または矢印キーで位置と形を調整します。</p>
+          <p v-if="dirty" class="mt-3 text-sm font-semibold text-terracotta-700">保存していない位置・形の変更があります。</p>
+          <div class="mt-4 flex flex-wrap gap-2 border-b pb-4">
+            <button type="button" class="min-h-11 rounded-lg border px-4 text-sm font-semibold disabled:opacity-50" :disabled="!dirty || saving || commandBusy" @click="discard">変更を破棄</button>
+            <button type="button" class="min-h-11 rounded-lg bg-terracotta-600 px-4 text-sm font-semibold text-white disabled:opacity-50" :disabled="!dirty || saving || commandBusy" @click="saveGeometry">{{ saving ? '保存中…' : '保存' }}</button>
+          </div>
+          <SaveFeedback class="mt-3" :state="saveState" :message="saveError || (saveState === 'success' ? '装飾の位置と形を保存しました。' : '')" />
+          <h3 class="mt-4 text-sm font-bold">装飾の操作</h3>
           <div class="mt-4 grid grid-cols-2 gap-2">
-            <button type="button" class="min-h-11 rounded border p-2 text-sm" @click="moveLayer(selected, -1)">後ろへ</button>
-            <button type="button" class="min-h-11 rounded border p-2 text-sm" @click="moveLayer(selected, 1)">前へ</button>
-            <button type="button" class="min-h-11 rounded border p-2 text-sm" @click="duplicate(selected)">複製</button>
-            <button type="button" class="min-h-11 rounded border border-red-200 p-2 text-sm text-red-700" @click="deleteTarget = selected">削除</button>
+            <button type="button" class="min-h-11 rounded border p-2 text-sm disabled:opacity-50" :disabled="saving || commandBusy" @click="moveLayer(selected, -1)">後ろへ</button>
+            <button type="button" class="min-h-11 rounded border p-2 text-sm disabled:opacity-50" :disabled="saving || commandBusy" @click="moveLayer(selected, 1)">前へ</button>
+            <button type="button" class="min-h-11 rounded border p-2 text-sm disabled:opacity-50" :disabled="saving || commandBusy" @click="duplicate(selected)">複製</button>
+            <button type="button" class="min-h-11 rounded border border-red-200 p-2 text-sm text-red-700 disabled:opacity-50" :disabled="saving || commandBusy" @click="requestDelete(selected)">削除</button>
           </div>
         </section>
-        <p v-if="saveError" role="alert" class="rounded-lg bg-red-50 p-3 text-sm text-red-700">{{ saveError }}</p>
+        <p v-if="saveError && saveState !== 'error'" role="alert" class="rounded-lg bg-red-50 p-3 text-sm text-red-700">{{ saveError }}</p>
       </aside>
     </div>
     <ConfirmDialog
@@ -298,5 +388,7 @@ onBeforeUnmount(() => activeCleanup?.())
       @cancel="deleteTarget = null"
       @confirm="removeConfirmed"
     />
+    <UiAlertDialog :open="transitionOpen" title="未保存の変更があります" message="位置と形の変更を保存して続けるか、破棄して続けるか選んでください。" confirm-label="保存して続ける" secondary-label="破棄して続ける" cancel-label="編集を続ける" :busy="saving" @confirm="saveAndContinue" @secondary="discardAndContinue" @cancel="stay" />
+    <UnsavedChangesGuard :dirty="dirty && !saving" />
   </div>
 </template>
