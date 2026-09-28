@@ -249,6 +249,15 @@ export function createSpotCsvExport(context: SpotCsvContext) {
   return encodeCsv([headers, ...rows])
 }
 
+/** A new-row starter keeps v3 metadata machine-authored without exporting a fake Spot. */
+export function createSpotCsvStarter(context: SpotCsvContext) {
+  const columns = spotCsvV3Columns(context.fields, context.enabledLocales)
+  return encodeCsv([
+    [...columns.map(column => column.header), ...SPOT_CSV_SYSTEM_HEADERS],
+    [...columns.map(() => ''), SPOT_CSV_VERSION, context.schemaVersion, '', '', ''],
+  ])
+}
+
 function parseTypedValue(field: CsvField, raw: string) {
   if (raw === '') return { value: null, valid: true }
   if (field.type === 'number') {

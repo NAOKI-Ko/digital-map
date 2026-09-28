@@ -120,8 +120,8 @@ function cancel() {
       <h2 class="text-lg font-bold text-stone-900">基本情報</h2>
       <div class="mt-5 grid gap-5 sm:grid-cols-2">
         <div class="sm:col-span-2">
-          <label for="spot-name" class="text-sm font-semibold text-stone-800">店名・スポット名 <span class="text-red-600">必須</span></label>
-          <input id="spot-name" v-model="name" v-bind="nameAttrs" maxlength="100" class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5" placeholder="例：まちかどカフェ">
+          <label for="spot-name" class="text-sm font-semibold text-stone-800">スポット名 <span class="text-red-600">必須</span></label>
+          <input id="spot-name" v-model="name" v-bind="nameAttrs" maxlength="100" class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5" placeholder="例：中央広場、展示室、〇〇商店">
           <p v-if="errors.name" class="mt-1 text-sm text-red-600">{{ errors.name }}</p>
         </div>
 
@@ -165,7 +165,7 @@ function cancel() {
 
 
     <section class="border-t border-stone-200 pt-5">
-      <h2 class="text-lg font-bold text-stone-900">営業情報・詳細</h2>
+      <h2 class="text-lg font-bold text-stone-900">追加情報</h2>
       <div class="mt-5 grid gap-5 sm:grid-cols-2">
         <div v-for="field in informationFields" :key="field.id" :class="{ 'sm:col-span-2': field.type === 'multiline_text' }">
           <label :for="`spot-field-${field.id}`" class="text-sm font-semibold text-stone-800">{{ field.label }} <span v-if="field.required" class="text-red-600">必須</span></label>

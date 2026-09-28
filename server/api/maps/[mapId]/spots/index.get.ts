@@ -1,3 +1,4 @@
+import { spotPhotoCount } from '~~/shared/utils/spot-operations'
 import type { Prisma } from '~~/prisma/generated/client'
 import { normalizePinIconType, normalizePinSize, normalizeSpotImportance } from '~~/shared/constants/spot'
 import { categoryOrderBy, sortSpotCategories, spotCategorySelect } from '~~/server/utils/category'
@@ -16,11 +17,11 @@ export default defineEventHandler(async (event): Promise<AdminSpotListResponse> 
     floor: { mapId: map.id },
     ...(keyword
       ? {
-          OR: [
+          AND: [{ OR: [
             { name: { contains: keyword, mode: 'insensitive' } },
             { spotCategories: { some: { category: { name: { contains: keyword, mode: 'insensitive' } } } } },
             { description: { contains: keyword, mode: 'insensitive' } },
-          ],
+          ] }],
         }
       : {}),
     ...(categoryId ? { spotCategories: { some: { categoryId, category: { mapId: map.id } } } } : {}),
@@ -50,6 +51,9 @@ export default defineEventHandler(async (event): Promise<AdminSpotListResponse> 
         pinColor: true,
         pinSize: true,
         updatedAt: true,
+        liveVersion: true,
+        photosJson: true,
+        _count: { select: { photos: true } },
         floor: { select: { name: true } },
         spotCategories: { select: spotCategorySelect },
       },
@@ -88,7 +92,9 @@ export default defineEventHandler(async (event): Promise<AdminSpotListResponse> 
       pinColor: spot.pinColor,
       pinSize: normalizePinSize(spot.pinSize),
       updatedAt: spot.updatedAt.toISOString(),
-    })),
+      liveVersion: spot.liveVersion,
+      photoCount: spotPhotoCount(spot.photosJson, spot._count.photos),
+    })).filter(spot => query.photo !== 'none' || spot.photoCount === 0),
     filters: {
       categories,
       floors,

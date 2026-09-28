@@ -13,7 +13,7 @@ const optionalRealCoordinate = (minimum: number, maximum: number, message: strin
 
 export const spotFormSchema = z.object({
   floorId: z.string().min(1, 'フロアを選択してください。'),
-  name: z.string().trim().min(1, '店名・スポット名を入力してください。').max(100, '名称は100文字以内で入力してください。'),
+  name: z.string().trim().min(1, 'スポット名を入力してください。').max(100, '名称は100文字以内で入力してください。'),
   categoryIds: z.array(z.string().min(1, 'カテゴリーIDが不正です。')).optional(),
   importance: z.enum(spotImportances).default('normal'),
   description: optionalText(2000, '説明文は2000文字以内で入力してください。'),
@@ -25,8 +25,8 @@ export const spotFormSchema = z.object({
       'WebサイトURLはhttpまたはhttpsで入力してください。',
     ),
   ]).default(''),
-  hoursText: optionalText(500, '営業時間は500文字以内で入力してください。'),
-  holidayText: optionalText(500, '定休日は500文字以内で入力してください。'),
+  hoursText: optionalText(500, '時間の情報は500文字以内で入力してください。'),
+  holidayText: optionalText(500, '休業日の情報は500文字以内で入力してください。'),
   phone: optionalText(50, '電話番号は50文字以内で入力してください。').refine(
     value => !value || /^[0-9+()\-ー―‐\s]+$/.test(value),
     '電話番号の形式を確認してください。',

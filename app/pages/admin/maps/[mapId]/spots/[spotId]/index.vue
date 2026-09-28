@@ -193,6 +193,7 @@ async function saveEnglish() {
           :map-id="mapId"
           :spot-id="spotId"
           :spot="data.spot"
+          :fields="data.fields"
           @updated="Object.assign(data.spot, $event)"
         />
       </section>

@@ -22,6 +22,8 @@ export interface AdminSpotSummary {
   pinColor: string
   pinSize: PinSize
   updatedAt: string
+  photoCount?: number
+  liveVersion?: number
 }
 
 export type PositionedAdminSpotSummary = AdminSpotSummary & {

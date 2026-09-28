@@ -1,17 +1,23 @@
 <script setup lang="ts">
 import { getPinIconPreset } from '~~/shared/constants/spot'
 import type { AdminSpotDetail, SpotPublishResponse } from '~~/shared/types/spot'
+import type { SpotFieldDefinitionItem } from '~~/shared/types/spot-field'
 import { getPinColorVariants } from '~~/shared/utils/pin-style'
 
 const props = defineProps<{
   mapId: string
   spotId: string
   spot: AdminSpotDetail
+  fields?: SpotFieldDefinitionItem[]
 }>()
 
 const emit = defineEmits<{
   updated: [publication: SpotPublishResponse['publication']]
 }>()
+
+function fieldLabel(key: string, fallback: string) {
+  return props.fields?.find(field => field.semanticKey === key)?.label ?? fallback
+}
 
 const isSaving = ref(false)
 const isPreviewOpen = ref(false)
@@ -117,8 +123,8 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleKeydown))
             <p v-else class="mt-3 text-sm text-stone-400">説明文は登録されていません。</p>
 
             <dl class="mt-5 divide-y divide-stone-100 border-y border-stone-100 text-sm">
-              <div v-if="spot.hoursText" class="grid grid-cols-[5rem_1fr] gap-3 py-3"><dt class="font-semibold text-stone-700">営業時間</dt><dd class="whitespace-pre-line text-stone-600">{{ spot.hoursText }}</dd></div>
-              <div v-if="spot.holidayText" class="grid grid-cols-[5rem_1fr] gap-3 py-3"><dt class="font-semibold text-stone-700">定休日</dt><dd class="whitespace-pre-line text-stone-600">{{ spot.holidayText }}</dd></div>
+              <div v-if="spot.hoursText" class="grid grid-cols-[5rem_1fr] gap-3 py-3"><dt class="font-semibold text-stone-700">{{ fieldLabel('hours', '営業時間') }}</dt><dd class="whitespace-pre-line text-stone-600">{{ spot.hoursText }}</dd></div>
+              <div v-if="spot.holidayText" class="grid grid-cols-[5rem_1fr] gap-3 py-3"><dt class="font-semibold text-stone-700">{{ fieldLabel('holiday', '定休日') }}</dt><dd class="whitespace-pre-line text-stone-600">{{ spot.holidayText }}</dd></div>
               <div v-if="spot.phone" class="grid grid-cols-[5rem_1fr] gap-3 py-3"><dt class="font-semibold text-stone-700">電話番号</dt><dd><a :href="`tel:${spot.phone}`" class="text-terracotta-700 underline">{{ spot.phone }}</a></dd></div>
             </dl>
             <p class="mt-4 text-center text-xs text-stone-400">管理画面プレビュー</p>
