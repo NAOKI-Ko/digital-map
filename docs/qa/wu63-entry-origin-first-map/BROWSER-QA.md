@@ -1,0 +1,5 @@
+# Local browser QA
+
+Built QA-mode server on `127.0.0.1:3143`, with fake mail and separate disposable PostgreSQL database. In-app browser verified guest `/` displayed Login/Signup; Login led to Signup; a verified disposable account logged in, reached its Workspace and created the first Map. The initial browser attempt caught stale navigation; after cache-key correction a fresh disposable account passed immediate no-reload sidebar verification. Screenshot inspection at the available 1280×720 browser viewport showed the expanded sidebar and setup content without visible clipping. The available browser control did not expose viewport resizing, so 390/768/1024/1440 visual checks remain **not executed** and must be completed before Windows acceptance is called PASS.
+
+The local first-Map has no illustration, positioned Spot or ready release. Publishing it solely to create a QR would exercise unrelated content setup; public URL/QR authority was instead tested by helpers and is reserved for the existing published Aquarium Map on Windows. Local fake-mail signup and verification used API calls so no auth token appears in screenshots or this evidence.

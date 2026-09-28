@@ -14,6 +14,8 @@ export type AdminIconName =
   | 'settings'
   | 'spot'
 
+export const ADMIN_MAP_LIST_KEY = 'admin-map-list'
+
 export type AdminNavigationGroupId = 'organization' | 'map' | 'operations' | 'team' | 'management'
 
 export interface AdminNavigationItem {
@@ -35,6 +37,11 @@ export interface AdminNavigationContext {
   mapId: string | null
   isOwner: boolean
   hasAssignedSpots: boolean
+}
+
+export function resolveNavigationMap<T extends { id: string }>(maps: T[], routeMapId: string | null): T | null {
+  if (routeMapId) return maps.find(map => map.id === routeMapId) ?? null
+  return maps.length === 1 ? maps[0]! : null
 }
 
 export const adminNavigationGroupLabels: Record<AdminNavigationGroupId, string> = {

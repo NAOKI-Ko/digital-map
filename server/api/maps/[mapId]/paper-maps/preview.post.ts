@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
     if (!saved || !canUsePaperDesign(parsed.data.config, parsePaperMapConfig(saved.config))) throw createError({ statusCode: 422, statusMessage: 'このデザインは新たに選択できません。' })
   }
   const source = await loadPaperMapSource(map.id, parsed.data.config.sourceMode, event)
-  const renderer = (parsed.data.config.templateVersion === 3 ? createEditorialRenderer : createPaperPageRenderer)(source, parsed.data.config, { publicBaseUrl: String(useRuntimeConfig(event).publicBaseUrl), uploadDirectory: getUploadDirectory(event), storage: getPublicStorage() })
+  const renderer = (parsed.data.config.templateVersion === 3 ? createEditorialRenderer : createPaperPageRenderer)(source, parsed.data.config, { publicBaseUrl: configuredPublicBaseUrl(event), uploadDirectory: getUploadDirectory(event), storage: getPublicStorage() })
   const document = renderer.document
   const page = Math.max(0, Math.min(parsed.data.page, document.pages.length - 1))
   const png = document.pages.length ? await renderer.render(page, parsed.data.thumbnail ? 55 : 150) : null

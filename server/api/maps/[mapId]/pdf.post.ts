@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
   const published = Boolean(record.isPublished && record.currentReleaseId)
   const source = published ? await loadCurrentPublicSnapshot(record.slug, 'ja', storage) : await getLivePublicMapById(map.id, 'ja')
   if (!source) throw createError({ statusCode: 409, statusMessage: 'PDFに出力できるマップ内容がありません。' })
-  const bytes = await generateMapPdf(source, input, { preview: !published, publicBaseUrl: String(useRuntimeConfig(event).publicBaseUrl), uploadDirectory: getUploadDirectory(event), storage })
+  const bytes = await generateMapPdf(source, input, { preview: !published, publicBaseUrl: configuredPublicBaseUrl(event), uploadDirectory: getUploadDirectory(event), storage })
   setResponseHeaders(event, { 'Content-Type': 'application/pdf', 'Content-Disposition': `attachment; filename="${record.slug}-${input.paper}-${input.orientation}.pdf"`, 'Cache-Control': 'private, no-store' })
   return bytes
 })

@@ -92,7 +92,7 @@ export default defineEventHandler(async (event): Promise<MapHomeSummaryResponse>
       isPublished: map.isPublished,
       currentReleaseId: map.currentReleaseId,
       lastPublishedAt: map.currentRelease?.readyAt?.toISOString() ?? null,
-      publicUrl: hasUsablePublicRelease ? buildPublicMapUrl(String(useRuntimeConfig(event).publicBaseUrl), map.slug) : null,
+      publicUrl: hasUsablePublicRelease ? buildPublicMapUrl(configuredPublicBaseUrl(event), map.slug) : null,
     },
     permissions: { isOwner, canReview: true, canManageEditors: isOwner },
     metrics: {

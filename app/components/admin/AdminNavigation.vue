@@ -3,8 +3,10 @@ import AdminIcon from './AdminIcon.vue'
 import type { AdminMapListResponse } from '~~/shared/types/map'
 import {
   adminNavigationGroupLabels,
+  ADMIN_MAP_LIST_KEY,
   buildAdminNavigation,
   isAdminNavigationItemActive,
+  resolveNavigationMap,
   type AdminNavigationGroupId,
   type AdminNavigationItem,
 } from '~/utils/admin-navigation'
@@ -18,13 +20,13 @@ const route = useRoute()
 const { logout, user } = useAuth()
 const isLoggingOut = ref(false)
 const { data: organizationData } = await useFetch('/api/organizations')
-const { data: mapData } = await useFetch<AdminMapListResponse>('/api/maps')
+const { data: mapData } = await useFetch<AdminMapListResponse>('/api/maps', { key: ADMIN_MAP_LIST_KEY })
 const { data: assignedSpotData } = await useFetch<{ spots: Array<{ id: string }> }>('/api/spot-editor/spots')
 const organizations = computed(() => organizationData.value?.organizations ?? [])
 const maps = computed(() => mapData.value?.maps ?? [])
 const activeOrganization = computed(() => organizations.value.find(item => item.id === organizationData.value?.activeOrganizationId))
 const routeMapId = computed(() => typeof route.params.mapId === 'string' ? route.params.mapId : null)
-const currentMap = computed(() => maps.value.find(map => map.id === routeMapId.value) ?? (maps.value.length === 1 ? maps.value[0]! : null))
+const currentMap = computed(() => resolveNavigationMap(maps.value, routeMapId.value))
 const isOwner = computed(() => activeOrganization.value?.role === 'OWNER')
 const showLabels = computed(() => props.mobile || props.expanded)
 const navigation = computed(() => buildAdminNavigation({

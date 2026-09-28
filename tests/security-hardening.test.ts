@@ -18,7 +18,7 @@ describe('WU-27 security hardening', () => {
     vi.stubGlobal('getRequestURL', () => new URL('https://admin.example.com/api/maps'))
     vi.stubGlobal('getUserSession', mocks.getUserSession)
     vi.stubGlobal('getHeader', mocks.getHeader)
-    vi.stubGlobal('useRuntimeConfig', () => ({ trustedOrigins: 'https://admin.example.com', publicBaseUrl: 'https://public.example.com' }))
+    vi.stubGlobal('useRuntimeConfig', () => ({ trustedOrigins: 'https://admin.example.com', public: { publicBaseUrl: 'https://public.example.com' }, adminBaseUrl: 'https://admin.example.com' }))
     ;({ consumeRateLimit, rateLimitKey } = await import('../server/utils/rate-limit'))
     ;({ enforceCsrfOrigin, contentSecurityPolicy } = await import('../server/utils/security'))
   })

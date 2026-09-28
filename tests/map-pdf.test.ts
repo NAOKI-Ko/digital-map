@@ -45,7 +45,8 @@ describe('paper map PDF', () => {
   }, 30_000)
 
   it('builds the exact configured public QR payload', () => {
-    expect(publicMapQrPayload('https://public.example.test/maps-root/', '駅 & 商店')).toBe('https://public.example.test/%E9%A7%85%20%26%20%E5%95%86%E5%BA%97')
+    expect(publicMapQrPayload('https://public.example.test', '駅 & 商店')).toBe('https://public.example.test/%E9%A7%85%20%26%20%E5%95%86%E5%BA%97')
+    expect(() => publicMapQrPayload('https://public.example.test/maps-root/', '駅 & 商店')).toThrow()
   })
 
   it('places normalized IMAGE coordinates across the print extent without pixel re-division', () => {

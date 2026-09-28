@@ -1,5 +1,5 @@
 export default defineEventHandler(async (event) => {
-  const base = String(useRuntimeConfig().publicBaseUrl).replace(/\/$/, '')
+  const base = configuredPublicBaseUrl().replace(/\/$/, '')
   const maps = await prisma.map.findMany({ where: { isPublished: true, currentReleaseId: { not: null } }, select: { slug: true, enabledLocales: true }, orderBy: { slug: 'asc' } })
   const escape = (value: string) => value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;')
   const urls = maps.flatMap(map => map.enabledLocales.filter(locale => locale === 'ja' || locale === 'en').map((locale) => {
