@@ -67,7 +67,8 @@ function close() { if (!saving.value) { if (action.value) discard.value = true; 
     <p v-if="loading" role="status">確認内容を読み込んでいます…</p>
     <template v-if="review">
       <p class="font-semibold">対象 {{ review.total }}件 · 変更 {{ review.changed }}件 · 変更不要 {{ review.unchanged }}件</p>
-      <p v-if="review.rows.some(row => row.error)" role="alert" class="mt-2 text-red-700">実行できないスポットがあります。選択を見直してください。自動的な除外は行いません。</p>
+      <p class="mt-1 text-sm">適用可能 {{ review.rows.filter(row => !row.error).length }}件 · 要解消 {{ review.rows.filter(row => row.error).length }}件 · 自動除外 0件</p>
+      <p v-if="review.rows.some(row => row.error)" role="alert" class="mt-2 text-red-700">全{{ review.total }}件とも未適用です。要解消のスポットを確認し、選択を見直してください。自動的な除外は行いません。</p>
       <ul class="my-3 max-h-80 overflow-y-auto divide-y rounded border p-3 text-sm">
         <li v-for="row in review.rows" :key="row.id" class="py-3"><strong>{{ row.name }}</strong> · {{ row.floorName }}<p>{{ row.description }}</p><p v-if="row.error" class="text-red-700">{{ row.error }}</p><div v-if="action === 'pinSource'" class="mt-2 flex gap-2"><PinAppearancePreview :appearance="row.before" label="現在" /><PinAppearancePreview :appearance="row.after" label="適用後" /></div></li>
       </ul>
