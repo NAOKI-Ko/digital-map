@@ -26,9 +26,9 @@ describe('PATCH Spot IMAGE position', () => {
   })
 
   beforeEach(() => {
-    mocks.requireOwnedSpot.mockReset().mockResolvedValue({ spot: { id: 'spot-1' } })
+    mocks.requireOwnedSpot.mockReset().mockResolvedValue({ spot: { id: 'spot-1', liveVersion: 1, floorId: 'floor-1' } })
     mocks.readBody.mockReset()
-    mocks.update.mockReset()
+    mocks.update.mockReset().mockResolvedValue({ liveVersion: 2 })
   })
 
   afterAll(() => vi.unstubAllGlobals())
@@ -47,12 +47,21 @@ describe('PATCH Spot IMAGE position', () => {
   })
 
   it('bounded x/yだけを永続化する', async () => {
-    mocks.readBody.mockResolvedValue({ x: 0.25, y: 0.75 })
-    await expect(handler({})).resolves.toEqual({ position: { x: 0.25, y: 0.75 } })
+    mocks.readBody.mockResolvedValue({ x: 0.25, y: 0.75, expectedVersion: 1, expectedFloorId: 'floor-1', expectedFloorUpdatedAt: '2026-09-29T00:00:00.000Z' })
+    await expect(handler({})).resolves.toEqual({ position: { x: 0.25, y: 0.75 }, liveVersion: 2 })
     expect(mocks.update).toHaveBeenCalledWith({
-      where: { id: 'spot-1' },
+      where: { id: 'spot-1', liveVersion: 1, floorId: 'floor-1', floor: { updatedAt: new Date('2026-09-29T00:00:00.000Z') } },
+      select: { liveVersion: true },
       data: { x: 0.25, y: 0.75, liveVersion: { increment: 1 } },
     })
+  })
+
+  it('rejects a stale queue or a changed Floor before writing coordinates', async () => {
+    for (const body of [{ x: 0.2, y: 0.3, expectedVersion: 0, expectedFloorId: 'floor-1', expectedFloorUpdatedAt: '2026-09-29T00:00:00.000Z' }, { x: 0.2, y: 0.3, expectedVersion: 1, expectedFloorId: 'other', expectedFloorUpdatedAt: '2026-09-29T00:00:00.000Z' }]) {
+      mocks.readBody.mockResolvedValue(body)
+      await expect(handler({})).rejects.toMatchObject({ statusCode: 409 })
+    }
+    expect(mocks.update).not.toHaveBeenCalled()
   })
 
   it('配置解除はSpotを削除せずx/yをnullにし、公開中なら下書きへ戻す', async () => {

@@ -98,7 +98,7 @@ async function persistSpot(input: SpotFormInput) {
   submitError.value = ''
   successMessage.value = ''
   try {
-    data.value = await $fetch<AdminSpotResponse>(`/api/maps/${mapId}/spots/${spotId}`, { method: 'PATCH', body: input })
+    data.value = await $fetch<AdminSpotResponse>(`/api/maps/${mapId}/spots/${spotId}`, { method: 'PATCH', body: { ...input, expectedVersion: data.value?.spot.liveVersion } })
     spotFormRef.value?.acceptSaved(initialValue.value ?? input)
     successMessage.value = 'スポット情報を保存しました。'
   }
@@ -184,13 +184,14 @@ async function saveEnglish() {
         <SpotPhotoManager
           :map-id="mapId"
           :spot-id="spotId"
+          :expected-version="data.spot.liveVersion"
           :initial-photos="data.spot.photos"
           :initial-photo-asset-ids="data.spot.photoAssetIds"
-          @updated="data.spot.photos = $event"
+          @updated="refresh()"
         />
       </details>
       <section class="mt-6 border-t border-stone-200 pt-5">
-        <PinSourceEditor :map-id="mapId" :spot="data.spot" @updated="refresh" />
+        <PinSourceEditor :map-id="mapId" :spot="data.spot" @updated="refresh()" />
         <SpotPublishPanel
           :map-id="mapId"
           :spot-id="spotId"

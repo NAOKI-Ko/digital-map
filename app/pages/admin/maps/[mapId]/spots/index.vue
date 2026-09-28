@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { AdminSpotListResponse } from '~~/shared/types/spot'
+import SpotPhotoDialog from '~/components/admin/SpotPhotoDialog.vue'
 import SpotBulkDialog from '~/components/admin/SpotBulkDialog.vue'
 import { pinSourceLabel } from '~~/shared/utils/pin-appearance'
 import type { AdminSpotSummary } from '~~/shared/types/spot'
@@ -30,6 +31,7 @@ const { data, error, status, refresh } = await useFetch<AdminSpotListResponse>(`
   query,
 })
 const selectedSpotIds = ref<string[]>([])
+const photoSpotId = ref('')
 const bulkSnapshot = ref<AdminSpotSummary[] | null>(null)
 const bulkMessage = ref('')
 const isBulkSaving = computed(() => bulkSnapshot.value !== null)
@@ -187,7 +189,7 @@ function formatDate(value: string) {
                 <p v-if="spot.x !== null && spot.y !== null" class="mt-2 text-sm text-stone-600">{{ spot.floorName }} · 配置済み</p>
                 <p v-else class="mt-2 text-sm font-medium text-amber-700">{{ spot.floorName }} · 位置未設定</p>
                 <NuxtLink v-if="spot.x !== null && spot.y !== null" :to="{ path: `/admin/maps/${mapId}/editor`, query: { floorId: spot.floorId, placeSpotId: spot.id } }" class="mt-2 inline-flex text-xs font-semibold text-terracotta-700">地図上で識別</NuxtLink>
-                <p class="mt-2 text-xs text-stone-600">{{ spot.photoCount ? `写真 ${spot.photoCount}枚` : '写真なし（任意）' }}</p>
+                <button type="button" class="mt-2 min-h-11 text-xs text-stone-600 underline" @click="photoSpotId = spot.id">{{ spot.photoCount ? `写真 ${spot.photoCount}枚を編集` : '写真を追加（任意）' }}</button>
                 <p class="mt-1 text-xs text-stone-600">{{ pinSourceLabel(spot.pinSourceMode, spot.pinSourceCategoryName) }}</p>
                 <p class="mt-1 text-xs text-stone-500">最終更新 {{ formatDate(spot.updatedAt) }}</p>
                 </div>
@@ -198,6 +200,7 @@ function formatDate(value: string) {
         </ul>
       </div>
     </section>
+    <SpotPhotoDialog v-if="photoSpotId" :key="photoSpotId" :map-id="mapId" :spot-id="photoSpotId" @close="photoSpotId = ''" @updated="refresh" />
     <SpotBulkDialog v-if="bulkSnapshot && data" :map-id="mapId" :spots="bulkSnapshot" :filters="data.filters" @close="bulkSnapshot = null" @saved="bulkSaved" />
   </div>
 </template>

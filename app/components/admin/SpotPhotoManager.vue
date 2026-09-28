@@ -7,17 +7,22 @@ import ConfirmDialog from '~/components/ui/ConfirmDialog.vue'
 const props = defineProps<{
   mapId: string
   spotId: string
+  expectedVersion?: number
   initialPhotos: string[]
   initialPhotoAssetIds?: Array<string | null>
 }>()
 
 const emit = defineEmits<{
   updated: [photos: string[]]
+  busy: [value: boolean]
 }>()
 
 const photos = ref([...props.initialPhotos])
 const assetIds = ref([...(props.initialPhotoAssetIds ?? props.initialPhotos.map(() => null))])
 const isSaving = ref(false)
+const version = ref(props.expectedVersion)
+watch(() => props.expectedVersion, value => { version.value = value })
+watch(isSaving, value => emit('busy', value))
 const errorMessage = ref('')
 const { success } = useToast()
 const removeTargetIndex = ref<number | null>(null)
@@ -64,14 +69,15 @@ async function movePhoto(index: number, direction: -1 | 1) {
 }
 
 async function saveChange(nextPhotos: string[], nextAssetIds: Array<string | null>, message: string) {
+  if (isSaving.value) return
   isSaving.value = true
   errorMessage.value = ''
   try {
     await persist(nextPhotos, nextAssetIds)
     success(message, `spot-photos-${props.spotId}`)
   }
-  catch {
-    errorMessage.value = '写真を保存できませんでした。もう一度お試しください。'
+  catch (error: any) {
+    errorMessage.value = error?.data?.statusMessage ?? '写真を保存できませんでした。再読込して確認してください。'
   }
   finally {
     isSaving.value = false
@@ -81,8 +87,9 @@ async function saveChange(nextPhotos: string[], nextAssetIds: Array<string | nul
 async function persist(nextPhotos: string[], nextAssetIds: Array<string | null>) {
   const response = await $fetch<SpotPhotosResponse>(`/api/maps/${props.mapId}/spots/${props.spotId}/photos`, {
     method: 'PATCH',
-    body: { photos: nextPhotos, assetIds: nextAssetIds },
+    body: { photos: nextPhotos, assetIds: nextAssetIds, expectedVersion: version.value },
   })
+  version.value = response.liveVersion
   photos.value = response.photos
   assetIds.value = response.assetIds
   emit('updated', response.photos)
@@ -97,7 +104,7 @@ async function persist(nextPhotos: string[], nextAssetIds: Array<string | null>)
         <p class="mt-1 text-sm text-stone-600">PNG / JPEG、1枚10MBまで、最大6枚。最初の写真を代表画像として扱います。</p>
       </div>
     </div>
-    <MediaPicker v-if="photos.length < 6" :map-id="mapId" label="スポット写真" usage="photo" class="mt-5" @selected="addPhoto" />
+    <MediaPicker v-if="photos.length < 6 && !isSaving" :map-id="mapId" label="スポット写真" usage="photo" class="mt-5" @selected="addPhoto" />
 
     <p v-if="errorMessage" role="alert" class="mt-4 text-sm text-red-600">{{ errorMessage }}</p>
 

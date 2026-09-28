@@ -77,6 +77,7 @@ export interface AdminSpotResponse {
 }
 
 export interface SpotPhotosResponse {
+  liveVersion?: number
   photos: string[]
   assetIds: Array<string | null>
 }

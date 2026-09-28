@@ -1,10 +1,12 @@
-import { assertPinSourceMembership } from '~~/server/utils/pin-appearance'
+import { assertPinSourceMembership, pinConflict } from '~~/server/utils/pin-appearance'
 import { spotFormSchema } from '~~/shared/schemas/spot'
 import type { AdminSpotResponse } from '~~/shared/types/spot'
 
 export default defineEventHandler(async (event): Promise<AdminSpotResponse> => {
   const { map, spot: ownedSpot } = await requireOwnedSpot(event)
-  const result = spotFormSchema.safeParse(await readBody(event))
+  const body = await readBody(event)
+  if (body.expectedVersion !== ownedSpot.liveVersion) throw pinConflict()
+  const result = spotFormSchema.safeParse(body)
 
   if (!result.success) {
     throw createError({
