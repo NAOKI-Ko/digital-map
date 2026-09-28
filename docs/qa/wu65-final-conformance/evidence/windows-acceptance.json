@@ -1,0 +1,145 @@
+{
+  "productSha": "0d0d1d5d75b6009c34e4bc37f9a6c5231e5cb245",
+  "setup": {
+    "adopted": 37,
+    "categoryAddRemove": 3,
+    "categoryId": "cmultn3zc000aysvafhh0lsdw",
+    "dependencyConflict": 37,
+    "explicitMultiCategory": true,
+    "floorPreparation": 3,
+    "imported": 37,
+    "mapId": "cmultn3yk0003ysvam9gkj3lx",
+    "roundtrip": 37
+  },
+  "photos": {
+    "results": [
+      {
+        "busyEscapeRetained": true,
+        "busyObserved": true,
+        "empty": true,
+        "explicit": true,
+        "title": "展示 36の写真"
+      },
+      {
+        "busyEscapeRetained": true,
+        "busyObserved": true,
+        "empty": true,
+        "explicit": true,
+        "title": "展示 37の写真"
+      },
+      {
+        "busyEscapeRetained": true,
+        "busyObserved": true,
+        "empty": true,
+        "explicit": true,
+        "title": "展示 35の写真"
+      }
+    ],
+    "count": {
+      "noPhoto": 34,
+      "photoSpots": 3
+    }
+  },
+  "placementPublication": {
+    "bluePublishedGreenLive": true,
+    "floors": 5,
+    "placed": 37,
+    "placedFloorBulkBlocked": true,
+    "publicationTargets": 37,
+    "releaseB": "cmultsr08001hrwvagv18r08s",
+    "releaseId": "cmultsqsq001frwvatjvp21mx",
+    "windows": true
+  },
+  "listRetail": {
+    "widths": [
+      {
+        "scroll": 390,
+        "width": 390
+      },
+      {
+        "scroll": 768,
+        "width": 768
+      },
+      {
+        "scroll": 1024,
+        "width": 1024
+      },
+      {
+        "scroll": 1440,
+        "width": 1440
+      }
+    ],
+    "keyboardSelectionReview": true,
+    "filterClearsSelection": true,
+    "conflicts": {
+      "disabled": true,
+      "truthful": true
+    },
+    "retailForm": {
+      "neutral": true,
+      "retail": true
+    }
+  },
+  "categoryDefault": {
+    "widths": [
+      {
+        "scroll": 390,
+        "width": 390
+      },
+      {
+        "scroll": 768,
+        "width": 768
+      },
+      {
+        "scroll": 1024,
+        "width": 1024
+      },
+      {
+        "scroll": 1440,
+        "width": 1440
+      }
+    ],
+    "retained": {
+      "checked": true,
+      "conflict": true,
+      "preview": true
+    },
+    "dirtyStayDiscard": true,
+    "setup": {
+      "categoryId": "cmultn407000pysva8l5o8efy",
+      "spotId": "cmultwdi9001krwvapccjl9kp"
+    }
+  },
+  "sourceTransitions": {
+    "modes": [
+      {
+        "color": "#2563EB",
+        "mode": "category",
+        "target": false,
+        "x": null,
+        "y": null
+      },
+      {
+        "color": "#2563EB",
+        "mode": "individual",
+        "target": false,
+        "x": null,
+        "y": null
+      },
+      {
+        "color": "#2563EB",
+        "mode": "category",
+        "target": false,
+        "x": null,
+        "y": null
+      },
+      {
+        "color": "#C7401F",
+        "mode": "standard",
+        "target": false,
+        "x": null,
+        "y": null
+      }
+    ]
+  }
+}

@@ -54,3 +54,60 @@ Initial read-only findings. Source basenames resolve to existing repository file
 | DEFER2 | INTENTIONAL-DEFER | Category Replace, custom-field grid, bulk photo/coordinates, pagination, extra shortcuts | 03/04 explicitly defer; CSV and per-item work retained |
 
 Slice rollup: A PASS with additional acceptance coverage pending; B PARTIAL; C PARTIAL (rollback evidence); D PARTIAL; E PASS; F PARTIAL; G PARTIAL. The final acceptance section will distinguish resolved implementation gaps from residual evidence limitations.
+
+## Final requirement reconciliation
+
+Every initial requirement has a final status below. The three PARTIAL rows refer to the same native IME manual coverage gap, not three missing features.
+
+| ID | Final classification | Evidence / remaining boundary |
+| --- | --- | --- |
+| A1 | PASS | original source basis remains valid; correction tests and focused final Windows replay introduce no regression. |
+| A2 | PASS | original source basis remains valid; correction tests and focused final Windows replay introduce no regression. |
+| A3 | PARTIAL | native Windows IME candidate-window testing remains unexecuted; neutral/configured retail UI and four-width checks pass. |
+| B1 | PASS | original source basis remains valid; correction tests and focused final Windows replay introduce no regression. |
+| B2 | PASS | original source basis remains valid; correction tests and focused final Windows replay introduce no regression. |
+| B3 | PASS | original source basis remains valid; correction tests and focused final Windows replay introduce no regression. |
+| B4 | PASS | original source basis remains valid; correction tests and focused final Windows replay introduce no regression. |
+| B5 | PASS | valid change/no-op counts exclude errors; Windows 37 conflicts shows 0 changes/0 no-ops/0 auto-skips. |
+| B6 | PASS | Map-wide factual counts, compact effective PIN preview and no-Category filter implemented/tested. |
+| B7 | PASS | native Excel UTF-8 open/save plus UI import; keyboard List review and applied-filter reset; four-width checks and conflict recovery. |
+| C1 | PASS | original source basis remains valid; correction tests and focused final Windows replay introduce no regression. |
+| C2 | PASS | original source basis remains valid; correction tests and focused final Windows replay introduce no regression. |
+| C3 | PASS | original source basis remains valid; correction tests and focused final Windows replay introduce no regression. |
+| C4 | NOT-APPLICABLE | assigned revisions cannot write categories/source; original scoped approval contract unchanged. |
+| C5 | PASS | original source basis remains valid; correction tests and focused final Windows replay introduce no regression. |
+| C6 | PASS | original source basis remains valid; correction tests and focused final Windows replay introduce no regression. |
+| C7 | PASS | original source basis remains valid; correction tests and focused final Windows replay introduce no regression. |
+| C8 | PASS | pin-rollback.integration.test.ts creates inherited appearance, freezes to legacy tuple, verifies old-reader output/coordinates/target/membership, then rolls back all fixture writes. |
+| C9 | PASS | original source basis remains valid; correction tests and focused final Windows replay introduce no regression. |
+| D1 | PASS | original source basis remains valid; correction tests and focused final Windows replay introduce no regression. |
+| D2 | PASS | original source basis remains valid; correction tests and focused final Windows replay introduce no regression. |
+| D3 | PASS | explicit outer individual-save label, effective thumbnail and absent-default label. |
+| D4 | PASS | original source basis remains valid; correction tests and focused final Windows replay introduce no regression. |
+| D5 | PASS | Category child controls are inside disabled fieldset during save; source inspection plus successful/failed Save browser paths. |
+| D6 | PARTIAL | default conflict retains draft; Stay/Discard, preview at four widths and keyboard source freeze/reset/standard pass. Only native Windows IME candidate-window coverage remains. |
+| E1 | PASS | original source basis remains valid; correction tests and focused final Windows replay introduce no regression. |
+| E2 | PASS | original source basis remains valid; correction tests and focused final Windows replay introduce no regression. |
+| E3 | PASS | original source basis remains valid; correction tests and focused final Windows replay introduce no regression. |
+| F1 | PASS | original source basis remains valid; correction tests and focused final Windows replay introduce no regression. |
+| F2 | PASS | original source basis remains valid; correction tests and focused final Windows replay introduce no regression. |
+| F3 | PASS | original source basis remains valid; correction tests and focused final Windows replay introduce no regression. |
+| F4 | PASS | real Windows stale then deleted target; candidate held until discard; refreshed Floor/Spot state reports deletion and focuses next item. |
+| F5 | PASS | focus follows target; composing/default-prevented Escape ignored; keyboard Save requires focused button, no global Enter binding. |
+| F6 | PASS | original source basis remains valid; correction tests and focused final Windows replay introduce no regression. |
+| F7 | PARTIAL | Windows-backed five sessions/37 focused Enter saves, skip/reload, stale/deleted recovery and four widths pass. Native Windows IME candidate-window coverage remains. |
+| G1 | PASS | original source basis remains valid; correction tests and focused final Windows replay introduce no regression. |
+| G2 | PASS | three real uploads remain library-only until explicit association; local real 409 retains pending selection. |
+| G3 | PASS | MutationObserver observed disabled return during real Windows uploads; Escape attempted then retained panel in all three cases; unlocked after completion. |
+| G4 | PASS | original source basis remains valid; correction tests and focused final Windows replay introduce no regression. |
+| G5 | PASS | stale association retained pending selection; explicit authoritative read/version refresh then retry; managed-photo DTO follows effective visitor contract with legacy fallback. |
+| G6 | PASS | original source basis remains valid; correction tests and focused final Windows replay introduce no regression. |
+| EXIT1 | PASS | original source basis remains valid; correction tests and focused final Windows replay introduce no regression. |
+| EXIT2 | PASS | fresh Windows 37 replay and final canonical compatibility digest; failure-state corrections verified. |
+| EXIT3 | PASS | exact corrected merge SHA, verified DB/media/public backup, staged Windows gates, post-merge Verify before activation; final digest unchanged. |
+| EXIT4 | PASS | original source basis remains valid; correction tests and focused final Windows replay introduce no regression. |
+| EXIT5 | PASS | findings closed on implemented/replayed behavior; native IME coverage exception remains explicitly recorded. |
+| DEFER1 | INTENTIONAL-DEFER | approved exclusions unchanged. |
+| DEFER2 | INTENTIONAL-DEFER | approved bulk/CSV exclusions unchanged. |
+
+Final slice rollup: **A PARTIAL (IME coverage only); B PASS; C PASS; D PARTIAL (IME coverage only); E PASS; F PARTIAL (IME coverage only); G PASS.** Functional implementation is complete for all seven slices. No MISSING product requirement remains. No schema/Paper/Content–Placement expansion was added. Browser tests use Chromium against Windows Node/PostgreSQL, not a claim of native Windows browser/IME operation.
