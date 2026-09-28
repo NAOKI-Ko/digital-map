@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { MapHomeSummaryResponse } from '~~/shared/types/map-home'
 import { mapVisibilityLabel } from '~/utils/admin-publication-copy'
+import { visitorPreviewPath } from '~~/shared/utils/visitor-preview'
 
 definePageMeta({ layout: 'admin', middleware: 'auth' })
 const route = useRoute()
@@ -32,6 +33,7 @@ function formatDateTime(value: string) {
       <AdminPageHeader eyebrow="ホーム" :title="data.map.name">
         <template #actions>
           <NuxtLink :to="`/admin/maps/${mapId}/settings`" class="inline-flex min-h-11 items-center justify-center rounded-lg bg-terracotta-600 px-4 text-sm font-semibold text-white shadow-sm hover:bg-terracotta-700">マップを編集</NuxtLink>
+          <NuxtLink :to="visitorPreviewPath(mapId, 'home')" class="inline-flex min-h-11 items-center justify-center rounded-lg border border-terracotta-300 bg-white px-4 text-sm font-semibold text-terracotta-800 hover:bg-terracotta-50">来館者プレビュー</NuxtLink>
           <a v-if="data.map.publicUrl" :href="data.map.publicUrl" target="_blank" rel="noopener noreferrer" class="inline-flex min-h-11 items-center justify-center rounded-lg border border-stone-300 bg-white px-4 text-sm font-semibold text-stone-800 hover:bg-stone-100">公開マップを見る<span class="ml-1" aria-hidden="true">↗</span></a>
         </template>
       </AdminPageHeader>

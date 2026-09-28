@@ -48,12 +48,14 @@ describe('privacy-light analytics', () => {
 
   it('公開送信は非同期でMAP_VIEWをsessionStorage dedupeし、SPOT_VIEWを許可する', () => {
     const source = readFileSync(new URL('../app/utils/public-analytics.ts', import.meta.url), 'utf8')
-    const page = readFileSync(new URL('../app/pages/[mapSlug]/index.vue', import.meta.url), 'utf8')
+    const page = readFileSync(new URL('../app/components/map/VisitorMapExperience.vue', import.meta.url), 'utf8')
     expect(source).toContain('sessionStorage.getItem')
     expect(source).toContain('navigator.sendBeacon')
     expect(source).toContain('keepalive: true')
     expect(page).toContain("type: 'SPOT_VIEW'")
     expect(page).toContain('recordMapViewOnce')
+    expect(page).toContain('props.analyticsEnabled !== false')
+    expect(readFileSync(new URL('../app/pages/admin/maps/[mapId]/preview.vue', import.meta.url), 'utf8')).toContain(':analytics-enabled="false"')
   })
 
   it('raw event/IP/cookie識別子を永続化せず、admin previewは計測しない', () => {

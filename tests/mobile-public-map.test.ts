@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { closeFilteredSpot, createFloorSwitchState, selectedSpotIdFromOverlay, shouldShowFloorSelector, type PublicOverlay } from '../app/utils/public-map-ui'
 
-const publicPage = readFileSync(new URL('../app/pages/[mapSlug]/index.vue', import.meta.url), 'utf8')
+const publicPage = readFileSync(new URL('../app/components/map/VisitorMapExperience.vue', import.meta.url), 'utf8')
 const floorSelector = readFileSync(new URL('../app/components/map/PublicFloorSelector.vue', import.meta.url), 'utf8')
 const info = readFileSync(new URL('../app/components/map/PublicMapInfo.vue', import.meta.url), 'utf8')
 const detail = readFileSync(new URL('../app/components/map/SpotDetailCard.vue', import.meta.url), 'utf8')
