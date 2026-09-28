@@ -3,6 +3,7 @@ import PublicSharePanel from '~/components/admin/PublicSharePanel.vue'
 import ConfirmDialog from '~/components/ui/ConfirmDialog.vue'
 import { buildPublicMapUrl } from '~~/shared/utils/public-url'
 import { resolvePublicationToggleAction } from '~~/shared/utils/map-publication'
+import { visitorPreviewPath } from '~~/shared/utils/visitor-preview'
 import { mapVisibilityLabel, releaseSourceLabel } from '~/utils/admin-publication-copy'
 import type { AdminMapResponse } from '~~/shared/types/map'
 import type { MapPublicationResponse } from '~~/shared/types/map-publication'
@@ -162,6 +163,7 @@ async function rollbackRelease(releaseId: string) {
           <div><h3 class="font-semibold">編集中の内容</h3><p class="mt-1">現在編集できる情報です。公開中のマップでも、変更だけでは閲覧者の表示は変わりません。</p></div>
           <div><h3 class="font-semibold">{{ hasReadyCurrentRelease ? releaseSourceLabel(data.map.isPublished) : '公開履歴なし' }}</h3><p class="mt-1">{{ hasReadyCurrentRelease ? data.map.isPublished ? '今、閲覧者に表示されている内容です。' : '以前公開した内容を保持しています。現在は閲覧者に表示されません。' : 'まだ公開した内容はありません。' }}</p></div>
         </div>
+        <NuxtLink :to="visitorPreviewPath(mapId, 'publish')" class="mt-4 inline-flex min-h-11 items-center justify-center rounded-lg border border-terracotta-300 bg-white px-4 py-2 text-sm font-semibold text-terracotta-800 hover:bg-terracotta-50">来館者プレビューで編集中の内容を確認</NuxtLink>
         <div v-if="data.map.isPublished || hasReadyCurrentRelease" class="mt-4 rounded-lg border border-stone-200 bg-white px-4 py-3 text-sm text-stone-700">
           <p>{{ data.map.isPublished ? '公開中の内容が、編集中の内容に更新されます。' : '前回公開した内容ではなく、現在編集中の情報から閲覧者向けの公開内容を作成します。' }}</p>
           <button type="button" class="mt-3 min-h-11 rounded border border-stone-300 bg-white px-3 py-2 text-sm font-semibold hover:bg-stone-100 disabled:opacity-60" :disabled="isSaving" @click="publishLatest">編集中の内容を公開する</button>

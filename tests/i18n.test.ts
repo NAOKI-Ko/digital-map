@@ -26,7 +26,7 @@ describe('ja/en i18n contract', () => {
   })
 
   it('公開UIに明示的な言語切替と英語有効時のbrowser suggestionがある', () => {
-    const page = readFileSync(new URL('../app/pages/[mapSlug]/index.vue', import.meta.url), 'utf8')
+    const page = readFileSync(new URL('../app/components/map/VisitorMapExperience.vue', import.meta.url), 'utf8')
     expect(page).toContain('public-locale')
     expect(page).toContain('route.query.lang')
     expect(page).toContain("navigator.language.toLowerCase().startsWith('en')")
