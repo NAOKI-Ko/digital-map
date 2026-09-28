@@ -11,6 +11,7 @@ import type { MapLocale } from '~~/shared/constants/map-languages'
 import type { MapNameInput } from '~~/shared/schemas/map'
 import type { AdminMapResponse, MapBrandingResponse } from '~~/shared/types/map'
 import type { UploadedImage } from '~~/shared/types/upload'
+import { ADMIN_MAP_LIST_KEY } from '~/utils/admin-navigation'
 
 definePageMeta({
   layout: 'admin',
@@ -130,6 +131,7 @@ async function saveMap(input: MapNameInput) {
       body: input,
     })
     data.value = response
+    await refreshNuxtData(ADMIN_MAP_LIST_KEY)
     mapNameForm.value?.acceptSaved(response.map.name)
     successMessage.value = 'マップ名を保存しました。'
   }
@@ -178,6 +180,7 @@ async function deleteMap() {
   isDeleting.value = true
   try {
     await $fetch(`/api/maps/${mapId}`, { method: 'DELETE' })
+    await refreshNuxtData(ADMIN_MAP_LIST_KEY)
     await navigateTo('/admin/dashboard')
   }
   catch (error: any) { deleteError.value = error?.data?.statusMessage ?? 'マップを削除できませんでした。' }

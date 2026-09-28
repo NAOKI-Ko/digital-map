@@ -3,6 +3,7 @@ import SaveFeedback from '~/components/ui/SaveFeedback.vue'
 import UnsavedChangesGuard from '~/components/admin/UnsavedChangesGuard.vue'
 import { mapCreateSchema, type MapCreateInput } from '~~/shared/schemas/map'
 import type { AdminMapResponse } from '~~/shared/types/map'
+import { ADMIN_MAP_LIST_KEY } from '~/utils/admin-navigation'
 
 definePageMeta({ layout: 'admin', middleware: 'auth' })
 useHead({ title: '新しいマップを作る | デジタルマップ' })
@@ -28,6 +29,7 @@ async function createMap() {
   try {
     const body: MapCreateInput = result.data
     const response = await $fetch<AdminMapResponse>('/api/maps', { method: 'POST', body })
+    await refreshNuxtData(ADMIN_MAP_LIST_KEY)
     await navigateTo({ path: `/admin/maps/${response.map.id}/setup`, query: { saved: 'map-created' } })
   }
   catch (error: any) {

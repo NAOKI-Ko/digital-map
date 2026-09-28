@@ -28,7 +28,6 @@ export default defineNuxtConfig({
     resendApiKey: '',
     mailFrom: '',
     mailReplyTo: '',
-    publicBaseUrl: process.env.PUBLIC_BASE_URL || process.env.NUXT_PUBLIC_BASE_URL || 'http://localhost:3000',
     adminBaseUrl: process.env.ADMIN_BASE_URL || process.env.NUXT_ADMIN_BASE_URL || process.env.PUBLIC_BASE_URL || process.env.NUXT_PUBLIC_BASE_URL || 'http://localhost:3000',
     trustedHosts: process.env.TRUSTED_HOSTS || '',
     trustProxy: process.env.TRUST_PROXY === 'true',

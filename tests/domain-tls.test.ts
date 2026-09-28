@@ -6,7 +6,7 @@ describe('WU-39 fixed URL/domain/TLS readiness', () => {
   let validateProductionBaseUrl: typeof import('../server/utils/base-url').validateProductionBaseUrl
   let effectiveRequestProtocol: typeof import('../server/utils/base-url').effectiveRequestProtocol
   let effectiveRequestHost: typeof import('../server/utils/base-url').effectiveRequestHost
-  const config = { publicBaseUrl: 'https://maps.example.test', adminBaseUrl: 'https://admin.example.test', trustedHosts: '', trustProxy: true }
+  const config = { public: { publicBaseUrl: 'https://maps.example.test' }, adminBaseUrl: 'https://admin.example.test', trustedHosts: '', trustProxy: true }
 
   beforeAll(async () => {
     vi.stubGlobal('useRuntimeConfig', () => config)
@@ -38,9 +38,9 @@ describe('WU-39 fixed URL/domain/TLS readiness', () => {
       readFile('app/pages/admin/maps/[mapId]/publish.vue', 'utf8'), readFile('server/api/auth/password/reset-request.post.ts', 'utf8'), readFile('server/api/organization/invitations/index.post.ts', 'utf8'), readFile('server/api/signup/index.post.ts', 'utf8'), readFile('app/pages/[mapSlug]/index.vue', 'utf8'),
     ])
     expect(publish).toContain('configuredPublicOrigin')
-    expect(reset).toContain('configuredAdminBaseUrl(event)')
-    expect(invite).toContain('configuredAdminBaseUrl(event)')
-    expect(signup).toContain('configuredAdminBaseUrl(event)')
+    expect(reset).toContain('configuredAdminUrl(')
+    expect(invite).toContain('configuredAdminUrl(')
+    expect(signup).toContain('configuredAdminUrl(')
     expect(publicPage).toContain('public.publicBaseUrl')
   })
 
@@ -62,7 +62,7 @@ describe('WU-39 fixed URL/domain/TLS readiness', () => {
     expect(middleware).toContain('effectiveRequestProtocol(event)')
     expect(middleware).toContain('sendRedirect(event')
     expect(middleware).toContain("'Strict-Transport-Security'")
-    expect(plugin).toContain("config.deploymentEnvironment !== 'production'")
+    expect(plugin).toContain("environment !== 'production'")
     expect(configSource).toContain('process.env.DEPLOYMENT_ENV')
     expect(configSource).toContain("secure: process.env.NODE_ENV === 'production'")
   })

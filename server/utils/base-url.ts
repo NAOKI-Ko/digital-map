@@ -1,11 +1,8 @@
 import type { H3Event } from 'h3'
+import { adminAbsoluteUrl, canonicalOrigin } from '../../shared/utils/origin'
 
 export function normalizeBaseUrl(value: unknown) {
-  const url = new URL(String(value))
-  url.pathname = url.pathname.replace(/\/$/, '') || '/'
-  url.search = ''
-  url.hash = ''
-  return url.toString().replace(/\/$/, '')
+  return canonicalOrigin(value, 'canonical origin')
 }
 
 export function validateProductionBaseUrl(name: 'PUBLIC_BASE_URL' | 'ADMIN_BASE_URL', value: unknown) {
@@ -17,14 +14,16 @@ export function validateProductionBaseUrl(name: 'PUBLIC_BASE_URL' | 'ADMIN_BASE_
   if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1' || hostname.endsWith('.localhost')) throw new Error(`${name} must not use localhost in production`)
   if (hostname === 'trycloudflare.com' || hostname.endsWith('.trycloudflare.com')) throw new Error(`${name} must not use a Quick Tunnel in production`)
   if (url.username || url.password) throw new Error(`${name} must not contain credentials`)
-  return normalizeBaseUrl(url)
+  return normalizeBaseUrl(url.toString())
 }
 
-export function configuredPublicBaseUrl(event?: H3Event) { return normalizeBaseUrl(useRuntimeConfig(event).publicBaseUrl) }
+export function configuredPublicBaseUrl(event?: H3Event) { return canonicalOrigin(useRuntimeConfig(event).public.publicBaseUrl, 'PUBLIC_ORIGIN') }
 export function configuredAdminBaseUrl(event?: H3Event) {
   const config = useRuntimeConfig(event)
-  return normalizeBaseUrl(config.adminBaseUrl || config.publicBaseUrl)
+  return canonicalOrigin(config.adminBaseUrl || config.public.publicBaseUrl, 'ADMIN_ORIGIN')
 }
+
+export function configuredAdminUrl(path: string, event?: H3Event) { return adminAbsoluteUrl(configuredAdminBaseUrl(event), path) }
 
 export function configuredTrustedHosts(event: H3Event) {
   const config = useRuntimeConfig(event)

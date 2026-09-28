@@ -18,7 +18,7 @@ describe('WU-41 Map Home summary', () => {
     vi.stubGlobal('defineEventHandler', (value: Handler) => value)
     vi.stubGlobal('requireMapAccess', mocks.requireMapAccess)
     vi.stubGlobal('getQuery', () => ({ days: '30' }))
-    vi.stubGlobal('useRuntimeConfig', () => ({ publicBaseUrl: 'https://maps.example.test' }))
+    vi.stubGlobal('configuredPublicBaseUrl', () => 'https://maps.example.test')
     vi.stubGlobal('setResponseHeader', mocks.setResponseHeader)
     vi.stubGlobal('createError', (input: { statusCode: number, statusMessage: string }) => Object.assign(new Error(input.statusMessage), input))
     vi.stubGlobal('prisma', {
@@ -77,4 +77,3 @@ describe('WU-41 Map Home summary', () => {
     expect(result.nextActions.map((item: any) => item.kind)).toContain('publish-map')
   })
 })
-

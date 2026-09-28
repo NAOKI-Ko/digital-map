@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import type { AdminMapListResponse } from '~~/shared/types/map'
+import { ADMIN_MAP_LIST_KEY } from '~/utils/admin-navigation'
 
 definePageMeta({ layout: 'admin', middleware: 'auth' })
 useHead({ title: 'ワークスペース | デジタルマップ' })
 
 const [{ data, error, refresh, status }, { data: organizationData }] = await Promise.all([
-  useFetch<AdminMapListResponse>('/api/maps'),
+  useFetch<AdminMapListResponse>('/api/maps', { key: ADMIN_MAP_LIST_KEY }),
   useFetch('/api/organizations'),
 ])
 const maps = computed(() => data.value?.maps ?? [])

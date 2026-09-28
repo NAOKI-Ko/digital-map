@@ -2,6 +2,7 @@ import { readFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { PDFDocument } from 'pdf-lib'
 import QRCode from 'qrcode'
+import { buildPublicMapUrl } from '../../shared/utils/public-url'
 import sharp, { type OverlayOptions } from 'sharp'
 import type { PublicFloor, PublicMap } from '~~/shared/types/public-map'
 import type { MapPdfRequest } from '~~/shared/schemas/map-pdf'
@@ -20,7 +21,7 @@ export function pdfPageSize(paper: MapPdfRequest['paper'], orientation: MapPdfRe
 }
 
 export function publicMapQrPayload(publicBaseUrl: string, slug: string) {
-  return new URL(`/${encodeURIComponent(slug)}`, publicBaseUrl.endsWith('/') ? publicBaseUrl : `${publicBaseUrl}/`).toString()
+  return buildPublicMapUrl(publicBaseUrl, slug)
 }
 
 export function normalizedImageToPage(value: number, offset: number, extent: number) {
