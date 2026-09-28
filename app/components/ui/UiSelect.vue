@@ -12,6 +12,7 @@ import {
   SelectValue,
   SelectViewport,
 } from 'reka-ui'
+import { fromSelectValue, toSelectValue } from '~/utils/ui-select-value'
 
 defineOptions({ inheritAttrs: false })
 
@@ -36,14 +37,16 @@ const emit = defineEmits<{
   'update:modelValue': [value: string]
   'update:open': [open: boolean]
 }>()
+
+const selectValue = computed(() => toSelectValue(props.modelValue))
 </script>
 
 <template>
   <div v-bind="$attrs">
     <SelectRoot
-      :model-value="props.modelValue"
+      :model-value="selectValue"
       :disabled="disabled"
-      @update:model-value="value => emit('update:modelValue', String(value))"
+      @update:model-value="value => emit('update:modelValue', fromSelectValue(value))"
       @update:open="open => emit('update:open', open)"
     >
       <SelectTrigger
@@ -67,7 +70,7 @@ const emit = defineEmits<{
             <SelectItem
               v-for="option in options"
               :key="option.value"
-              :value="option.value"
+              :value="toSelectValue(option.value)"
               :disabled="option.disabled"
               class="relative flex min-h-10 cursor-default select-none items-center rounded-lg py-2 pl-9 pr-3 text-sm text-stone-800 outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-40 data-[highlighted]:bg-terracotta-50 data-[highlighted]:text-terracotta-900"
             >
