@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PinSourceEditor from '~/components/admin/PinSourceEditor.vue'
 import SaveFeedback from '~/components/ui/SaveFeedback.vue'
 import SpotPhotoManager from '~/components/admin/SpotPhotoManager.vue'
 import SpotPublishPanel from '~/components/admin/SpotPublishPanel.vue'
@@ -17,7 +18,7 @@ const spotFormRef = useTemplateRef<{ acceptSaved: (value: SpotFormInput) => void
 const mapId = route.params.mapId as string
 const spotId = route.params.spotId as string
 const returnTo = computed(() => resolveSpotListReturnTo(mapId, route.query.returnTo))
-const { data, error, status } = await useFetch<AdminSpotResponse>(`/api/maps/${mapId}/spots/${spotId}`)
+const { data, error, status, refresh } = await useFetch<AdminSpotResponse>(`/api/maps/${mapId}/spots/${spotId}`)
 const isSubmitting = ref(false)
 const submitError = ref('')
 const successMessage = ref(route.query.saved === 'spot-created' ? 'スポットを登録しました。' : '')
@@ -189,6 +190,7 @@ async function saveEnglish() {
         />
       </details>
       <section class="mt-6 border-t border-stone-200 pt-5">
+        <PinSourceEditor :map-id="mapId" :spot="data.spot" @updated="refresh" />
         <SpotPublishPanel
           :map-id="mapId"
           :spot-id="spotId"

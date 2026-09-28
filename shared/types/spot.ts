@@ -15,6 +15,9 @@ export interface AdminSpotSummary {
   lat: number | null
   lng: number | null
   isPublished: boolean
+  pinSourceMode?: string
+  pinSourceCategoryId?: string | null
+  pinSourceCategoryName?: string | null
   pinIconType: PinIconType
   pinIconId: string | null
   pinIconImageUrl: string | null
@@ -87,6 +90,8 @@ export interface SpotPositionResponse {
 
 export interface SpotPinDesignResponse {
   design: {
+    liveVersion?: number
+    pinSourceMode?: string
     pinIconType: PinIconType
     pinIconId: string | null
     pinIconImageUrl: string | null

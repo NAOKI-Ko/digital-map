@@ -24,6 +24,8 @@ const props = withDefaults(defineProps<{
   compact?: boolean
   showSave?: boolean
   guardNavigation?: boolean
+  showImportance?: boolean
+  expectedVersion?: number
   initialValue: {
     pinIconType: PinIconType
     pinIconId: string | null
@@ -33,7 +35,7 @@ const props = withDefaults(defineProps<{
     pinSize: PinSize
     importance?: 'normal' | 'featured'
   }
-}>(), { compact: false, showSave: true, guardNavigation: true })
+}>(), { compact: false, showSave: true, guardNavigation: true, showImportance: true })
 
 const emit = defineEmits<{
   updated: [design: SpotPinDesignResponse['design']]
@@ -115,15 +117,15 @@ async function save(): Promise<SpotPinDesignResponse['design'] | null> {
   try {
     const response = await $fetch<SpotPinDesignResponse>(`/api/maps/${props.mapId}/spots/${props.spotId}/design`, {
       method: 'PATCH',
-      body: result.data,
+      body: { ...result.data, expectedVersion: props.expectedVersion },
     })
     Object.assign(design, response.design)
     emit('updated', response.design)
     if (props.showSave) success('ピンデザインを保存しました', `pin-design-${props.spotId}`)
     return response.design
   }
-  catch {
-    errorMessage.value = 'ピンデザインを保存できませんでした。もう一度お試しください。'
+  catch (error: any) {
+    errorMessage.value = error?.data?.statusMessage ?? 'ピンデザインを保存できませんでした。もう一度お試しください。'
     return null
   }
   finally {
@@ -218,7 +220,7 @@ defineExpose({ isDirty: () => isDirty.value, reset, save })
           </div>
         </fieldset>
 
-        <fieldset class="mt-7">
+        <fieldset v-if="showImportance" class="mt-7">
           <legend class="text-sm font-semibold text-stone-800">表示優先度</legend>
           <div class="mt-3 flex gap-2">
             <label v-for="item in [{ id: 'normal', label: '通常' }, { id: 'featured', label: '注目' }]" :key="item.id" class="rounded-lg border px-4 py-2 text-sm">
@@ -238,7 +240,7 @@ defineExpose({ isDirty: () => isDirty.value, reset, save })
     </div>
 
     <p v-if="errorMessage" role="alert" class="mt-5 text-sm text-red-600">{{ errorMessage }}</p>
-    <div v-if="showSave" class="mt-6 flex justify-end"><button type="button" :disabled="isSaving" class="rounded-lg bg-terracotta-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60" @click="save">{{ isSaving ? '保存中…' : 'ピンデザインを保存' }}</button></div>
+    <div v-if="showSave" class="mt-6 flex justify-end"><button type="button" :disabled="isSaving" class="rounded-lg bg-terracotta-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60" @click="save">{{ isSaving ? '保存中…' : '個別設定として保存' }}</button></div>
   </div>
   <UnsavedChangesGuard v-if="guardNavigation" :dirty="isDirty && !isSaving" />
 </template>

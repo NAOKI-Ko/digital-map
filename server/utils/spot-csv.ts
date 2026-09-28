@@ -21,6 +21,7 @@ type CsvSpot = {
   hoursText: string | null
   holidayText: string | null
   phone: string | null
+  pinSourceCategoryId?: string | null
   spotCategories: { categoryId: string }[]
   fieldValues: { fieldDefinitionId: string, valueJson: unknown }[]
   translations: { locale: string, name: string | null, description: string | null, address: string | null, hoursText: string | null, holidayText: string | null }[]
@@ -497,6 +498,7 @@ export function previewSpotCsv(
     }
     const row: ParsedSpotCsvRow = { rowNumber, spotId, suppliedRowVersion, floorId: resolvedFloorId, floorName, name, standardValues, customValues, englishName, englishStandardValues, englishCustomValues, categoryIds: [...new Set(categoryIds)], status: 'NEW', classifications: ['NEW'], diffs: [], messages }
     const existing = spotId ? spotById.get(spotId) : undefined
+    if (existing?.pinSourceCategoryId && !categoryIds.includes(existing.pinSourceCategoryId)) messages.push({ level: 'error', message: 'PIN用カテゴリーは外せません。先にPINの設定元を変更してください。' })
     if (existing && !messages.some(message => message.level !== 'warning')) {
       row.diffs = compareStates(spotEditableState(existing, fields), nextEditableState(existing, row, fields), fields, categories)
       row.status = row.diffs.length ? 'UPDATE' : 'UNCHANGED'

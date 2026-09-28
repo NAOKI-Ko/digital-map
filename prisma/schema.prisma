@@ -390,6 +390,15 @@ model Category {
   iconImageUrl   String?
   iconAssetId    String?
   iconAsset      MediaAsset?           @relation("CategoryIconAsset", fields: [iconAssetId], references: [id], onDelete: SetNull)
+  pinDefaultType     String?
+  pinDefaultIconId   String?
+  pinDefaultImageUrl String?
+  pinDefaultAssetId  String?
+  pinDefaultAsset    MediaAsset? @relation("CategoryPinDefaultAsset", fields: [pinDefaultAssetId], references: [id], onDelete: Restrict)
+  pinDefaultColor    String?
+  pinDefaultSize     String?
+  pinDefaultRevision Int @default(0)
+  pinSourceSpots     Spot[] @relation("SpotPinSource")
   spotCategories SpotCategory[]
   translations   CategoryTranslation[]
   createdAt      DateTime              @default(now())
@@ -459,6 +468,9 @@ model Spot {
   hoursText              String?
   holidayText            String?
   phone                  String?
+  pinSourceMode          String @default("individual")
+  pinSourceCategoryId    String?
+  pinSourceCategory      Category? @relation("SpotPinSource", fields: [pinSourceCategoryId], references: [id], onDelete: Restrict)
   pinIconType            String                      @default("preset")
   pinIconId              String?
   pinIconImageUrl        String?
@@ -483,6 +495,7 @@ model Spot {
   @@index([tenantId])
   @@index([floorId])
   @@index([floorId, isPublished])
+  @@index([pinSourceCategoryId, pinSourceMode])
 }
 
 model SpotTranslation {
@@ -652,6 +665,7 @@ model MediaAsset {
   mapSeoImages       Map[]               @relation("MapSeoImageAsset")
   floorIllustrations MapFloor[]          @relation("FloorIllustrationAsset")
   categoryIcons      Category[]          @relation("CategoryIconAsset")
+  categoryPinDefaults Category[] @relation("CategoryPinDefaultAsset")
   spotPins           Spot[]              @relation("SpotPinAsset")
   spotPhotos         SpotPhoto[]
   revisionPhotos     SpotRevisionPhoto[]

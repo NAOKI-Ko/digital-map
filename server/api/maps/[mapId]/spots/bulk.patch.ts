@@ -37,9 +37,13 @@ export default defineEventHandler(async (event): Promise<SpotBulkResponse> => {
         skipDuplicates: true,
       })
     }
-    else await transaction.spotCategory.deleteMany({ where: { spotId: { in: spotIds }, categoryId: category.id } })
+    else {
+      const referenced = await transaction.spot.count({ where: { id: { in: spotIds }, pinSourceCategoryId: category.id } })
+      if (referenced) throw createError({ statusCode: 409, statusMessage: 'PIN用カテゴリーとして使用中です。先にPINの設定元を変更してください。' })
+      await transaction.spotCategory.deleteMany({ where: { spotId: { in: spotIds }, categoryId: category.id } })
+    }
     await transaction.spot.updateMany({ where: { id: { in: spotIds } }, data: { liveVersion: { increment: 1 } } })
-  })
+  }, { isolationLevel: 'Serializable' })
 
   return { updatedCount: spotIds.length }
 })

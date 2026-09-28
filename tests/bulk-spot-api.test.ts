@@ -4,6 +4,7 @@ const mocks = vi.hoisted(() => ({
   requireOwnedMap: vi.fn(),
   readBody: vi.fn(),
   findMany: vi.fn(),
+  countSources: vi.fn(),
   transaction: vi.fn(),
   validateSpotCategories: vi.fn(),
   deleteManySpots: vi.fn(),
@@ -35,10 +36,11 @@ describe('release security: Spot bulk API', () => {
 
   beforeEach(() => {
     const transactionClient = {
-      spot: { deleteMany: mocks.deleteManySpots, updateMany: mocks.updateManySpots },
+      spot: { count: mocks.countSources, deleteMany: mocks.deleteManySpots, updateMany: mocks.updateManySpots },
       spotCategory: { deleteMany: mocks.deleteManyRelations, createMany: mocks.createManyRelations },
     }
     mocks.requireOwnedMap.mockReset().mockResolvedValue({ map: { id: 'map-a', tenantId: 'tenant-a' } })
+    mocks.countSources.mockReset().mockResolvedValue(0)
     mocks.readBody.mockReset()
     mocks.findMany.mockReset()
     mocks.validateSpotCategories.mockReset().mockResolvedValue([])
@@ -97,6 +99,15 @@ describe('release security: Spot bulk API', () => {
     await expect(handler({})).resolves.toEqual({ updatedCount: 1 })
     expect(mocks.deleteManyRelations).toHaveBeenCalledWith({ where: { spotId: { in: ['spot-a'] }, categoryId: 'category-a' } })
     expect(mocks.createManyRelations).not.toHaveBeenCalled()
+  })
+
+  it('PIN用カテゴリーを参照している場合はrelationを削除しない', async () => {
+    mocks.readBody.mockResolvedValue({ action: 'removeCategory', spotIds: ['spot-a'], categoryId: 'category-a' })
+    mocks.findMany.mockResolvedValue([{ id: 'spot-a', x: 0.25, y: 0.25 }])
+    mocks.validateSpotCategories.mockResolvedValue([{ id: 'category-a' }])
+    mocks.countSources.mockResolvedValue(1)
+    await expect(handler({})).rejects.toMatchObject({ statusCode: 409 })
+    expect(mocks.deleteManyRelations).not.toHaveBeenCalled()
   })
 
   it('transaction失敗時は成功responseを返さない', async () => {

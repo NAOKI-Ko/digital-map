@@ -29,6 +29,7 @@ export default defineEventHandler(async (event): Promise<AdminSpotResponse> => {
     return transaction.spot.create({
       data: {
         tenantId: map.tenantId,
+        pinSourceMode: 'standard',
         ...spotData,
         description: spotData.description || null,
         address: spotData.address || null,

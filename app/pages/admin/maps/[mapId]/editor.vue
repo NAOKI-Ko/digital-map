@@ -529,6 +529,7 @@ onBeforeUnmount(() => {
                   :key="placementSpot.id"
                   :map-id="mapId"
                   :spot-id="placementSpot.id"
+                  :expected-version="placementSpot.liveVersion"
                   :initial-value="placementSpot"
                   compact
                   :show-save="false"

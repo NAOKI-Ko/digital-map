@@ -1,3 +1,5 @@
+import { resolveEffectivePinAppearance } from '~~/shared/utils/pin-appearance'
+import { pinSourceInclude } from '~~/server/utils/pin-appearance'
 import { spotPhotoCount } from '~~/shared/utils/spot-operations'
 import type { Prisma } from '~~/prisma/generated/client'
 import { normalizePinIconType, normalizePinSize, normalizeSpotImportance } from '~~/shared/constants/spot'
@@ -44,6 +46,9 @@ export default defineEventHandler(async (event): Promise<AdminSpotListResponse> 
         lat: true,
         lng: true,
         isPublished: true,
+        pinSourceMode: true,
+        pinSourceCategoryId: true,
+        pinSourceCategory: pinSourceInclude,
         pinIconType: true,
         pinIconId: true,
         pinIconImageUrl: true,
@@ -85,12 +90,16 @@ export default defineEventHandler(async (event): Promise<AdminSpotListResponse> 
       lat: spot.lat,
       lng: spot.lng,
       isPublished: spot.isPublished,
-      pinIconType: normalizePinIconType(spot.pinIconType),
-      pinIconId: spot.pinIconId,
-      pinIconImageUrl: spot.pinIconImageUrl,
-      pinIconAssetId: spot.pinIconAssetId,
-      pinColor: spot.pinColor,
-      pinSize: normalizePinSize(spot.pinSize),
+
+
+
+
+
+
+      ...resolveEffectivePinAppearance(spot),
+      pinSourceMode: spot.pinSourceMode,
+      pinSourceCategoryId: spot.pinSourceCategoryId,
+      pinSourceCategoryName: spot.pinSourceCategory?.name ?? null,
       updatedAt: spot.updatedAt.toISOString(),
       liveVersion: spot.liveVersion,
       photoCount: spotPhotoCount(spot.photosJson, spot._count.photos),

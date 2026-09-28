@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import CategoryPinDefaultEditor from '~/components/admin/CategoryPinDefaultEditor.vue'
 import CategoryIcon from '~/components/CategoryIcon.vue'
 import SaveFeedback from '~/components/ui/SaveFeedback.vue'
 import CategoryIconEditor from '~/components/admin/CategoryIconEditor.vue'
@@ -205,7 +206,7 @@ async function saveEnglishName(category: CategorySummary) {
 <template>
   <div class="max-w-4xl">
     <NuxtLink :to="`/admin/maps/${mapId}`" class="text-sm font-medium text-stone-600 hover:text-stone-900">← マップのホームに戻る</NuxtLink>
-    <header class="mt-5"><p class="text-sm font-medium text-terracotta-700">マップ / カテゴリー</p><h1 class="mt-1 text-3xl font-bold text-stone-900">カテゴリー管理</h1><p class="mt-2 text-sm text-stone-600">スポットの分類を一元管理します。スポット情報項目はイラストマップ内で管理します。カテゴリーアイコンはスポットのピンデザインには影響しません。</p></header>
+    <header class="mt-5"><p class="text-sm font-medium text-terracotta-700">マップ / カテゴリー</p><h1 class="mt-1 text-3xl font-bold text-stone-900">カテゴリー管理</h1><p class="mt-2 text-sm text-stone-600">スポットの分類を一元管理します。スポット情報項目はイラストマップ内で管理します。カテゴリーアイコンは絞り込み・凡例用です。PINの既定デザインは別に設定します。</p></header>
     <SaveFeedback class="mt-6" :state="saveState" :message="message" />
     <details class="mt-6 border-y border-stone-200 py-4" :open="!data?.categories.length"><summary class="w-fit cursor-pointer text-sm font-semibold text-terracotta-700">＋ カテゴリーを追加</summary><form class="mt-4 space-y-4" @submit.prevent="createCategory">
       <div><label for="new-category-name" class="text-sm font-semibold text-stone-800">新しいカテゴリー名</label><input id="new-category-name" v-model="newName" maxlength="50" required class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5" placeholder="カテゴリー名"></div>
@@ -227,6 +228,7 @@ async function saveEnglishName(category: CategorySummary) {
             <button type="button" :disabled="category.spotCount > 0" class="rounded border border-red-200 px-3 py-1.5 text-red-700 disabled:opacity-40" @click="deleteTarget = category">削除</button>
           </div>
         </div>
+        <details class="mt-3"><summary class="cursor-pointer text-sm">PIN既定デザイン</summary><CategoryPinDefaultEditor :map-id="mapId" :category-id="category.id" /></details>
         <details class="mt-3"><summary class="w-fit cursor-pointer text-xs text-stone-500">英語名を編集</summary><label class="mt-3 block text-xs font-semibold text-stone-600">英語名（任意）<span class="mt-1 flex gap-2"><input v-model="englishDrafts[category.id]" class="w-full rounded border px-3 py-2 text-sm"><button type="button" :disabled="isSaving || englishDrafts[category.id] === savedEnglish[category.id]" class="rounded bg-stone-900 px-3 text-xs text-white disabled:opacity-50" @click="saveEnglishName(category)">英語名を保存</button></span></label></details>
       </li>
     </ul>
