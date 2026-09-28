@@ -1,120 +1,93 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
-
-const mocks = vi.hoisted(() => ({
-  requireOwnedMap: vi.fn(),
-  readBody: vi.fn(),
-  findMany: vi.fn(),
-  countSources: vi.fn(),
-  transaction: vi.fn(),
-  validateSpotCategories: vi.fn(),
-  deleteManySpots: vi.fn(),
-  updateManySpots: vi.fn(),
-  deleteManyRelations: vi.fn(),
-  createManyRelations: vi.fn(),
-}))
-
-type Handler = (event: unknown) => Promise<unknown>
-let handler: Handler
-
-function testError(input: { statusCode: number, statusMessage: string }) {
-  return Object.assign(new Error(input.statusMessage), input)
-}
-
-describe('release security: Spot bulk API', () => {
+import { planSpotBulk } from '../server/utils/spot-bulk'
+import type { SpotBulkInput } from '../shared/schemas/spot-bulk'
+const map = { id: 'map-a', tenantId: 'tenant-a' }
+const category = { id: 'category-a', name: '展示', pinDefaultRevision: 0, pinDefaultType: null }
+const spot = () => ({ id: 'spot-a', name: 'A', floorId: 'floor-a', floor: { name: '1F' }, x: null, y: null, lat: null, lng: null, isPublished: false, liveVersion: 1, pinSourceMode: 'individual', pinSourceCategoryId: null, pinSourceCategory: null, spotCategories: [{ categoryId: category.id, category }], pinIconType: 'preset', pinIconId: null, pinIconImageUrl: null, pinIconAssetId: null, pinColor: '#C7401F', pinSize: 'medium' })
+const tx = { spot: { findMany: vi.fn(), update: vi.fn(), delete: vi.fn() }, spotCategory: { createMany: vi.fn(), deleteMany: vi.fn() }, category: { findMany: vi.fn() }, mapFloor: { findFirst: vi.fn() }, auditEvent: { create: vi.fn() } }
+let input: unknown
+let handler: (event: unknown) => Promise<unknown>
+async function plan(command: SpotBulkInput) { return planSpotBulk(tx as never, map, command) }
+async function reviewed(command: SpotBulkInput) { input = { ...command, reviewToken: (await plan(command)).token } }
+describe('atomic reviewed Spot bulk API', () => {
   beforeAll(async () => {
-    vi.stubGlobal('defineEventHandler', (value: Handler) => value)
-    vi.stubGlobal('requireOwnedMap', mocks.requireOwnedMap)
-    vi.stubGlobal('readBody', mocks.readBody)
-    vi.stubGlobal('createError', testError)
-    vi.stubGlobal('validateSpotCategories', mocks.validateSpotCategories)
-    vi.stubGlobal('prisma', {
-      spot: { findMany: mocks.findMany },
-      $transaction: mocks.transaction,
-    })
-    handler = (await import('../server/api/maps/[mapId]/spots/bulk.patch')).default as Handler
+    vi.stubGlobal('defineEventHandler', (fn: unknown) => fn)
+    vi.stubGlobal('createError', (value: object) => Object.assign(new Error(), value))
+    vi.stubGlobal('requireOwnedMap', async () => ({ map, session: { user: { id: 'actor' } } }))
+    vi.stubGlobal('readBody', async () => input)
+    vi.stubGlobal('appendAuditEvent', async () => {})
+    vi.stubGlobal('prisma', { $transaction: async (fn: (client: unknown) => unknown) => fn(tx) })
+    handler = (await import('../server/api/maps/[mapId]/spots/bulk.patch')).default as never
   })
-
   beforeEach(() => {
-    const transactionClient = {
-      spot: { count: mocks.countSources, deleteMany: mocks.deleteManySpots, updateMany: mocks.updateManySpots },
-      spotCategory: { deleteMany: mocks.deleteManyRelations, createMany: mocks.createManyRelations },
-    }
-    mocks.requireOwnedMap.mockReset().mockResolvedValue({ map: { id: 'map-a', tenantId: 'tenant-a' } })
-    mocks.countSources.mockReset().mockResolvedValue(0)
-    mocks.readBody.mockReset()
-    mocks.findMany.mockReset()
-    mocks.validateSpotCategories.mockReset().mockResolvedValue([])
-    mocks.deleteManySpots.mockReset()
-    mocks.updateManySpots.mockReset()
-    mocks.deleteManyRelations.mockReset()
-    mocks.createManyRelations.mockReset()
-    mocks.transaction.mockReset().mockImplementation(async callback => callback(transactionClient))
+    vi.clearAllMocks()
+    tx.spot.findMany.mockResolvedValue([spot()])
+    tx.category.findMany.mockResolvedValue([category])
+    tx.mapFloor.findFirst.mockResolvedValue({ id: 'floor-b', name: '2F' })
   })
-
   afterAll(() => vi.unstubAllGlobals())
-
-  it('他Map Spotが1件でも混ざればtransaction前に全体を拒否する', async () => {
-    mocks.readBody.mockResolvedValue({ action: 'delete', spotIds: ['spot-a', 'spot-b'] })
-    mocks.findMany.mockResolvedValue([{ id: 'spot-a', x: 0.5, y: 0.5 }])
-
-    await expect(handler({})).rejects.toMatchObject({ statusCode: 404 })
-    expect(mocks.findMany).toHaveBeenCalledWith(expect.objectContaining({
-      where: { id: { in: ['spot-a', 'spot-b'] }, floor: { mapId: 'map-a' } },
-    }))
-    expect(mocks.transaction).not.toHaveBeenCalled()
-  })
-
-  it('位置未設定Spotを含む一括公開をtransaction前に拒否する', async () => {
-    mocks.readBody.mockResolvedValue({ action: 'publish', spotIds: ['spot-a'] })
-    mocks.findMany.mockResolvedValue([{ id: 'spot-a', x: null, y: null }])
-
-    await expect(handler({})).rejects.toMatchObject({ statusCode: 422 })
-    expect(mocks.transaction).not.toHaveBeenCalled()
-  })
-
-  it('重複Spot IDを除去し、既存Categoryを残したまま1件を冪等追加する', async () => {
-    mocks.readBody.mockResolvedValue({ action: 'addCategory', spotIds: ['spot-a', 'spot-a', 'spot-b'], categoryId: 'category-a' })
-    mocks.findMany.mockResolvedValue([
-      { id: 'spot-a', x: 0.25, y: 0.25 },
-      { id: 'spot-b', x: 0.75, y: 0.75 },
-    ])
-    mocks.validateSpotCategories.mockResolvedValue([{ id: 'category-a' }])
-
-    await expect(handler({})).resolves.toEqual({ updatedCount: 2 })
-    expect(mocks.validateSpotCategories).toHaveBeenCalledWith(expect.anything(), 'map-a', 'tenant-a', ['category-a'])
-    expect(mocks.deleteManyRelations).not.toHaveBeenCalled()
-    expect(mocks.createManyRelations).toHaveBeenCalledWith({
-      data: [
-        { spotId: 'spot-a', categoryId: 'category-a' },
-        { spotId: 'spot-b', categoryId: 'category-a' },
-      ],
-      skipDuplicates: true,
-    })
-  })
-
-  it('Category削除は他のrelationを残し、存在しないrelationも成功する', async () => {
-    mocks.readBody.mockResolvedValue({ action: 'removeCategory', spotIds: ['spot-a'], categoryId: 'category-a' })
-    mocks.findMany.mockResolvedValue([{ id: 'spot-a', x: 0.25, y: 0.25 }])
-    mocks.validateSpotCategories.mockResolvedValue([{ id: 'category-a' }])
-    await expect(handler({})).resolves.toEqual({ updatedCount: 1 })
-    expect(mocks.deleteManyRelations).toHaveBeenCalledWith({ where: { spotId: { in: ['spot-a'] }, categoryId: 'category-a' } })
-    expect(mocks.createManyRelations).not.toHaveBeenCalled()
-  })
-
-  it('PIN用カテゴリーを参照している場合はrelationを削除しない', async () => {
-    mocks.readBody.mockResolvedValue({ action: 'removeCategory', spotIds: ['spot-a'], categoryId: 'category-a' })
-    mocks.findMany.mockResolvedValue([{ id: 'spot-a', x: 0.25, y: 0.25 }])
-    mocks.validateSpotCategories.mockResolvedValue([{ id: 'category-a' }])
-    mocks.countSources.mockResolvedValue(1)
+  it('bounds commands, requires review and authorizes every ID inside transaction', async () => {
+    input = { action: 'unpublish', spotIds: ['spot-a'] }
     await expect(handler({})).rejects.toMatchObject({ statusCode: 409 })
-    expect(mocks.deleteManyRelations).not.toHaveBeenCalled()
+    input = { action: 'unpublish', spotIds: ['spot-a', 'cross-map'], reviewToken: 'a'.repeat(64) }
+    await expect(handler({})).rejects.toMatchObject({ statusCode: 404 })
+    expect(tx.spot.findMany).toHaveBeenCalledWith(expect.objectContaining({ where: { id: { in: ['cross-map', 'spot-a'] }, tenantId: map.tenantId, floor: { mapId: map.id } } }))
+    expect(tx.spot.update).not.toHaveBeenCalled()
   })
-
-  it('transaction失敗時は成功responseを返さない', async () => {
-    mocks.readBody.mockResolvedValue({ action: 'unpublish', spotIds: ['spot-a'] })
-    mocks.findMany.mockResolvedValue([{ id: 'spot-a', x: 0.5, y: 0.5 }])
-    mocks.transaction.mockRejectedValue(new Error('transaction failed'))
-
-    await expect(handler({})).rejects.toThrow('transaction failed')
+  it('reports no-op membership adds without bumping versions or deleting other memberships', async () => {
+    await reviewed({ action: 'addCategory', spotIds: ['spot-a', 'spot-a'], categoryId: category.id })
+    await expect(handler({})).resolves.toEqual({ updatedCount: 0, unchangedCount: 1, total: 1 })
+    expect(tx.spot.update).not.toHaveBeenCalled(); expect(tx.spotCategory.deleteMany).not.toHaveBeenCalled()
+  })
+  it('blocks removing an active or retained source reference', async () => {
+    tx.spot.findMany.mockResolvedValue([{ ...spot(), pinSourceCategoryId: category.id }])
+    await reviewed({ action: 'removeCategory', spotIds: ['spot-a'], categoryId: category.id })
+    await expect(handler({})).rejects.toMatchObject({ statusCode: 409 })
+    expect(tx.spotCategory.deleteMany).not.toHaveBeenCalled()
+  })
+  it('rejects any coordinate or eligibility on Floor assignment, even same Floor', async () => {
+    for (const change of [{ x: 0 }, { y: 0 }, { lat: 0 }, { lng: 0 }, { isPublished: true }]) {
+      tx.spot.findMany.mockResolvedValue([{ ...spot(), ...change }])
+      await reviewed({ action: 'assignFloor', spotIds: ['spot-a'], floorId: 'floor-b' })
+      await expect(handler({})).rejects.toMatchObject({ statusCode: 409 })
+    }
+    expect(tx.spot.update).not.toHaveBeenCalled()
+  })
+  it('assigns only floorId and version, never coordinates', async () => {
+    await reviewed({ action: 'assignFloor', spotIds: ['spot-a'], floorId: 'floor-b' })
+    await expect(handler({})).resolves.toMatchObject({ updatedCount: 1 })
+    expect(tx.spot.update).toHaveBeenCalledWith({ where: { id: 'spot-a', liveVersion: 1 }, data: { floorId: 'floor-b', liveVersion: { increment: 1 } } })
+  })
+  it('requires a complete position for target on', async () => {
+    await reviewed({ action: 'publish', spotIds: ['spot-a'] })
+    await expect(handler({})).rejects.toMatchObject({ statusCode: 409 })
+    expect(tx.spot.update).not.toHaveBeenCalled()
+  })
+  it('does not choose a source by category order and does not implicitly add memberships', async () => {
+    tx.spot.findMany.mockResolvedValue([{ ...spot(), spotCategories: [] }])
+    expect((await plan({ action: 'pinSource', spotIds: ['spot-a'], mode: 'soleCategory' })).rows[0]?.error).toBeTruthy()
+    tx.spot.findMany.mockResolvedValue([{ ...spot(), spotCategories: [{ categoryId: 'a' }, { categoryId: 'b' }] }])
+    expect((await plan({ action: 'pinSource', spotIds: ['spot-a'], mode: 'soleCategory' })).rows[0]?.error).toBeTruthy()
+    expect((await plan({ action: 'pinSource', spotIds: ['spot-a'], mode: 'category', categoryId: category.id })).rows[0]?.error).toBeTruthy()
+  })
+  it('freezes resolved appearance and clears retained source without modifying importance or coordinates', async () => {
+    tx.spot.findMany.mockResolvedValue([{ ...spot(), pinSourceMode: 'category', pinSourceCategoryId: category.id, pinSourceCategory: { ...category, pinDefaultType: 'preset', pinDefaultIconId: 'kanji:●', pinDefaultColor: '#2563EB', pinDefaultSize: 'large' } }])
+    const result = await plan({ action: 'pinSource', spotIds: ['spot-a'], mode: 'individual' })
+    expect(result.rows[0]?.data).toMatchObject({ pinSourceMode: 'individual', pinSourceCategoryId: null, pinColor: '#2563EB', pinSize: 'large' })
+    expect(result.rows[0]?.data).not.toHaveProperty('importance')
+    expect(result.rows[0]?.data).not.toHaveProperty('x')
+  })
+  it('rejects changed Spot versions and changed Category defaults after review', async () => {
+    await reviewed({ action: 'pinSource', spotIds: ['spot-a'], mode: 'category', categoryId: category.id })
+    tx.spot.findMany.mockResolvedValue([{ ...spot(), liveVersion: 2 }])
+    await expect(handler({})).rejects.toMatchObject({ statusCode: 409 })
+    tx.spot.findMany.mockResolvedValue([spot()]); tx.category.findMany.mockResolvedValue([{ ...category, pinDefaultRevision: 1 }])
+    await expect(handler({})).rejects.toMatchObject({ statusCode: 409 })
+    expect(tx.spot.update).not.toHaveBeenCalled()
+  })
+  it('returns conflict on serialization failure instead of success', async () => {
+    await reviewed({ action: 'assignFloor', spotIds: ['spot-a'], floorId: 'floor-b' })
+    tx.spot.update.mockRejectedValueOnce({ code: 'P2034' })
+    await expect(handler({})).rejects.toMatchObject({ statusCode: 409 })
   })
 })

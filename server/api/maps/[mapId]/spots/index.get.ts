@@ -17,6 +17,8 @@ export default defineEventHandler(async (event): Promise<AdminSpotListResponse> 
   const sort = query.sort === 'name' || query.sort === 'created' ? query.sort : 'updated'
   const where: Prisma.SpotWhereInput = {
     floor: { mapId: map.id },
+    ...(['standard', 'category', 'individual'].includes(String(query.pinSource)) ? { pinSourceMode: String(query.pinSource) } : {}),
+    ...(typeof query.pinSourceCategoryId === 'string' && query.pinSourceCategoryId ? { pinSourceCategoryId: query.pinSourceCategoryId } : {}),
     ...(keyword
       ? {
           AND: [{ OR: [

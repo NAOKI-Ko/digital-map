@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { AdminSpotListResponse } from '~~/shared/types/spot'
-import ConfirmDialog from '~/components/ui/ConfirmDialog.vue'
+import SpotBulkDialog from '~/components/admin/SpotBulkDialog.vue'
+import { pinSourceLabel } from '~~/shared/utils/pin-appearance'
+import type { AdminSpotSummary } from '~~/shared/types/spot'
 
 definePageMeta({
   layout: 'admin',
@@ -16,6 +18,8 @@ const form = reactive({
   status: typeof route.query.status === 'string' ? route.query.status : '',
   position: typeof route.query.position === 'string' ? route.query.position : '',
   photo: typeof route.query.photo === 'string' ? route.query.photo : '',
+  pinSource: typeof route.query.pinSource === 'string' ? route.query.pinSource : '',
+  pinSourceCategoryId: typeof route.query.pinSourceCategoryId === 'string' ? route.query.pinSourceCategoryId : '',
   sort: typeof route.query.sort === 'string' ? route.query.sort : 'updated',
 })
 const appliedFilters = ref({ ...form })
@@ -26,25 +30,24 @@ const { data, error, status, refresh } = await useFetch<AdminSpotListResponse>(`
   query,
 })
 const selectedSpotIds = ref<string[]>([])
-const bulkCategoryId = ref('')
-const pendingCategoryAction = ref<'addCategory' | 'removeCategory' | null>(null)
+const bulkSnapshot = ref<AdminSpotSummary[] | null>(null)
 const bulkMessage = ref('')
-const isBulkSaving = ref(false)
-const { success } = useToast()
-const bulkDeleteOpen = ref(false)
+const isBulkSaving = computed(() => bulkSnapshot.value !== null)
 const allCurrentSelected = computed(() => Boolean(data.value?.spots.length) && data.value!.spots.every(spot => selectedSpotIds.value.includes(spot.id)))
 let searchTimer: ReturnType<typeof setTimeout> | null = null
 
 useHead({ title: 'スポット一覧 | デジタルマップ' })
 
 function search() {
+  if (bulkSnapshot.value) return
+  if (selectedSpotIds.value.length) bulkMessage.value = '検索条件の変更により選択を解除しました。'
   selectedSpotIds.value = []
   appliedFilters.value = { ...form, q: form.q.trim() }
   void navigateTo({ path: route.path, query: query.value }, { replace: true })
 }
 
 function reset() {
-  Object.assign(form, { q: '', categoryId: '', floorId: '', status: '', position: '', photo: '', sort: 'updated' })
+  Object.assign(form, { q: '', categoryId: '', floorId: '', status: '', position: '', photo: '', pinSource: '', pinSourceCategoryId: '', sort: 'updated' })
   search()
 }
 
@@ -72,32 +75,12 @@ function toggleAllCurrent() {
   selectedSpotIds.value = allCurrentSelected.value ? [] : data.value?.spots.map(spot => spot.id) ?? []
 }
 
-async function runBulk(action: 'delete' | 'publish' | 'unpublish') {
-  if (!selectedSpotIds.value.length) return
-  if (action === 'delete') {
-    bulkDeleteOpen.value = true
-    return
-  }
-  await executeBulk(action)
+function openBulk() {
+  if (searchTimer) clearTimeout(searchTimer)
+  bulkSnapshot.value = structuredClone(toRaw(data.value?.spots.filter(spot => selectedSpotIds.value.includes(spot.id)) ?? []))
 }
-
-async function executeBulk(action: 'delete' | 'publish' | 'unpublish' | 'addCategory' | 'removeCategory') {
-  isBulkSaving.value = true
-  bulkMessage.value = ''
-  try {
-    await $fetch(`/api/maps/${mapId}/spots/bulk`, {
-      method: 'PATCH',
-      body: { action, spotIds: selectedSpotIds.value, ...((action === 'addCategory' || action === 'removeCategory') ? { categoryId: bulkCategoryId.value } : {}) },
-    })
-    const result = action === 'publish' ? '公開対象にしました' : action === 'unpublish' ? '公開対象外にしました' : action === 'addCategory' ? 'カテゴリーを追加しました' : action === 'removeCategory' ? 'カテゴリーを外しました' : '削除しました'
-    success(`${selectedSpotIds.value.length}件のスポットを${result}`, 'spot-bulk-operation')
-    selectedSpotIds.value = []
-    bulkDeleteOpen.value = false
-    pendingCategoryAction.value = null
-    await refresh()
-  }
-  catch (error: any) { bulkMessage.value = error?.data?.statusMessage ?? '一括操作を完了できませんでした。' }
-  finally { isBulkSaving.value = false }
+async function bulkSaved(message: string) {
+  bulkSnapshot.value = null; selectedSpotIds.value = []; bulkMessage.value = message; await refresh()
 }
 
 function formatDate(value: string) {
@@ -143,6 +126,7 @@ function formatDate(value: string) {
       <details class="min-w-0 flex-1" :open="Boolean(form.floorId || form.status || form.photo || form.sort !== 'updated')">
         <summary class="w-fit cursor-pointer py-2 text-sm font-medium text-stone-600">詳細条件</summary>
         <div class="mt-2 grid gap-3 sm:grid-cols-3">
+        <div><label for="spot-pin-source" class="text-xs font-semibold text-stone-600">PINの設定元</label><UiSelect id="spot-pin-source" v-model="form.pinSource" class="mt-1.5" label="PINの設定元" :options="[{ value: '', label: 'すべて' }, { value: 'standard', label: '標準ピン' }, { value: 'category', label: 'カテゴリー既定' }, { value: 'individual', label: '個別設定' }]" /></div>
         <div><label for="spot-photo" class="text-xs font-semibold text-stone-600">写真</label><UiSelect id="spot-photo" v-model="form.photo" class="mt-1.5" label="写真" :options="[{ value: '', label: 'すべて' }, { value: 'none', label: '写真なし（任意）' }]" /></div>
         <div><label for="spot-sort" class="text-xs font-semibold text-stone-600">並び順</label><UiSelect id="spot-sort" v-model="form.sort" class="mt-1.5" label="並び順" :options="[{ value: 'updated', label: '更新が新しい順' }, { value: 'name', label: '名前順' }, { value: 'created', label: '作成が新しい順' }]" /></div>
         <div>
@@ -166,21 +150,14 @@ function formatDate(value: string) {
       <div class="mb-3">
         <div class="flex flex-wrap items-center gap-3">
 
-          <template v-if="selectedSpotIds.length"><span class="text-sm text-stone-600">{{ selectedSpotIds.length }}件選択中</span>
-          <button type="button" :disabled="!selectedSpotIds.length || isBulkSaving" class="rounded-lg border px-3 py-2 text-sm disabled:opacity-40" @click="runBulk('publish')">公開対象にする</button>
-          <button type="button" :disabled="!selectedSpotIds.length || isBulkSaving" class="rounded-lg border px-3 py-2 text-sm disabled:opacity-40" @click="runBulk('unpublish')">公開対象外にする</button>
-          <button type="button" :disabled="!selectedSpotIds.length || isBulkSaving" class="rounded-lg border border-red-200 px-3 py-2 text-sm text-red-700 disabled:opacity-40" @click="runBulk('delete')">削除</button></template>
+          <span class="text-sm" aria-live="polite">{{ selectedSpotIds.length }}件選択中</span>
+          <button type="button" :disabled="!selectedSpotIds.length || isBulkSaving" class="rounded border px-3 py-2 text-sm disabled:opacity-40" @click="openBulk">選択したスポットを一括操作</button>
+          <button v-if="selectedSpotIds.length" type="button" :disabled="isBulkSaving" class="text-sm underline" @click="selectedSpotIds = []">選択を解除</button>
         </div>
-        <div v-if="selectedSpotIds.length" class="mt-4 flex flex-wrap items-center gap-2 border-t border-stone-200 pt-4">
-          <span class="text-sm font-semibold">カテゴリー一括操作:</span>
-          <UiSelect v-model="bulkCategoryId" class="min-w-52" label="一括操作するカテゴリー" :options="[{ value: '', label: '1つ選択' }, ...(data?.filters.categories ?? []).map(category => ({ value: category.id, label: category.name }))]" />
-          <button type="button" :disabled="!bulkCategoryId || isBulkSaving" class="rounded-lg border px-3 py-2 text-sm font-semibold disabled:opacity-40" @click="pendingCategoryAction = 'addCategory'">追加</button>
-          <button type="button" :disabled="!bulkCategoryId || isBulkSaving" class="rounded-lg border px-3 py-2 text-sm font-semibold disabled:opacity-40" @click="pendingCategoryAction = 'removeCategory'">削除</button>
-        </div>
-        <p v-if="bulkMessage" role="alert" class="mt-3 text-sm text-red-700">{{ bulkMessage }}</p>
+        <p v-if="bulkMessage" role="status" class="mt-3 text-sm text-stone-700">{{ bulkMessage }}</p>
       </div>
       <div class="flex items-center justify-between">
-        <div class="flex items-center gap-4"><h2 class="font-bold text-stone-900">検索結果</h2><button type="button" class="min-h-11 px-2 text-sm font-medium text-stone-600 hover:text-stone-900" :disabled="(data?.spots.length ?? 0) > 100 || isBulkSaving" @click="toggleAllCurrent">{{ allCurrentSelected ? '選択解除' : `検索結果${data?.spots.length ?? 0}件を選択` }}</button></div>
+        <div class="flex items-center gap-4"><h2 class="font-bold text-stone-900">検索結果</h2><label class="flex min-h-11 items-center gap-2 text-sm"><input type="checkbox" :checked="allCurrentSelected" :indeterminate="selectedSpotIds.length > 0 && !allCurrentSelected" :disabled="!data?.spots.length || (data?.spots.length ?? 0) > 100 || isBulkSaving" @change="toggleAllCurrent">検索結果{{ data?.spots.length ?? 0 }}件を選択</label></div>
         <span v-if="data" class="text-sm text-stone-500">{{ data.spots.length }}件</span>
       </div>
 
@@ -211,6 +188,7 @@ function formatDate(value: string) {
                 <p v-else class="mt-2 text-sm font-medium text-amber-700">{{ spot.floorName }} · 位置未設定</p>
                 <NuxtLink v-if="spot.x !== null && spot.y !== null" :to="{ path: `/admin/maps/${mapId}/editor`, query: { floorId: spot.floorId, placeSpotId: spot.id } }" class="mt-2 inline-flex text-xs font-semibold text-terracotta-700">地図上で識別</NuxtLink>
                 <p class="mt-2 text-xs text-stone-600">{{ spot.photoCount ? `写真 ${spot.photoCount}枚` : '写真なし（任意）' }}</p>
+                <p class="mt-1 text-xs text-stone-600">{{ pinSourceLabel(spot.pinSourceMode, spot.pinSourceCategoryName) }}</p>
                 <p class="mt-1 text-xs text-stone-500">最終更新 {{ formatDate(spot.updatedAt) }}</p>
                 </div>
               </div>
@@ -220,7 +198,6 @@ function formatDate(value: string) {
         </ul>
       </div>
     </section>
-    <ConfirmDialog :open="bulkDeleteOpen" title="スポットを一括削除" :message="`選択した${selectedSpotIds.length}件のスポットを削除します。関連する写真やカテゴリー設定も登録から外れ、元に戻せません。`" confirm-label="削除する" destructive :busy="isBulkSaving" @cancel="bulkDeleteOpen = false" @confirm="executeBulk('delete')" />
-    <ConfirmDialog :open="pendingCategoryAction !== null" title="カテゴリー一括操作" :message="`選択した${selectedSpotIds.length}件へ「${data?.filters.categories.find(category => category.id === bulkCategoryId)?.name ?? ''}」を${pendingCategoryAction === 'addCategory' ? '追加' : '削除'}します。他のカテゴリーは維持されます。`" confirm-label="実行する" :busy="isBulkSaving" @cancel="pendingCategoryAction = null" @confirm="pendingCategoryAction && executeBulk(pendingCategoryAction)" />
+    <SpotBulkDialog v-if="bulkSnapshot && data" :map-id="mapId" :spots="bulkSnapshot" :filters="data.filters" @close="bulkSnapshot = null" @saved="bulkSaved" />
   </div>
 </template>

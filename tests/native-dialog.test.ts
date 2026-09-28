@@ -100,7 +100,7 @@ describe('native dialog replacements', () => {
     '/app/components/admin/ImageUploader.vue',
     '/app/components/admin/SpotPhotoManager.vue',
     '/app/pages/admin/maps/[mapId]/floors.vue',
-    '/app/pages/admin/maps/[mapId]/spots/index.vue',
+    '/app/components/admin/SpotBulkDialog.vue',
   ])('%s uses the shared confirmation dialog', (file) => {
     expect(source(file)).toContain('ConfirmDialog')
   })

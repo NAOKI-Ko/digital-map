@@ -1,49 +1,32 @@
 import { spotBulkSchema } from '~~/shared/schemas/spot-bulk'
-import type { SpotBulkResponse } from '~~/shared/types/spot'
-
-export default defineEventHandler(async (event): Promise<SpotBulkResponse> => {
+import { planSpotBulk } from '~~/server/utils/spot-bulk'
+import { pinConflict } from '~~/server/utils/pin-appearance'
+export default defineEventHandler(async event => {
   const { map, session } = await requireOwnedMap(event)
-  const result = spotBulkSchema.safeParse(await readBody(event))
-  if (!result.success) throw createError({ statusCode: 422, statusMessage: result.error.issues[0]?.message ?? '一括操作の内容を確認してください。' })
-
-  const input = result.data
-  const spotIds = [...new Set(input.spotIds)]
-  const categoryId = input.action === 'addCategory' || input.action === 'removeCategory' ? input.categoryId : null
-  const spots = await prisma.spot.findMany({
-    where: { id: { in: spotIds }, floor: { mapId: map.id } },
-    select: { id: true, x: true, y: true },
-  })
-  if (spots.length !== spotIds.length) throw createError({ statusCode: 404, statusMessage: '選択したスポットが見つかりません。' })
-  if (input.action === 'publish' && spots.some(spot => spot.x === null || spot.y === null)) {
-    throw createError({ statusCode: 422, statusMessage: '位置未設定のスポットは公開できません。' })
+  const parsed = spotBulkSchema.safeParse(await readBody(event))
+  if (!parsed.success) throw createError({ statusCode: 422, statusMessage: '一括操作の内容を確認してください。' })
+  const input = parsed.data
+  if (!input.reviewToken) throw createError({ statusCode: 409, statusMessage: '変更内容を確認してから実行してください。' })
+  try {
+    return await prisma.$transaction(async tx => {
+      const plan = await planSpotBulk(tx, map, input)
+      if (input.reviewToken !== plan.token) throw pinConflict()
+      const blocked = plan.rows.filter(row => row.error)
+      if (blocked.length) throw createError({ statusCode: 409, statusMessage: '実行できないスポットがあります。変更は保存されていません。', data: { rows: blocked.map(({ id, name, error }) => ({ id, name, error })) } })
+      for (const row of plan.rows.filter(row => row.changed)) {
+        if (input.action === 'delete') await tx.spot.delete({ where: { id: row.id, liveVersion: row.version } })
+        else {
+          if (input.action === 'addCategory') await tx.spotCategory.createMany({ data: [{ spotId: row.id, categoryId: input.categoryId }], skipDuplicates: true })
+          if (input.action === 'removeCategory') await tx.spotCategory.deleteMany({ where: { spotId: row.id, categoryId: input.categoryId } })
+          await tx.spot.update({ where: { id: row.id, liveVersion: row.version }, data: { ...row.data, liveVersion: { increment: 1 } } })
+        }
+      }
+      await appendAuditEvent(tx, { tenantId: map.tenantId, actorUserId: session.user.id, action: 'SPOT_BULK_APPLIED', targetType: 'Map', targetId: map.id, mapId: map.id, metadata: { action: input.action, spotIds: plan.rows.map(row => row.id), total: plan.total, changed: plan.changed, unchanged: plan.unchanged } })
+      return { updatedCount: plan.changed, unchangedCount: plan.unchanged, total: plan.total }
+    }, { isolationLevel: 'Serializable' })
   }
-
-  await prisma.$transaction(async (transaction) => {
-    if (input.action === 'delete') {
-      for (const spot of spots) await appendAuditEvent(transaction, { tenantId: map.tenantId, actorUserId: session.user.id, action: 'SPOT_DELETED', targetType: 'Spot', targetId: spot.id, mapId: map.id })
-      await transaction.spot.deleteMany({ where: { id: { in: spotIds }, floor: { mapId: map.id } } })
-      return
-    }
-    if (input.action === 'publish' || input.action === 'unpublish') {
-      await transaction.spot.updateMany({ where: { id: { in: spotIds }, floor: { mapId: map.id } }, data: { isPublished: input.action === 'publish', liveVersion: { increment: 1 } } })
-      return
-    }
-    if (categoryId === null) return
-    const [category] = await validateSpotCategories(transaction, map.id, map.tenantId, [categoryId])
-    if (!category) return
-    if (input.action === 'addCategory') {
-      await transaction.spotCategory.createMany({
-        data: spotIds.map(spotId => ({ spotId, categoryId: category.id })),
-        skipDuplicates: true,
-      })
-    }
-    else {
-      const referenced = await transaction.spot.count({ where: { id: { in: spotIds }, pinSourceCategoryId: category.id } })
-      if (referenced) throw createError({ statusCode: 409, statusMessage: 'PIN用カテゴリーとして使用中です。先にPINの設定元を変更してください。' })
-      await transaction.spotCategory.deleteMany({ where: { spotId: { in: spotIds }, categoryId: category.id } })
-    }
-    await transaction.spot.updateMany({ where: { id: { in: spotIds } }, data: { liveVersion: { increment: 1 } } })
-  }, { isolationLevel: 'Serializable' })
-
-  return { updatedCount: spotIds.length }
+  catch (error) {
+    if (typeof error === 'object' && error && 'code' in error && ['P2034', 'P2025'].includes(String(error.code))) throw pinConflict()
+    throw error
+  }
 })
