@@ -1,8 +1,11 @@
+import { resolveEffectivePinAppearance } from '~~/shared/utils/pin-appearance'
+import { pinSourceInclude } from './pin-appearance'
 import type { Prisma } from '~~/prisma/generated/client'
 import { normalizePinIconType, normalizePinSize, normalizeSpotImportance } from '~~/shared/constants/spot'
 import { sortSpotCategories, spotCategorySelect } from './category'
 
 export const adminSpotInclude = {
+  pinSourceCategory: pinSourceInclude,
   floor: { select: { name: true } },
   spotCategories: { select: spotCategorySelect },
   photos: { include: { asset: { include: { variants: true } } }, orderBy: { order: 'asc' as const } },
@@ -58,12 +61,17 @@ export function toAdminSpotDetail(spot: SpotWithFloor) {
     hoursText: spot.hoursText,
     holidayText: spot.holidayText,
     phone: spot.phone,
-    pinIconType: normalizePinIconType(spot.pinIconType),
-    pinIconId: spot.pinIconId,
-    pinIconImageUrl: spot.pinIconImageUrl,
-    pinIconAssetId: spot.pinIconAssetId,
-    pinColor: spot.pinColor,
-    pinSize: normalizePinSize(spot.pinSize),
+
+
+
+
+
+
+    ...resolveEffectivePinAppearance(spot),
+    pinSourceMode: spot.pinSourceMode,
+    pinSourceCategoryId: spot.pinSourceCategoryId,
+    pinSourceCategoryName: spot.pinSourceCategory?.name ?? null,
+    liveVersion: spot.liveVersion,
     isPublished: spot.isPublished,
     createdAt: spot.createdAt.toISOString(),
     updatedAt: spot.updatedAt.toISOString(),

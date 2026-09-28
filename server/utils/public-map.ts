@@ -1,3 +1,5 @@
+import { resolveEffectivePinAppearance } from '~~/shared/utils/pin-appearance'
+import { pinSourceInclude } from './pin-appearance'
 import type { Prisma } from '../../prisma/generated/client'
 import type { PublicMap } from '../../shared/types/public-map'
 import { normalizePinIconType, normalizePinSize, normalizeSpotImportance } from '../../shared/constants/spot'
@@ -83,6 +85,9 @@ export function buildPublicMapQuery(slug: string) {
               phone: true,
               fieldValues: { select: { fieldDefinitionId: true, valueJson: true } },
               fieldValueTranslations: { select: { fieldDefinitionId: true, locale: true, value: true } },
+              pinSourceMode: true,
+              pinSourceCategoryId: true,
+              pinSourceCategory: pinSourceInclude,
               pinIconType: true,
               pinIconId: true,
               pinIconImageUrl: true,
@@ -151,6 +156,8 @@ export function serializePublicMap(record: PublicMapRecord | null, requestedLoca
       refBLng: floor.refBLng,
       spots: floor.spots.flatMap((spot) => {
         if (!spot.isPublished || spot.x === null || spot.y === null) return []
+        const appearance = resolveEffectivePinAppearance(spot)
+        const effectiveAsset = spot.pinSourceMode === 'category' ? spot.pinSourceCategory?.pinDefaultAsset : spot.pinSourceMode === 'standard' ? null : spot.pinIconAsset
         const legacyPhotos = Array.isArray(spot.photosJson)
           ? spot.photosJson.filter((value): value is string => typeof value === 'string')
           : []
@@ -218,11 +225,11 @@ export function serializePublicMap(record: PublicMapRecord | null, requestedLoca
           photos,
           informationFields,
           websiteAction,
-          pinIconType: normalizePinIconType(spot.pinIconType),
-          pinIconId: spot.pinIconId,
-          pinIconImageUrl: optimizedUrl(spot.pinIconAsset, 'icon', spot.pinIconImageUrl),
-          pinColor: spot.pinColor,
-          pinSize: normalizePinSize(spot.pinSize),
+          pinIconType: appearance.pinIconType,
+          pinIconId: appearance.pinIconId,
+          pinIconImageUrl: optimizedUrl(effectiveAsset, 'icon', appearance.pinIconImageUrl),
+          pinColor: appearance.pinColor,
+          pinSize: appearance.pinSize,
         }]
       }),
       decorations: floor.decorations.map(item => ({ id: item.id, imageUrl: optimizedUrl(item.asset, 'decoration', `/uploads/${item.asset.storageKey}`)!, imageWidth: item.asset.width, imageHeight: item.asset.height, x: item.x, y: item.y, width: item.width, rotation: item.rotation, order: item.order })),

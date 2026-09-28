@@ -275,7 +275,7 @@ function dropOn(targetId: string) {
     <header class="mt-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
       <div>
         <h1 class="text-3xl font-bold">スポット情報項目</h1>
-        <p class="mt-2 text-sm text-stone-600">スポットで使用する情報項目と表示順を管理します。</p>
+        <p class="mt-2 text-sm text-stone-600">スポットで使用する情報項目と表示順を管理します。施設では「営業時間」を「利用時間」「開館時間」に、「定休日」を「休館日」に変更することもできます。必要のない項目は無効にできます。</p>
       </div>
       <button type="button" class="min-h-11 shrink-0 rounded-lg bg-terracotta-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-terracotta-700" @click="requestAdd">＋ 項目を追加</button>
     </header>

@@ -1,3 +1,4 @@
+import { assertPinSourceMembership } from '~~/server/utils/pin-appearance'
 import type { Prisma } from '~~/prisma/generated/client'
 import type { SpotCsvImportResponse } from '~~/shared/types/spot-csv'
 import type { ParsedSpotCsvRow } from '~~/server/utils/spot-csv'
@@ -77,6 +78,7 @@ export default defineEventHandler(async (event): Promise<SpotCsvImportResponse> 
             floorId: row.floorId,
             name: row.name,
             ...standardSpotData(row, context.fields),
+            pinSourceMode: 'standard',
             x: null,
             y: null,
             isPublished: false,
@@ -88,6 +90,8 @@ export default defineEventHandler(async (event): Promise<SpotCsvImportResponse> 
         changedSpotIds.push(spot.id)
       }
       else if (row.status === 'UPDATE' && row.spotId) {
+        const current = await transaction.spot.findUniqueOrThrow({ where: { id: row.spotId } })
+        assertPinSourceMembership(current, row.categoryIds)
         await transaction.spot.update({
           where: { id: row.spotId },
           data: {

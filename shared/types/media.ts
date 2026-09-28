@@ -3,6 +3,7 @@ export interface MediaAssetUsage {
   mapSeoImages: number
   floorIllustrations: number
   categoryIcons: number
+  categoryPinDefaults?: number
   spotPins: number
   spotPhotos: number
   revisionPhotos: number

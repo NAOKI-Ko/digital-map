@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { placementQueue } from '~/utils/placement-queue'
+import { pinSourceLabel } from '~~/shared/utils/pin-appearance'
+import PinAppearancePreview from '~/components/admin/PinAppearancePreview.vue'
 import SaveFeedback from '~/components/ui/SaveFeedback.vue'
 import SpotCombobox from '~/components/admin/SpotCombobox.vue'
 import PinDesignEditor from '~/components/admin/PinDesignEditor.vue'
@@ -48,6 +51,9 @@ const floorOptions = computed(() => data.value?.floors.map(floor => ({ value: fl
 const selectedFloorSpots = computed(() => spotData.value?.spots.filter(spot => spot.floorId === selectedFloorId.value) ?? [])
 const positionedFloorSpots = computed(() => selectedFloorSpots.value.filter(hasPosition))
 const unpositionedFloorSpots = computed(() => selectedFloorSpots.value.filter(spot => !hasPosition(spot)))
+const queueMode = ref(false)
+const skippedSpotIds = ref<string[]>([])
+const queueItems = computed(() => placementQueue(spotData.value?.spots ?? [], selectedFloorId.value, skippedSpotIds.value))
 const placementSpotId = ref(requestedPlacementSpotId)
 const placementSpot = computed(() => selectedFloorSpots.value.find(spot => spot.id === placementSpotId.value) ?? null)
 const placementSpotIsPositioned = computed(() => Boolean(placementSpot.value && hasPosition(placementSpot.value)))
@@ -99,6 +105,8 @@ watch(() => data.value?.floors, (floors) => {
 }, { immediate: true })
 
 watch(selectedFloorId, () => {
+  queueMode.value = false
+  skippedSpotIds.value = []
   currentCamera.value = null
   operationGate.invalidate()
   addressRequestGate.invalidate()
@@ -204,18 +212,19 @@ function discardAndContinue() {
   action?.()
 }
 
-async function finishSuccessfulSave(message: string, operation: PinEditorOperationContext) {
+async function finishSuccessfulSave(message: string, operation: PinEditorOperationContext, advance = false) {
   await refreshSpots()
   if (!operationGate.isCurrent(operation)) return
   position.value = null
   placementMode.value = 'idle'
   pendingPinDesign.value = null
-  placementSpotId.value = ''
+  if (queueMode.value && advance) await selectNextInQueue()
+  else if (!(queueMode.value && operation.mode === 'designing')) placementSpotId.value = ''
   moveStatus.value = message
   await navigateTo({ path: route.path, query: { floorId: selectedFloorId.value } }, { replace: true })
 }
 
-async function savePosition() {
+async function savePosition(advance = false) {
   if (!placementSpot.value || !position.value || positionSaving.value) return
   const operation = operationGate.begin()
   positionSaving.value = true
@@ -225,17 +234,17 @@ async function savePosition() {
   try {
     await $fetch<SpotPositionResponse>(`/api/maps/${mapId}/spots/${placementSpot.value.id}/position`, {
       method: 'PATCH',
-      body: toPositionUpdatePayload(position.value),
+      body: { ...toPositionUpdatePayload(position.value), expectedVersion: placementSpot.value.liveVersion, expectedFloorId: selectedFloorId.value, expectedFloorUpdatedAt: selectedFloor.value?.updatedAt },
     })
-    await finishSuccessfulSave('', operation)
+    await finishSuccessfulSave('', operation, advance)
     saveState.value = 'success'
     saveMessage.value = 'スポットの位置を保存しました。'
   }
-  catch {
+  catch (error: any) {
     if (operationGate.isCurrent(operation)) {
       moveStatus.value = ''
       saveState.value = 'error'
-      saveMessage.value = '位置を保存できませんでした。候補位置は保持しています。'
+      saveMessage.value = (error?.data?.statusMessage ?? '位置を保存できませんでした。') + ' 候補位置は保持しています。'
     }
   }
   finally {
@@ -378,6 +387,7 @@ function updateCandidateFromDrag(value: { spotId: string, x: number, y: number }
 function selectExistingSpot(spot: { id: string }) {
   if (spot.id === placementSpotId.value) return
   requestTransition(() => {
+    queueMode.value = false
     placementSpotId.value = spot.id
     position.value = null
     placementMode.value = 'idle'
@@ -389,6 +399,7 @@ function selectPositionedSpot(spotId: string) {
   const spot = positionedFloorSpots.value.find(item => item.id === spotId)
   if (!spot) return
   requestTransition(() => {
+    queueMode.value = false
     placementSpotId.value = spot.id
     position.value = null
     placementMode.value = 'idle'
@@ -400,11 +411,33 @@ function selectPositionedSpot(spotId: string) {
 function selectUnpositionedSpot(spotId: string) {
   if (!spotId) return
   requestTransition(() => {
+    queueMode.value = false
     placementSpotId.value = spotId
     position.value = null
     placementMode.value = 'idle'
     moveStatus.value = ''
   })
+}
+
+async function selectNextInQueue() {
+  position.value = null
+  placementMode.value = 'idle'
+  placementSpotId.value = queueItems.value[0]?.id ?? ''
+  await nextTick()
+  if (placementSpot.value) startPlacement()
+}
+function startQueue() {
+  requestTransition(() => { queueMode.value = true; skippedSpotIds.value = []; void selectNextInQueue() })
+}
+function skipQueueSpot() {
+  requestTransition(() => {
+    if (placementSpotId.value) skippedSpotIds.value.push(placementSpotId.value)
+    void selectNextInQueue()
+  })
+}
+function stopQueue() { requestTransition(() => { queueMode.value = false; position.value = null; placementMode.value = 'idle' }) }
+async function reloadQueue() {
+  requestTransition(() => { void refreshSpots().then(() => { skippedSpotIds.value = []; return selectNextInQueue() }) })
 }
 
 function selectFloor(floorId: string) {
@@ -474,6 +507,14 @@ onBeforeUnmount(() => {
         </div>
       </div>
       <div class="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm font-semibold"><NuxtLink :to="spotNewLocation" class="text-terracotta-700">このフロアにスポットを作る →</NuxtLink><NuxtLink :to="{ path: `/admin/maps/${mapId}/floors/${selectedFloorId}/georeference`, query: { from: 'editor' } }" class="text-stone-600">このフロアの位置合わせを開く →</NuxtLink></div>
+      <section class="my-3 rounded-lg border border-stone-200 p-3" aria-label="フロアごとの連続配置">
+        <div class="flex flex-wrap items-center gap-3"><strong>{{ selectedFloor.name }} · 未配置 {{ unpositionedFloorSpots.length }}件</strong>
+          <button v-if="!queueMode" type="button" :disabled="!unpositionedFloorSpots.length" class="rounded border px-3 py-2 text-sm disabled:opacity-50" @click="startQueue">このフロアの未配置を順に配置</button>
+          <template v-else><span class="text-sm">後回し {{ skippedSpotIds.length }}件</span><button v-if="placementSpot" type="button" :disabled="positionSaving || designSaving" class="rounded border px-3 py-2 text-sm" @click="skipQueueSpot">このスポットを後回し</button><button type="button" class="text-sm underline" @click="stopQueue">連続配置を終了</button></template>
+        </div>
+        <p v-if="queueMode && !queueItems.length" role="status" class="mt-2 text-sm">{{ unpositionedFloorSpots.length ? '後回しのスポットが残っています。未配置のまま保存されています。' : 'このフロアの配置を完了しました。次のフロアはフロア選択から選んでください。' }}</p>
+        <button v-if="queueMode" type="button" :disabled="positionSaving || designSaving" class="mt-2 text-sm underline" @click="reloadQueue">最新の未配置を読み込み直す（後回しも再表示）</button>
+      </section>
       <div data-pin-editor-workspace class="mt-3 grid min-h-0 items-stretch gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(360px,1fr)] xl:grid-cols-[minmax(0,7fr)_minmax(380px,3fr)]">
         <section class="min-w-0 lg:sticky lg:top-6 lg:self-start" aria-label="地図操作">
           <ClientOnly>
@@ -500,13 +541,15 @@ onBeforeUnmount(() => {
         <UiInspector class="overflow-hidden rounded-xl border border-stone-200" :title="designEditing ? 'ピンデザインを編集' : placementActive ? 'ピン位置を編集' : '詳細設定'">
           <SaveFeedback v-if="route.query.saved === 'spot-created'" class="mt-3" state="success" message="スポットを登録しました。" />
           <SaveFeedback class="mt-3" :state="saveState" :message="saveMessage" />
-          <SpotCombobox v-if="placementMode === 'idle'" :model-value="placementSpotIsPositioned ? '' : placementSpotId" :spots="unpositionedFloorSpots" @update:model-value="selectUnpositionedSpot" />
+          <SpotCombobox v-if="placementMode === 'idle' && !queueMode" :model-value="placementSpotIsPositioned ? '' : placementSpotId" :spots="unpositionedFloorSpots" @update:model-value="selectUnpositionedSpot" />
 
           <section class="mt-6 border-t border-stone-200 pt-5" aria-live="polite">
             <h2 class="text-sm font-bold text-stone-900">{{ placementMode === 'idle' ? '選択中のスポット' : '編集中のスポット' }}</h2>
             <p v-if="!placementSpot" class="mt-3 text-sm text-stone-600">地図上のピンを選択してください。</p>
             <template v-else>
               <h3 class="mt-3 text-lg font-bold text-stone-900">{{ placementSpot.name }}</h3>
+              <p class="mt-2 text-xs">{{ pinSourceLabel(placementSpot.pinSourceMode, placementSpot.pinSourceCategoryName) }}</p>
+              <PinAppearancePreview v-if="queueMode" class="mt-2" :appearance="placementSpot" label="配置するピン" />
               <p class="mt-1 text-xs text-stone-500">{{ placementSpot.floorName }}<span v-if="placementSpot.categories.length"> / {{ placementSpot.categories.map(category => category.name).join('・') }}</span></p>
               <div v-if="placementMode === 'idle'" class="mt-3 flex flex-wrap gap-2 text-xs font-semibold">
                 <span class="rounded-full bg-stone-100 px-2.5 py-1 text-stone-700">{{ placementSpotIsPositioned ? '配置済み' : '未配置' }}</span>
@@ -529,6 +572,7 @@ onBeforeUnmount(() => {
                   :key="placementSpot.id"
                   :map-id="mapId"
                   :spot-id="placementSpot.id"
+                  :expected-version="placementSpot.liveVersion"
                   :initial-value="placementSpot"
                   compact
                   :show-save="false"
@@ -558,7 +602,7 @@ onBeforeUnmount(() => {
             <UiFormActions>
               <UiButton variant="secondary" :disabled="positionSaving || designSaving" @click="requestTransition(designEditing ? cancelDesignEditing : cancelPositionEditing)">キャンセル</UiButton>
               <UiButton v-if="designEditing" :busy="designSaving" :disabled="designSaving || !pageDirty" @click="saveDesign">{{ designSaving ? '保存中…' : 'デザインを保存' }}</UiButton>
-              <UiButton v-else :busy="positionSaving" :disabled="!position || positionSaving" @click="savePosition">{{ positionSaving ? '保存中…' : 'この位置を保存' }}</UiButton>
+              <UiButton v-else :busy="positionSaving" :disabled="!position || positionSaving" @click="savePosition(queueMode)">{{ positionSaving ? '保存中…' : queueMode ? '保存して次へ' : 'この位置を保存' }}</UiButton>
             </UiFormActions>
           </template>
         </UiInspector>

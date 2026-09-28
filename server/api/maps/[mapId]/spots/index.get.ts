@@ -1,3 +1,6 @@
+import { resolveEffectivePinAppearance } from '~~/shared/utils/pin-appearance'
+import { pinSourceInclude } from '~~/server/utils/pin-appearance'
+import { spotPhotoCount } from '~~/shared/utils/spot-operations'
 import type { Prisma } from '~~/prisma/generated/client'
 import { normalizePinIconType, normalizePinSize, normalizeSpotImportance } from '~~/shared/constants/spot'
 import { categoryOrderBy, sortSpotCategories, spotCategorySelect } from '~~/server/utils/category'
@@ -14,13 +17,15 @@ export default defineEventHandler(async (event): Promise<AdminSpotListResponse> 
   const sort = query.sort === 'name' || query.sort === 'created' ? query.sort : 'updated'
   const where: Prisma.SpotWhereInput = {
     floor: { mapId: map.id },
+    ...(['standard', 'category', 'individual'].includes(String(query.pinSource)) ? { pinSourceMode: String(query.pinSource) } : {}),
+    ...(typeof query.pinSourceCategoryId === 'string' && query.pinSourceCategoryId ? { pinSourceCategoryId: query.pinSourceCategoryId } : {}),
     ...(keyword
       ? {
-          OR: [
+          AND: [{ OR: [
             { name: { contains: keyword, mode: 'insensitive' } },
             { spotCategories: { some: { category: { name: { contains: keyword, mode: 'insensitive' } } } } },
             { description: { contains: keyword, mode: 'insensitive' } },
-          ],
+          ] }],
         }
       : {}),
     ...(categoryId ? { spotCategories: { some: { categoryId, category: { mapId: map.id } } } } : {}),
@@ -43,6 +48,9 @@ export default defineEventHandler(async (event): Promise<AdminSpotListResponse> 
         lat: true,
         lng: true,
         isPublished: true,
+        pinSourceMode: true,
+        pinSourceCategoryId: true,
+        pinSourceCategory: pinSourceInclude,
         pinIconType: true,
         pinIconId: true,
         pinIconImageUrl: true,
@@ -50,6 +58,9 @@ export default defineEventHandler(async (event): Promise<AdminSpotListResponse> 
         pinColor: true,
         pinSize: true,
         updatedAt: true,
+        liveVersion: true,
+        photosJson: true,
+        _count: { select: { photos: true } },
         floor: { select: { name: true } },
         spotCategories: { select: spotCategorySelect },
       },
@@ -81,14 +92,20 @@ export default defineEventHandler(async (event): Promise<AdminSpotListResponse> 
       lat: spot.lat,
       lng: spot.lng,
       isPublished: spot.isPublished,
-      pinIconType: normalizePinIconType(spot.pinIconType),
-      pinIconId: spot.pinIconId,
-      pinIconImageUrl: spot.pinIconImageUrl,
-      pinIconAssetId: spot.pinIconAssetId,
-      pinColor: spot.pinColor,
-      pinSize: normalizePinSize(spot.pinSize),
+
+
+
+
+
+
+      ...resolveEffectivePinAppearance(spot),
+      pinSourceMode: spot.pinSourceMode,
+      pinSourceCategoryId: spot.pinSourceCategoryId,
+      pinSourceCategoryName: spot.pinSourceCategory?.name ?? null,
       updatedAt: spot.updatedAt.toISOString(),
-    })),
+      liveVersion: spot.liveVersion,
+      photoCount: spotPhotoCount(spot.photosJson, spot._count.photos),
+    })).filter(spot => query.photo !== 'none' || spot.photoCount === 0),
     filters: {
       categories,
       floors,

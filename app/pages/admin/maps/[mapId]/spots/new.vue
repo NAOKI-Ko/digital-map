@@ -126,7 +126,7 @@ function cancelForm() {
     <header class="mt-5">
       <p class="text-sm font-medium text-terracotta-700">スポット管理</p>
       <h1 class="mt-1 text-2xl font-bold tracking-tight text-stone-900 sm:text-3xl">新しいスポット</h1>
-      <p class="mt-2 text-sm text-stone-600">店名や営業情報、所属フロアを登録します。</p>
+      <p class="mt-2 text-sm text-stone-600">スポット名や説明、カテゴリー、配置するフロアを登録します。</p>
     </header>
     <div v-if="floors.length === 0" class="mt-8 rounded-xl bg-amber-50 p-6 text-sm text-amber-800">先にフロアを1件以上登録してください。</div>
     <SaveFeedback class="mt-6" :state="isSubmitting ? 'saving' : submitError ? 'error' : 'idle'" :message="submitError" />

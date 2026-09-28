@@ -45,7 +45,7 @@ const visibleAssets = computed(() => {
       seo: 'mapSeoImages',
       decoration: 'decorations',
     }[usageFilter.value] as keyof MediaAssetItem['usage']
-    assets = assets.filter(asset => asset.usage[field] > 0)
+    assets = assets.filter(asset => (asset.usage[field] ?? 0) + (usageFilter.value === 'pin' ? (asset.usage.categoryPinDefaults ?? 0) : 0) > 0)
   }
   return assets
 })

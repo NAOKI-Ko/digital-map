@@ -53,6 +53,7 @@ describe('Media optimization and GC', () => {
     const candidates = planMediaGc([
       { id: 'unused', createdAt: old, storageKey: 'unused.png', _count: counts() },
       { id: 'pending', createdAt: old, storageKey: 'pending.png', _count: counts({ revisionPhotos: 1 }) },
+      { id: 'category-default', createdAt: old, storageKey: 'pin.png', _count: counts({ categoryPinDefaults: 1 }) },
       { id: 'shared', createdAt: old, storageKey: 'shared.png', _count: counts({ spotPhotos: 2 }) },
       { id: 'recent', createdAt: recent, storageKey: 'recent.png', _count: counts() },
     ], now, 7)

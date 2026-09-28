@@ -6,6 +6,7 @@ export interface MediaUsageCounts {
   mapLogos: number
   mapSeoImages?: number
   floorIllustrations: number
+  categoryPinDefaults?: number
   categoryIcons: number
   spotPins: number
   spotPhotos: number
@@ -19,7 +20,7 @@ export function summarizeMediaUsage(counts: MediaUsageCounts): MediaAssetUsage {
     ...counts,
     mapSeoImages: counts.mapSeoImages ?? 0,
     total: counts.mapLogos + (counts.mapSeoImages ?? 0) + counts.floorIllustrations + counts.categoryIcons
-      + counts.spotPins + counts.spotPhotos + counts.revisionPhotos + counts.decorations + counts.tenantLogos,
+      + (counts.categoryPinDefaults ?? 0) + counts.spotPins + counts.spotPhotos + counts.revisionPhotos + counts.decorations + counts.tenantLogos,
   }
 }
 
@@ -46,6 +47,7 @@ export async function requireOwnedMediaAsset(event: H3Event) {
           mapSeoImages: true,
           floorIllustrations: true,
           categoryIcons: true,
+          categoryPinDefaults: true,
           spotPins: true,
           spotPhotos: true,
           revisionPhotos: { where: { revision: { status: 'PENDING' } } },
