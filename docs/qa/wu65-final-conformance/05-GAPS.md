@@ -30,3 +30,13 @@ Local browser on isolated `digital_map_test_wu65`: selecting a library photo cau
 Targeted tests: bulk/list/queue 18 PASS, effective-photo read 2 PASS, transactional rollback rehearsal 1 PASS. Full disposable-DB suite including restored before/after visual comparison: 670 PASS before adding rollback test; final count recorded below after rerun. Build, Prisma validate and typecheck PASS. Windows acceptance and CI remain pending; initial verdict is not yet promoted.
 
 Limitations: browser-dispatched composition event checks shortcut handling, not native Windows IME candidate-window behavior. Native Excel first-use editing remains an explicit manual coverage gap. These must not be described as executed.
+
+## Final gap disposition
+
+G1/G2/G3/G4/G6 **resolved** by PR21 and executed acceptance. G5 **resolved except native Windows IME candidate-window manual coverage**. Native Excel was subsequently available and actually exercised; its earlier limitation is superseded. No additional feature/schema correction is required.
+
+Final tests: local671/671; CI/Windows670 PASS and1 private-clone SKIP, covered separately by local90-marker comparison and Windows canonical digest. Build/typecheck/Prisma/diff checks pass. Windows List/default preview/queue widths390/768/1024/1440, keyboard selection/review/Save, stale default/position, deleted target, dirty Stay/Discard, photo upload busy/Escape, explicit associations, source freeze/reset/standard all exercised. Test harness assertions were adjusted to wait for the existing250ms applied-filter debounce and click within the observed illustration bounds; these were not product defects.
+
+Remaining debt: one native Windows Japanese IME candidate-window manual pass covering Spot input and Category/PIN/queue keyboard interactions. A dispatched `isComposing` Escape event is covered but does not replace that OS-level test. This is a nonblocking coverage exception, not an unresolved product decision or an automatic completion claim. All production behavior requirements are supported by source/tests/actual workflow evidence; no P0/P1 remains.
+
+AQUA-005 CLOSED; AQUA-010 CLOSED; AQUA-013 CLOSED. WU-65 may close with this explicit coverage debt. Nagoya Aquarium production-quality work may resume; production deployment remains outside authorization.
