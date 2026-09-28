@@ -27,7 +27,7 @@ async function save() {
 <template>
   <section class="my-4 rounded-lg border border-stone-200 p-4">
     <h3 class="font-semibold">PINの設定元</h3>
-    <p class="my-2 text-sm">現在：{{ pinSourceLabel(spot.pinSourceMode, spot.pinSourceCategoryName) }}</p>
+    <p class="my-2 text-sm">現在：{{ pinSourceLabel(spot.pinSourceMode, spot.pinSourceCategoryName, spot.pinSourceCategoryHasDefault) }}</p>
     <label class="block text-sm">設定元<select v-model="mode" :disabled="saving" class="mt-1 block w-full rounded border p-2"><option value="standard">標準ピン</option><option value="category">カテゴリー既定</option><option value="individual">今の見た目を個別設定として保持</option></select></label>
     <label v-if="mode !== 'standard'" class="mt-3 block text-sm">{{ mode === 'category' ? 'PIN用カテゴリー' : '戻す先のカテゴリー（任意）' }}<select v-model="categoryId" :disabled="saving" class="mt-1 block w-full rounded border p-2"><option value="">未選択・解除</option><option v-for="category in spot.categories" :key="category.id" :value="category.id">{{ category.name }}</option></select></label>
     <p v-if="mode === 'category'" class="mt-2 text-xs text-stone-600">所属カテゴリーから明示的に選びます。既定未設定なら標準ピンを使い、今後の既定変更が編集中のピンに反映されます。</p>

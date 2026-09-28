@@ -1,4 +1,5 @@
 import { resolveEffectivePinAppearance } from '~~/shared/utils/pin-appearance'
+import { selectMediaVariant } from './media-variants'
 import { pinSourceInclude } from './pin-appearance'
 import type { Prisma } from '~~/prisma/generated/client'
 import { normalizePinIconType, normalizePinSize, normalizeSpotImportance } from '~~/shared/constants/spot'
@@ -21,7 +22,7 @@ function isCustomSpotFieldValue(value: Prisma.JsonValue): value is string | numb
 }
 
 export function toAdminSpotDetail(spot: SpotWithFloor) {
-  const photos = Array.isArray(spot.photosJson)
+  const photos = spot.photos.length ? spot.photos.map(photo => `/uploads/${selectMediaVariant(photo.asset.variants, 'spot-photo')?.storageKey ?? photo.asset.storageKey}`) : Array.isArray(spot.photosJson)
     ? spot.photosJson.filter((value): value is string => typeof value === 'string')
     : []
   const assetIdByUrl = new Map<string, string>(spot.photos.flatMap(photo => [
@@ -71,6 +72,7 @@ export function toAdminSpotDetail(spot: SpotWithFloor) {
     pinSourceMode: spot.pinSourceMode,
     pinSourceCategoryId: spot.pinSourceCategoryId,
     pinSourceCategoryName: spot.pinSourceCategory?.name ?? null,
+    pinSourceCategoryHasDefault: Boolean(spot.pinSourceCategory?.pinDefaultType),
     liveVersion: spot.liveVersion,
     isPublished: spot.isPublished,
     createdAt: spot.createdAt.toISOString(),

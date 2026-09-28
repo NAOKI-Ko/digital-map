@@ -51,6 +51,6 @@ export function resolveEffectivePinAppearance(spot: {
     pinIconImageUrl: spot.pinIconImageUrl, pinIconAssetId: spot.pinIconAssetId,
     pinColor: spot.pinColor, pinSize: normalizePinSize(spot.pinSize) }
 }
-export function pinSourceLabel(mode?: string, name?: string | null) {
-  return mode === 'standard' ? '標準ピン' : mode === 'category' ? `カテゴリー既定：${name ?? ''}` : '個別設定'
+export function pinSourceLabel(mode?: string, name?: string | null, hasDefault?: boolean) {
+  return mode === 'standard' ? '標準ピン' : mode === 'category' ? `カテゴリー既定：${name ?? ''}${hasDefault === false ? '（既定未設定・標準ピン）' : ''}` : '個別設定'
 }

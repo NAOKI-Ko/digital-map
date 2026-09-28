@@ -14,10 +14,12 @@ const props = withDefaults(defineProps<{
 
 const emit = defineEmits<{
   uploaded: [image: UploadedImage]
+  busy: [value: boolean]
 }>()
 
 const input = useTemplateRef<HTMLInputElement>('input')
 const isUploading = ref(false)
+watch(isUploading, value => emit('busy', value), { flush: 'sync' })
 const errorMessage = ref('')
 const uploadedImage = ref<UploadedImage>()
 const selectedFile = ref<File>()

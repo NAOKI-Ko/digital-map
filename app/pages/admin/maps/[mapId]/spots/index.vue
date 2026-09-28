@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { AdminSpotListResponse } from '~~/shared/types/spot'
+import PinAppearancePreview from '~/components/admin/PinAppearancePreview.vue'
 import SpotPhotoDialog from '~/components/admin/SpotPhotoDialog.vue'
 import SpotBulkDialog from '~/components/admin/SpotBulkDialog.vue'
 import { pinSourceLabel } from '~~/shared/utils/pin-appearance'
@@ -106,6 +107,7 @@ function formatDate(value: string) {
       </div>
     </header>
 
+    <p v-if="data?.taskCounts" class="mt-4 text-sm" role="status">このマップ：未配置 {{ data.taskCounts.unplaced }}件 / 配置済み・公開対象外 {{ data.taskCounts.positionedTargetOff }}件</p>
     <div class="mt-4 flex flex-wrap gap-3 text-sm" aria-label="スポット準備の作業">
       <button type="button" class="min-h-11 underline" @click="Object.assign(form, { position: 'unpositioned', status: '', photo: '' })">未配置を確認</button>
       <button type="button" class="min-h-11 underline" @click="Object.assign(form, { position: 'positioned', status: 'draft', photo: '' })">配置済み・公開対象外を確認</button>
@@ -120,7 +122,7 @@ function formatDate(value: string) {
         </div>
         <div>
           <label for="spot-category" class="text-xs font-semibold text-stone-600">カテゴリー</label>
-          <UiSelect id="spot-category" v-model="form.categoryId" class="mt-1.5" label="カテゴリー" :options="[{ value: '', label: 'すべて' }, ...(data?.filters.categories ?? []).map(category => ({ value: category.id, label: category.name }))]" />
+          <UiSelect id="spot-category" v-model="form.categoryId" class="mt-1.5" label="カテゴリー" :options="[{ value: '', label: 'すべて' }, { value: 'none', label: 'カテゴリーなし' }, ...(data?.filters.categories ?? []).map(category => ({ value: category.id, label: category.name }))]" />
         </div>
         <div><label for="spot-position" class="text-xs font-semibold text-stone-600">配置状態</label><UiSelect id="spot-position" v-model="form.position" class="mt-1.5" label="配置状態" :options="[{ value: '', label: 'すべて' }, { value: 'positioned', label: '配置済み' }, { value: 'unpositioned', label: '位置未設定' }]" /></div>
       </div>
@@ -190,7 +192,7 @@ function formatDate(value: string) {
                 <p v-else class="mt-2 text-sm font-medium text-amber-700">{{ spot.floorName }} · 位置未設定</p>
                 <NuxtLink v-if="spot.x !== null && spot.y !== null" :to="{ path: `/admin/maps/${mapId}/editor`, query: { floorId: spot.floorId, placeSpotId: spot.id } }" class="mt-2 inline-flex text-xs font-semibold text-terracotta-700">地図上で識別</NuxtLink>
                 <button type="button" class="mt-2 min-h-11 text-xs text-stone-600 underline" @click="photoSpotId = spot.id">{{ spot.photoCount ? `写真 ${spot.photoCount}枚を編集` : '写真を追加（任意）' }}</button>
-                <p class="mt-1 text-xs text-stone-600">{{ pinSourceLabel(spot.pinSourceMode, spot.pinSourceCategoryName) }}</p>
+                <PinAppearancePreview class="mt-2" compact :appearance="spot" :label="pinSourceLabel(spot.pinSourceMode, spot.pinSourceCategoryName, spot.pinSourceCategoryHasDefault)" />
                 <p class="mt-1 text-xs text-stone-500">最終更新 {{ formatDate(spot.updatedAt) }}</p>
                 </div>
               </div>

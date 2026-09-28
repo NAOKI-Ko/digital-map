@@ -11,8 +11,9 @@ const props = withDefaults(defineProps<{
   label?: string
   usage?: Exclude<UsageFilter, 'all'>
   selectedUrl?: string | null
+  disabled?: boolean
 }>(), { label: '画像', usage: 'photo' })
-const emit = defineEmits<{ selected: [image: UploadedImage] }>()
+const emit = defineEmits<{ selected: [image: UploadedImage], busy: [value: boolean], cleared: [] }>()
 const { data, refresh } = await useFetch<MediaAssetListResponse>('/api/media')
 const scope = ref<Scope>('recent')
 const usageFilter = ref<UsageFilter>(props.usage)
@@ -73,6 +74,7 @@ async function useUpload(image: UploadedImage) {
 }
 
 function changeSelection() {
+  emit('cleared')
   selected.value = null
   initialSelectionDismissed.value = true
   selectionSource.value = 'initial'
@@ -81,7 +83,7 @@ function changeSelection() {
 </script>
 
 <template>
-  <div class="rounded-xl border border-stone-200 p-4">
+  <fieldset :disabled="disabled" class="rounded-xl border border-stone-200 p-4">
     <div v-if="selectedPreviewUrl" class="overflow-hidden rounded-lg border border-stone-200 bg-stone-50">
       <img :src="selectedPreviewUrl" :alt="`${label}の選択プレビュー`" class="h-64 w-full object-contain">
       <div class="flex flex-wrap items-center justify-between gap-3 border-t border-stone-200 bg-white px-4 py-3">
@@ -92,7 +94,7 @@ function changeSelection() {
     <div v-else class="grid gap-5 lg:grid-cols-2">
       <section>
         <h3 class="text-sm font-bold text-stone-900">新規アップロード</h3>
-        <ImageUploader :label="label" @uploaded="useUpload" />
+        <ImageUploader :label="label" @uploaded="useUpload" @busy="emit('busy', $event)" />
       </section>
       <section>
         <h3 class="text-sm font-bold text-stone-900">登録済み画像から選ぶ</h3>
@@ -110,5 +112,5 @@ function changeSelection() {
         <p v-else class="mt-4 rounded-lg bg-stone-50 p-4 text-center text-xs text-stone-500">該当する登録画像はありません。</p>
       </section>
     </div>
-  </div>
+  </fieldset>
 </template>

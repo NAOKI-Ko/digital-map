@@ -36,7 +36,7 @@ function updateDraft(value: PinAppearance) {
       <details v-if="data.spots.length" class="my-3 text-sm"><summary>対象スポットとフロアを確認</summary><ul><li v-for="spot in data.spots" :key="spot.id">{{ spot.floor.name }} — {{ spot.name }}</li></ul></details>
       <div class="my-3 flex gap-3"><PinAppearancePreview :appearance="data.design ?? standardPinAppearance" label="現在" /><PinAppearancePreview :appearance="enabled ? draft : standardPinAppearance" label="保存後" /></div>
       <label class="block text-sm"><input v-model="enabled" type="checkbox" :disabled="saving"> PIN既定を設定する（解除すると継承中のピンは標準ピンになります）</label>
-      <PinDesignEditor v-if="enabled" :key="data.revision" :map-id="mapId" spot-id="" :initial-value="data.design ?? standardPinAppearance" :show-save="false" :show-importance="false" :guard-navigation="false" @changed="updateDraft" />
+      <fieldset :disabled="saving"><PinDesignEditor v-if="enabled" :key="data.revision" :map-id="mapId" spot-id="" :initial-value="data.design ?? standardPinAppearance" :show-save="false" :show-importance="false" :guard-navigation="false" @changed="updateDraft" /></fieldset>
       <button type="button" :disabled="saving || !dirty" class="mt-4 rounded bg-stone-900 px-4 py-2 text-sm text-white disabled:opacity-50" @click="save">{{ saving ? '保存中…' : `確認した${data.spots.length}件の既定を保存` }}</button>
       <p v-if="message" role="status" class="mt-2 text-sm">{{ message }}</p>
     </template>
