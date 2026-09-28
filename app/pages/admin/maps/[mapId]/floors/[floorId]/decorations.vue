@@ -246,6 +246,12 @@ function onKeyboard(event: KeyboardEvent, item: FloorDecorationItem, kind: Inter
   draft.value = next
 }
 
+function selectDecoration(item: FloorDecorationItem) {
+  if (selectedId.value === item.id) return
+  if (dirty.value) { requestTransition(() => select(item)); return }
+  select(item)
+}
+
 async function duplicate(item: FloorDecorationItem) {
   if (dirty.value) { requestTransition(() => duplicate(item)); return }
   if (commandBusy.value) return
@@ -333,6 +339,7 @@ onBeforeUnmount(() => activeCleanup?.())
             :class="item.id === selectedId ? 'outline outline-2 outline-offset-2 outline-terracotta-600' : ''"
             :aria-label="`${floor.name}の装飾を移動`"
             @pointerdown.prevent.stop="startInteraction($event, item, 'move')"
+            @click.stop="selectDecoration(item)"
             @keydown="onKeyboard($event, item, 'move')"
           >
             <img :src="item.imageUrl" alt="" draggable="false" class="pointer-events-none block h-auto w-full object-contain">
@@ -363,8 +370,8 @@ onBeforeUnmount(() => activeCleanup?.())
           <p class="mt-2 text-sm text-stone-600">ドラッグ、角のハンドル、または矢印キーで位置と形を調整します。</p>
           <p v-if="dirty" class="mt-3 text-sm font-semibold text-terracotta-700">保存していない位置・形の変更があります。</p>
           <div class="mt-4 flex flex-wrap gap-2 border-b pb-4">
-            <button type="button" class="min-h-11 rounded-lg border px-4 text-sm font-semibold disabled:opacity-50" :disabled="!dirty || saving || commandBusy" @click="discard">変更を破棄</button>
-            <button type="button" class="min-h-11 rounded-lg bg-terracotta-600 px-4 text-sm font-semibold text-white disabled:opacity-50" :disabled="!dirty || saving || commandBusy" @click="saveGeometry">{{ saving ? '保存中…' : '保存' }}</button>
+            <UiButton variant="secondary" :disabled="!dirty || saving || commandBusy" @click="discard">変更を破棄</UiButton>
+            <UiButton :busy="saving" :disabled="!dirty || saving || commandBusy" @click="saveGeometry">{{ saving ? '保存中…' : '保存' }}</UiButton>
           </div>
           <SaveFeedback class="mt-3" :state="saveState" :message="saveError || (saveState === 'success' ? '装飾の位置と形を保存しました。' : '')" />
           <h3 class="mt-4 text-sm font-bold">装飾の操作</h3>
