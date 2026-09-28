@@ -39,10 +39,10 @@ async function togglePublication() {
       body: { isPublished: nextState },
     })
     emit('updated', response.publication)
-    success(response.publication.isPublished ? 'スポットを公開対象にしました' : 'スポットを下書きに戻しました', `spot-publication-${props.spotId}`)
+    success(response.publication.isPublished ? 'スポットを公開対象にしました。次のマップ公開時に反映されます。' : 'スポットを公開対象外にしました。次のマップ公開時に反映されます。', `spot-publication-${props.spotId}`)
   }
   catch {
-    errorMessage.value = '公開状態を変更できませんでした。もう一度お試しください。'
+    errorMessage.value = '公開対象の設定を変更できませんでした。もう一度お試しください。'
   }
   finally {
     isSaving.value = false
@@ -62,22 +62,22 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleKeydown))
     <div class="flex flex-wrap items-start justify-between gap-5">
       <div>
         <div class="flex flex-wrap items-center gap-3">
-          <h2 class="text-lg font-bold text-stone-900">公開状態</h2>
+          <h2 class="text-lg font-bold text-stone-900">公開対象の設定</h2>
           <span class="rounded-full px-2.5 py-1 text-xs font-semibold" :class="spot.isPublished ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'">
-            {{ spot.isPublished ? '公開' : '下書き' }}
+            {{ spot.isPublished ? '公開対象' : '公開対象外' }}
           </span>
         </div>
         <p class="mt-2 max-w-2xl text-sm leading-6 text-stone-600">
-          公開にすると、マップ全体の公開後に閲覧者へ表示される対象になります。下書きのスポットは公開側には表示されません。
+          公開対象にしたスポットは、イラスト上の位置を設定してマップの内容を公開したときに掲載候補になります。ここでの変更だけでは閲覧者の表示は変わりません。
         </p>
-        <p v-if="!hasCoordinates" class="mt-2 text-sm font-semibold text-amber-700">位置が未設定のため公開できません。基本情報の緯度と経度を設定してください。</p>
+        <p v-if="!hasCoordinates" class="mt-2 text-sm font-semibold text-amber-700">イラスト上の位置が未設定のため公開対象にできません。ピン配置で位置を設定してください。</p>
       </div>
       <div class="flex flex-wrap gap-3">
         <button type="button" class="rounded-lg border border-stone-300 px-4 py-2.5 text-sm font-semibold text-stone-700 hover:bg-stone-50" @click="isPreviewOpen = true">
           プレビューを表示
         </button>
         <button type="button" :disabled="isSaving || (!spot.isPublished && !hasCoordinates)" class="rounded-lg px-4 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50" :class="spot.isPublished ? 'bg-stone-700 hover:bg-stone-800' : 'bg-emerald-700 hover:bg-emerald-800'" @click="togglePublication">
-          {{ isSaving ? '変更中…' : spot.isPublished ? '下書きに戻す' : 'スポットを公開する' }}
+          {{ isSaving ? '変更中…' : spot.isPublished ? '公開対象外にする' : '公開対象にする' }}
         </button>
       </div>
     </div>

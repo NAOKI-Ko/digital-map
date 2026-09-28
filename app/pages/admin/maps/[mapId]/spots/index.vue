@@ -86,7 +86,8 @@ async function executeBulk(action: 'delete' | 'publish' | 'unpublish' | 'addCate
       method: 'PATCH',
       body: { action, spotIds: selectedSpotIds.value, ...((action === 'addCategory' || action === 'removeCategory') ? { categoryId: bulkCategoryId.value } : {}) },
     })
-    success(`${selectedSpotIds.value.length}件を更新しました`, 'spot-bulk-operation')
+    const result = action === 'publish' ? '公開対象にしました' : action === 'unpublish' ? '公開対象外にしました' : action === 'addCategory' ? 'カテゴリーを追加しました' : action === 'removeCategory' ? 'カテゴリーを外しました' : '削除しました'
+    success(`${selectedSpotIds.value.length}件のスポットを${result}`, 'spot-bulk-operation')
     selectedSpotIds.value = []
     bulkDeleteOpen.value = false
     pendingCategoryAction.value = null
@@ -138,8 +139,8 @@ function formatDate(value: string) {
           <UiSelect id="spot-floor" v-model="form.floorId" class="mt-1.5" label="フロア" :options="[{ value: '', label: 'すべて' }, ...(data?.filters.floors ?? []).map(floor => ({ value: floor.id, label: floor.name }))]" />
         </div>
         <div>
-          <label for="spot-status" class="text-xs font-semibold text-stone-600">公開状態</label>
-          <UiSelect id="spot-status" v-model="form.status" class="mt-1.5" label="公開状態" :options="[{ value: '', label: 'すべて' }, { value: 'published', label: '公開' }, { value: 'draft', label: '下書き' }]" />
+          <label for="spot-status" class="text-xs font-semibold text-stone-600">公開対象</label>
+          <UiSelect id="spot-status" v-model="form.status" class="mt-1.5" label="公開対象" :options="[{ value: '', label: 'すべて' }, { value: 'published', label: '公開対象' }, { value: 'draft', label: '公開対象外' }]" />
         </div>
         </div>
       </details>
@@ -155,8 +156,8 @@ function formatDate(value: string) {
         <div class="flex flex-wrap items-center gap-3">
 
           <template v-if="selectedSpotIds.length"><span class="text-sm text-stone-600">{{ selectedSpotIds.length }}件選択中</span>
-          <button type="button" :disabled="!selectedSpotIds.length || isBulkSaving" class="rounded-lg border px-3 py-2 text-sm disabled:opacity-40" @click="runBulk('publish')">公開</button>
-          <button type="button" :disabled="!selectedSpotIds.length || isBulkSaving" class="rounded-lg border px-3 py-2 text-sm disabled:opacity-40" @click="runBulk('unpublish')">非公開</button>
+          <button type="button" :disabled="!selectedSpotIds.length || isBulkSaving" class="rounded-lg border px-3 py-2 text-sm disabled:opacity-40" @click="runBulk('publish')">公開対象にする</button>
+          <button type="button" :disabled="!selectedSpotIds.length || isBulkSaving" class="rounded-lg border px-3 py-2 text-sm disabled:opacity-40" @click="runBulk('unpublish')">公開対象外にする</button>
           <button type="button" :disabled="!selectedSpotIds.length || isBulkSaving" class="rounded-lg border border-red-200 px-3 py-2 text-sm text-red-700 disabled:opacity-40" @click="runBulk('delete')">削除</button></template>
         </div>
         <div v-if="selectedSpotIds.length" class="mt-4 flex flex-wrap items-center gap-2 border-t border-stone-200 pt-4">
@@ -192,7 +193,7 @@ function formatDate(value: string) {
                   <h3 class="font-bold text-stone-900"><NuxtLink :to="spotDetailLocation(spot.id)" class="hover:text-terracotta-700">{{ spot.name }}</NuxtLink></h3>
                   <span v-if="spot.importance === 'featured'" class="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-800">注目</span>
                   <span v-for="category in spot.categories" :key="category.id" class="rounded-full bg-stone-100 px-2.5 py-1 text-xs text-stone-700">{{ category.name }}</span>
-                  <span class="rounded-full px-2.5 py-1 text-xs font-semibold" :class="spot.isPublished ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'">{{ spot.isPublished ? '公開' : '下書き' }}</span>
+                  <span class="rounded-full px-2.5 py-1 text-xs font-semibold" :class="spot.isPublished ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'">{{ spot.isPublished ? '公開対象' : '公開対象外' }}</span>
                 </div>
                 <p v-if="spot.x !== null && spot.y !== null" class="mt-2 text-sm text-stone-600">{{ spot.floorName }} · 配置済み</p>
                 <p v-else class="mt-2 text-sm font-medium text-amber-700">{{ spot.floorName }} · 位置未設定</p>

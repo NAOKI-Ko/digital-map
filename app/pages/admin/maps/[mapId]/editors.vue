@@ -39,8 +39,8 @@ async function run(action: () => Promise<void>) {
 
 <template>
   <div class="max-w-4xl">
-    <NuxtLink :to="`/admin/maps/${mapId}/settings`" class="text-sm font-medium text-stone-600">← マップ設定に戻る</NuxtLink>
-    <header class="mt-5"><p class="text-sm font-medium text-terracotta-700">マップ設定</p><h1 class="mt-1 text-3xl font-bold">このマップの編集者</h1><p class="mt-2 text-sm text-stone-600">{{ mapData?.map.name }}。ワークスペースのオーナーはすべてのマップを編集できます。</p></header>
+    <NuxtLink :to="`/admin/maps/${mapId}`" class="text-sm font-medium text-stone-600">← マップのホームに戻る</NuxtLink>
+    <header class="mt-5"><p class="text-sm font-medium text-terracotta-700">チーム / マップ編集者</p><h1 class="mt-1 text-3xl font-bold">このマップの編集者</h1><p class="mt-2 text-sm text-stone-600">{{ mapData?.map.name }}。ワークスペースのオーナーはすべてのマップを編集できます。</p></header>
     <section v-if="error" class="mt-6 rounded-xl border border-red-200 bg-red-50 p-5 text-red-800">この設定はワークスペースのオーナーだけが利用できます。</section>
     <section v-else class="mt-6 border-t border-stone-200 pt-5">
       <p v-if="errorMessage" role="alert" class="rounded-lg bg-red-50 p-3 text-sm text-red-800">{{ errorMessage }}</p>

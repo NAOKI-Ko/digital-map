@@ -5,6 +5,7 @@ import SpotPublishPanel from '~/components/admin/SpotPublishPanel.vue'
 import SpotForm from '~/components/admin/SpotForm.vue'
 import DuplicateSpotDialog from '~/components/admin/DuplicateSpotDialog.vue'
 import UnsavedChangesGuard from '~/components/admin/UnsavedChangesGuard.vue'
+import { resolveSpotListReturnTo } from '~/utils/admin-return-context'
 import type { SpotFormInput } from '~~/shared/schemas/spot'
 import type { AdminSpotResponse } from '~~/shared/types/spot'
 import type { SpotDuplicateMatch, SpotDuplicateResponse } from '~~/shared/types/spot-duplicate'
@@ -15,7 +16,7 @@ const route = useRoute()
 const spotFormRef = useTemplateRef<{ acceptSaved: (value: SpotFormInput) => void }>('spotForm')
 const mapId = route.params.mapId as string
 const spotId = route.params.spotId as string
-const returnTo = computed(() => typeof route.query.returnTo === 'string' && route.query.returnTo.startsWith(`/admin/maps/${mapId}/spots`) ? route.query.returnTo : `/admin/maps/${mapId}/spots`)
+const returnTo = computed(() => resolveSpotListReturnTo(mapId, route.query.returnTo))
 const { data, error, status } = await useFetch<AdminSpotResponse>(`/api/maps/${mapId}/spots/${spotId}`)
 const isSubmitting = ref(false)
 const submitError = ref('')

@@ -167,6 +167,6 @@ export function buildSpotSubnavigation(mapId: string) {
   return [
     { label: '一覧', to: mapPath(mapId, '/spots') },
     { label: 'CSVでまとめて登録', to: mapPath(mapId, '/spots/import') },
-    { label: '承認待ち', to: mapPath(mapId, '/revisions') },
+    { label: '承認待ちを見る（チーム）', to: mapPath(mapId, '/revisions') },
   ]
 }

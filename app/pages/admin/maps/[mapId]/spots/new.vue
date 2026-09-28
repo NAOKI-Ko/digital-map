@@ -18,14 +18,15 @@ const { data } = await useFetch<MapFloorListResponse>(`/api/maps/${mapId}/floors
 const { data: categoryData } = await useFetch<CategoryListResponse>(`/api/maps/${mapId}/categories`)
 const { data: fieldData } = await useFetch<SpotFieldDefinitionListResponse>(`/api/maps/${mapId}/spot-fields`)
 const floors = computed(() => data.value?.floors.map(floor => ({ id: floor.id, name: floor.name })) ?? [])
+const pinFloorId = computed(() => route.query.from === 'editor' && typeof route.query.floorId === 'string' && floors.value.some(floor => floor.id === route.query.floorId) ? route.query.floorId : null)
 const returnContext = computed(() => resolveMapEditorReturnContext(
   route.query,
   floors.value.map(floor => floor.id),
 ))
-const editorReturnLocation = computed(() => returnContext.value
+const editorReturnLocation = computed(() => pinFloorId.value
   ? {
       path: `/admin/maps/${mapId}/editor`,
-      query: createMapEditorReturnQuery(returnContext.value),
+      query: returnContext.value ? createMapEditorReturnQuery(returnContext.value) : { floorId: pinFloorId.value },
     }
   : null)
 
@@ -92,7 +93,7 @@ async function persistSpot(input: SpotFormInput) {
   try {
     const response = await $fetch<AdminSpotResponse>(`/api/maps/${mapId}/spots`, { method: 'POST', body: input })
     await navigateTo(editorReturnLocation.value
-      ? { ...editorReturnLocation.value, query: { ...editorReturnLocation.value.query, saved: 'spot-created' } }
+      ? { ...editorReturnLocation.value, query: { ...editorReturnLocation.value.query, placeSpotId: response.spot.id, saved: 'spot-created' } }
       : { path: `/admin/maps/${mapId}/spots/${response.spot.id}`, query: { saved: 'spot-created' } }, { external: true })
   }
   catch {
