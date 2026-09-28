@@ -8,4 +8,8 @@ Read-only SSH on configured Windows QA host `CHIFFONCHAN`: deployed SHA marker/r
 
 ## Local built-artifact proof after change
 
-With `PUBLIC_BASE_URL`/`ADMIN_BASE_URL` and matching `NUXT_PUBLIC_PUBLIC_BASE_URL`/`NUXT_ADMIN_BASE_URL`, a QA-mode production build served `/` with the new entry links and the expected public runtime origin. Starting the same build without the public Nuxt override failed with `PUBLIC_BASE_URL differs from effective Nuxt runtime origin`. This is the recurrence gate. Windows post-deploy evidence is recorded in `WINDOWS-QA.md` when available.
+With `PUBLIC_BASE_URL`/`ADMIN_BASE_URL` and matching `NUXT_PUBLIC_PUBLIC_BASE_URL`/`NUXT_ADMIN_BASE_URL`, a QA-mode production build served `/` with the new entry links and the expected public runtime origin. Starting the same build without the public Nuxt override failed with `PUBLIC_BASE_URL differs from effective Nuxt runtime origin`. This is the recurrence gate.
+
+## Windows after deployment
+
+The existing protected Windows settings file was copied to `C:\DigitalMap\runtime\secrets-wu63-pre.ps1` before adding Nuxt runtime overrides. The active tunnel marker, declared `PUBLIC_BASE_URL` and `ADMIN_BASE_URL`, and effective `NUXT_PUBLIC_PUBLIC_BASE_URL` and `NUXT_ADMIN_BASE_URL` all matched `https://eyes-retention-judgment-neural.trycloudflare.com` before app restart. `NUXT_DEPLOYMENT_ENVIRONMENT=qa`, `NUXT_TRUSTED_HOSTS` and `NUXT_TRUST_PROXY` were set consistently. The public homepage response after restart exposed `publicBaseUrl:"https://eyes-retention-judgment-neural.trycloudflare.com"`. Fresh signup, resend and password-reset links all used that Admin origin; no token values were recorded.
