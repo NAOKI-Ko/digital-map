@@ -57,7 +57,7 @@ export async function planSpotBulk(tx: Prisma.TransactionClient, map: { id: stri
   const relevantCategoryIds = new Set(rows.map(row => row.sourceId).filter(Boolean))
   const revisions = categories.filter(item => relevantCategoryIds.has(item.id)).map(item => [item.id, item.pinDefaultRevision]).sort()
   const token = createHash('sha256').update(JSON.stringify({ command: { ...command, spotIds }, versions: rows.map(row => [row.id, row.version]), revisions, rows })).digest('hex')
-  return { rows, token, category, total: rows.length, changed: rows.filter(row => row.changed).length, unchanged: rows.filter(row => !row.changed).length }
+  return { rows, token, category, total: rows.length, changed: rows.filter(row => !row.error && row.changed).length, unchanged: rows.filter(row => !row.error && !row.changed).length }
 }
 export function publicBulkPlan(plan: Awaited<ReturnType<typeof planSpotBulk>>) {
   return { reviewToken: plan.token, total: plan.total, changed: plan.changed, unchanged: plan.unchanged, rows: plan.rows.map(({ data: _data, sourceId: _sourceId, ...row }) => row) }

@@ -28,13 +28,13 @@ export default defineEventHandler(async (event): Promise<AdminSpotListResponse> 
           ] }],
         }
       : {}),
-    ...(categoryId ? { spotCategories: { some: { categoryId, category: { mapId: map.id } } } } : {}),
+    ...(categoryId === 'none' ? { spotCategories: { none: {} } } : categoryId ? { spotCategories: { some: { categoryId, category: { mapId: map.id } } } } : {}),
     ...(floorId ? { floorId } : {}),
     ...(status ? { isPublished: status === 'published' } : {}),
     ...(position === 'positioned' ? { x: { not: null }, y: { not: null } } : position === 'unpositioned' ? { OR: [{ x: null }, { y: null }] } : {}),
   }
 
-  const [spots, floors, categories] = await Promise.all([
+  const [spots, floors, categories, unplaced, positionedTargetOff] = await Promise.all([
     prisma.spot.findMany({
       where,
       select: {
@@ -76,9 +76,12 @@ export default defineEventHandler(async (event): Promise<AdminSpotListResponse> 
       select: { id: true, name: true, order: true, iconType: true, iconPresetId: true, iconImageUrl: true, iconAssetId: true },
       orderBy: categoryOrderBy,
     }),
+    prisma.spot.count({ where: { floor: { mapId: map.id }, OR: [{ x: null }, { y: null }] } }),
+    prisma.spot.count({ where: { floor: { mapId: map.id }, x: { not: null }, y: { not: null }, isPublished: false } }),
   ])
 
   return {
+    taskCounts: { unplaced, positionedTargetOff },
     spots: spots.map(spot => ({
       id: spot.id,
       floorId: spot.floorId,
@@ -102,6 +105,7 @@ export default defineEventHandler(async (event): Promise<AdminSpotListResponse> 
       pinSourceMode: spot.pinSourceMode,
       pinSourceCategoryId: spot.pinSourceCategoryId,
       pinSourceCategoryName: spot.pinSourceCategory?.name ?? null,
+    pinSourceCategoryHasDefault: Boolean(spot.pinSourceCategory?.pinDefaultType),
       updatedAt: spot.updatedAt.toISOString(),
       liveVersion: spot.liveVersion,
       photoCount: spotPhotoCount(spot.photosJson, spot._count.photos),

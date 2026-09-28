@@ -31,8 +31,8 @@ const pinDesignEditorRef = useTemplateRef<{
 
 const route = useRoute()
 const mapId = route.params.mapId as string
-const { data, error, status } = await useFetch<MapFloorListResponse>(`/api/maps/${mapId}/floors`)
-const { data: spotData, refresh: refreshSpots } = await useFetch<AdminSpotListResponse>(`/api/maps/${mapId}/spots`)
+const { data, error, status, refresh: refreshFloors } = await useFetch<MapFloorListResponse>(`/api/maps/${mapId}/floors`)
+const { data: spotData, refresh: refreshSpots, error: spotsError } = await useFetch<AdminSpotListResponse>(`/api/maps/${mapId}/spots`)
 const requestedFloorId = typeof route.query.floorId === 'string' ? route.query.floorId : ''
 const requestedPlacementSpotId = typeof route.query.placeSpotId === 'string' ? route.query.placeSpotId : ''
 const returnContext = resolveMapEditorReturnContext(
@@ -52,6 +52,8 @@ const selectedFloorSpots = computed(() => spotData.value?.spots.filter(spot => s
 const positionedFloorSpots = computed(() => selectedFloorSpots.value.filter(hasPosition))
 const unpositionedFloorSpots = computed(() => selectedFloorSpots.value.filter(spot => !hasPosition(spot)))
 const queueMode = ref(false)
+const queueTargetRef = useTemplateRef<HTMLElement>('queueTarget')
+const placementConflict = ref(false)
 const skippedSpotIds = ref<string[]>([])
 const queueItems = computed(() => placementQueue(spotData.value?.spots ?? [], selectedFloorId.value, skippedSpotIds.value))
 const placementSpotId = ref(requestedPlacementSpotId)
@@ -105,6 +107,7 @@ watch(() => data.value?.floors, (floors) => {
 }, { immediate: true })
 
 watch(selectedFloorId, () => {
+  placementConflict.value = false
   queueMode.value = false
   skippedSpotIds.value = []
   currentCamera.value = null
@@ -121,6 +124,7 @@ watch(selectedFloorId, () => {
 })
 
 watch(placementSpotId, () => {
+  placementConflict.value = false
   operationGate.invalidate()
   addressRequestGate.invalidate()
   isSearchingAddress.value = false
@@ -214,6 +218,7 @@ function discardAndContinue() {
 
 async function finishSuccessfulSave(message: string, operation: PinEditorOperationContext, advance = false) {
   await refreshSpots()
+  if (spotsError.value) throw new Error('最新の配置状態を読み込めませんでした。保存結果を確認するため、未配置を読み込み直してください。')
   if (!operationGate.isCurrent(operation)) return
   position.value = null
   placementMode.value = 'idle'
@@ -225,7 +230,7 @@ async function finishSuccessfulSave(message: string, operation: PinEditorOperati
 }
 
 async function savePosition(advance = false) {
-  if (!placementSpot.value || !position.value || positionSaving.value) return
+  if (!placementSpot.value || !position.value || positionSaving.value || placementConflict.value) return
   const operation = operationGate.begin()
   positionSaving.value = true
   saveState.value = 'saving'
@@ -244,7 +249,8 @@ async function savePosition(advance = false) {
     if (operationGate.isCurrent(operation)) {
       moveStatus.value = ''
       saveState.value = 'error'
-      saveMessage.value = (error?.data?.statusMessage ?? '位置を保存できませんでした。') + ' 候補位置は保持しています。'
+      placementConflict.value = [404, 409].includes(error?.statusCode ?? error?.status ?? error?.data?.statusCode) || Boolean(spotsError.value)
+      saveMessage.value = (error?.data?.statusMessage ?? error?.message ?? '位置を保存できませんでした。') + ' 候補位置は保持しています。' + (placementConflict.value ? ' 他の変更または削除を確認するため、候補を破棄して最新状態を読み込み直してください。次のスポットへは進んでいません。' : '')
     }
   }
   finally {
@@ -420,11 +426,14 @@ function selectUnpositionedSpot(spotId: string) {
 }
 
 async function selectNextInQueue() {
+  placementConflict.value = false
   position.value = null
   placementMode.value = 'idle'
   placementSpotId.value = queueItems.value[0]?.id ?? ''
   await nextTick()
   if (placementSpot.value) startPlacement()
+  await nextTick()
+  queueTargetRef.value?.focus()
 }
 function startQueue() {
   requestTransition(() => { queueMode.value = true; skippedSpotIds.value = []; void selectNextInQueue() })
@@ -437,7 +446,23 @@ function skipQueueSpot() {
 }
 function stopQueue() { requestTransition(() => { queueMode.value = false; position.value = null; placementMode.value = 'idle' }) }
 async function reloadQueue() {
-  requestTransition(() => { void refreshSpots().then(() => { skippedSpotIds.value = []; return selectNextInQueue() }) })
+  requestTransition(() => { void refreshPlacementFacts() })
+}
+
+async function refreshPlacementFacts() {
+  positionSaving.value = true
+  try {
+    await Promise.all([refreshSpots(), refreshFloors()])
+    if (spotsError.value || error.value) throw new Error('最新状態を読み込めませんでした。もう一度読み込み直してください。')
+    placementConflict.value = false
+    skippedSpotIds.value = []
+    saveState.value = 'success'
+    saveMessage.value = '最新のスポットとフロアを確認しました。削除済み・配置済みのスポットは未配置一覧から除外しました。'
+    if (queueMode.value) await selectNextInQueue()
+    else { position.value = null; placementMode.value = 'idle'; placementSpotId.value = '' }
+  }
+  catch (error: any) { saveState.value = 'error'; saveMessage.value = error.message }
+  finally { positionSaving.value = false }
 }
 
 function selectFloor(floorId: string) {
@@ -459,7 +484,7 @@ function updatePinDesign(design: SpotPinDesignResponse['design']) {
 }
 
 function handleEscape(event: KeyboardEvent) {
-  if (event.key !== 'Escape' || unplaceConfirmOpen.value || discardConfirmOpen.value) return
+  if (event.isComposing || event.defaultPrevented || event.key !== 'Escape' || unplaceConfirmOpen.value || discardConfirmOpen.value) return
   if (placementActive.value) requestTransition(cancelPositionEditing)
   else if (designEditing.value) requestTransition(cancelDesignEditing)
 }
@@ -541,14 +566,15 @@ onBeforeUnmount(() => {
         <UiInspector class="overflow-hidden rounded-xl border border-stone-200" :title="designEditing ? 'ピンデザインを編集' : placementActive ? 'ピン位置を編集' : '詳細設定'">
           <SaveFeedback v-if="route.query.saved === 'spot-created'" class="mt-3" state="success" message="スポットを登録しました。" />
           <SaveFeedback class="mt-3" :state="saveState" :message="saveMessage" />
+          <button v-if="placementConflict" type="button" :disabled="positionSaving" class="mt-2 text-sm underline" @click="reloadQueue">候補を破棄して最新状態を確認</button>
           <SpotCombobox v-if="placementMode === 'idle' && !queueMode" :model-value="placementSpotIsPositioned ? '' : placementSpotId" :spots="unpositionedFloorSpots" @update:model-value="selectUnpositionedSpot" />
 
           <section class="mt-6 border-t border-stone-200 pt-5" aria-live="polite">
             <h2 class="text-sm font-bold text-stone-900">{{ placementMode === 'idle' ? '選択中のスポット' : '編集中のスポット' }}</h2>
             <p v-if="!placementSpot" class="mt-3 text-sm text-stone-600">地図上のピンを選択してください。</p>
             <template v-else>
-              <h3 class="mt-3 text-lg font-bold text-stone-900">{{ placementSpot.name }}</h3>
-              <p class="mt-2 text-xs">{{ pinSourceLabel(placementSpot.pinSourceMode, placementSpot.pinSourceCategoryName) }}</p>
+              <h3 ref="queueTarget" tabindex="-1" class="mt-3 text-lg font-bold text-stone-900">{{ placementSpot.name }}</h3>
+              <p class="mt-2 text-xs">{{ pinSourceLabel(placementSpot.pinSourceMode, placementSpot.pinSourceCategoryName, placementSpot.pinSourceCategoryHasDefault) }}</p>
               <PinAppearancePreview v-if="queueMode" class="mt-2" :appearance="placementSpot" label="配置するピン" />
               <p class="mt-1 text-xs text-stone-500">{{ placementSpot.floorName }}<span v-if="placementSpot.categories.length"> / {{ placementSpot.categories.map(category => category.name).join('・') }}</span></p>
               <div v-if="placementMode === 'idle'" class="mt-3 flex flex-wrap gap-2 text-xs font-semibold">
@@ -601,8 +627,8 @@ onBeforeUnmount(() => {
             <p v-if="moveStatus" role="status" class="mb-3 text-xs leading-5 text-stone-600">{{ moveStatus }}</p>
             <UiFormActions>
               <UiButton variant="secondary" :disabled="positionSaving || designSaving" @click="requestTransition(designEditing ? cancelDesignEditing : cancelPositionEditing)">キャンセル</UiButton>
-              <UiButton v-if="designEditing" :busy="designSaving" :disabled="designSaving || !pageDirty" @click="saveDesign">{{ designSaving ? '保存中…' : 'デザインを保存' }}</UiButton>
-              <UiButton v-else :busy="positionSaving" :disabled="!position || positionSaving" @click="savePosition(queueMode)">{{ positionSaving ? '保存中…' : queueMode ? '保存して次へ' : 'この位置を保存' }}</UiButton>
+              <UiButton v-if="designEditing" :busy="designSaving" :disabled="designSaving || !pageDirty" @click="saveDesign">{{ designSaving ? '保存中…' : '個別設定として保存' }}</UiButton>
+              <UiButton v-else :busy="positionSaving" :disabled="!position || positionSaving || placementConflict" @click="savePosition(queueMode)">{{ positionSaving ? '保存中…' : queueMode ? '保存して次へ' : 'この位置を保存' }}</UiButton>
             </UiFormActions>
           </template>
         </UiInspector>

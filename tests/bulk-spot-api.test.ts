@@ -85,6 +85,15 @@ describe('atomic reviewed Spot bulk API', () => {
     await expect(handler({})).rejects.toMatchObject({ statusCode: 409 })
     expect(tx.spot.update).not.toHaveBeenCalled()
   })
+  it('excludes conflicts from both valid-change and no-op counts', async () => {
+    tx.spot.findMany.mockResolvedValue([spot(), { ...spot(), id: 'spot-b', x: 0 }, { ...spot(), id: 'spot-c', floorId: 'floor-b' }])
+    const result = await plan({ action: 'assignFloor', spotIds: ['spot-a', 'spot-b', 'spot-c'], floorId: 'floor-b' })
+    expect(result).toMatchObject({ total: 3, changed: 1, unchanged: 1 })
+    expect(result.rows.filter(row => row.error)).toHaveLength(1)
+    input = { action: 'assignFloor', spotIds: ['spot-a', 'spot-b', 'spot-c'], floorId: 'floor-b', reviewToken: result.token }
+    await expect(handler({})).rejects.toMatchObject({ statusCode: 409 })
+    expect(tx.spot.update).not.toHaveBeenCalled()
+  })
   it('returns conflict on serialization failure instead of success', async () => {
     await reviewed({ action: 'assignFloor', spotIds: ['spot-a'], floorId: 'floor-b' })
     tx.spot.update.mockRejectedValueOnce({ code: 'P2034' })

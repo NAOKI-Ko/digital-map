@@ -47,7 +47,7 @@ describe('WU-65 list scope', () => {
     vi.stubGlobal('defineEventHandler', (handler: unknown) => handler)
     vi.stubGlobal('requireOwnedMap', async () => ({ map: { id: 'map-a' } }))
     vi.stubGlobal('getQuery', () => ({ q: '展示', position: 'unpositioned', floorId: 'floor-0' }))
-    vi.stubGlobal('prisma', { spot: { findMany }, mapFloor: { findMany: vi.fn().mockResolvedValue([]) }, category: { findMany: vi.fn().mockResolvedValue([]) } })
+    vi.stubGlobal('prisma', { spot: { findMany, count: vi.fn().mockResolvedValue(0) }, mapFloor: { findMany: vi.fn().mockResolvedValue([]) }, category: { findMany: vi.fn().mockResolvedValue([]) } })
     const handler = (await import('../server/api/maps/[mapId]/spots/index.get')).default
     await handler({} as never)
     expect(findMany.mock.calls[0]![0].where).toMatchObject({
@@ -56,4 +56,22 @@ describe('WU-65 list scope', () => {
       OR: [{ x: null }, { y: null }],
     })
   })
+  it('reports Map-wide work counts independently of row filters and supports no Category', async () => {
+    const findMany = vi.fn().mockResolvedValue([])
+    const count = vi.fn().mockResolvedValueOnce(37).mockResolvedValueOnce(4)
+    vi.stubGlobal('defineEventHandler', (handler: unknown) => handler)
+    vi.stubGlobal('requireOwnedMap', async () => ({ map: { id: 'map-a' } }))
+    vi.stubGlobal('getQuery', () => ({ q: 'one', categoryId: 'none', floorId: 'floor-0' }))
+    vi.stubGlobal('prisma', { spot: { findMany, count }, mapFloor: { findMany: vi.fn().mockResolvedValue([]) }, category: { findMany: vi.fn().mockResolvedValue([]) } })
+    const handler = (await import('../server/api/maps/[mapId]/spots/index.get')).default
+    const result = await handler({} as never)
+    expect(result.taskCounts).toEqual({ unplaced: 37, positionedTargetOff: 4 })
+    expect(findMany.mock.calls[0]![0].where.spotCategories).toEqual({ none: {} })
+    for (const call of count.mock.calls) {
+      expect(call[0].where).toHaveProperty('floor.mapId', 'map-a')
+      expect(call[0].where).not.toHaveProperty('floorId')
+      expect(call[0].where).not.toHaveProperty('name')
+    }
+  })
+
 })

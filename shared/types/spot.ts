@@ -18,6 +18,7 @@ export interface AdminSpotSummary {
   pinSourceMode?: string
   pinSourceCategoryId?: string | null
   pinSourceCategoryName?: string | null
+  pinSourceCategoryHasDefault?: boolean
   pinIconType: PinIconType
   pinIconId: string | null
   pinIconImageUrl: string | null
@@ -40,6 +41,7 @@ export interface SpotListFilterFloor {
 }
 
 export interface AdminSpotListResponse {
+  taskCounts?: { unplaced: number, positionedTargetOff: number }
   spots: AdminSpotSummary[]
   filters: {
     categories: SpotCategorySummary[]
