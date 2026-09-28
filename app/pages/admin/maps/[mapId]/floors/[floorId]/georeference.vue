@@ -199,16 +199,17 @@ function getErrorMessage(error: unknown) {
       </section>
 
       <SaveFeedback class="mt-4" :state="saveState" :message="saveError || (saveState === 'success' ? '2つの基準点を保存しました。' : '')" />
-       <div v-if="validationError" role="alert" class="mt-4 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-800">{{ validationError }}</div>
-       <div v-if="saveError && saveState !== 'error'" role="alert" class="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-800">{{ saveError }}</div>
+      <p class="mt-3 text-sm font-semibold text-stone-700" role="status" aria-live="polite">{{ isDirty ? '保存していない位置合わせの変更があります。' : '未保存の変更はありません。' }}</p>
+      <div v-if="validationError" role="alert" class="mt-4 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-800">{{ validationError }}</div>
+      <div v-if="saveError && saveState !== 'error'" role="alert" class="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-800">{{ saveError }}</div>
       <div v-if="successMessage" role="status" class="mt-4 rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{{ successMessage }}</div>
       <div class="mt-5 flex flex-wrap justify-end gap-3">
         <NuxtLink v-if="cameFromEditor" :to="backPath" class="rounded-lg border border-stone-300 bg-white px-5 py-2.5 text-sm font-semibold text-stone-700 hover:bg-stone-50">ピン配置エディタに戻る</NuxtLink>
-        <button type="button" :disabled="isSaving || !isDirty" class="rounded-lg border border-stone-300 bg-white px-5 py-2.5 text-sm font-semibold disabled:opacity-50" @click="cancelDraft">変更を破棄</button>
+        <UiButton variant="secondary" :disabled="isSaving || !isDirty" @click="cancelDraft">変更を破棄</UiButton>
         <button v-if="hasSavedGeoReference" type="button" :disabled="isSaving" class="rounded-lg px-5 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-50 disabled:opacity-60" @click="removeConfirmOpen = true">位置合わせを解除</button>
-        <button type="button" :disabled="isSaving || !isDirty || !isGeoReferenceDraftComplete(draft) || Boolean(validationError)" class="rounded-lg bg-terracotta-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60" @click="save">
+        <UiButton :busy="isSaving" :disabled="isSaving || !isDirty || !isGeoReferenceDraftComplete(draft) || Boolean(validationError)" @click="save">
           {{ isSaving ? '保存中…' : 'この内容で保存' }}
-        </button>
+        </UiButton>
       </div>
       <p v-if="floor.spotCount > 0" class="mt-3 text-right text-sm font-semibold text-amber-700">イラスト上のピン位置は変わりません。実世界との対応のみ更新されます。</p>
        <ConfirmDialog :open="removeConfirmOpen" title="マップの位置合わせを解除" :message="`保存済みの実世界との対応を解除します。スポットやイラスト上のピン位置は削除・変更されません。${isDirty ? '編集中の基準点も破棄されます。' : ''}`" confirm-label="解除する" destructive :busy="isSaving" @cancel="removeConfirmOpen = false" @confirm="removeGeoReference" />
