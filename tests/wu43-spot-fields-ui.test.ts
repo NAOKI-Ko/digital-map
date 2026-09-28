@@ -12,7 +12,7 @@ describe('WU-43 Reka wrapper contracts', () => {
 
   it('Select uses stable values, portal, popper collision handling, and viewport constraints', () => {
     expect(select).toContain(':key="option.value"')
-    expect(select).toContain(':value="option.value"')
+    expect(select).toContain(':value="toSelectValue(option.value)"')
     expect(select).toContain('SelectPortal')
     expect(select).toContain('position="popper"')
     expect(select).toContain(':collision-padding="12"')
