@@ -9,3 +9,5 @@ Editable SVG plus structured JSON relationships/anchors; raster exports derived 
 - Main labels are kept away from PIN anchors. PINs live in dedicated quiet pads, never over connection symbols. Existing IDs/categories/media survive coordinate remapping.
 - Facility icons share a 48-unit box and consistent stroke. Text labels accompany unfamiliar symbols; public detail carries longer copy.
 - Gate evidence must include exact source revision and actual 390px composition. If limited image scale cannot carry the required hierarchy with 44px PINs, assess that limitation explicitly rather than silently reducing the acceptance standard.
+
+Actual renderer evidence: medium PIN buttons are 60×60px, not merely 44px. Reserve at least 212 drawing units between nearby anchors at 390px fit (1200-wide source, 342px displayed width). Use measured rectangles after integration. Original SVG pictograms are part of this design system.

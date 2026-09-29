@@ -13,3 +13,5 @@ Primary refs R1–R3 in 01-OFFICIAL-REFERENCE-AUDIT. Diagram directions here des
 Important distinction: multi-floor tank identity is not an invented direct passage through a tank. The map will distinguish water, walkable surface, vertical transition and off-floor continuation. Source icon locations are approximately represented as service clusters, never false point-precision surveys.
 
 Before North2 acceptance, inspect each circulation-core destination and the connection to South2 against both leaflet and live map. Any important unresolved contradiction triggers the parent stop condition; it cannot be covered by a schematic disclaimer.
+
+North2 live-map enlargement correction: baby room is on entrance-right beside the guide/service group. Do not interpret the rear restroom washbasin symbol as a baby room. This corrected R1–R4 before acceptance.
