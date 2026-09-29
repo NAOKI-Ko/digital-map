@@ -21,6 +21,6 @@ Compared against current official leaflet p2 and official live 2F map, including
 
 Filtering and interactive discovery are ABOVE static paper for the tested task: isolate equipment, select a single exhibit and read its photograph/description without shrinking text. This does not claim superiority over all features of the official digital map.
 
-All mandatory axes reached COMPARABLE before expansion. Any later regression reopens this gate. Geometry is not a survey and must not support precise distance or indoor-positioning claims. Final five-floor acceptance is still pending.
+All mandatory axes reached COMPARABLE before expansion. Any later regression reopens this gate. Geometry is not a survey and must not support precise distance or indoor-positioning claims. Final five-floor acceptance is recorded in 10-FINAL-OFFICIAL-BENCHMARK.md and 11-FINAL-ACCEPTANCE.md.
 
 Delivery refinement after gate: identical North2 layout and PIN pads, 2× vector-derived PNG export (2400×3660), provenance footer finalized to non-official guide. Final delivered PNG digest is recorded in asset-manifest.json; the historical hash above identifies the accepted 1× gate artifact. This is not a new geometry candidate.

@@ -1,0 +1,156 @@
+{
+  "status": "APPLIED_PASS",
+  "mode": "apply",
+  "target": "windows-qa",
+  "mapId": "cmukrf4gz0007c8vawtaeozwn",
+  "floors": 5,
+  "spots": 37,
+  "categories": 6,
+  "originalAssets": 23,
+  "previousRelease": "cmukwfp30003hc8va3evrt3vp",
+  "productionUntouched": true,
+  "releaseId": "cmum8fu9i0013iwva9733nbgi",
+  "artifactCommit": "3ba5a58dbd71216d2d765db50ad973785fc6a887",
+  "immutableContentPreserved": true,
+  "oldQaFixtureReleaseRetained": "cmukwfp30003hc8va3evrt3vp",
+  "assets": [
+    {
+      "file": "north-2f-master.png",
+      "sha256": "9e3c094d6ec2eadd60fb841c4452f7ba7c2b56068d0a57533c02b837786c3915",
+      "width": 2400,
+      "height": 3660
+    },
+    {
+      "file": "icons/dolphin.png",
+      "sha256": "f86bb45bde41ae49653a7afc3013cc69307539d0fd180a512175b359012ee6cb",
+      "width": 128,
+      "height": 128
+    },
+    {
+      "file": "icons/locker.png",
+      "sha256": "ea6fa640943cfd2ca74e3b714c8b7752ed1a4d2a419d14d9010e88d17c07bee2",
+      "width": 128,
+      "height": 128
+    },
+    {
+      "file": "icons/orca.png",
+      "sha256": "dceb8edc934023792352e937cc07199841aa59e14f6d34b8d535244d17ef6b8a",
+      "width": 128,
+      "height": 128
+    },
+    {
+      "file": "icons/baby.png",
+      "sha256": "48323a2edb088c47c50523edc4c484b827b5e92a7d2cd62a6ac29510d0f61ef5",
+      "width": 128,
+      "height": 128
+    },
+    {
+      "file": "icons/beluga.png",
+      "sha256": "416aa73fd77fcfcf2f4f5ced60b8a8532d8112b0ed9471d265fc59911de17692",
+      "width": 128,
+      "height": 128
+    },
+    {
+      "file": "icons/entry.png",
+      "sha256": "d381a75eab573187ec034ed59a0651b863619bb0de9592f13bf2304e8f516b90",
+      "width": 128,
+      "height": 128
+    },
+    {
+      "file": "icons/seating.png",
+      "sha256": "f60d185efb7e45d3a7507fb0aac6637fd2b31cb0a3bb351c178bf4852d89f0e0",
+      "width": 128,
+      "height": 128
+    },
+    {
+      "file": "icons/evolution.png",
+      "sha256": "71cc02a75cb5b8f56a030fe62ab4317265921040d54c50cfdd112fde8407ccff",
+      "width": 128,
+      "height": 128
+    },
+    {
+      "file": "north-3f-master.png",
+      "sha256": "498fdf1de12d65d460cc491db79b6865a3b426dab7b8848f09d7a1f4843d360f",
+      "width": 2400,
+      "height": 3660
+    },
+    {
+      "file": "south-1f-master.png",
+      "sha256": "5aded717cf414be696bc0f473d4f2368cd9fd10208056cc7cf4dd06b22697cdd",
+      "width": 2400,
+      "height": 3660
+    },
+    {
+      "file": "icons/jelly.png",
+      "sha256": "81ee29f441936f4f6338e39c9405a356a77da7ec009036876c94976625542113",
+      "width": 128,
+      "height": 128
+    },
+    {
+      "file": "icons/touch.png",
+      "sha256": "1b00d7d6ba05d955a75b32cc44d3ff5c98332306fc0b8ee525c5f717d80890a3",
+      "width": 128,
+      "height": 128
+    },
+    {
+      "file": "icons/deep.png",
+      "sha256": "9e3d88776faf1bd1a251019d79559ad9a01d361577f84b31937083dc43bb6d9f",
+      "width": 128,
+      "height": 128
+    },
+    {
+      "file": "icons/coral.png",
+      "sha256": "e91ea7214f5a120ab62592099371fe71909faaf622b620c0ccab29e61762fd3a",
+      "width": 128,
+      "height": 128
+    },
+    {
+      "file": "south-2f-master.png",
+      "sha256": "6714c508739231f2489a112c255e558dbfc830b1d66d0238818d73a79ee7c20e",
+      "width": 2400,
+      "height": 3660
+    },
+    {
+      "file": "icons/turtle.png",
+      "sha256": "fce9b4a332c3a012a6810e5eadf165c64512e8605508db70f07dfb569ca74910",
+      "width": 128,
+      "height": 128
+    },
+    {
+      "file": "icons/phone.png",
+      "sha256": "826dbabe9db0ae30ff2594b781aa2b58051f8f59dba4d3811bc023d296e1b0a1",
+      "width": 128,
+      "height": 128
+    },
+    {
+      "file": "icons/cup.png",
+      "sha256": "7125ea941b6a5c2b0dd88c256db84b7fc5083a4ebd3f75131ee39bb1133d3b05",
+      "width": 128,
+      "height": 128
+    },
+    {
+      "file": "icons/fish.png",
+      "sha256": "2796999bc9cdc74b6ea3bc2ecd8ec0dd2b3b489797bf7d0a4ce8a4bdcf06c060",
+      "width": 128,
+      "height": 128
+    },
+    {
+      "file": "south-3f-master.png",
+      "sha256": "720b85a7ebfd8c933970cadef09a3beeaec9e24097d045915cefe7632a264113",
+      "width": 2400,
+      "height": 3660
+    },
+    {
+      "file": "icons/camera.png",
+      "sha256": "98092d0e1d27b87c1e2de6fbd0f34958eb9e7f960d3b0a67e59a69659cc04065",
+      "width": 128,
+      "height": 128
+    },
+    {
+      "file": "icons/penguin.png",
+      "sha256": "51fa027badc4699fee3608d68a455aaedaaef85a22578fcb8f63db895cbda0ae",
+      "width": 128,
+      "height": 128
+    }
+  ]
+}

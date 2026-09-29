@@ -16,4 +16,11 @@ SVG design coordinates are 1200×1830. Final raster export is 2400×3660 through
 
 Source facts were refined before final production: South1 deep-sea species were confirmed at the rear of the coral-side gallery in the official live map; South2 baby room is near the deep/Japan junction; public phone is beside Arribada according to official FAQ. No new facility or route is invented to resolve unknown dimensions.
 
-Local public-renderer review passed in both 390×844 and 1440×1000. Windows managed-media/published-release verification is pending and required before final acceptance.
+Local public-renderer review passed in both 390×844 and 1440×1000. Windows managed-media/published-release verification subsequently passed; see the final review below.
+
+
+## Final Windows QA verification — 2026-09-29
+
+Actual Windows QA public release `cmum8fu9i0013iwva9733nbgi` was reviewed through the public VisitorMapExperience at 390×844 and 1440×1000. All five floor selector choices, one representative detail per floor, North2 equipment filtering (exactly locker + accessible WC), and existing Dolphin/Beluga/Orca photo attribution were exercised. Native marker counts 11/4/6/9/7; pairwise 60px target overlap counts all zero in initial full-floor mobile views. Loaded final artwork and pictograms were visually inspected. No browser console errors were reported. Cold image loading was allowed to complete before judging visuals. Detail opening pans the map; the existing full-map control restores overview.
+
+This validates the actual public shared visitor renderer; no authenticated Admin Preview session or physical mobile-device test is claimed. Browser screenshots were viewed inline in the task history; no persisted screenshot artifact is claimed.
