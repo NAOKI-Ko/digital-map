@@ -19,4 +19,17 @@ Existing Spot IDs, photos, descriptions, category memberships and field content 
 
 The new audit event identifies automated maintenance. The release schema requires a creator; it uses the existing responsible QA publisher, not a new account. No credentials, accounts, roles or permissions were changed.
 
-Live QA installation and final browser verification are pending. CI/PR/merge evidence will be recorded before application.
+Live QA dry-run and apply both PASS. New release: `cmum8fu9i0013iwva9733nbgi`; see WINDOWS-QA-REPORT.json. Live rollback baseline is at C:/DigitalMap/backups/wu67-art-20260929/installation. The old public release is retained.
+
+PR #25: https://github.com/NAOKI-Ko/digital-map/pull/25
+Normal merge into dev: cc0d3fc8b67e49ea89a04e98c194511f86bf6ba0.
+Post-merge Verify PASS before live QA application: https://github.com/NAOKI-Ko/digital-map/actions/runs/36525826127.
+Application runtime remains 4a90be0186666a0e2007029da85e5a0846539e2a. No app rebuild/restart or schema migration was needed. Assets and scoped map data are supplied by the rehearsed artifact 3ba5a58dbd71216d2d765db50ad973785fc6a887, contained in the merged history.
+Production main was rechecked unchanged at a58b4353bd108e6586f329080c772f69b8aaffda.
+
+
+## Final Windows QA verification — 2026-09-29
+
+Actual Windows QA public release `cmum8fu9i0013iwva9733nbgi` was reviewed through the public VisitorMapExperience at 390×844 and 1440×1000. All five floor selector choices, one representative detail per floor, North2 equipment filtering (exactly locker + accessible WC), and existing Dolphin/Beluga/Orca photo attribution were exercised. Native marker counts 11/4/6/9/7; pairwise 60px target overlap counts all zero in initial full-floor mobile views. Loaded final artwork and pictograms were visually inspected. No browser console errors were reported. Cold image loading was allowed to complete before judging visuals. Detail opening pans the map; the existing full-map control restores overview.
+
+This validates the actual public shared visitor renderer; no authenticated Admin Preview session or physical mobile-device test is claimed. Browser screenshots were viewed inline in the task history; no persisted screenshot artifact is claimed.
