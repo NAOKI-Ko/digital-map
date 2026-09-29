@@ -1,0 +1,39 @@
+{
+  "revision": "south-1f-R4",
+  "width": 1200,
+  "height": 1830,
+  "gate": "PENDING_FIVE_FLOOR_REVIEW",
+  "anchors": {
+    "深海ギャラリー（1F）": [
+      458,
+      548
+    ],
+    "赤道の海（1F）": [
+      241,
+      1027
+    ],
+    "くらげなごりうむ": [
+      800,
+      833
+    ],
+    "タッチタンク": [
+      794,
+      1148
+    ],
+    "ミュージアムショップ（南館）": [
+      482,
+      1493
+    ],
+    "南館1F バリアフリートイレ": [
+      176,
+      1300
+    ]
+  },
+  "relationships": [
+    "Deep gallery rear of coral spine",
+    "Jelly room rear of touch-tank spine",
+    "Spines join near shop/exit approach, not through a water volume",
+    "South exit foreground",
+    "North building via South2 bridge, never an invented 1F bridge"
+  ]
+}

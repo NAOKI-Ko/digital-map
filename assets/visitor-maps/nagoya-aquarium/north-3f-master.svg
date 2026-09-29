@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1830" viewBox="0 0 1200 1830"><style>text{font-family:"Hiragino Sans","Arial Unicode MS",sans-serif}</style>
+<rect x="0" y="0" width="1200" height="1830" rx="0" fill="#F7F5EE" stroke="none" stroke-width="3"/>
+<text x="55" y="62" font-size="28" font-weight="650" fill="#123D4A" text-anchor="start">MARINE ATLAS</text>
+<text x="55" y="151" font-size="86" font-weight="750" fill="#123D4A" text-anchor="start">北館 3F</text>
+<text x="56" y="211" font-size="40" font-weight="600" fill="#123D4A" text-anchor="start">水面の上から見る海の仲間たち</text>
+<path d="M55 248H1145" fill="none" stroke="#123D4A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M180 510L330 500Q657 241 1090 454L1120 1270Q1060 1460 892 1510L416 1510L185 1370L105 1110L125 635Z" fill="#FFFDF8" stroke="#BBCAC8" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M410 575Q718 344 1078 546L1040 735Q749 554 452 747Z" fill="#DCE9DE" stroke="#7F9F94" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M470 600Q750 425 1045 590" fill="none" stroke="#ABC3BA" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M470 632Q750 457 1045 622" fill="none" stroke="#ABC3BA" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M470 664Q750 489 1045 654" fill="none" stroke="#ABC3BA" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="756" y="395" font-size="52" font-weight="700" fill="#123D4A" text-anchor="middle">スタジアム</text>
+<path d="M443 835Q689 658 1005 808Q1120 901 998 1062Q770 1182 486 1029Z" fill="#83C7D0" stroke="#398EA5" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="760" y="903" font-size="52" font-weight="700" fill="#123D4A" text-anchor="middle">メインプール</text>
+<text x="760" y="962" font-size="30" font-weight="500" fill="#123D4A" text-anchor="middle">水槽 / 観覧はスタジアムから</text>
+<path d="M454 1023Q511 987 574 1051L606 1170Q558 1220 464 1166Z" fill="#C5E5E7" stroke="#398EA5" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M688 1095Q810 1097 836 1187Q873 1267 780 1375Q673 1394 630 1290Z" fill="#398EA5" stroke="#246478" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M882 1120Q998 1057 1025 1151Q1020 1314 887 1387Q821 1325 882 1120Z" fill="#83C7D0" stroke="#398EA5" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="519" y="1230" font-size="36" font-weight="600" fill="#123D4A" text-anchor="middle">イルカ</text>
+<rect x="629" y="1150" width="197" height="68" rx="14" fill="#FFFDF8" stroke="none" stroke-width="3"/>
+<text x="728" y="1197" font-size="43" font-weight="700" fill="#123D4A" text-anchor="middle">シャチ</text>
+<path d="M130 937Q209 838 309 919L331 1141Q295 1268 178 1240L127 1165Z" fill="#C5E5E7" stroke="#398EA5" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="223" y="768" font-size="39" font-weight="700" fill="#123D4A" text-anchor="middle">オーロラの海</text>
+<text x="223" y="824" font-size="48" font-weight="700" fill="#123D4A" text-anchor="middle">ベルーガ</text>
+<path d="M345 1390L387 1170L383 804Q385 703 447 663" fill="none" stroke="#E9DAB6" stroke-width="62" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M443 663Q735 489 1050 670" fill="none" stroke="#E9DAB6" stroke-width="53" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="157" y="506" width="72" height="68" rx="8" fill="#FFFDF8" stroke="#A76522" stroke-width="3"/>
+<path d="M169 554h15l21-28h13M169 543h9l21-27h19" fill="none" stroke="#A76522" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="243" y="506" width="66" height="68" rx="8" fill="#FFFDF8" stroke="#A76522" stroke-width="3"/>
+<path d="M260 554V523m-7 9 7-9 7 9M290 523v31m-7-8 7 8 7-8" fill="none" stroke="#A76522" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="157" y="622" font-size="42" font-weight="700" fill="#A76522" text-anchor="start">2Fへ</text>
+<rect x="216" y="1410" width="72" height="68" rx="8" fill="#FFFDF8" stroke="#A76522" stroke-width="3"/>
+<path d="M228 1458h15l21-28h13M228 1447h9l21-27h19" fill="none" stroke="#A76522" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="302" y="1410" width="66" height="68" rx="8" fill="#FFFDF8" stroke="#A76522" stroke-width="3"/>
+<path d="M319 1458V1427m-7 9 7-9 7 9M349 1427v31m-7-8 7 8 7-8" fill="none" stroke="#A76522" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="216" y="1526" font-size="42" font-weight="700" fill="#A76522" text-anchor="start">2Fへ</text>
+<rect x="515" y="640" width="80" height="60" rx="10" fill="#FFFDF8" stroke="#123D4A" stroke-width="3"/>
+<text x="555" y="683" font-size="32" font-weight="700" fill="#123D4A" text-anchor="middle">WC</text>
+<rect x="999" y="473" width="80" height="60" rx="10" fill="#FFFDF8" stroke="#123D4A" stroke-width="3"/>
+<text x="1039" y="516" font-size="32" font-weight="700" fill="#123D4A" text-anchor="middle">WC</text>
+<rect x="425" y="370" width="133" height="210" rx="15" fill="#E8EFED" stroke="#B6C9C4" stroke-width="3"/>
+<text x="491" y="370" font-size="42" font-weight="700" fill="#123D4A" text-anchor="middle">売店</text>
+<text x="771" y="1540" font-size="34" font-weight="600" fill="#123D4A" text-anchor="middle">南館へは北館2Fの連絡通路から</text>
+<path d="M55 1680H1145" fill="none" stroke="#BBCAC8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="60" y="1720" width="36" height="28" rx="5" fill="#83C7D0" stroke="none" stroke-width="3"/>
+<text x="112" y="1748" font-size="34" font-weight="600" fill="#123D4A" text-anchor="start">水槽</text>
+<rect x="260" y="1720" width="36" height="28" rx="5" fill="#E9DAB6" stroke="none" stroke-width="3"/>
+<text x="312" y="1748" font-size="34" font-weight="600" fill="#123D4A" text-anchor="start">通路</text>
+<text x="494" y="1748" font-size="34" font-weight="600" fill="#123D4A" text-anchor="start">WC トイレ</text>
+<text x="794" y="1748" font-size="34" font-weight="600" fill="#123D4A" text-anchor="start">↕ 上下階</text>
+<text x="56" y="1790" font-size="24" font-weight="600" fill="#123D4A" text-anchor="start">非公式案内図 / 距離・寸法は模式化</text>
+</svg>

@@ -1,0 +1,283 @@
+{
+  "workUnit": "WU-67",
+  "assets": [
+    {
+      "file": "icons/baby.png",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "48323a2edb088c47c50523edc4c484b827b5e92a7d2cd62a6ac29510d0f61ef5"
+    },
+    {
+      "file": "icons/baby.svg",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "d9af738b81b36bce5e7651cfdb7aadac5c22368ce75c692250d0b86fdbb29aa7"
+    },
+    {
+      "file": "icons/beluga.png",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "416aa73fd77fcfcf2f4f5ced60b8a8532d8112b0ed9471d265fc59911de17692"
+    },
+    {
+      "file": "icons/beluga.svg",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "6e006d5341d3a257f7f214a0738374f34c805e317ae6f5a381aa9d04450298bb"
+    },
+    {
+      "file": "icons/camera.png",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "98092d0e1d27b87c1e2de6fbd0f34958eb9e7f960d3b0a67e59a69659cc04065"
+    },
+    {
+      "file": "icons/camera.svg",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "18858e7ebb327651da795deb4f7178941c6e58ee410261603b32fbefb90e230e"
+    },
+    {
+      "file": "icons/coral.png",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "e91ea7214f5a120ab62592099371fe71909faaf622b620c0ccab29e61762fd3a"
+    },
+    {
+      "file": "icons/coral.svg",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "79e380ff5b5e7f432e689851ebe614915440915c530c5037ffaec67866297e3b"
+    },
+    {
+      "file": "icons/cup.png",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "7125ea941b6a5c2b0dd88c256db84b7fc5083a4ebd3f75131ee39bb1133d3b05"
+    },
+    {
+      "file": "icons/cup.svg",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "588ed6ef92a08ace7ab474796b4f2df8a108fcdcb62215dec34f5ef165c99fd8"
+    },
+    {
+      "file": "icons/deep.png",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "9e3d88776faf1bd1a251019d79559ad9a01d361577f84b31937083dc43bb6d9f"
+    },
+    {
+      "file": "icons/deep.svg",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "f15362e2706309d7201bf8f45b8898ec5f9ea0ce7966f41c51f2b0cf464a9273"
+    },
+    {
+      "file": "icons/dolphin.png",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "f86bb45bde41ae49653a7afc3013cc69307539d0fd180a512175b359012ee6cb"
+    },
+    {
+      "file": "icons/dolphin.svg",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "e9bdcd6a154211f0f8000261410928f2e948b8e94b506ed6d4abe224a2cdeac8"
+    },
+    {
+      "file": "icons/entry.png",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "d381a75eab573187ec034ed59a0651b863619bb0de9592f13bf2304e8f516b90"
+    },
+    {
+      "file": "icons/entry.svg",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "5858558769d054680af3f23cf02f2b27bb0a87e253005a96052dcaffeb273a11"
+    },
+    {
+      "file": "icons/evolution.png",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "71cc02a75cb5b8f56a030fe62ab4317265921040d54c50cfdd112fde8407ccff"
+    },
+    {
+      "file": "icons/evolution.svg",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "655ba4e1ede3e0a165df2c7f03da292e909d4d822cdb473c45716d6db4273f1e"
+    },
+    {
+      "file": "icons/fish.png",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "2796999bc9cdc74b6ea3bc2ecd8ec0dd2b3b489797bf7d0a4ce8a4bdcf06c060"
+    },
+    {
+      "file": "icons/fish.svg",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "f091a020aee755118a351415a3bd32f7101991a1da0a98deaa6e5b21051476e3"
+    },
+    {
+      "file": "icons/jelly.png",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "81ee29f441936f4f6338e39c9405a356a77da7ec009036876c94976625542113"
+    },
+    {
+      "file": "icons/jelly.svg",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "088082e45a9a973409a86cdbe1cf6b21d8ac7ff6734f1f4fd71f3428c6d635a5"
+    },
+    {
+      "file": "icons/locker.png",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "ea6fa640943cfd2ca74e3b714c8b7752ed1a4d2a419d14d9010e88d17c07bee2"
+    },
+    {
+      "file": "icons/locker.svg",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "3650c8e3f382280c319479f6d4b83a1829ab4cc26b779163e7c6720e11244d44"
+    },
+    {
+      "file": "icons/orca.png",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "dceb8edc934023792352e937cc07199841aa59e14f6d34b8d535244d17ef6b8a"
+    },
+    {
+      "file": "icons/orca.svg",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "a2235066486168b0cac42ccffb1b366b32ad6ef399daa0e3bae2aaff57911d99"
+    },
+    {
+      "file": "icons/penguin.png",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "51fa027badc4699fee3608d68a455aaedaaef85a22578fcb8f63db895cbda0ae"
+    },
+    {
+      "file": "icons/penguin.svg",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "bf00666ff6e3da71b9d23b6b89de3978f7448f20de25318fc72812a1d5964e42"
+    },
+    {
+      "file": "icons/phone.png",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "826dbabe9db0ae30ff2594b781aa2b58051f8f59dba4d3811bc023d296e1b0a1"
+    },
+    {
+      "file": "icons/phone.svg",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "b183bd3070a7e677ab5ffc16418f440a0940f77badb44240f8e8145e60c86974"
+    },
+    {
+      "file": "icons/seating.png",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "f60d185efb7e45d3a7507fb0aac6637fd2b31cb0a3bb351c178bf4852d89f0e0"
+    },
+    {
+      "file": "icons/seating.svg",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "bcb158111b520cd49e30978be75accf968bf77dde10d5d7bda32ebb6cfbfad2d"
+    },
+    {
+      "file": "icons/touch.png",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "1b00d7d6ba05d955a75b32cc44d3ff5c98332306fc0b8ee525c5f717d80890a3"
+    },
+    {
+      "file": "icons/touch.svg",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "1f3dcef15e33c5892859b4c40f4c5b99c36b4948f7c31e429ba11f7360c73e88"
+    },
+    {
+      "file": "icons/turtle.png",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "fce9b4a332c3a012a6810e5eadf165c64512e8605508db70f07dfb569ca74910"
+    },
+    {
+      "file": "icons/turtle.svg",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "ba80c69c8b79e0614a401f0fe7c8bb787486cc8a82e705eb503eb8b31f81ed6e"
+    },
+    {
+      "file": "north-2f-master.png",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "9e3c094d6ec2eadd60fb841c4452f7ba7c2b56068d0a57533c02b837786c3915"
+    },
+    {
+      "file": "north-2f-master.svg",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "c697000f16fc063e7ea4f297f55ed70834e3316183dd197c656229ef7b673571"
+    },
+    {
+      "file": "north-3f-master.png",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "498fdf1de12d65d460cc491db79b6865a3b426dab7b8848f09d7a1f4843d360f"
+    },
+    {
+      "file": "north-3f-master.svg",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "13bce85119db151566d66ac527657a35f7d8a6ee56e84c2c92562f2fde29c7ee"
+    },
+    {
+      "file": "south-1f-master.png",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "5aded717cf414be696bc0f473d4f2368cd9fd10208056cc7cf4dd06b22697cdd"
+    },
+    {
+      "file": "south-1f-master.svg",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "77c4869dd17503f638a499b63f6731e1e8d7fdca4744df77d3c405c9633c387a"
+    },
+    {
+      "file": "south-2f-master.png",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "6714c508739231f2489a112c255e558dbfc830b1d66d0238818d73a79ee7c20e"
+    },
+    {
+      "file": "south-2f-master.svg",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "3a05efebbea6cc53dde153ae76a813efe517ae561a25d89b8c9d7a382d7426f2"
+    },
+    {
+      "file": "south-3f-master.png",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "720b85a7ebfd8c933970cadef09a3beeaec9e24097d045915cefe7632a264113"
+    },
+    {
+      "file": "south-3f-master.svg",
+      "provenance": "GENERATED",
+      "method": "Codex-authored structured original vector; raster derived with sharp; no image-generation model or source-image trace",
+      "sha256": "03883372778d25857bc5ed8f5d20f34cc6d9b9b75db782cbd7494f96c9914374"
+    }
+  ],
+  "officialReferenceUploaded": false,
+  "thirdPartyPhotos": "Existing licensed general-animal images retained without modification or reassignment; their existing detail attribution is preserved."
+}
