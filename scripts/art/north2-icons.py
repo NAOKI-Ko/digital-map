@@ -11,5 +11,17 @@ icons={
 'locker':'<rect x="17" y="10" width="66" height="80" rx="5"/><path d="M50 10V90M17 50H83M39 26V35M61 26V35M39 65V74M61 65V74"/>',
 'entry':'<path d="M55 12H84V88H55M11 50H65M44 30L65 50L44 70"/>',
 }
+icons.update({
+'fish':'<path d="M15 51Q44 17 82 51Q48 84 15 51ZM18 51L5 35V68Z"/><circle cx="66" cy="48" r="3" fill="#123D4A"/>',
+'coral':'<path d="M50 88V24M50 53L26 34V16M27 33L11 27M50 68L77 47V24M77 47L92 37M50 79L26 66L20 52M50 43L66 32V13"/>',
+'jelly':'<path d="M16 48Q20 11 50 11Q83 11 86 48Z" fill="#C5E5E7"/><path d="M26 52Q13 66 29 80M43 52Q56 67 40 89M61 52Q46 70 64 87M78 52Q91 69 77 80"/>',
+'penguin':'<path d="M29 39Q28 11 50 11Q73 11 72 39L82 70L69 61Q75 84 62 88H38Q25 84 30 61L16 70Z" fill="#123D4A"/><ellipse cx="50" cy="64" rx="16" ry="22" fill="white" stroke="none"/><circle cx="42" cy="29" r="3" fill="white" stroke="none"/><circle cx="58" cy="29" r="3" fill="white" stroke="none"/><path d="M44 36H57L50 44Z" fill="#E9DAB6" stroke="none"/>',
+'camera':'<path d="M12 32H31L39 21H65L73 32H89V80H12Z"/><circle cx="51" cy="55" r="16"/>',
+'phone':'<path d="M23 12L38 31L28 42Q39 62 60 72L70 62L89 77Q83 97 66 88Q18 69 12 28Q12 17 23 12Z"/>',
+'cup':'<path d="M17 31H67V75Q43 92 17 75ZM67 38H79Q95 57 67 63M14 90H79M31 10V19M49 7V17"/>',
+'turtle':'<ellipse cx="50" cy="52" rx="22" ry="29" fill="#C5E5E7"/><ellipse cx="50" cy="14" rx="10" ry="10"/><path d="M30 39L10 27L21 47M70 39L90 27L80 47M31 69L14 85L32 79M69 69L86 85L68 79M50 81V94M36 40L49 32L64 43L60 63L45 71L34 59Z"/>',
+'deep':'<ellipse cx="50" cy="46" rx="22" ry="30"/><path d="M39 24H60M32 38H69M30 53H70M37 68H62M29 29L13 23L8 41M27 48L8 50L7 68M29 62L16 77L24 90M72 29L87 23L93 41M73 48L91 50L94 68M70 62L84 77L76 90"/>',
+'touch':'<path d="M50 14L60 38L87 36L68 55L77 82L51 68L25 83L32 55L12 36L40 38Z" fill="#E9DAB6"/>',
+})
 for name,body in icons.items():
  (p/(name+'.svg')).write_text('<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 100 100"><title>'+name+'</title><g fill="none" stroke="#123D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">'+body+'</g></svg>')

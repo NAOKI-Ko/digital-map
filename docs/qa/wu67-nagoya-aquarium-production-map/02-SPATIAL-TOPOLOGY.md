@@ -15,3 +15,5 @@ Important distinction: multi-floor tank identity is not an invented direct passa
 Before North2 acceptance, inspect each circulation-core destination and the connection to South2 against both leaflet and live map. Any important unresolved contradiction triggers the parent stop condition; it cannot be covered by a schematic disclaimer.
 
 North2 live-map enlargement correction: baby room is on entrance-right beside the guide/service group. Do not interpret the rear restroom washbasin symbol as a baby room. This corrected R1–R4 before acceptance.
+
+Detailed South1 verification: live official isopod record locates the deep exhibit at the rear of the coral-side gallery, distinct from the jelly/touch spine. South2 live plan places the baby-room symbol near the rear central junction; official FAQ establishes the phone beside Arribada.

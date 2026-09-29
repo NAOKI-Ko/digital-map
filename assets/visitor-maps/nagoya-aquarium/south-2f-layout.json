@@ -1,0 +1,52 @@
+{
+  "revision": "south-2f-R4",
+  "width": 1200,
+  "height": 1830,
+  "gate": "PENDING_FIVE_FLOOR_REVIEW",
+  "anchors": {
+    "深海ギャラリー（2F）": [
+      342,
+      599
+    ],
+    "黒潮大水槽": [
+      916,
+      733
+    ],
+    "赤道の海（2F）": [
+      290,
+      945
+    ],
+    "ウミガメ回遊水槽（2F）": [
+      414,
+      1260
+    ],
+    "ベビーコーナー（南館）": [
+      608,
+      870
+    ],
+    "南館2F バリアフリートイレ": [
+      898,
+      1114
+    ],
+    "レストラン アリバダ": [
+      292,
+      1580
+    ],
+    "公衆電話": [
+      535,
+      1551
+    ],
+    "自販機コーナー": [
+      764,
+      1630
+    ]
+  },
+  "relationships": [
+    "North2 bridge joins foreground east",
+    "Japan/Black Current rear east; deep gallery rear west",
+    "Baby room beside deep/Japan junction (live map)",
+    "Coral diagonal and turtle ring west; Arribada foreground west",
+    "Public phone beside Arribada entrance (official FAQ)",
+    "Cinema east and South1/South3 cores distinct"
+  ]
+}

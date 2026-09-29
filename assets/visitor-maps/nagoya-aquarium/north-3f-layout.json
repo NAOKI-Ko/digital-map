@@ -1,0 +1,30 @@
+{
+  "revision": "north-3f-R4",
+  "width": 1200,
+  "height": 1830,
+  "gate": "PENDING_FIVE_FLOOR_REVIEW",
+  "anchors": {
+    "スタジアム売店": [
+      493,
+      565
+    ],
+    "ベルーガ（水上観覧）": [
+      231,
+      1091
+    ],
+    "メインプール・スタジアム": [
+      780,
+      594
+    ],
+    "北館3F バリアフリートイレ": [
+      550,
+      800
+    ]
+  },
+  "relationships": [
+    "Stadium wraps main pool rear",
+    "Beluga surface gallery west",
+    "North2 transitions west rear and entry-side",
+    "No same-level South3 bridge"
+  ]
+}

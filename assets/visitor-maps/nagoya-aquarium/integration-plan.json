@@ -1,0 +1,474 @@
+{
+  "workUnit": "WU-67",
+  "mapId": "cmukrf4gz0007c8vawtaeozwn",
+  "slug": "nagoya-aquarium-uat-20260928",
+  "expectedReleaseId": "cmukwfp30003hc8va3evrt3vp",
+  "gateCommit": "3dc7771",
+  "removeQaDecorationIds": [
+    "cmukw0xf10037c8vas5b9qmjx",
+    "cmukw2jle0038c8vaqv1mgqer"
+  ],
+  "floors": [
+    {
+      "id": "cmukrhmvm000hc8varaqaf5e3",
+      "name": "北館 2F",
+      "image": "north-2f-master.png",
+      "sha256": "9e3c094d6ec2eadd60fb841c4452f7ba7c2b56068d0a57533c02b837786c3915",
+      "imageWidth": 2400,
+      "imageHeight": 3660,
+      "spots": [
+        {
+          "id": "cmuktclah0015c8var8l162k5",
+          "name": "イルカ（日本の海）",
+          "x": 0.5975,
+          "y": 0.5699453551912569,
+          "categoryIds": [
+            "cmuksotzo000yc8vaetbgucd7"
+          ],
+          "icon": "icons/dolphin.png",
+          "iconSha256": "f86bb45bde41ae49653a7afc3013cc69307539d0fd180a512175b359012ee6cb",
+          "pinColor": "#246478"
+        },
+        {
+          "id": "cmuktdg9s001bc8vaiha6s9xx",
+          "name": "コインロッカー",
+          "x": 0.15833333333333333,
+          "y": 0.8797814207650273,
+          "categoryIds": [
+            "cmuksr33g0012c8vaiz7a5qra"
+          ],
+          "icon": "icons/locker.png",
+          "iconSha256": "ea6fa640943cfd2ca74e3b714c8b7752ed1a4d2a419d14d9010e88d17c07bee2",
+          "pinColor": "#2563EB"
+        },
+        {
+          "id": "cmukt2blb0014c8vazlil9c4k",
+          "name": "シャチ（日本の海）",
+          "x": 0.7958333333333333,
+          "y": 0.6377049180327868,
+          "categoryIds": [
+            "cmuksotzo000yc8vaetbgucd7"
+          ],
+          "icon": "icons/orca.png",
+          "iconSha256": "dceb8edc934023792352e937cc07199841aa59e14f6d34b8d535244d17ef6b8a",
+          "pinColor": "#246478"
+        },
+        {
+          "id": "cmuktdhcy001cc8va0p3q6kjw",
+          "name": "ベビーコーナー",
+          "x": 0.8916666666666667,
+          "y": 0.8360655737704918,
+          "categoryIds": [
+            "cmuksrbeg0013c8varnahowq5"
+          ],
+          "icon": "icons/baby.png",
+          "iconSha256": "48323a2edb088c47c50523edc4c484b827b5e92a7d2cd62a6ac29510d0f61ef5",
+          "pinColor": "#047857"
+        },
+        {
+          "id": "cmuktd3lp0016c8va4vyu47ad",
+          "name": "ベルーガ（水中観覧）",
+          "x": 0.19916666666666666,
+          "y": 0.533879781420765,
+          "categoryIds": [
+            "cmuksotzo000yc8vaetbgucd7"
+          ],
+          "icon": "icons/beluga.png",
+          "iconSha256": "416aa73fd77fcfcf2f4f5ced60b8a8532d8112b0ed9471d265fc59911de17692",
+          "pinColor": "#246478"
+        },
+        {
+          "id": "cmukth2kc001wc8vax120q81y",
+          "name": "ミュージアムショップ（北館）",
+          "x": 0.345,
+          "y": 0.8743169398907104,
+          "categoryIds": [
+            "cmuksqtyp0011c8vam3bru61s"
+          ]
+        },
+        {
+          "id": "cmuktddxf0019c8vaz1dy7gr3",
+          "name": "入口",
+          "x": 0.525,
+          "y": 0.8278688524590164,
+          "categoryIds": [
+            "cmuksrbeg0013c8varnahowq5"
+          ],
+          "icon": "icons/entry.png",
+          "iconSha256": "d381a75eab573187ec034ed59a0651b863619bb0de9592f13bf2304e8f516b90",
+          "pinColor": "#047857"
+        },
+        {
+          "id": "cmukth14y001vc8vas0at370p",
+          "name": "北館2F バリアフリートイレ",
+          "x": 0.14,
+          "y": 0.6639344262295082,
+          "categoryIds": [
+            "cmuksr33g0012c8vaiz7a5qra"
+          ]
+        },
+        {
+          "id": "cmuktd5u80018c8vaik5ppju7",
+          "name": "水中観覧席",
+          "x": 0.7716666666666666,
+          "y": 0.32786885245901637,
+          "categoryIds": [
+            "cmuksotzo000yc8vaetbgucd7"
+          ],
+          "icon": "icons/seating.png",
+          "iconSha256": "f60d185efb7e45d3a7507fb0aac6637fd2b31cb0a3bb351c178bf4852d89f0e0",
+          "pinColor": "#246478"
+        },
+        {
+          "id": "cmuktdf7c001ac8vaq1bea4c7",
+          "name": "総合案内",
+          "x": 0.7083333333333334,
+          "y": 0.8360655737704918,
+          "categoryIds": [
+            "cmuksrbeg0013c8varnahowq5"
+          ]
+        },
+        {
+          "id": "cmuktd4q10017c8vaa0236mll",
+          "name": "進化の海",
+          "x": 0.475,
+          "y": 0.2896174863387978,
+          "categoryIds": [
+            "cmuksotzo000yc8vaetbgucd7"
+          ],
+          "icon": "icons/evolution.png",
+          "iconSha256": "71cc02a75cb5b8f56a030fe62ab4317265921040d54c50cfdd112fde8407ccff",
+          "pinColor": "#246478"
+        }
+      ]
+    },
+    {
+      "id": "cmuksbnaj000lc8vasrlaoqww",
+      "name": "北館 3F",
+      "image": "north-3f-master.png",
+      "sha256": "498fdf1de12d65d460cc491db79b6865a3b426dab7b8848f09d7a1f4843d360f",
+      "imageWidth": 2400,
+      "imageHeight": 3660,
+      "spots": [
+        {
+          "id": "cmukth53k001yc8vax75t2x45",
+          "name": "スタジアム売店",
+          "x": 0.41083333333333333,
+          "y": 0.3087431693989071,
+          "categoryIds": [
+            "cmuksqm1o0010c8va5w39e2zm"
+          ]
+        },
+        {
+          "id": "cmuktdp2i001ec8var5bsjmb7",
+          "name": "ベルーガ（水上観覧）",
+          "x": 0.1925,
+          "y": 0.5961748633879781,
+          "categoryIds": [
+            "cmuksotzo000yc8vaetbgucd7"
+          ],
+          "icon": "icons/beluga.png",
+          "iconSha256": "416aa73fd77fcfcf2f4f5ced60b8a8532d8112b0ed9471d265fc59911de17692",
+          "pinColor": "#246478"
+        },
+        {
+          "id": "cmuktdnza001dc8varu72qn0y",
+          "name": "メインプール・スタジアム",
+          "x": 0.65,
+          "y": 0.32459016393442625,
+          "categoryIds": [
+            "cmukspx8i000zc8vabsajv6sj"
+          ],
+          "icon": "icons/seating.png",
+          "iconSha256": "f60d185efb7e45d3a7507fb0aac6637fd2b31cb0a3bb351c178bf4852d89f0e0",
+          "pinColor": "#7C3AED"
+        },
+        {
+          "id": "cmukth42e001xc8vabh6cya4s",
+          "name": "北館3F バリアフリートイレ",
+          "x": 0.4583333333333333,
+          "y": 0.4371584699453552,
+          "categoryIds": [
+            "cmuksr33g0012c8vaiz7a5qra"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cmukscq3b000pc8va9r87tgs4",
+      "name": "南館 1F",
+      "image": "south-1f-master.png",
+      "sha256": "5aded717cf414be696bc0f473d4f2368cd9fd10208056cc7cf4dd06b22697cdd",
+      "imageWidth": 2400,
+      "imageHeight": 3660,
+      "spots": [
+        {
+          "id": "cmukte0xu001fc8va4a6c1pz3",
+          "name": "くらげなごりうむ",
+          "x": 0.6666666666666666,
+          "y": 0.4551912568306011,
+          "categoryIds": [
+            "cmuksotzo000yc8vaetbgucd7"
+          ],
+          "icon": "icons/jelly.png",
+          "iconSha256": "81ee29f441936f4f6338e39c9405a356a77da7ec009036876c94976625542113",
+          "pinColor": "#246478"
+        },
+        {
+          "id": "cmukte4gt001ic8vakcr8vlwu",
+          "name": "タッチタンク",
+          "x": 0.6616666666666666,
+          "y": 0.6273224043715847,
+          "categoryIds": [
+            "cmuksotzo000yc8vaetbgucd7"
+          ],
+          "icon": "icons/touch.png",
+          "iconSha256": "1b00d7d6ba05d955a75b32cc44d3ff5c98332306fc0b8ee525c5f717d80890a3",
+          "pinColor": "#246478"
+        },
+        {
+          "id": "cmukte5j9001jc8va06nh86yc",
+          "name": "ミュージアムショップ（南館）",
+          "x": 0.40166666666666667,
+          "y": 0.8158469945355191,
+          "categoryIds": [
+            "cmuksqtyp0011c8vam3bru61s"
+          ]
+        },
+        {
+          "id": "cmukth62i001zc8va1psl2dbc",
+          "name": "南館1F バリアフリートイレ",
+          "x": 0.14666666666666667,
+          "y": 0.7103825136612022,
+          "categoryIds": [
+            "cmuksr33g0012c8vaiz7a5qra"
+          ]
+        },
+        {
+          "id": "cmukte260001gc8vaw9c9zlee",
+          "name": "深海ギャラリー（1F）",
+          "x": 0.38166666666666665,
+          "y": 0.2994535519125683,
+          "categoryIds": [
+            "cmuksotzo000yc8vaetbgucd7"
+          ],
+          "icon": "icons/deep.png",
+          "iconSha256": "9e3d88776faf1bd1a251019d79559ad9a01d361577f84b31937083dc43bb6d9f",
+          "pinColor": "#246478"
+        },
+        {
+          "id": "cmukte39k001hc8vai0jivag4",
+          "name": "赤道の海（1F）",
+          "x": 0.20083333333333334,
+          "y": 0.5612021857923497,
+          "categoryIds": [
+            "cmuksotzo000yc8vaetbgucd7"
+          ],
+          "icon": "icons/coral.png",
+          "iconSha256": "e91ea7214f5a120ab62592099371fe71909faaf622b620c0ccab29e61762fd3a",
+          "pinColor": "#246478"
+        }
+      ]
+    },
+    {
+      "id": "cmukshlyb000tc8van3dpun6a",
+      "name": "南館 2F",
+      "image": "south-2f-master.png",
+      "sha256": "6714c508739231f2489a112c255e558dbfc830b1d66d0238818d73a79ee7c20e",
+      "imageWidth": 2400,
+      "imageHeight": 3660,
+      "spots": [
+        {
+          "id": "cmuktgg8r001nc8va7hnc92i9",
+          "name": "ウミガメ回遊水槽（2F）",
+          "x": 0.345,
+          "y": 0.6885245901639344,
+          "categoryIds": [
+            "cmuksotzo000yc8vaetbgucd7"
+          ],
+          "icon": "icons/turtle.png",
+          "iconSha256": "fce9b4a332c3a012a6810e5eadf165c64512e8605508db70f07dfb569ca74910",
+          "pinColor": "#246478"
+        },
+        {
+          "id": "cmuktgii8001pc8va3edshhrz",
+          "name": "ベビーコーナー（南館）",
+          "x": 0.5066666666666667,
+          "y": 0.47540983606557374,
+          "categoryIds": [
+            "cmuksrbeg0013c8varnahowq5"
+          ],
+          "icon": "icons/baby.png",
+          "iconSha256": "48323a2edb088c47c50523edc4c484b827b5e92a7d2cd62a6ac29510d0f61ef5",
+          "pinColor": "#047857"
+        },
+        {
+          "id": "cmuktghey001oc8vacauz01ip",
+          "name": "レストラン アリバダ",
+          "x": 0.24333333333333335,
+          "y": 0.8633879781420765,
+          "categoryIds": [
+            "cmuksqm1o0010c8va5w39e2zm"
+          ]
+        },
+        {
+          "id": "cmukthhne0022c8vat5a3176r",
+          "name": "公衆電話",
+          "x": 0.44583333333333336,
+          "y": 0.8475409836065574,
+          "categoryIds": [
+            "cmuksr33g0012c8vaiz7a5qra"
+          ],
+          "icon": "icons/phone.png",
+          "iconSha256": "826dbabe9db0ae30ff2594b781aa2b58051f8f59dba4d3811bc023d296e1b0a1",
+          "pinColor": "#2563EB"
+        },
+        {
+          "id": "cmukthgf60021c8vazbuyojvy",
+          "name": "南館2F バリアフリートイレ",
+          "x": 0.7483333333333333,
+          "y": 0.6087431693989072,
+          "categoryIds": [
+            "cmuksr33g0012c8vaiz7a5qra"
+          ]
+        },
+        {
+          "id": "cmuktge33001lc8va4w4zvm76",
+          "name": "深海ギャラリー（2F）",
+          "x": 0.285,
+          "y": 0.3273224043715847,
+          "categoryIds": [
+            "cmuksotzo000yc8vaetbgucd7"
+          ],
+          "icon": "icons/deep.png",
+          "iconSha256": "9e3d88776faf1bd1a251019d79559ad9a01d361577f84b31937083dc43bb6d9f",
+          "pinColor": "#246478"
+        },
+        {
+          "id": "cmukthf510020c8vaoh1zcqix",
+          "name": "自販機コーナー",
+          "x": 0.6366666666666667,
+          "y": 0.8907103825136612,
+          "categoryIds": [
+            "cmuksqm1o0010c8va5w39e2zm"
+          ],
+          "icon": "icons/cup.png",
+          "iconSha256": "7125ea941b6a5c2b0dd88c256db84b7fc5083a4ebd3f75131ee39bb1133d3b05",
+          "pinColor": "#D97706"
+        },
+        {
+          "id": "cmuktgf50001mc8vazpkqmmdg",
+          "name": "赤道の海（2F）",
+          "x": 0.24166666666666667,
+          "y": 0.5163934426229508,
+          "categoryIds": [
+            "cmuksotzo000yc8vaetbgucd7"
+          ],
+          "icon": "icons/coral.png",
+          "iconSha256": "e91ea7214f5a120ab62592099371fe71909faaf622b620c0ccab29e61762fd3a",
+          "pinColor": "#246478"
+        },
+        {
+          "id": "cmuktgcuf001kc8vavw5st4ki",
+          "name": "黒潮大水槽",
+          "x": 0.7633333333333333,
+          "y": 0.4005464480874317,
+          "categoryIds": [
+            "cmuksotzo000yc8vaetbgucd7"
+          ],
+          "icon": "icons/fish.png",
+          "iconSha256": "2796999bc9cdc74b6ea3bc2ecd8ec0dd2b3b489797bf7d0a4ce8a4bdcf06c060",
+          "pinColor": "#246478"
+        }
+      ]
+    },
+    {
+      "id": "cmuksihln000xc8vai4iwe2lh",
+      "name": "南館 3F",
+      "image": "south-3f-master.png",
+      "sha256": "720b85a7ebfd8c933970cadef09a3beeaec9e24097d045915cefe7632a264113",
+      "imageWidth": 2400,
+      "imageHeight": 3660,
+      "spots": [
+        {
+          "id": "cmuktgr04001rc8vanmm2nvfc",
+          "name": "ウミガメ回遊水槽（3F）",
+          "x": 0.34833333333333333,
+          "y": 0.6551912568306011,
+          "categoryIds": [
+            "cmuksotzo000yc8vaetbgucd7"
+          ],
+          "icon": "icons/turtle.png",
+          "iconSha256": "fce9b4a332c3a012a6810e5eadf165c64512e8605508db70f07dfb569ca74910",
+          "pinColor": "#246478"
+        },
+        {
+          "id": "cmuktgs3a001sc8va2nkzsx23",
+          "name": "オーストラリアの水辺",
+          "x": 0.2991666666666667,
+          "y": 0.3185792349726776,
+          "categoryIds": [
+            "cmuksotzo000yc8vaetbgucd7"
+          ],
+          "icon": "icons/turtle.png",
+          "iconSha256": "fce9b4a332c3a012a6810e5eadf165c64512e8605508db70f07dfb569ca74910",
+          "pinColor": "#246478"
+        },
+        {
+          "id": "cmuktgu45001uc8vahsbg8tdq",
+          "name": "フードテラス トータス",
+          "x": 0.37083333333333335,
+          "y": 0.8579234972677595,
+          "categoryIds": [
+            "cmuksqm1o0010c8va5w39e2zm"
+          ]
+        },
+        {
+          "id": "cmukthkio0024c8vay1iqgr4p",
+          "name": "ペンギンスタジオ",
+          "x": 0.6925,
+          "y": 0.4918032786885246,
+          "categoryIds": [
+            "cmuksrbeg0013c8varnahowq5"
+          ],
+          "icon": "icons/camera.png",
+          "iconSha256": "98092d0e1d27b87c1e2de6fbd0f34958eb9e7f960d3b0a67e59a69659cc04065",
+          "pinColor": "#047857"
+        },
+        {
+          "id": "cmuktgt33001tc8vakt808jtp",
+          "name": "ペンギン（南極の海）",
+          "x": 0.75,
+          "y": 0.3224043715846995,
+          "categoryIds": [
+            "cmuksotzo000yc8vaetbgucd7"
+          ],
+          "icon": "icons/penguin.png",
+          "iconSha256": "51fa027badc4699fee3608d68a455aaedaaef85a22578fcb8f63db895cbda0ae",
+          "pinColor": "#246478"
+        },
+        {
+          "id": "cmukthisp0023c8vaorpkq701",
+          "name": "南館3F バリアフリートイレ",
+          "x": 0.7866666666666666,
+          "y": 0.6147540983606558,
+          "categoryIds": [
+            "cmuksr33g0012c8vaiz7a5qra"
+          ]
+        },
+        {
+          "id": "cmuktgpvb001qc8va1ki9mqut",
+          "name": "赤道の海（3F）",
+          "x": 0.24083333333333334,
+          "y": 0.5005464480874317,
+          "categoryIds": [
+            "cmuksotzo000yc8vaetbgucd7"
+          ],
+          "icon": "icons/coral.png",
+          "iconSha256": "e91ea7214f5a120ab62592099371fe71909faaf622b620c0ccab29e61762fd3a",
+          "pinColor": "#246478"
+        }
+      ]
+    }
+  ]
+}

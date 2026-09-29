@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1830" viewBox="0 0 1200 1830"><style>text{font-family:"Hiragino Sans","Arial Unicode MS",sans-serif}</style>
+<rect x="0" y="0" width="1200" height="1830" rx="0" fill="#F7F5EE" stroke="none" stroke-width="3"/>
+<text x="55" y="62" font-size="28" font-weight="650" fill="#123D4A" text-anchor="start">MARINE ATLAS</text>
+<text x="55" y="151" font-size="86" font-weight="750" fill="#123D4A" text-anchor="start">南館 3F</text>
+<text x="56" y="211" font-size="40" font-weight="600" fill="#123D4A" text-anchor="start">オーストラリアから南極へ</text>
+<path d="M55 248H1145" fill="none" stroke="#123D4A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M150 390L1082 390L1082 820Q1200 861 1150 1106L1066 1200L1066 1550L630 1550Q380 1650 145 1500L145 930L100 750Z" fill="#FFFDF8" stroke="#BBCAC8" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M155 405L574 405L574 542Q307 531 225 659L150 600Z" fill="#DCE9DE" stroke="#7F9F94" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M680 405L1055 405L1055 625L818 625L680 562Z" fill="#C5E5E7" stroke="#398EA5" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="372" y="333" font-size="44" font-weight="700" fill="#123D4A" text-anchor="middle">オーストラリア</text>
+<text x="372" y="377" font-size="43" font-weight="700" fill="#123D4A" text-anchor="middle">の水辺</text>
+<text x="873" y="333" font-size="49" font-weight="700" fill="#123D4A" text-anchor="middle">南極の海</text>
+<text x="873" y="377" font-size="41" font-weight="650" fill="#123D4A" text-anchor="middle">ペンギン</text>
+<path d="M171 737L528 650L561 706L280 971L154 958Z" fill="#83C7D0" stroke="#398EA5" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="292" y="725" font-size="46" font-weight="700" fill="#123D4A" text-anchor="middle">赤道の海</text>
+<ellipse cx="406" cy="1108" rx="137" ry="151" fill="#83C7D0" stroke="#398EA5" stroke-width="5"/><ellipse cx="406" cy="1108" rx="68" ry="85" fill="#E9DAB6"/>
+<text x="415" y="942" font-size="46" font-weight="700" fill="#123D4A" text-anchor="middle">ウミガメ</text>
+<text x="416" y="992" font-size="35" font-weight="600" fill="#123D4A" text-anchor="middle">回遊水槽</text>
+<rect x="592" y="856" width="192" height="334" rx="10" fill="#E8EFED" stroke="#BBCAC8" stroke-width="3"/>
+<path d="M922 903Q1150 882 1118 1092L946 1230Z" fill="#E8EFED" stroke="#BBCAC8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M957 947Q1017 1029 957 1160" fill="none" stroke="#BBCAC8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M982 947Q1042 1029 982 1160" fill="none" stroke="#BBCAC8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M1007 947Q1067 1029 1007 1160" fill="none" stroke="#BBCAC8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="1032" y="1320" font-size="39" font-weight="650" fill="#123D4A" text-anchor="middle">シネマ館</text>
+<path d="M546 1430L840 1377L842 707Q786 600 643 602L451 602Q332 601 288 662M287 978L224 1190L319 1357L546 1430" fill="none" stroke="#E9DAB6" stroke-width="55" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M842 1010L939 1010M839 713L932 701" fill="none" stroke="#E9DAB6" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="730" y="665" width="220" height="240" rx="15" fill="#DCE9DE" stroke="#7F9F94" stroke-width="3"/>
+<text x="840" y="660" font-size="37" font-weight="650" fill="#123D4A" text-anchor="middle">ペンギン</text>
+<text x="840" y="705" font-size="36" font-weight="650" fill="#123D4A" text-anchor="middle">スタジオ</text>
+<rect x="321" y="1342" width="233" height="224" rx="18" fill="#DCE9DE" stroke="#7F9F94" stroke-width="3"/>
+<text x="437" y="1330" font-size="43" font-weight="700" fill="#123D4A" text-anchor="middle">トータス</text>
+<text x="437" y="1370" font-size="31" font-weight="550" fill="#123D4A" text-anchor="middle">フードテラス</text>
+<rect x="125" y="1184" width="72" height="68" rx="8" fill="#FFFDF8" stroke="#A76522" stroke-width="3"/>
+<path d="M137 1232h15l21-28h13M137 1221h9l21-27h19" fill="none" stroke="#A76522" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="211" y="1184" width="66" height="68" rx="8" fill="#FFFDF8" stroke="#A76522" stroke-width="3"/>
+<path d="M228 1232V1201m-7 9 7-9 7 9M258 1201v31m-7-8 7 8 7-8" fill="none" stroke="#A76522" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="125" y="1300" font-size="42" font-weight="700" fill="#A76522" text-anchor="start">2Fへ</text>
+<rect x="616" y="914" width="72" height="68" rx="8" fill="#FFFDF8" stroke="#A76522" stroke-width="3"/>
+<path d="M628 962h15l21-28h13M628 951h9l21-27h19" fill="none" stroke="#A76522" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="702" y="914" width="66" height="68" rx="8" fill="#FFFDF8" stroke="#A76522" stroke-width="3"/>
+<path d="M719 962V931m-7 9 7-9 7 9M749 931v31m-7-8 7 8 7-8" fill="none" stroke="#A76522" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="616" y="1030" font-size="42" font-weight="700" fill="#A76522" text-anchor="start">2Fへ</text>
+<rect x="906" y="922" width="80" height="60" rx="10" fill="#FFFDF8" stroke="#123D4A" stroke-width="3"/>
+<text x="946" y="965" font-size="32" font-weight="700" fill="#123D4A" text-anchor="middle">WC</text>
+<rect x="118" y="1298" width="80" height="60" rx="10" fill="#FFFDF8" stroke="#123D4A" stroke-width="3"/>
+<text x="158" y="1341" font-size="32" font-weight="700" fill="#123D4A" text-anchor="middle">WC</text>
+<text x="783" y="1604" font-size="31" font-weight="600" fill="#123D4A" text-anchor="middle">北館へは南館2Fの連絡通路から</text>
+<path d="M55 1680H1145" fill="none" stroke="#BBCAC8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="60" y="1720" width="36" height="28" rx="5" fill="#83C7D0" stroke="none" stroke-width="3"/>
+<text x="112" y="1748" font-size="34" font-weight="600" fill="#123D4A" text-anchor="start">水槽</text>
+<rect x="260" y="1720" width="36" height="28" rx="5" fill="#E9DAB6" stroke="none" stroke-width="3"/>
+<text x="312" y="1748" font-size="34" font-weight="600" fill="#123D4A" text-anchor="start">通路</text>
+<text x="494" y="1748" font-size="34" font-weight="600" fill="#123D4A" text-anchor="start">WC トイレ</text>
+<text x="794" y="1748" font-size="34" font-weight="600" fill="#123D4A" text-anchor="start">↕ 上下階</text>
+<text x="56" y="1790" font-size="24" font-weight="600" fill="#123D4A" text-anchor="start">非公式案内図 / 距離・寸法は模式化</text>
+</svg>

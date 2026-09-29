@@ -1,0 +1,43 @@
+{
+  "revision": "south-3f-R4",
+  "width": 1200,
+  "height": 1830,
+  "gate": "PENDING_FIVE_FLOOR_REVIEW",
+  "anchors": {
+    "オーストラリアの水辺": [
+      359,
+      583
+    ],
+    "ペンギン（南極の海）": [
+      900,
+      590
+    ],
+    "ペンギンスタジオ": [
+      831,
+      900
+    ],
+    "赤道の海（3F）": [
+      289,
+      916
+    ],
+    "ウミガメ回遊水槽（3F）": [
+      418,
+      1199
+    ],
+    "フードテラス トータス": [
+      445,
+      1570
+    ],
+    "南館3F バリアフリートイレ": [
+      944,
+      1125
+    ]
+  },
+  "relationships": [
+    "Australia and Antarctic cross-gallery at rear",
+    "Coral diagonal wing and turtle ring west",
+    "Tortoise food terrace foreground west",
+    "Cinema separate east lobe",
+    "Return to South2 via west/central cores; no same-floor North bridge"
+  ]
+}

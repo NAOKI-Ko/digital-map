@@ -13,3 +13,5 @@ R1 confirms entrance on North2, lockers on entrance-left and connecting corridor
 Do not reproduce printed prices, schedules or animal-presence guarantees. Do not imply all elevators are unrestricted accessible routes without evidence. Reference drawings have illustrative perspective rather than survey measurements; all new drawing dimensions are explicitly diagrammatic.
 
 Official photos/images are not licensed as upload assets by this task. No such assets are used. Existing third-party exhibit media must retain their explicit general-image attribution and cannot be relabelled as actual Aquarium photographs.
+
+R4 — https://nagoyaaqua.jp/faq/ (accessed 2026-09-29): public telephone is beside the South2 Arribada entrance; North2 and South2 have baby rooms; drinks-only rule applies to the South2 former entrance vending area. These facts are paraphrased and do not import official art.

@@ -1,0 +1,1 @@
+{"compilerOptions":{"baseUrl":"../..","paths":{"~~/*":["./*"]},"module":"ESNext","moduleResolution":"Bundler","target":"ESNext"}}
