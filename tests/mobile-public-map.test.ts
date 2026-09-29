@@ -64,7 +64,8 @@ describe('公開Mapのモバイル契約', () => {
     const category = readFileSync(new URL('../app/components/map/CategoryFilter.vue', import.meta.url), 'utf8')
     expect(publicPage).toContain('hidden h-14')
     expect(publicPage).toContain('h-[100dvh]')
-    expect(publicPage).toContain('mobile-cover')
+    expect(publicPage).toContain('visitor-overview')
+    expect(publicPage).not.toContain('mobile-cover')
     expect(category).toContain('overflow-x-auto')
     expect(category).toContain('text-sm')
     expect(category).toContain('h-8')
@@ -75,7 +76,7 @@ describe('公開Mapのモバイル契約', () => {
   })
 
   it('top controls、Map controls、Category、attributionへ独立した配置zoneを持つ', () => {
-    expect(publicPage).toContain('max-w-[40vw]')
+    expect(publicPage).toContain('max-w-[calc(100vw-5.5rem)]')
     expect(publicPage).toContain('bottom-[calc(env(safe-area-inset-bottom)+2rem)]')
     expect(publicPage).toContain('right-[calc(env(safe-area-inset-right)+0.75rem)]')
     expect(mapViewer).toContain('margin-top: calc(env(safe-area-inset-top) + 4.5rem) !important;')

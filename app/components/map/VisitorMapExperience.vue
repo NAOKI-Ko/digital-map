@@ -32,6 +32,8 @@ const cameraComparisonEnabled = computed(() => import.meta.dev && route.query.ca
 const cameraComparisonMode = ref<'same' | 'fit'>('same')
 const floorSelectorOpen = computed(() => overlay.value?.type === 'floor')
 const infoOpen = computed(() => overlay.value?.type === 'info')
+let modalTrigger: HTMLElement | null = null
+let modalAction: string | undefined
 let spotTrigger: HTMLElement | null = null
 let spotTriggerId: string | null = null
 let focusRestoreTimer: number | null = null
@@ -72,6 +74,16 @@ watch(() => data.value?.map.floors, (floors) => {
     selectedFloorId.value = floors[0]?.id ?? ''
   }
 }, { immediate: true })
+
+watch(appModalOpen, (open, wasOpen) => {
+  if (wasOpen && !open) nextTick(() => {
+    const fallback = [...document.querySelectorAll<HTMLElement>('[data-visitor-action]')]
+      .find(element => element.dataset.visitorAction === modalAction && element.getClientRects().length > 0)
+    ;(modalTrigger?.isConnected ? modalTrigger : fallback)?.focus({ preventScroll: true })
+    modalTrigger = null
+    modalAction = undefined
+  })
+})
 
 watch(selectedFloorId, () => {
   overlay.value = null
@@ -165,11 +177,15 @@ function closeSpot(source: 'pointer' | 'other' = 'other') {
   finishTimer = window.setTimeout(finishPointerGesture, 1000)
 }
 
-function openFloorSelector() {
+function openFloorSelector(event: MouseEvent) {
+  modalTrigger = event.currentTarget as HTMLElement
+  modalAction = modalTrigger.dataset.visitorAction
   overlay.value = { type: 'floor' }
 }
 
-function openInfo() {
+function openInfo(event: MouseEvent) {
+  modalTrigger = event.currentTarget as HTMLElement
+  modalAction = modalTrigger.dataset.visitorAction
   overlay.value = { type: 'info' }
 }
 
@@ -221,36 +237,37 @@ onBeforeUnmount(clearPendingSpotClose)
         <nav v-show="!appModalOpen" aria-label="公開マップ操作" class="flex shrink-0 items-center gap-2">
           <label v-if="data.map.enabledLocales.includes('en')" class="sr-only" for="public-locale">{{ t.language }}</label>
           <select v-if="data.map.enabledLocales.includes('en')" id="public-locale" :value="data.map.locale" class="rounded-full border border-stone-200 px-2.5 py-1.5 text-xs" @change="switchLocale(($event.target as HTMLSelectElement).value as 'ja' | 'en')"><option value="ja">日本語</option><option value="en">English</option></select>
-          <button type="button" class="grid size-11 place-items-center rounded-full border border-stone-200 bg-white/80 text-sm font-bold" aria-label="マップ情報を開く" @click="openInfo">i</button>
+          <button type="button" class="grid size-11 place-items-center rounded-full border border-stone-200 bg-white/80 text-sm font-bold" data-visitor-action="info" aria-label="マップ情報を開く" @click="openInfo">i</button>
         </nav>
       </header>
 
       <section class="public-map-stage relative h-[100dvh] min-h-0 md:h-[calc(100dvh-3.5rem)]" :class="{ 'public-map-locked': appModalOpen, 'public-map-has-spot': Boolean(selectedSpot) }">
         <div v-show="!appModalOpen" class="pointer-events-none absolute inset-0 z-20 md:hidden" aria-label="公開マップ操作">
-          <div v-if="showFloorSelector" class="pointer-events-auto absolute left-[calc(env(safe-area-inset-left)+0.75rem)] top-[calc(env(safe-area-inset-top)+0.75rem)] max-w-[40vw]">
-          <button type="button" class="flex h-11 max-w-full items-center gap-2 rounded-full border border-white/70 bg-white/85 px-4 text-sm font-bold shadow-sm backdrop-blur" aria-haspopup="dialog" :aria-expanded="floorSelectorOpen" @click="openFloorSelector">
+          <div v-if="showFloorSelector" data-map-fit-edge="top" class="pointer-events-auto absolute left-[calc(env(safe-area-inset-left)+0.75rem)] top-[calc(env(safe-area-inset-top)+0.75rem)] " :class="data.map.enabledLocales.includes('en') ? 'max-w-[calc(100vw-10rem)]' : 'max-w-[calc(100vw-5.5rem)]'">
+          <button type="button" class="flex h-11 max-w-full items-center gap-2 rounded-full border border-white/70 bg-white/85 px-4 text-sm font-bold shadow-sm backdrop-blur" data-visitor-action="floor" aria-haspopup="dialog" :aria-expanded="floorSelectorOpen" @click="openFloorSelector">
             <span class="truncate">{{ selectedFloor.name }}</span> <span class="shrink-0" aria-hidden="true">⌄</span>
           </button>
           </div>
 
-        <div class="pointer-events-auto absolute right-[calc(env(safe-area-inset-right)+0.75rem)] top-[calc(env(safe-area-inset-top)+0.75rem)] flex items-center gap-2">
+        <div data-map-fit-edge="top" class="pointer-events-auto absolute right-[calc(env(safe-area-inset-right)+0.75rem)] top-[calc(env(safe-area-inset-top)+0.75rem)] flex items-center gap-2">
           <label v-if="data.map.enabledLocales.includes('en')" class="sr-only" for="public-locale-mobile">{{ t.language }}</label>
           <select v-if="data.map.enabledLocales.includes('en')" id="public-locale-mobile" :value="data.map.locale" class="h-11 w-16 rounded-full border border-white/70 bg-white/85 px-3 text-xs font-bold shadow-sm backdrop-blur" @change="switchLocale(($event.target as HTMLSelectElement).value as 'ja' | 'en')"><option value="ja">JA</option><option value="en">EN</option></select>
-          <span v-else class="grid h-11 w-16 place-items-center rounded-full border border-white/70 bg-white/85 text-xs font-bold shadow-sm backdrop-blur" aria-label="言語: 日本語">JA</span>
-          <button type="button" class="grid size-11 place-items-center rounded-full border border-white/70 bg-white/85 text-sm font-bold shadow-sm backdrop-blur" aria-label="マップ情報を開く" @click="openInfo">i</button>
+          <button type="button" class="grid size-11 place-items-center rounded-full border border-white/70 bg-white/85 text-sm font-bold shadow-sm backdrop-blur" data-visitor-action="info" aria-label="マップ情報を開く" @click="openInfo">i</button>
         </div>
         </div>
 
-        <div v-if="showFloorSelector && !appModalOpen" class="absolute left-5 top-5 z-20 hidden md:block">
-          <button type="button" class="flex min-h-11 max-w-full items-center gap-2 rounded-full border border-white/70 bg-white/80 px-4 text-sm font-bold shadow-sm backdrop-blur" aria-haspopup="dialog" :aria-expanded="floorSelectorOpen" @click="openFloorSelector"><span class="truncate">{{ selectedFloor.name }}</span><span aria-hidden="true">⌄</span></button>
+        <div v-if="showFloorSelector && !appModalOpen" data-map-fit-edge="top" class="absolute left-5 top-5 z-20 hidden md:block">
+          <button type="button" class="flex min-h-11 max-w-full items-center gap-2 rounded-full border border-white/70 bg-white/80 px-4 text-sm font-bold shadow-sm backdrop-blur" data-visitor-action="floor" aria-haspopup="dialog" :aria-expanded="floorSelectorOpen" @click="openFloorSelector"><span class="truncate">{{ selectedFloor.name }}</span><span aria-hidden="true">⌄</span></button>
         </div>
 
         <div
+          data-map-fit-edge="bottom"
           v-show="!appModalOpen && !selectedSpot"
           class="pointer-events-none absolute bottom-[calc(env(safe-area-inset-bottom)+2rem)] left-[calc(env(safe-area-inset-left)+0.75rem)] right-[calc(env(safe-area-inset-right)+0.75rem)] z-20 md:left-1/2 md:right-auto md:w-[min(50vw,44rem)] md:-translate-x-1/2"
         >
           <div class="pointer-events-auto">
             <CategoryFilter v-model="selectedCategoryIds" :categories="categories" />
+            <p v-if="selectedCategoryIds.length" role="status" class="mt-1 w-fit rounded-full bg-white px-3 py-1 text-xs font-semibold text-stone-800">{{ selectedFloor.name }} · {{ visibleSpots.length }}件を表示</p>
           </div>
         </div>
 
@@ -264,7 +281,7 @@ onBeforeUnmount(clearPendingSpotClose)
             mode="view"
             :selected-spot-id="selectedSpotId"
             :prioritize-visible-spots="selectedCategoryIds.length > 0"
-            mobile-cover
+            visitor-overview
             height="100%"
             :label="`${data.map.name} ${selectedFloor.name}`"
             @spot-selected="selectSpot"

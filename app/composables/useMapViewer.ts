@@ -27,6 +27,7 @@ export interface UseMapViewerOptions {
   candidateSpot?: Readonly<Ref<MapViewerSpot | null>>
   candidateKind?: Readonly<Ref<'placement' | 'move' | null>>
   prioritizeVisibleSpots?: Readonly<Ref<boolean>>
+  visitorOverview?: Readonly<Ref<boolean>>
   mobileCover?: Readonly<Ref<boolean>>
   initialCamera?: MapViewerCameraState | null
   onReady?: (map: MapLibreMap) => void
@@ -197,6 +198,7 @@ export function useMapViewer(
     mode: options.mode,
     floor: options.floor,
     mobileCover: options.mobileCover,
+    visitorOverview: options.visitorOverview,
     isReady,
   })
   const locationCameraPolicy = createOneShotLocationCameraPolicy(
@@ -211,7 +213,7 @@ export function useMapViewer(
     mode: options.mode,
     map,
     maplibre,
-    createBaseControls: () => [new MapNavigationControl(VIEWER_CAMERA_CONSTRAINTS[options.mode].pitch, options.mode === 'view' ? mapCamera.showWholeFloor : undefined)],
+    createBaseControls: () => [new MapNavigationControl(options.visitorOverview?.value ? 0 : VIEWER_CAMERA_CONSTRAINTS[options.mode].pitch, options.mode === 'view' ? mapCamera.showWholeFloor : undefined)],
     createControlGroup: controls => new HorizontalMapControlGroup(controls),
     onExplicitRequest: () => locationCameraPolicy.beginRequest(),
     onOutsideResult: result => locationCameraPolicy.consumeOutsideResult(result.firstForRequest),
@@ -229,18 +231,18 @@ export function useMapViewer(
         import('maplibre-gl/dist/maplibre-gl.css'),
       ])
       maplibre.value = maplibregl
-      const instance = new maplibregl.Map(createMapViewerOptions(container.value, options.mode))
+      const instance = new maplibregl.Map({ ...createMapViewerOptions(container.value, options.mode), ...(options.visitorOverview?.value ? { pitch: 0 } : {}) })
       map.value = instance
       instance.once('load', () => {
         if (map.value !== instance) return
         isReady.value = true
+        syncGeolocateControl(options.floor.value)
         showFloor(options.floor.value, false)
         comparisonBaseline = mapCamera.getState()
         if (options.initialCamera) mapCamera.restore(options.initialCamera)
         syncSpotMarkers()
         instance.on('zoom', syncMarkerDensity)
         syncDraftMarker(options.position.value)
-        syncGeolocateControl(options.floor.value)
         options.onCameraChanged?.(getMapViewerCameraState(instance))
         instance.on('moveend', () => {
           options.onCameraChanged?.(getMapViewerCameraState(instance))
@@ -533,11 +535,11 @@ export function useMapViewer(
   watch(() => options.floor.value.id, () => {
     if (!isReady.value) return
     const floor = options.floor.value
+    syncGeolocateControl(floor)
     showFloor(floor, true)
     syncSpotMarkers()
     syncDraftMarker(options.position.value)
-    syncGeolocateControl(floor)
-  })
+  }, { flush: 'post' })
 
   return {
     map: readonly(map),
