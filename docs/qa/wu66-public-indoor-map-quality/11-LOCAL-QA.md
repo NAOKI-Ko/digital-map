@@ -35,3 +35,5 @@ Final typecheck/build/Prisma validate/diff-check logs retained in task work dire
 Public and authenticated LIVE Preview both call VisitorMapExperience; shared renderer and existing preview authorization/analytics tests pass. Existing Aquarium login unavailable in this browser; requested user login while continuing. Do not count unauthenticated redirect as LIVE Preview visual acceptance. No new identity, credential reset or auth bypass.
 
 Native multitouch/pinch and real screen-reader/physical device validation are not available through current CUA viewport controls. Pointer drag, zoom buttons, Floor, Category, focus and 44px targets tested; report touch-specific evidence as PARTIAL.
+
+Final gate rerun on implementation: typecheck PASS, build PASS after stopping dev, Prisma validate PASS, diff-check PASS, full tests 678 PASS / 1 SKIP. Selected-category white/#c7401f contrast 5.02:1; selected-Floor #8c311f/#fdf5f3 7.59:1; All white/#1c1917 17.49:1 (sRGB calculation from configured colors). This checks these controls, not all image/PIN contrast combinations.
