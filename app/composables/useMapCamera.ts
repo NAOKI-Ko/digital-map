@@ -1,4 +1,5 @@
 import type { Ref } from 'vue'
+import { measureVisitorFitPadding } from '~/utils/visitor-floor-fit'
 import type { Map as MapLibreMap, MapOptions, StyleSpecification } from 'maplibre-gl'
 import { getFloorCorners, getGeoReferenceBounds, toImageCoordinates, type FloorCorners } from '~~/lib/geo'
 import type { MapViewerCameraState, MapViewerFloor } from '~~/shared/types/map-viewer'
@@ -162,6 +163,7 @@ export function createOneShotLocationCameraPolicy(
 interface UseMapCameraOptions {
   mode: MapViewerMode
   floor: Readonly<Ref<MapViewerFloor>>
+  visitorOverview?: Readonly<Ref<boolean>>
   mobileCover?: Readonly<Ref<boolean>>
   isReady: Readonly<Ref<boolean>>
 }
@@ -275,6 +277,11 @@ export function useMapCamera(
     // A previous Floor's relative constraints must not affect this Floor's camera calculation.
     instance.setMinZoom(ABSOLUTE_ZOOM_LIMITS.minZoom)
     instance.setMaxZoom(ABSOLUTE_ZOOM_LIMITS.maxZoom)
+    if (options.mode === 'view' && options.visitorOverview?.value && container.value) {
+      return instance.cameraForBounds([bounds.southwest, bounds.northeast], {
+        padding: measureVisitorFitPadding(container.value), bearing: 0, pitch: 0, maxZoom: 20,
+      })
+    }
     if (options.mode === 'edit') {
       return instance.cameraForBounds([bounds.southwest, bounds.northeast], {
         padding,
@@ -344,6 +351,16 @@ export function useMapCamera(
   function fitFloorBounds(corners: FloorCorners, animate: boolean) {
     const instance = map.value
     if (!instance) return
+    if (options.mode === 'view' && options.visitorOverview?.value) {
+      // Floor changes are a new overview, never an animated carry-over of the previous Floor.
+      instance.stop()
+      instance.resize()
+      instance.jumpTo({ bearing: 0, pitch: 0 })
+      const result = updateFloorZoomConstraints(corners)
+      if (result) instance.jumpTo({ center: result.camera.center, zoom: result.targetZoom, bearing: 0, pitch: 0 })
+      constraintLayoutKey = getConstraintLayoutKey()
+      return
+    }
     constraintLayoutKey = getConstraintLayoutKey()
     if (usesMobileCover()) {
       const camera = getFloorCamera(corners, 0)
@@ -372,6 +389,10 @@ export function useMapCamera(
     const instance = map.value
     const corners = getFloorCorners(options.floor.value)
     if (!instance || !corners || options.mode !== 'view') return
+    if (options.visitorOverview?.value) {
+      fitFloorBounds(corners, false)
+      return
+    }
     // The explicit overview is an entire-image fit, never the initial mobile cover.
     instance.jumpTo({ bearing: 0, pitch: 0 })
     const result = updateFloorZoomConstraints(corners)

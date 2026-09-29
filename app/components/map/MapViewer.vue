@@ -19,6 +19,7 @@ const props = withDefaults(defineProps<{
   floorErrorActionTo?: string | null
   initialCamera?: MapViewerCameraState | null
   prioritizeVisibleSpots?: boolean
+  visitorOverview?: boolean
   mobileCover?: boolean
 }>(), {
   spots: () => [],
@@ -35,6 +36,7 @@ const props = withDefaults(defineProps<{
   initialCamera: null,
   prioritizeVisibleSpots: false,
   mobileCover: false,
+  visitorOverview: false,
 })
 
 const emit = defineEmits<{
@@ -55,6 +57,7 @@ const candidateKind = toRef(props, 'candidateKind')
 const placementEnabled = toRef(props, 'placementEnabled')
 const prioritizeVisibleSpots = toRef(props, 'prioritizeVisibleSpots')
 const mobileCover = toRef(props, 'mobileCover')
+const visitorOverview = toRef(props, 'visitorOverview')
 const viewer = useMapViewer(container, {
   floor,
   spots,
@@ -66,6 +69,7 @@ const viewer = useMapViewer(container, {
   placementEnabled,
   prioritizeVisibleSpots,
   mobileCover,
+  visitorOverview,
   mode: props.mode,
   initialCamera: props.initialCamera,
   onCameraChanged: camera => emit('cameraChanged', camera),
