@@ -30,6 +30,8 @@ async function main() {
  const db = new URL(process.env.DATABASE_URL)
  assert.ok(['localhost','127.0.0.1'].includes(db.hostname),'Only local DB on the selected QA host is permitted')
  const rehearsal = process.env.WU67_TARGET === 'rehearsal'
+ const rollbackProbe = process.argv.includes('--rehearsal-fail-after-draft')
+ if(rollbackProbe) assert.equal(rehearsal,true,'Failure probe is forbidden on QA')
  if (rehearsal) assert.match(db.pathname,/^\/digital_map_test_wu67_[a-z0-9_]+$/)
  else {
   assert.equal(process.env.WU67_TARGET,'windows-qa')
@@ -119,6 +121,7 @@ async function main() {
    await appendAuditEvent(tx,{tenantId:before.tenantId,actorUserId:null,action:'WU67_ART_APPLIED',targetType:'Map',targetId:plan.mapId,mapId:plan.mapId,metadata:{executor:'authorized-qa-maintenance',artifactCommit:process.env.WU67_ARTIFACT_COMMIT,sourceGate:'3dc7771',preservedSpots:37,archivedQaDecorations:plan.removeQaDecorationIds}})
    return after
   },{isolationLevel:'Serializable',timeout:180000})
+  if(rollbackProbe) throw new Error('EXPECTED_REHEARSAL_FAILURE_AFTER_DRAFT')
   // The required release creator is the existing responsible QA publisher. The independent
   // maintenance audit above identifies automation and does not claim a human approval.
   const actor=before.currentRelease.createdBy
@@ -150,7 +153,9 @@ async function main() {
     }
     await appendAuditEvent(tx,{tenantId:before.tenantId,action:'WU67_ART_ROLLED_BACK',targetType:'Map',targetId:plan.mapId,mapId:plan.mapId,metadata:{reason:'installation-or-publication-validation-failed'}})
    },{timeout:60000})
-   console.error('Draft and pointer restored; unused new art media may remain for normal media lifecycle management.')
+   assert.equal(invariant(await getMap(prisma),plan.removeQaDecorationIds),invariant(before,plan.removeQaDecorationIds),'P1: rollback content mismatch')
+   assert.equal((await loadCurrentPublicSnapshot(plan.slug,'ja')).releaseId,before.currentReleaseId,'P1: rollback pointer mismatch')
+   console.error('ROLLBACK_VERIFIED: draft and pointer restored; unused new art media may remain for normal media lifecycle management.')
   }
   throw error
  }
