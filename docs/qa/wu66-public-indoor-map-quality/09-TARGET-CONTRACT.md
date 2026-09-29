@@ -1,0 +1,14 @@
+# Target Visitor Contract — fixed before implementation
+
+2026-09-29. Applies identically to Public Release and authenticated LIVE Preview through VisitorMapExperience. Source remains snapshot versus authorized LIVE, analytics isolation unchanged. Existing five-Floor/37-Spot Aquarium is not rebuilt or republished.
+
+1. INITIAL LOAD and explicit different FLOOR CHANGE show the entire illustration at bearing=0/pitch=0, with the largest contain scale fitting the actual map container and safe UI inset rectangle. No mobile cover. Reset constraints before fitting new Floor. Cancel prior animation; show the new Floor immediately at its own overview, including after rotation or rapid switches.
+2. Measure visible top/bottom UI chrome relative to the map container, including safe-area positions; retain marker-edge breathing room. Preserve artwork aspect ratio. The rectangle must be nonempty even at short viewport sizes. Explicit overview uses the same fit. No schema, Building or Placement model.
+3. USER PAN/ZOOM owns camera afterward. Category updates, Spot detail open/close, hint expiration and passive viewport resizing must not trigger floor fit. Resizing may only apply existing hard-bound clamp. Spot detail may minimally pan a hidden selected PIN without zoom reset; closing retains spatial context. Same-floor selection does not reset.
+4. Show full existing Floor names (including building). Floor modal traps focus, Escape closes, selection/current state is announced, focus returns to visible trigger. Info receives equivalent behavior. 44px controls; no preview-only renderer fixes.
+5. Existing per-Floor Category OR filter resets on new Floor. Provide obvious horizontal overflow navigation and selected/result feedback. Preserve original placements, category assignments and style. Map remains the primary stage; dense markers may be disambiguated by filtering/zoom, never by mutating fixture.
+6. Desktop stage uses all available width/height below compact header; full illustration fit takes precedence over removing unavoidable square-image landscape margins. Padding protects image from controls; never overscale/crop to claim utilization improvement.
+7. Validate 390×844, 768×1024, 1024×768, 1440×900, 1440×700; five floors at 390; open/close details; filtering; keyboard and browser pointer/zoom; document native touch limits honestly.
+8. Tests/typecheck/build/Prisma validate/diff, PR Verify, merge to dev, post-merge Verify, verified Windows backup, exact merge SHA deployment, local/public health, existing Aquarium acceptance. Main/Production untouched. Stop only for user-stated material decisions/P0/P1/unsafe schema work.
+
+Competitive rating need not be ABOVE everywhere: report illustration/routing/positioning/language gaps honestly. AQUA-007 closure requires actual post-deploy fit evidence. Production-quality illustration work can begin once visitor-container acceptance is established; this is not a Production release approval.
