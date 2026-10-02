@@ -19,3 +19,14 @@ Affected AC1–7,9–13,15–17: PASS on tested local implementation. AC8,14,20 
 Both configured registry and explicit https://registry.npmjs.org lookup of node-forge@1.4.1 return ERR_PNPM_PACKAGE_NOT_FOUND; latest tag1.4.0. Latest listhen1.10.1 still depends on ^1.4.0. No safe upstream version or resolvable minimal override is available from the official registry at this run. Do not commit a failing override or pretend1.4.0 is patched. No audit ignore or policy relaxation. Mandatory audit/Verify remains blocked until a published patched >=1.4.1 can be installed and verified.
 
 Codex re-review is requested after pushing this fix. Thread resolution and returned findings must be checked before future merge. Merge is allowed only after Verify PASS, then post-merge Verify → Windows exactSHA → authenticated Preview → Final Acceptance. Production untouched.
+
+## Second Codex review / additional P2 fixes
+
+Codex review on ce23eec completed2026-10-02T02:20:43Z with three additional P2s. Original three threads were resolved; these new findings are also fixed:
+- Unwrap content longitude relative to its first corner before taking bounds. Test and browser georeferenced Floor extend across180° with nearby valid reference points. Initial center≈179.999° at all five sizes, never Greenwich.
+- Navigation home pitch now reads the camera policy dynamically. Empty/invalid/broad fallback begins without a reset compass; rotating then resetting restores bearing0/pitch0. Valid content restores bearing0/pitch20. Floor-specific policy follows recalculation.
+- Content fit is never raised past its fitted zoom. When the fitted content zoom cannot reach the discovery minimum+.55, use the level whole-floor fallback. No forced crop of broadly distributed Spot edges; two featured edge Spots at x/y .1/.9 remain reachable and visible at all five sizes.
+
+Second revision verification:694 tests PASS/1 optional SKIP, typecheck/build PASS. Twenty browser cases(empty/invalid/broad/dateline×five sizes)PASS; all reset bearings0, fallback reset pitches0, valid dateline reset pitches20, no initial compass, zero collision/hidden-focus violations. evidence/p2-round2-responsive.json.
+
+node-forge official published versions end at1.4.0; no stable>=1.4.1 exists in returned registry metadata. Required audit remains unchanged and FAIL; no merge or downstream Windows activation.

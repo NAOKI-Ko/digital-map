@@ -4,3 +4,5 @@ Overview separately resets heading to 0/0 and whole-floor fit. Passive resize on
 DOM data-viewer-camera and data-viewer-moving expose current rendered camera/corners and settled state for exact-SHA browser verification; there is no debug UI or separate Preview implementation. Existing geolocation and georeference conversion remain unchanged.
 
 PR27 P2 amendment: empty/invalid/extreme whole-floor fallback is displayed at pitch0 to match its fitted camera. Valid-content initial policy remains pitch20.
+
+Second P2 amendment: when content cannot fit at whole-floor+.55, use level whole-floor fallback rather than force past content fit. Content longitude bounds unwrap at the antimeridian. Compass reset reads the current Floor policy (0° fallback/20° valid content).

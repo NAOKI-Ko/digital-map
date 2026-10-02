@@ -111,7 +111,7 @@ export class MapNavigationControl implements IControl {
   private updateCompass: (() => void) | null = null
 
   constructor(
-    private readonly homePitch: number = VIEWER_CAMERA_CONSTRAINTS.view.pitch,
+    private readonly homePitch: () => number = () => VIEWER_CAMERA_CONSTRAINTS.view.pitch,
     private readonly showWholeFloor?: () => void,
   ) {}
 
@@ -123,9 +123,9 @@ export class MapNavigationControl implements IControl {
     const zoomOut = createControlButton('縮小', '−', () => this.map?.zoomOut())
     zoomIn.className = 'map-viewer-zoom-control'
     zoomOut.className = 'map-viewer-zoom-control'
-    const compass = createControlButton('向きを戻す', 'N', () => this.map?.easeTo({ bearing: 0, pitch: this.homePitch, duration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 250 }))
+    const compass = createControlButton('向きを戻す', 'N', () => this.map?.easeTo({ bearing: 0, pitch: this.homePitch(), duration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 250 }))
     compass.className = 'map-viewer-compass'
-    this.updateCompass = () => { compass.hidden = !needsHeadingReset(map.getBearing(), map.getPitch(), this.homePitch) }
+    this.updateCompass = () => { compass.hidden = !needsHeadingReset(map.getBearing(), map.getPitch(), this.homePitch()) }
     const overview = this.showWholeFloor ? createControlButton('地図全体を表示', '□', this.showWholeFloor) : null
     if (overview) overview.className = 'map-viewer-overview-control'
     container.append(
@@ -217,7 +217,7 @@ export function useMapViewer(
     mode: options.mode,
     map,
     maplibre,
-    createBaseControls: () => [new MapNavigationControl(VIEWER_CAMERA_CONSTRAINTS[options.mode].pitch, options.mode === 'view' ? mapCamera.showWholeFloor : undefined)],
+    createBaseControls: () => [new MapNavigationControl(mapCamera.getHomePitch, options.mode === 'view' ? mapCamera.showWholeFloor : undefined)],
     createControlGroup: controls => new HorizontalMapControlGroup(controls),
     onExplicitRequest: () => locationCameraPolicy.beginRequest(),
     onOutsideResult: result => locationCameraPolicy.consumeOutsideResult(result.firstForRequest),

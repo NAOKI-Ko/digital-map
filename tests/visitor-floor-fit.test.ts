@@ -28,6 +28,7 @@ describe('visitor viewport safe fit', () => {
     expect(instance.cameraForBounds).toHaveBeenCalledOnce()
     expect(instance.cameraForBounds).toHaveBeenLastCalledWith(expect.anything(), expect.objectContaining({ pitch: 0 }))
     expect(instance.jumpTo).toHaveBeenLastCalledWith({ center: [0,0], zoom: 14, bearing: 0, pitch: 0 })
+    expect(camera.getHomePitch()).toBe(0)
   })
   it('new Floor cancels old motion, resets heading, measures padding and fits its own bounds; passive resize never refits', () => {
     const floor=ref({id:'a',imageWidth:1280,imageHeight:1280} as MapViewerFloor)

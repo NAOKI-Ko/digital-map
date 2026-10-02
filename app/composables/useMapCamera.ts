@@ -1,5 +1,5 @@
 import type { Ref } from 'vue'
-import { clampVisitorInitialZoom, getVisitorContentBounds, VISITOR_INITIAL_PITCH, VISITOR_INITIAL_ZOOM_ALLOWANCE } from '~/utils/visitor-initial-camera'
+import { canUseVisitorContentCamera, clampVisitorInitialZoom, getVisitorContentBounds, VISITOR_INITIAL_PITCH, VISITOR_INITIAL_ZOOM_ALLOWANCE } from '~/utils/visitor-initial-camera'
 import { measureVisitorFitPadding } from '~/utils/visitor-floor-fit'
 import type { Map as MapLibreMap, MapOptions, StyleSpecification } from 'maplibre-gl'
 import { getFloorCorners, getGeoReferenceBounds, toImageCoordinates, type FloorCorners } from '~~/lib/geo'
@@ -180,6 +180,7 @@ export function useMapCamera(
   let largeViewportHeight = 0
   let largeViewportOrientation = ''
   let constraintLayoutKey = ''
+  let homePitch: number = VIEWER_CAMERA_CONSTRAINTS[options.mode].pitch
 
   function usesMobileCover() {
     return options.mode === 'view'
@@ -361,9 +362,11 @@ export function useMapCamera(
       const result = updateFloorZoomConstraints(corners)
       if (result) {
         const bounds = getVisitorContentBounds(options.floor.value, options.spots?.value ?? [])
-        const content = bounds ? instance.cameraForBounds(bounds, { padding: measureVisitorFitPadding(container.value!), bearing: 0, maxZoom: result.targetZoom + VISITOR_INITIAL_ZOOM_ALLOWANCE }) : null
+        const fittedContent = bounds ? instance.cameraForBounds(bounds, { padding: measureVisitorFitPadding(container.value!), bearing: 0, maxZoom: result.targetZoom + VISITOR_INITIAL_ZOOM_ALLOWANCE }) : null
+        const content = fittedContent && canUseVisitorContentCamera(result.targetZoom, fittedContent.zoom) ? fittedContent : null
+        homePitch = content ? VISITOR_INITIAL_PITCH : 0
         const zoom = content ? clampVisitorInitialZoom(result.targetZoom, content.zoom ?? result.targetZoom) : result.targetZoom
-        instance.jumpTo({ center: content?.center ?? result.camera.center, zoom, bearing: 0, pitch: content ? VISITOR_INITIAL_PITCH : 0 })
+        instance.jumpTo({ center: content?.center ?? result.camera.center, zoom, bearing: 0, pitch: homePitch })
       }
       constraintLayoutKey = getConstraintLayoutKey()
       return
@@ -460,6 +463,7 @@ export function useMapCamera(
   }
 
   return {
+    getHomePitch: () => homePitch,
     fitFloorBounds,
     showWholeFloor,
     comparePitch,

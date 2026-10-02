@@ -26,7 +26,7 @@ Base dev SHA: 34c8b901a8dfd11a871e7f83e1c65bdae9ecbbb8. Implementation SHA: 3c2f
 | 16 | PASS | 390/768/1024/1440/1440x700 primary flows | Local public responsive matrix and multi-floor flows PASS. |
 | 17 | PASS | Outdoor dense and multi-floor regressions | 36-Spot development-only fixture plus existing five-floor Aquarium; no canonical fixture write. |
 | 18 | PARTIAL | Public Release / LIVE Preview parity | One shared implementation/source verified; authenticated browser parity pending credential authorization. |
-| 19 | FAIL | Tests/typecheck/build/Prisma/Verify all PASS | Local tests 692 PASS, 1 optional SKIP; typecheck/build/Prisma PASS after same-major security refresh; Verify blocked by unpatched advisory. |
+| 19 | FAIL | Tests/typecheck/build/Prisma/Verify all PASS | Local tests 694 PASS, 1 optional SKIP; typecheck/build/Prisma PASS after same-major security refresh; Verify blocked by unpatched advisory. |
 | 20 | PASS | Production untouched | No main/Production merge or deployment; production baseline a58b4353bd108e6586f329080c772f69b8aaffda. |
 
 Totals: 18 PASS / 1 PARTIAL / 1 FAIL. PASS rows refer to the tested local implementation; they do not substitute for pending Windows exact-SHA acceptance.
@@ -54,3 +54,5 @@ Authenticated LIVE browser QA is awaiting explicit approval to read/use the prev
 Remaining Public Viewer debt: authenticated browser parity and exact merged-SHA Windows acceptance; upstream node-forge dependency disposition; current-location/georeference existing limitations remain unchanged; dense PIN discovery uses zoom and exact-coordinate detail navigation (no cluster/search by scope); legacy DOM candidate rebuild on Category changes remains, while collision itself preserves DOM; stale Windows public tunnel pointer needs reconciliation before external-link QA. No new importance, routing, Admin redesign, art, schema or Production work.
 
 PR27 P2 follow-up: all three original findings have implemented fixes and local regression coverage; see07-P2-REVIEW-QA.md. Patched node-forge>=1.4.1 remains unpublished in official npm registry, so audit/Verify and downstream acceptance are blocked without exception.
+
+Second review follow-up: content longitudes unwrapped across180°, dynamic Floor home pitch, and broad content fit fallback implemented.694 tests PASS/1 optional SKIP, typecheck/build PASS; additional20 responsive browser cases PASS. See07-P2-REVIEW-QA.md.
