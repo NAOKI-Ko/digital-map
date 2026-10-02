@@ -11,6 +11,11 @@ describe('exact-coordinate detail recovery', () => {
     expect(JSON.stringify(spots.reverse())).toBe(before)
     expect(getCoincidentSpots(spots.filter(s => s.id !== 'a'), selected).map(s => s.id)).toEqual(['z'])
   })
+  it('includes measured overlapping neighbors with unequal coordinates, without leaking filtered Spots', () => {
+    const selected = spot('selected')
+    const nearby = spot('near', .500001)
+    expect(getCoincidentSpots([selected, nearby], selected, ['near', 'filtered-out']).map(s => s.id)).toEqual(['near'])
+  })
   it('has no recovery links for absent or invalid selection', () => {
     expect(getCoincidentSpots([spot('a')], null)).toEqual([])
     expect(getCoincidentSpots([spot('a', NaN)], spot('b', NaN))).toEqual([])

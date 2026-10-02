@@ -64,7 +64,8 @@ const categories = computed(() => (
   collectSpotCategories(selectedFloor.value?.spots ?? [])
 ))
 const visibleSpots = computed(() => filterSpotsByCategoryIds(selectedFloor.value?.spots ?? [], selectedCategoryIds.value))
-const coincidentSpots = computed(() => getCoincidentSpots(visibleSpots.value, selectedSpot.value))
+const collisionRecovery = ref<{ spotId: string | null, spotIds: string[] }>({ spotId: null, spotIds: [] })
+const coincidentSpots = computed(() => getCoincidentSpots(visibleSpots.value, selectedSpot.value, collisionRecovery.value.spotId === selectedSpotId.value ? collisionRecovery.value.spotIds : []))
 const showFloorSelector = computed(() => shouldShowFloorSelector(data.value?.map.floors.length ?? 0))
 const appModalOpen = computed(() => overlay.value?.type === 'floor' || overlay.value?.type === 'info')
 watch(() => data.value?.map.floors, (floors) => {
@@ -295,6 +296,7 @@ onBeforeUnmount(clearPendingSpotClose)
             height="100%"
             :label="`${data.map.name} ${selectedFloor.name}`"
             @spot-selected="selectSpot"
+            @collision-recovery="collisionRecovery = $event"
           />
           <template #fallback>
             <div class="h-full animate-pulse bg-stone-200" />
@@ -321,8 +323,8 @@ onBeforeUnmount(clearPendingSpotClose)
         @close="closeSpot"
         @expanded-change="() => nextTick(ensureSelectedSpotVisible)"
       >
-        <nav v-if="coincidentSpots.length" class="mb-4 rounded-xl border border-stone-200 bg-stone-50 p-3" :aria-label="data.map.locale === 'en' ? 'Spots at this location' : '同じ場所のスポット'">
-          <p class="mb-2 text-xs font-semibold text-stone-600">{{ data.map.locale === 'en' ? 'Spots at this location' : '同じ場所のスポット' }}</p>
+        <nav v-if="coincidentSpots.length" class="mb-4 rounded-xl border border-stone-200 bg-stone-50 p-3" :aria-label="data.map.locale === 'en' ? 'Overlapping spots' : '重なっているスポット'">
+          <p class="mb-2 text-xs font-semibold text-stone-600">{{ data.map.locale === 'en' ? 'Overlapping spots' : '重なっているスポット' }}</p>
           <div class="flex flex-wrap gap-2">
             <button v-for="spot in coincidentSpots" :key="spot.id" type="button" class="min-h-11 max-w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-left text-sm font-semibold text-terracotta-700" :data-coincident-spot-id="spot.id" @click="selectCoincidentSpot(spot)">{{ spot.name }}</button>
           </div>

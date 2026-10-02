@@ -400,7 +400,8 @@ export function useMapCamera(
     const corners = getFloorCorners(options.floor.value)
     if (!instance || !corners || options.mode !== 'view') return
 
-    // The explicit overview is an entire-image fit, never the initial mobile cover.
+    // Overview establishes a level home; heading recovery must preserve this fitted pitch.
+    homePitch = 0
     instance.jumpTo({ bearing: 0, pitch: 0 })
     const result = updateFloorZoomConstraints(corners)
     if (!result) return

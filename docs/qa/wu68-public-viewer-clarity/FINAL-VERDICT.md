@@ -17,16 +17,16 @@ Base dev SHA: 34c8b901a8dfd11a871e7f83e1c65bdae9ecbbb8. Implementation SHA: 3c2f
 | 7 | PASS | Zoom out suppresses lower priority | All five responsive browser cases return to initial collision set. |
 | 8 | PASS | Presentation-only; canonical data unchanged | Pure input-immutability tests; public JSON before/after identical; no schema/snapshot mutation. |
 | 9 | PASS | Hidden PINs excluded from keyboard focus | All hidden DOMs inert/tabindex -1; focus handoff unit tests. |
-| 10 | PASS | Initial pitch20/bearing0 | All responsive and 25 multi-floor initial cases. |
+| 10 | PASS | Initial pitch20/bearing0 | Primary dense initial20°/0°; new multi-floor25 cases:15 valid-content20°,10 mobile broad fallback0°/0°. |
 | 11 | PASS | Initial zoom closer and Map prominent | Dense 390 zoom14.6097076464 →15.2597076464; screenshot acceptance. |
 | 12 | PASS | Safe zoom upper bound | Whole-floor +.65 cap; single/empty/invalid/extreme bounds tests. |
-| 13 | PASS | Floor switch recalculates camera | 25 cases over five floors × five sizes; +.55–.65 for valid content. |
+| 13 | PASS | Floor switch recalculates camera | 25 cases over five floors × five sizes; valid-content20° with cap; broad content uses safe level fallback. |
 | 14 | PASS | Filter/detail/passive resize do not reset user camera | Native zoom preserved; detail only existing minimal panel avoidance pan; close/resize no reset. |
 | 15 | PASS | Overview 0/0 whole-floor fit | All five responsive cases: projected Floor corners contained. |
 | 16 | PASS | 390/768/1024/1440/1440x700 primary flows | Local public responsive matrix and multi-floor flows PASS. |
 | 17 | PASS | Outdoor dense and multi-floor regressions | 36-Spot development-only fixture plus existing five-floor Aquarium; no canonical fixture write. |
 | 18 | PARTIAL | Public Release / LIVE Preview parity | One shared implementation/source verified; authenticated browser parity pending credential authorization. |
-| 19 | FAIL | Tests/typecheck/build/Prisma/Verify all PASS | Local tests 694 PASS, 1 optional SKIP; typecheck/build/Prisma PASS after same-major security refresh; Verify blocked by unpatched advisory. |
+| 19 | FAIL | Tests/typecheck/build/Prisma/Verify all PASS | Local tests 696 PASS, 1 optional SKIP; typecheck/build/Prisma PASS after same-major security refresh; Verify blocked by unpatched advisory. |
 | 20 | PASS | Production untouched | No main/Production merge or deployment; production baseline a58b4353bd108e6586f329080c772f69b8aaffda. |
 
 Totals: 18 PASS / 1 PARTIAL / 1 FAIL. PASS rows refer to the tested local implementation; they do not substitute for pending Windows exact-SHA acceptance.
@@ -43,7 +43,7 @@ Overview: bearing0/pitch0, zoom14.609707646398311; all four projected Floor corn
 
 Algorithm: requestAnimationFrame-coalesced scale writes → actual button/artwork union rectangle reads → visibility writes; stable greedy O(n²), selected > active Category > featured > normal, stable Spot ID ties, 10px gap. Selected always accepted. Hidden PINs are inert, tabindex -1 and aria-hidden; focus moves to map region. Collision does not rebuild markers. Initial camera gets unfiltered Floor Spots through the shared Visitor renderer.
 
-Responsive local initial visible counts for 390/768/1024/1440/1440×700: 4/9/9/22/9. Zero collision/focus violations in every case. Multi-floor: five floors × five sizes =25 cases PASS; 390px visible counts 10/4/6/9/7. Data and artwork differ from current Windows WU-67 snapshot, so Windows baseline/after must be compared on the unchanged Windows dataset.
+Responsive local initial visible counts for 390/768/1024/1440/1440×700: 4/9/9/22/9. Zero collision/focus violations in every case. Multi-floor: five floors × five sizes =25 cases PASS; 390px broad-normal initial counts0/0/0/0/0; zoom+1 reveals11/4/6/9/7 and Category navigation opens details. Data and artwork differ from current Windows WU-67 snapshot, so Windows baseline/after must be compared on the unchanged Windows dataset.
 
 ## Security gate and pending acceptance
 
@@ -56,3 +56,5 @@ Remaining Public Viewer debt: authenticated browser parity and exact merged-SHA 
 PR27 P2 follow-up: all three original findings have implemented fixes and local regression coverage; see07-P2-REVIEW-QA.md. Patched node-forge>=1.4.1 remains unpublished in official npm registry, so audit/Verify and downstream acceptance are blocked without exception.
 
 Second review follow-up: content longitudes unwrapped across180°, dynamic Floor home pitch, and broad content fit fallback implemented.694 tests PASS/1 optional SKIP, typecheck/build PASS; additional20 responsive browser cases PASS. See07-P2-REVIEW-QA.md.
+
+Third revision: overview now establishes0° home pitch; recovery includes all actual screen overlaps, covering nearby inseparable Spots at maxZoom.696 tests PASS/1optional SKIP, typecheck/build PASS. Multi-floor25 cases and near/max/overview five-size flow PASS. Remaining debt explicitly includes initially suppressed all-normal PINs in mobile broad-content fallback; zoom/Category discovery works.

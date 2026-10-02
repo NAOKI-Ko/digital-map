@@ -5,7 +5,7 @@ import { getDecorationRenderCoordinates } from '~~/lib/decoration'
 import type { MapViewerCameraState, MapViewerDecoration, MapViewerFloor, MapViewerSpot } from '~~/shared/types/map-viewer'
 import { createSpotMarkerElement } from '~/utils/marker-element'
 import { applyMarkerDensityPresentation, getMarkerDensityPresentation } from '~/utils/marker-density'
-import { applyPinVisibility, declutterPins, measurePinRect } from '~/utils/marker-collision'
+import { applyPinVisibility, declutterPins, getCollisionRecoveryIds, measurePinRect } from '~/utils/marker-collision'
 import { getMinimalSpotPan, needsHeadingReset } from '~/utils/public-map-exploration'
 import {
   createMapViewerOptions,
@@ -36,6 +36,7 @@ export interface UseMapViewerOptions {
   onCameraChanged?: (camera: MapViewerCameraState) => void
   onPositionChanged?: (position: ImagePosition) => void
   onSpotMoved?: (value: { spotId: string, x: number, y: number }) => void
+  onCollisionRecovery?: (value: { spotId: string | null, spotIds: string[] }) => void
   onSpotSelected?: (spot: MapViewerSpot) => void
 }
 
@@ -342,6 +343,7 @@ export function useMapViewer(
     syncMarkerDensity()
   }
 
+  let recoveryKey = ''
   function syncMarkerDensity() {
     if (collisionFrame !== null) return
     collisionFrame = window.requestAnimationFrame(() => {
@@ -361,7 +363,14 @@ export function useMapViewer(
       })
       if (options.mode === 'edit') return
       // All scale writes precede all geometry reads; visibility writes happen last.
-      const visible = declutterPins(presentations.filter(p => p.presentation.visible).map(({ element, spot, presentation }) => ({ id: spot.id, priority: presentation.priority, protected: element.contains(element.ownerDocument.activeElement), rect: measurePinRect(element) })))
+      const measured = presentations.map(({ element, spot, presentation }) => ({ id: spot.id, priority: presentation.priority, protected: element.contains(element.ownerDocument.activeElement), rect: measurePinRect(element), eligible: presentation.visible }))
+      const visible = declutterPins(measured.filter(pin => pin.eligible))
+      const recovery = { spotId: options.selectedSpotId.value, spotIds: getCollisionRecoveryIds(options.selectedSpotId.value, measured) }
+      const nextRecoveryKey = JSON.stringify(recovery)
+      if (recoveryKey !== nextRecoveryKey) {
+        recoveryKey = nextRecoveryKey
+        options.onCollisionRecovery?.(recovery)
+      }
       presentations.forEach(({ element, spot }) => applyPinVisibility(element, visible.has(spot.id)))
     })
   }

@@ -37,3 +37,10 @@ export function applyPinVisibility(element: HTMLElement, visible: boolean) {
     element.blur()
   }
 }
+
+/** Every actual overlap is recoverable, including nearby PINs inseparable at maximum zoom. */
+export function getCollisionRecoveryIds(selectedId: string | null, candidates: readonly CollisionCandidate[]) {
+  const selected = candidates.find(pin => pin.id === selectedId)
+  if (!selected) return []
+  return candidates.filter(pin => pin.id !== selectedId && rectanglesCollide(selected.rect, pin.rect)).map(pin => pin.id).sort()
+}

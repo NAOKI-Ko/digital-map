@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { describe, expect, it } from 'vitest'
-import { applyPinVisibility, declutterPins, measurePinRect } from '../app/utils/marker-collision'
+import { applyPinVisibility, declutterPins, getCollisionRecoveryIds, measurePinRect } from '../app/utils/marker-collision'
 const pin = (id: string, priority: number, left = 0, size = 60) => ({ id, priority, rect: { left, top: 0, right: left + size, bottom: size } })
 describe('screen-space decluttering', () => {
   it('selected > active Category > featured > normal, independent of input order', () => {
@@ -18,6 +18,12 @@ describe('screen-space decluttering', () => {
     expect([...declutterPins([pin('a-featured', 2, 80), focused])]).toEqual(['z-focused'])
     expect([...declutterPins([pin('selected', 4), focused])]).toEqual(['selected', 'z-focused'])
     expect([...declutterPins([pin('a-featured', 2, 80), { ...focused, protected: false }])]).toEqual(['a-featured'])
+  })
+  it('recovers all actual overlaps, even unequal nearby positions and density-hidden candidates', () => {
+    const candidates=[pin('selected',4),pin('near',1,.001),pin('edge',2,65),pin('far',1,80)]
+    expect(getCollisionRecoveryIds('selected',candidates)).toEqual(['edge','near'])
+    expect(getCollisionRecoveryIds(null,candidates)).toEqual([])
+    expect(getCollisionRecoveryIds('missing',candidates)).toEqual([])
   })
   it('ties use stable IDs; touching safety gap is allowed; zoom spacing reveals then suppresses', () => {
     expect([...declutterPins([pin('b',2,69),pin('a',2)])]).toEqual(['a'])

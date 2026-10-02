@@ -30,3 +30,15 @@ Codex review on ce23eec completed2026-10-02T02:20:43Z with three additional P2s.
 Second revision verification:694 tests PASS/1 optional SKIP, typecheck/build PASS. Twenty browser cases(empty/invalid/broad/dateline×five sizes)PASS; all reset bearings0, fallback reset pitches0, valid dateline reset pitches20, no initial compass, zero collision/hidden-focus violations. evidence/p2-round2-responsive.json.
 
 node-forge official published versions end at1.4.0; no stable>=1.4.1 exists in returned registry metadata. Required audit remains unchanged and FAIL; no merge or downstream Windows activation.
+
+## Third revision: second re-review additional findings
+
+Review on58b25ce added2 P2s. Both fixed:
+- Explicit overview establishes homePitch0. Compass resets after overview retain the level fitted camera; next Floor initial load establishes its own20° or fallback0° policy.
+- Recovery now includes every actual measured screen-rectangle overlap with the selected PIN, not just exact coordinates. Geometry is measured once for all candidates including density-suppressed normals; recovery IDs are emitted only when changed. Detail links intersect the current published/Category-visible Floor Spots and remain stable by ID. This covers nearby Spots inseparable at finite maximum zoom. No new search/cluster UI or canonical mutation.
+
+Five near-coordinate browser fixtures reach exact maxZoom, where only00 is visible;01 and02 are then reachable through Enter/click detail navigation at each size. Five overview→rotate→reset flows preserve0°/0° and have no immediate reset compass. evidence/p2-round3-near.json.696 tests PASS/1optional SKIP, typecheck/build PASS.
+
+Final multi-Floor revalidation:25 cases PASS for initial policy, zoom discovery, overview recovery, Category selection and detail.390px/768px broad all-normal Floors use safe level fallback and initially suppress normal PINs; zoom+1 reveals11/4/6/9/7, or Category selection provides direct discovery at the fit.1024/1440 sizes use20° valid content framing. This mobile broad-normal initial discovery limitation is explicitly remaining Viewer debt, not a canonical data edit. evidence/p2-round3-multi-floor.json.
+
+The mandatory audit still reports node-forge1.4.0 high, with official npm1.4.1 HTTP404 and no published stable>=1.4.1. No exception, no merge or Windows activation. Third Codex review requested on the new implementation head; final result must be recorded separately.

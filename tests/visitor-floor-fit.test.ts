@@ -41,6 +41,7 @@ describe('visitor viewport safe fit', () => {
     expect(instance.cameraForBounds).toHaveBeenCalledWith(expect.anything(),expect.objectContaining({bearing:0,pitch:0,padding:{top:24,bottom:24,left:24,right:24}}))
     expect(instance.jumpTo).toHaveBeenLastCalledWith({center:[0,0],zoom:14,bearing:0,pitch:0})
     camera.showWholeFloor()
+    expect(camera.getHomePitch()).toBe(0)
     expect(instance.easeTo).toHaveBeenLastCalledWith(expect.objectContaining({zoom:14,bearing:0,pitch:0}))
     instance.easeTo.mockClear()
     instance.jumpTo.mockClear(); instance.cameraForBounds.mockClear(); zoom=16
