@@ -42,3 +42,5 @@ Five near-coordinate browser fixtures reach exact maxZoom, where only00 is visib
 Final multi-Floor revalidation:25 cases PASS for initial policy, zoom discovery, overview recovery, Category selection and detail.390px/768px broad all-normal Floors use safe level fallback and initially suppress normal PINs; zoom+1 reveals11/4/6/9/7, or Category selection provides direct discovery at the fit.1024/1440 sizes use20° valid content framing. This mobile broad-normal initial discovery limitation is explicitly remaining Viewer debt, not a canonical data edit. evidence/p2-round3-multi-floor.json.
 
 The mandatory audit still reports node-forge1.4.0 high, with official npm1.4.1 HTTP404 and no published stable>=1.4.1. No exception, no merge or Windows activation. Third Codex review requested on the new implementation head; final result must be recorded separately.
+
+Final Codex re-review completed2026-10-02T02:53:29.694884Z on2e636a3, no new findings/threads. All8 threads resolved. Final primary390 filter/detail/close/passive-resize/overview also PASS (detail pan settled before comparison); evidence/p2-round3-dense.json.
