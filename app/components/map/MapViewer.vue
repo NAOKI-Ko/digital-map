@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useMapViewer } from '~/composables/useMapViewer'
 import type { MapViewerMode } from '~/composables/useMapCamera'
-import type { ImagePosition } from '~~/lib/geo'
+import { getFloorCorners, toImageCoordinates, type ImagePosition } from '~~/lib/geo'
 import type { MapViewerCameraState, MapViewerDecoration, MapViewerFloor, MapViewerSpot } from '~~/shared/types/map-viewer'
 
 const props = withDefaults(defineProps<{
@@ -20,6 +20,7 @@ const props = withDefaults(defineProps<{
   initialCamera?: MapViewerCameraState | null
   prioritizeVisibleSpots?: boolean
   visitorOverview?: boolean
+  initialSpots?: readonly MapViewerSpot[]
   mobileCover?: boolean
 }>(), {
   spots: () => [],
@@ -70,9 +71,20 @@ const viewer = useMapViewer(container, {
   prioritizeVisibleSpots,
   mobileCover,
   visitorOverview,
+  initialSpots: computed(() => props.initialSpots ?? props.spots),
   mode: props.mode,
   initialCamera: props.initialCamera,
   onCameraChanged: camera => emit('cameraChanged', camera),
+  onReady: map => {
+    const report = () => {
+      if (container.value) container.value.dataset.viewerMoving = String(map.isMoving())
+      if (container.value) container.value.dataset.viewerCamera = JSON.stringify({ floorId: props.floor.id, corners: getFloorCorners(props.floor) ? toImageCoordinates(getFloorCorners(props.floor)!).map(point => map.project(point)) : [], center: map.getCenter(), zoom: map.getZoom(), bearing: map.getBearing(), pitch: map.getPitch(), minZoom: map.getMinZoom(), maxZoom: map.getMaxZoom() })
+    }
+    map.on('movestart', () => { if (container.value) container.value.dataset.viewerMoving = 'true' })
+    map.on('moveend', report)
+    map.on('resize', report)
+    report()
+  },
   onPositionChanged: value => emit('update:modelValue', value),
   onSpotMoved: value => emit('spotMoved', value),
   onSpotSelected: spot => emit('spotSelected', spot),
@@ -289,12 +301,14 @@ defineExpose({
 
 /* Public PINs keep a small raised edge and a fixed tip. The visual scale never changes the marker anchor. */
 .public-map-viewer .map-viewer-marker__shape {
+  transition: box-shadow 150ms ease, opacity 120ms linear;
   border-width: 2px;
   background-image: linear-gradient(145deg, var(--pin-color-light), var(--pin-color) 64%, var(--pin-color-dark));
   box-shadow: 0 3px 5px rgb(37 48 58 / 28%), inset 0 1px 2px rgb(255 255 255 / 32%);
 }
 
 .public-map-viewer .map-viewer-marker__illustration {
+  transition: filter 150ms ease, opacity 120ms linear;
   filter: drop-shadow(0 3px 3px rgb(37 48 58 / 38%));
 }
 
@@ -437,4 +451,8 @@ defineExpose({
 .public-map-locked .maplibregl-canvas-container {
   pointer-events: none;
 }
+</style>
+
+<style>
+.maplibregl-marker.map-viewer-marker[hidden] { display: none; }
 </style>

@@ -5,6 +5,7 @@ import { getDecorationRenderCoordinates } from '~~/lib/decoration'
 import type { MapViewerCameraState, MapViewerDecoration, MapViewerFloor, MapViewerSpot } from '~~/shared/types/map-viewer'
 import { createSpotMarkerElement } from '~/utils/marker-element'
 import { applyMarkerDensityPresentation, getMarkerDensityPresentation } from '~/utils/marker-density'
+import { applyPinVisibility, declutterPins, measurePinRect } from '~/utils/marker-collision'
 import { getMinimalSpotPan, needsHeadingReset } from '~/utils/public-map-exploration'
 import {
   createMapViewerOptions,
@@ -28,6 +29,7 @@ export interface UseMapViewerOptions {
   candidateKind?: Readonly<Ref<'placement' | 'move' | null>>
   prioritizeVisibleSpots?: Readonly<Ref<boolean>>
   visitorOverview?: Readonly<Ref<boolean>>
+  initialSpots?: Readonly<Ref<readonly MapViewerSpot[]>>
   mobileCover?: Readonly<Ref<boolean>>
   initialCamera?: MapViewerCameraState | null
   onReady?: (map: MapLibreMap) => void
@@ -192,6 +194,7 @@ export function useMapViewer(
   let decorationLayers: Array<{ sourceId: string, layerId: string }> = []
   let containerResizeObserver: ResizeObserver | null = null
   let focusSpotTimer: number | null = null
+  let collisionFrame: number | null = null
   let comparisonBaseline: MapViewerCameraState | null = null
 
   const mapCamera = useMapCamera(container, map, {
@@ -199,6 +202,7 @@ export function useMapViewer(
     floor: options.floor,
     mobileCover: options.mobileCover,
     visitorOverview: options.visitorOverview,
+    spots: options.initialSpots ?? options.spots,
     isReady,
   })
   const locationCameraPolicy = createOneShotLocationCameraPolicy(
@@ -213,7 +217,7 @@ export function useMapViewer(
     mode: options.mode,
     map,
     maplibre,
-    createBaseControls: () => [new MapNavigationControl(options.visitorOverview?.value ? 0 : VIEWER_CAMERA_CONSTRAINTS[options.mode].pitch, options.mode === 'view' ? mapCamera.showWholeFloor : undefined)],
+    createBaseControls: () => [new MapNavigationControl(VIEWER_CAMERA_CONSTRAINTS[options.mode].pitch, options.mode === 'view' ? mapCamera.showWholeFloor : undefined)],
     createControlGroup: controls => new HorizontalMapControlGroup(controls),
     onExplicitRequest: () => locationCameraPolicy.beginRequest(),
     onOutsideResult: result => locationCameraPolicy.consumeOutsideResult(result.firstForRequest),
@@ -231,8 +235,10 @@ export function useMapViewer(
         import('maplibre-gl/dist/maplibre-gl.css'),
       ])
       maplibre.value = maplibregl
-      const instance = new maplibregl.Map({ ...createMapViewerOptions(container.value, options.mode), ...(options.visitorOverview?.value ? { pitch: 0 } : {}) })
+      const instance = new maplibregl.Map(createMapViewerOptions(container.value, options.mode))
       map.value = instance
+      container.value.addEventListener('focusin', syncMarkerDensity)
+      container.value.addEventListener('focusout', syncMarkerDensity)
       instance.once('load', () => {
         if (map.value !== instance) return
         isReady.value = true
@@ -241,7 +247,9 @@ export function useMapViewer(
         comparisonBaseline = mapCamera.getState()
         if (options.initialCamera) mapCamera.restore(options.initialCamera)
         syncSpotMarkers()
-        instance.on('zoom', syncMarkerDensity)
+        instance.on('move', syncMarkerDensity)
+        instance.on('resize', syncMarkerDensity)
+        instance.on('render', syncMarkerDensity)
         syncDraftMarker(options.position.value)
         options.onCameraChanged?.(getMapViewerCameraState(instance))
         instance.on('moveend', () => {
@@ -270,6 +278,10 @@ export function useMapViewer(
   }
 
   function destroy() {
+    container.value?.removeEventListener('focusin', syncMarkerDensity)
+    container.value?.removeEventListener('focusout', syncMarkerDensity)
+    if (collisionFrame !== null) window.cancelAnimationFrame(collisionFrame)
+    collisionFrame = null
     draftMarker?.remove()
     draftMarker = null
     spotMarkers.forEach(marker => marker.remove())
@@ -307,6 +319,7 @@ export function useMapViewer(
         stronglyDimmed: Boolean(candidateKind) && !selected,
         onSelected: () => options.onSpotSelected?.(spot),
       })
+      element.querySelectorAll('img').forEach(image => image.addEventListener('load', syncMarkerDensity, { once: true }))
       spotMarkerElements.push({ element, spot })
 
       const marker = new currentMaplibre.Marker(createSpotMarkerOptions(element, options.mode, false))
@@ -330,19 +343,25 @@ export function useMapViewer(
   }
 
   function syncMarkerDensity() {
-    const instance = map.value
-    if (!instance) return
-    const zoom = instance.getZoom()
-    const minimumZoom = instance.getMinZoom()
-    spotMarkerElements.forEach(({ element, spot }) => {
-      applyMarkerDensityPresentation(element, getMarkerDensityPresentation(
-        spot.importance,
-        spot.pinSize ?? 'medium',
-        zoom,
-        minimumZoom,
-        options.mode === 'edit' || spot.id === options.selectedSpotId.value,
-        options.prioritizeVisibleSpots?.value ?? false,
-      ))
+    if (collisionFrame !== null) return
+    collisionFrame = window.requestAnimationFrame(() => {
+      collisionFrame = null
+      const instance = map.value
+      if (!instance) return
+      const presentations = spotMarkerElements.map(({ element, spot }) => {
+        const presentation = getMarkerDensityPresentation(spot.importance, spot.pinSize ?? 'medium', instance.getZoom(), instance.getMinZoom(), options.mode === 'edit' || spot.id === options.selectedSpotId.value, options.prioritizeVisibleSpots?.value ?? false)
+        if (options.mode === 'edit') applyMarkerDensityPresentation(element, presentation)
+        else {
+          element.hidden = false
+          element.style.zIndex = String(presentation.priority)
+          element.style.setProperty('--marker-size-scale', presentation.scale.toFixed(3))
+        }
+        return { element, spot, presentation }
+      })
+      if (options.mode === 'edit') return
+      // All scale writes precede all geometry reads; visibility writes happen last.
+      const visible = declutterPins(presentations.filter(p => p.presentation.visible).map(({ element, spot, presentation }) => ({ id: spot.id, priority: presentation.priority, rect: measurePinRect(element) })))
+      presentations.forEach(({ element, spot }) => applyPinVisibility(element, visible.has(spot.id)))
     })
   }
 

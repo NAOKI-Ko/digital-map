@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { describe, expect, it, vi } from 'vitest'
 import { ref } from 'vue'
 import type { Map as MapLibreMap } from 'maplibre-gl'
@@ -27,7 +28,10 @@ describe('visitor viewport safe fit', () => {
     camera.fitFloorBounds(getFloorCorners(floor.value)!,true)
     expect(instance.stop).toHaveBeenCalledOnce()
     expect(instance.cameraForBounds).toHaveBeenCalledWith(expect.anything(),expect.objectContaining({bearing:0,pitch:0,padding:{top:24,bottom:24,left:24,right:24}}))
-    expect(instance.jumpTo).toHaveBeenLastCalledWith({center:[0,0],zoom:14,bearing:0,pitch:0})
+    expect(instance.jumpTo).toHaveBeenLastCalledWith({center:[0,0],zoom:14,bearing:0,pitch:20})
+    camera.showWholeFloor()
+    expect(instance.easeTo).toHaveBeenLastCalledWith(expect.objectContaining({zoom:14,bearing:0,pitch:0}))
+    instance.easeTo.mockClear()
     instance.jumpTo.mockClear(); instance.cameraForBounds.mockClear(); zoom=16
     camera.resize()
     expect(instance.cameraForBounds).not.toHaveBeenCalled()
@@ -36,6 +40,6 @@ describe('visitor viewport safe fit', () => {
     floor.value={...floor.value,id:'wide',imageWidth:2560,imageHeight:640}
     camera.fitFloorBounds(getFloorCorners(floor.value)!,true)
     expect(instance.stop).toHaveBeenCalledTimes(2)
-    expect(instance.jumpTo).toHaveBeenLastCalledWith({center:[0,0],zoom:14,bearing:0,pitch:0})
+    expect(instance.jumpTo).toHaveBeenLastCalledWith({center:[0,0],zoom:14,bearing:0,pitch:20})
   })
 })

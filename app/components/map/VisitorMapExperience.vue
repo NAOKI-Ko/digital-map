@@ -123,7 +123,8 @@ function closeSpot(source: 'pointer' | 'other' = 'other') {
     const fallbackMarker = [...document.querySelectorAll<HTMLElement>('.map-viewer-marker[data-spot-id]')]
       .find(element => element.dataset.spotId === closingSpotId)
     const mapEntry = document.querySelector<HTMLElement>('.map-viewer-frame [role="region"]')
-    ;(closingTrigger?.isConnected ? closingTrigger : fallbackMarker ?? mapEntry)?.focus({ preventScroll: true })
+    const trigger = closingTrigger?.isConnected ? closingTrigger : fallbackMarker
+    ;(trigger && !trigger.inert && getComputedStyle(trigger).visibility !== 'hidden' ? trigger : mapEntry)?.focus({ preventScroll: true })
     if (spotTriggerId === closingSpotId) {
       spotTrigger = null
       spotTriggerId = null
@@ -277,6 +278,7 @@ onBeforeUnmount(clearPendingSpotClose)
             class="h-full"
             :floor="selectedFloor"
             :spots="visibleSpots"
+            :initial-spots="selectedFloor.spots"
             :decorations="displayedDecorations"
             mode="view"
             :selected-spot-id="selectedSpotId"
