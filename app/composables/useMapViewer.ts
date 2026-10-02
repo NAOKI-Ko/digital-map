@@ -350,6 +350,7 @@ export function useMapViewer(
       if (!instance) return
       const presentations = spotMarkerElements.map(({ element, spot }) => {
         const presentation = getMarkerDensityPresentation(spot.importance, spot.pinSize ?? 'medium', instance.getZoom(), instance.getMinZoom(), options.mode === 'edit' || spot.id === options.selectedSpotId.value, options.prioritizeVisibleSpots?.value ?? false)
+        if (element.contains(element.ownerDocument.activeElement)) presentation.visible = true
         if (options.mode === 'edit') applyMarkerDensityPresentation(element, presentation)
         else {
           element.hidden = false
@@ -360,7 +361,7 @@ export function useMapViewer(
       })
       if (options.mode === 'edit') return
       // All scale writes precede all geometry reads; visibility writes happen last.
-      const visible = declutterPins(presentations.filter(p => p.presentation.visible).map(({ element, spot, presentation }) => ({ id: spot.id, priority: presentation.priority, rect: measurePinRect(element) })))
+      const visible = declutterPins(presentations.filter(p => p.presentation.visible).map(({ element, spot, presentation }) => ({ id: spot.id, priority: presentation.priority, protected: element.contains(element.ownerDocument.activeElement), rect: measurePinRect(element) })))
       presentations.forEach(({ element, spot }) => applyPinVisibility(element, visible.has(spot.id)))
     })
   }

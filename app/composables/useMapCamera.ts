@@ -363,7 +363,7 @@ export function useMapCamera(
         const bounds = getVisitorContentBounds(options.floor.value, options.spots?.value ?? [])
         const content = bounds ? instance.cameraForBounds(bounds, { padding: measureVisitorFitPadding(container.value!), bearing: 0, maxZoom: result.targetZoom + VISITOR_INITIAL_ZOOM_ALLOWANCE }) : null
         const zoom = content ? clampVisitorInitialZoom(result.targetZoom, content.zoom ?? result.targetZoom) : result.targetZoom
-        instance.jumpTo({ center: content?.center ?? result.camera.center, zoom, bearing: 0, pitch: VISITOR_INITIAL_PITCH })
+        instance.jumpTo({ center: content?.center ?? result.camera.center, zoom, bearing: 0, pitch: content ? VISITOR_INITIAL_PITCH : 0 })
       }
       constraintLayoutKey = getConstraintLayoutKey()
       return

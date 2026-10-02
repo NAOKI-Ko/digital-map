@@ -130,6 +130,7 @@ onBeforeUnmount(() => {
         </header>
 
         <div ref="scrollBody" class="spot-detail-sheet__body min-h-0 flex-1 overflow-y-auto overscroll-contain" @touchstart="gesture.onBodyTouchStart" @touchend="gesture.onBodyTouchEnd" @touchcancel="gesture.onBodyTouchCancel">
+          <div v-if="$slots.default" class="px-4 pt-4 md:px-6"><slot /></div>
           <div v-if="spot.photos.length" class="flex snap-x snap-mandatory overflow-x-auto bg-stone-100" data-sheet-no-drag>
             <img v-for="(photo, index) in spot.photos" :key="photo" :src="photo" :alt="`${spot.name}の写真${index + 1}`" class="h-52 w-full shrink-0 snap-center object-cover md:h-64">
           </div>

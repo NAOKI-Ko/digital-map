@@ -2,7 +2,7 @@ import fixture from '../../../fixtures/arimatsu-public.json'
 import type { PublicMapResponse } from '~~/shared/types/public-map'
 
 // Development-only deterministic density fixture; no DB or publication writes.
-export default defineEventHandler((): PublicMapResponse => {
+export function createWu68Fixture(mode: 'dense' | 'coincident' | 'empty' | 'invalid' = 'dense'): PublicMapResponse {
   if (!import.meta.dev) throw createError({ statusCode: 404 })
   const response = structuredClone(fixture) as PublicMapResponse
   response.map.slug = '__qa_arimatsu'
@@ -12,11 +12,15 @@ export default defineEventHandler((): PublicMapResponse => {
   const sample = floor.spots[0]!
   floor.spots = Array.from({ length: 36 }, (_, index) => ({
     ...structuredClone(sample), id: `wu68-${String(index).padStart(2, '0')}`,
-    name: `Spot ${String(index).padStart(2, '0')}`,
+    name: `Spot ${String(index).padStart(2, '0')}`, photos: [],
     x: 0.3 + (index % 6) * 0.06, y: 0.3 + Math.floor(index / 6) * 0.06,
     importance: index % 3 === 0 ? 'featured' : 'normal',
     pinIconType: 'preset', pinIconId: 'shop', pinIconImageUrl: null,
     pinSize: (['small', 'medium', 'large'] as const)[index % 3]!,
   }))
+  if (mode === 'coincident') floor.spots = floor.spots.slice(0, 3).map(spot => ({ ...spot, x: .5, y: .5, categories: [] }))
+  if (mode === 'empty') floor.spots = []
+  if (mode === 'invalid') floor.spots = [{ ...floor.spots[0]!, x: 2 }]
   return response
-})
+}
+export default defineEventHandler(() => createWu68Fixture())

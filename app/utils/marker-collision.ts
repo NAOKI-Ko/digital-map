@@ -1,17 +1,19 @@
 export const PIN_COLLISION_GAP = 10
 export interface ScreenRect { left: number, top: number, right: number, bottom: number }
-export interface CollisionCandidate { id: string, priority: number, rect: ScreenRect }
+export interface CollisionCandidate { id: string, priority: number, protected?: boolean, rect: ScreenRect }
 
 export function rectanglesCollide(a: ScreenRect, b: ScreenRect, gap = PIN_COLLISION_GAP) {
   return a.left < b.right + gap && a.right + gap > b.left
     && a.top < b.bottom + gap && a.bottom + gap > b.top
 }
 
-/** Greedy presentation-only decluttering. IDs break ties independently of source order. */
+const isProtected = (pin: CollisionCandidate) => Boolean(pin.protected) || pin.priority === 4
+
+/** Protect selection/focus first; preserve the normal priority order and stable ID ties. */
 export function declutterPins(candidates: readonly CollisionCandidate[], gap = PIN_COLLISION_GAP) {
   const accepted: CollisionCandidate[] = []
-  for (const candidate of [...candidates].sort((a, b) => b.priority - a.priority || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))) {
-    if (candidate.priority === 4 || !accepted.some(pin => rectanglesCollide(pin.rect, candidate.rect, gap))) accepted.push(candidate)
+  for (const candidate of [...candidates].sort((a, b) => Number(isProtected(b)) - Number(isProtected(a)) || b.priority - a.priority || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))) {
+    if (isProtected(candidate) || !accepted.some(pin => rectanglesCollide(pin.rect, candidate.rect, gap))) accepted.push(candidate)
   }
   return new Set(accepted.map(pin => pin.id))
 }

@@ -26,7 +26,7 @@ Base dev SHA: 34c8b901a8dfd11a871e7f83e1c65bdae9ecbbb8. Implementation SHA: 3c2f
 | 16 | PASS | 390/768/1024/1440/1440x700 primary flows | Local public responsive matrix and multi-floor flows PASS. |
 | 17 | PASS | Outdoor dense and multi-floor regressions | 36-Spot development-only fixture plus existing five-floor Aquarium; no canonical fixture write. |
 | 18 | PARTIAL | Public Release / LIVE Preview parity | One shared implementation/source verified; authenticated browser parity pending credential authorization. |
-| 19 | FAIL | Tests/typecheck/build/Prisma/Verify all PASS | Local tests 686 PASS, 1 optional SKIP; typecheck/build/Prisma PASS after same-major security refresh; Verify blocked by unpatched advisory. |
+| 19 | FAIL | Tests/typecheck/build/Prisma/Verify all PASS | Local tests 692 PASS, 1 optional SKIP; typecheck/build/Prisma PASS after same-major security refresh; Verify blocked by unpatched advisory. |
 | 20 | PASS | Production untouched | No main/Production merge or deployment; production baseline a58b4353bd108e6586f329080c772f69b8aaffda. |
 
 Totals: 18 PASS / 1 PARTIAL / 1 FAIL. PASS rows refer to the tested local implementation; they do not substitute for pending Windows exact-SHA acceptance.
@@ -35,7 +35,7 @@ Totals: 18 PASS / 1 PARTIAL / 1 FAIL. PASS rows refer to the tested local implem
 
 Before: evidence/390-before.jpg. 36 PINs rendered; original density hidden attribute was overridden by display:flex. Camera bearing0/pitch0, zoom14.609707646398311; center lng136.97123594617784, lat35.068358034016384.
 
-After: evidence/390-after.jpg. Visible Spot IDs wu68-00, wu68-03, wu68-18, wu68-21. Zero pairwise overlaps including 10px safety gap. Camera bearing0/pitch20, zoom15.259707646398311; center lng136.97076018598818, lat35.06792808243404. Whole-floor difference +.65. Valid content camera lower bound +.55 avoids hiding all normal PINs at the legacy +.5 density boundary. Empty/invalid/extreme placement falls back to whole-floor fit.
+After: evidence/390-after.jpg. Visible Spot IDs wu68-00, wu68-03, wu68-18, wu68-21. Zero pairwise overlaps including 10px safety gap. Camera bearing0/pitch20, zoom15.259707646398311; center lng136.97076018598818, lat35.06792808243404. Whole-floor difference +.65. Valid content camera lower bound +.55 avoids hiding all normal PINs at the legacy +.5 density boundary. Empty/invalid/extreme placement falls back to whole-floor fit displayed at pitch0.
 
 Zoom +1 visible: wu68-00/03/05/12/15/17/24/27/29. Active shop Category at that zoom: wu68-00/02/04/12/14/16/24/26/28. Selected wu68-02 remains visible. Detail camera may make the pre-existing minimal pan to avoid the panel; it does not restore initial zoom. Closing detail and passive resize preserve the user camera.
 
@@ -51,4 +51,6 @@ Verify initially found 18 advisories. Same-major refresh removes all except node
 
 Authenticated LIVE browser QA is awaiting explicit approval to read/use the previously established QA credential file. Automatic approval review rejected the action because authorization for that specific credential source was absent. Shared-renderer/source parity is verified.
 
-Remaining Public Viewer debt: authenticated browser parity and exact merged-SHA Windows acceptance; upstream node-forge dependency disposition; current-location/georeference existing limitations remain unchanged; dense PIN discovery still requires zoom (no cluster/search by scope); legacy DOM candidate rebuild on Category changes remains, while collision itself preserves DOM; stale Windows public tunnel pointer needs reconciliation before external-link QA. No new importance, routing, Admin redesign, art, schema or Production work.
+Remaining Public Viewer debt: authenticated browser parity and exact merged-SHA Windows acceptance; upstream node-forge dependency disposition; current-location/georeference existing limitations remain unchanged; dense PIN discovery uses zoom and exact-coordinate detail navigation (no cluster/search by scope); legacy DOM candidate rebuild on Category changes remains, while collision itself preserves DOM; stale Windows public tunnel pointer needs reconciliation before external-link QA. No new importance, routing, Admin redesign, art, schema or Production work.
+
+PR27 P2 follow-up: all three original findings have implemented fixes and local regression coverage; see07-P2-REVIEW-QA.md. Patched node-forge>=1.4.1 remains unpublished in official npm registry, so audit/Verify and downstream acceptance are blocked without exception.

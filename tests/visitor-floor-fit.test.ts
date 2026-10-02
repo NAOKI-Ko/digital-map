@@ -19,6 +19,16 @@ describe('visitor viewport safe fit', () => {
   it('ignores hidden chrome and handles safe area offsets rather than window height', () => {
     expect(calculateVisitorFitPadding(rect(390,700,100),[{edge:'top',rect:rect(100,44,142)},{edge:'bottom',rect:rect(0,0)}])).toEqual({top:98,bottom:24,left:24,right:24})
   })
+  it.each([[], [{ x: 2, y: .5 }], [{ x: 0, y: 0 }, { x: 1, y: 1 }]])('fallback content %j is displayed at its computed level fit', (spots) => {
+    const floor = ref({ id: 'fallback', imageWidth: 1280, imageHeight: 640 } as MapViewerFloor)
+    const container = ref({ clientWidth: 390, clientHeight: 844, closest: () => null, getBoundingClientRect: () => rect(390,844) } as unknown as HTMLElement)
+    const instance = { stop: vi.fn(), resize: vi.fn(), getZoom: () => 14, getMaxZoom: () => 23, setMinZoom: vi.fn(), setMaxZoom: vi.fn(), cameraForBounds: vi.fn(() => ({ center: [0,0], zoom: 14 })), jumpTo: vi.fn() }
+    const camera = useMapCamera(container, ref(instance as unknown as MapLibreMap), { mode: 'view', floor, spots: ref(spots as import('../shared/types/map-viewer').MapViewerSpot[]), isReady: ref(true), visitorOverview: ref(true) })
+    camera.fitFloorBounds(getFloorCorners(floor.value)!, false)
+    expect(instance.cameraForBounds).toHaveBeenCalledOnce()
+    expect(instance.cameraForBounds).toHaveBeenLastCalledWith(expect.anything(), expect.objectContaining({ pitch: 0 }))
+    expect(instance.jumpTo).toHaveBeenLastCalledWith({ center: [0,0], zoom: 14, bearing: 0, pitch: 0 })
+  })
   it('new Floor cancels old motion, resets heading, measures padding and fits its own bounds; passive resize never refits', () => {
     const floor=ref({id:'a',imageWidth:1280,imageHeight:1280} as MapViewerFloor)
     const container=ref({clientWidth:390,clientHeight:844,closest:()=>null,getBoundingClientRect:()=>rect(390,844)} as unknown as HTMLElement)
@@ -28,7 +38,7 @@ describe('visitor viewport safe fit', () => {
     camera.fitFloorBounds(getFloorCorners(floor.value)!,true)
     expect(instance.stop).toHaveBeenCalledOnce()
     expect(instance.cameraForBounds).toHaveBeenCalledWith(expect.anything(),expect.objectContaining({bearing:0,pitch:0,padding:{top:24,bottom:24,left:24,right:24}}))
-    expect(instance.jumpTo).toHaveBeenLastCalledWith({center:[0,0],zoom:14,bearing:0,pitch:20})
+    expect(instance.jumpTo).toHaveBeenLastCalledWith({center:[0,0],zoom:14,bearing:0,pitch:0})
     camera.showWholeFloor()
     expect(instance.easeTo).toHaveBeenLastCalledWith(expect.objectContaining({zoom:14,bearing:0,pitch:0}))
     instance.easeTo.mockClear()
@@ -40,6 +50,6 @@ describe('visitor viewport safe fit', () => {
     floor.value={...floor.value,id:'wide',imageWidth:2560,imageHeight:640}
     camera.fitFloorBounds(getFloorCorners(floor.value)!,true)
     expect(instance.stop).toHaveBeenCalledTimes(2)
-    expect(instance.jumpTo).toHaveBeenLastCalledWith({center:[0,0],zoom:14,bearing:0,pitch:20})
+    expect(instance.jumpTo).toHaveBeenLastCalledWith({center:[0,0],zoom:14,bearing:0,pitch:0})
   })
 })

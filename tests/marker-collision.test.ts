@@ -13,6 +13,12 @@ describe('screen-space decluttering', () => {
   it('selected is never removed even if selected candidates overlap', () => {
     expect([...declutterPins([pin('b',4),pin('a',4),pin('z',3)])]).toEqual(['a','b'])
   })
+  it('focused PIN survives enlargement and density suppression, while selected remains visible', () => {
+    const focused = { ...pin('z-focused', 1, 0, 100), protected: true }
+    expect([...declutterPins([pin('a-featured', 2, 80), focused])]).toEqual(['z-focused'])
+    expect([...declutterPins([pin('selected', 4), focused])]).toEqual(['selected', 'z-focused'])
+    expect([...declutterPins([pin('a-featured', 2, 80), { ...focused, protected: false }])]).toEqual(['a-featured'])
+  })
   it('ties use stable IDs; touching safety gap is allowed; zoom spacing reveals then suppresses', () => {
     expect([...declutterPins([pin('b',2,69),pin('a',2)])]).toEqual(['a'])
     expect([...declutterPins([pin('b',2,70),pin('a',2)])]).toEqual(['a','b'])
