@@ -1,6 +1,6 @@
 export const PIN_COLLISION_GAP = 10
 export interface ScreenRect { left: number, top: number, right: number, bottom: number }
-export interface CollisionCandidate { id: string, priority: number, protected?: boolean, rect: ScreenRect }
+export interface CollisionCandidate { id: string, priority: number, protected?: boolean, rect: ScreenRect, centerDistance?: number }
 
 export function rectanglesCollide(a: ScreenRect, b: ScreenRect, gap = PIN_COLLISION_GAP) {
   return a.left < b.right + gap && a.right + gap > b.left
@@ -10,9 +10,9 @@ export function rectanglesCollide(a: ScreenRect, b: ScreenRect, gap = PIN_COLLIS
 const isProtected = (pin: CollisionCandidate) => Boolean(pin.protected) || pin.priority === 4
 
 /** Protect selection/focus first; preserve the normal priority order and stable ID ties. */
-export function declutterPins(candidates: readonly CollisionCandidate[], gap = PIN_COLLISION_GAP) {
+export function declutterPins(candidates: readonly CollisionCandidate[], gap = PIN_COLLISION_GAP, previousWinners: ReadonlySet<string> = new Set()) {
   const accepted: CollisionCandidate[] = []
-  for (const candidate of [...candidates].sort((a, b) => Number(isProtected(b)) - Number(isProtected(a)) || b.priority - a.priority || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))) {
+  for (const candidate of [...candidates].sort((a, b) => Number(isProtected(b)) - Number(isProtected(a)) || b.priority - a.priority || ((a.centerDistance ?? 0) - (previousWinners.has(a.id) ? 8 : 0)) - ((b.centerDistance ?? 0) - (previousWinners.has(b.id) ? 8 : 0)) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))) {
     if (isProtected(candidate) || !accepted.some(pin => rectanglesCollide(pin.rect, candidate.rect, gap))) accepted.push(candidate)
   }
   return new Set(accepted.map(pin => pin.id))
@@ -38,9 +38,18 @@ export function applyPinVisibility(element: HTMLElement, visible: boolean) {
   }
 }
 
-/** Every actual overlap is recoverable, including nearby PINs inseparable at maximum zoom. */
-export function getCollisionRecoveryIds(selectedId: string | null, candidates: readonly CollisionCandidate[]) {
-  const selected = candidates.find(pin => pin.id === selectedId)
-  if (!selected) return []
-  return candidates.filter(pin => pin.id !== selectedId && rectanglesCollide(selected.rect, pin.rect)).map(pin => pin.id).sort()
+/** Connected screen-space overlaps, including density-hidden members; no canonical writes. */
+export function getCollisionGroup(id: string, candidates: readonly CollisionCandidate[]) {
+  const first = candidates.find(pin => pin.id === id)
+  if (!first) return []
+  const group = [first], seen = new Set([id])
+  for (let index = 0; index < group.length; index++) {
+    for (const pin of candidates) {
+      if (!seen.has(pin.id) && rectanglesCollide(group[index]!.rect, pin.rect)) {
+        seen.add(pin.id)
+        group.push(pin)
+      }
+    }
+  }
+  return group
 }

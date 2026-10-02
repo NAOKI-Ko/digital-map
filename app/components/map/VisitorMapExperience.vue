@@ -5,7 +5,6 @@ import MapOperationHint from '~/components/map/MapOperationHint.vue'
 import PublicFloorSelector from '~/components/map/PublicFloorSelector.vue'
 import PublicMapInfo from '~/components/map/PublicMapInfo.vue'
 import SpotDetailCard from '~/components/map/SpotDetailCard.vue'
-import { getCoincidentSpots } from '~/utils/coincident-spots'
 import { collectSpotCategories, filterSpotsByCategoryIds } from '~/utils/category-filter'
 import { closeFilteredSpot, createFloorSwitchState, selectedSpotIdFromOverlay, shouldShowFloorSelector, type PublicOverlay } from '~/utils/public-map-ui'
 import type { MapViewerSpot } from '~~/shared/types/map-viewer'
@@ -64,8 +63,6 @@ const categories = computed(() => (
   collectSpotCategories(selectedFloor.value?.spots ?? [])
 ))
 const visibleSpots = computed(() => filterSpotsByCategoryIds(selectedFloor.value?.spots ?? [], selectedCategoryIds.value))
-const collisionRecovery = ref<{ spotId: string | null, spotIds: string[] }>({ spotId: null, spotIds: [] })
-const coincidentSpots = computed(() => getCoincidentSpots(visibleSpots.value, selectedSpot.value, collisionRecovery.value.spotId === selectedSpotId.value ? collisionRecovery.value.spotIds : []))
 const showFloorSelector = computed(() => shouldShowFloorSelector(data.value?.map.floors.length ?? 0))
 const appModalOpen = computed(() => overlay.value?.type === 'floor' || overlay.value?.type === 'info')
 watch(() => data.value?.map.floors, (floors) => {
@@ -106,10 +103,9 @@ function selectSpot(spot: MapViewerSpot) {
   if (props.analyticsEnabled !== false && data.value?.map.id && mapSlug.value !== '__qa_arimatsu') sendPublicAnalytics({ type: 'SPOT_VIEW', mapId: data.value.map.id, spotId: spot.id })
 }
 
-function selectCoincidentSpot(spot: MapViewerSpot) {
+function beginMapRecovery() {
   clearPendingSpotClose()
-  selectSpot(spot)
-  nextTick(() => document.querySelector<HTMLElement>('[data-spot-detail-title]')?.focus({ preventScroll: true }))
+  overlay.value = null
 }
 
 function ensureSelectedSpotVisible() {
@@ -296,7 +292,7 @@ onBeforeUnmount(clearPendingSpotClose)
             height="100%"
             :label="`${data.map.name} ${selectedFloor.name}`"
             @spot-selected="selectSpot"
-            @collision-recovery="collisionRecovery = $event"
+            @collision-started="beginMapRecovery"
           />
           <template #fallback>
             <div class="h-full animate-pulse bg-stone-200" />
@@ -322,14 +318,7 @@ onBeforeUnmount(clearPendingSpotClose)
         :spot="selectedSpot"
         @close="closeSpot"
         @expanded-change="() => nextTick(ensureSelectedSpotVisible)"
-      >
-        <nav v-if="coincidentSpots.length" class="mb-4 rounded-xl border border-stone-200 bg-stone-50 p-3" :aria-label="data.map.locale === 'en' ? 'Overlapping spots' : '重なっているスポット'">
-          <p class="mb-2 text-xs font-semibold text-stone-600">{{ data.map.locale === 'en' ? 'Overlapping spots' : '重なっているスポット' }}</p>
-          <div class="flex flex-wrap gap-2">
-            <button v-for="spot in coincidentSpots" :key="spot.id" type="button" class="min-h-11 max-w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-left text-sm font-semibold text-terracotta-700" :data-coincident-spot-id="spot.id" @click="selectCoincidentSpot(spot)">{{ spot.name }}</button>
-          </div>
-        </nav>
-      </SpotDetailCard>
+      />
       <PublicFloorSelector v-if="floorSelectorOpen" :floors="data.map.floors" :model-value="selectedFloorId" @select="selectFloor" @close="overlay = null" />
       <PublicMapInfo v-if="infoOpen" :map-name="data.map.name" :organization-name="data.map.organizationName" :logo-url="data.map.logoUrl" :website-url="data.map.websiteUrl" :sns-url="data.map.snsUrl" :official-label="t.official" @close="overlay = null" />
     </template>

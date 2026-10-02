@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { describe, expect, it } from 'vitest'
-import { applyPinVisibility, declutterPins, getCollisionRecoveryIds, measurePinRect } from '../app/utils/marker-collision'
+import { applyPinVisibility, declutterPins, getCollisionGroup, measurePinRect } from '../app/utils/marker-collision'
 const pin = (id: string, priority: number, left = 0, size = 60) => ({ id, priority, rect: { left, top: 0, right: left + size, bottom: size } })
 describe('screen-space decluttering', () => {
   it('selected > active Category > featured > normal, independent of input order', () => {
@@ -21,14 +21,21 @@ describe('screen-space decluttering', () => {
   })
   it('recovers all actual overlaps, even unequal nearby positions and density-hidden candidates', () => {
     const candidates=[pin('selected',4),pin('near',1,.001),pin('edge',2,65),pin('far',1,80)]
-    expect(getCollisionRecoveryIds('selected',candidates)).toEqual(['edge','near'])
-    expect(getCollisionRecoveryIds(null,candidates)).toEqual([])
-    expect(getCollisionRecoveryIds('missing',candidates)).toEqual([])
+    expect(getCollisionGroup('selected',candidates).map(pin=>pin.id).filter(id=>id!=='selected').sort()).toEqual(['edge','far','near'])
+    expect(getCollisionGroup('',candidates)).toEqual([])
+    expect(getCollisionGroup('missing',candidates)).toEqual([])
   })
   it('ties use stable IDs; touching safety gap is allowed; zoom spacing reveals then suppresses', () => {
     expect([...declutterPins([pin('b',2,69),pin('a',2)])]).toEqual(['a'])
     expect([...declutterPins([pin('b',2,70),pin('a',2)])]).toEqual(['a','b'])
     expect([...declutterPins([pin('b',2,35),pin('a',2)])]).toEqual(['a'])
+  })
+  it('prefers viewport center in equal priorities, with an eight-pixel winner retention band', () => {
+    const a={...pin('a',2),centerDistance:50}, b={...pin('b',2),centerDistance:20}
+    expect([...declutterPins([a,b])]).toEqual(['b'])
+    expect([...declutterPins([{...a,centerDistance:25},b],10,new Set(['a']))]).toEqual(['a'])
+    expect([...declutterPins([{...a,centerDistance:30},b],10,new Set(['a']))]).toEqual(['b'])
+    expect([...declutterPins([a,{...b,priority:1}])]).toEqual(['a'])
   })
   it('larger actual artwork suppresses more neighbors without mutating canonical candidates', () => {
     const pins=[pin('a',2,0,80),pin('b',1,75)]

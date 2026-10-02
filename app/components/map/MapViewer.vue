@@ -44,7 +44,7 @@ const emit = defineEmits<{
   'update:modelValue': [position: ImagePosition]
   'spotMoved': [value: { spotId: string, x: number, y: number }]
   'spotSelected': [spot: MapViewerSpot]
-  'collisionRecovery': [value: { spotId: string | null, spotIds: string[] }]
+  'collisionStarted': []
   'cameraChanged': [camera: MapViewerCameraState]
 }>()
 
@@ -88,8 +88,8 @@ const viewer = useMapViewer(container, {
   },
   onPositionChanged: value => emit('update:modelValue', value),
   onSpotMoved: value => emit('spotMoved', value),
-  onCollisionRecovery: value => emit('collisionRecovery', value),
   onSpotSelected: spot => emit('spotSelected', spot),
+  onCollisionStarted: () => emit('collisionStarted'),
 })
 const { floorError, geolocationAreaMessage, isReady, mapError } = viewer
 
