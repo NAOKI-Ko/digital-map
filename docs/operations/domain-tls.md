@@ -49,3 +49,7 @@ credential、Tunnel token、API tokenはGit・ログ・`.env.example`へ保存�
 - HTTPアクセスが同じ許可hostのHTTPSへ308 redirectされることを確認する。
 - session cookieがSecureで、HSTSがHTTPS応答だけに付くことを確認する。
 - 公開URL、QR、メール、canonical/OGPが一時Tunnel URLを含まないことを確認する。
+
+## Windows QA automatic Quick Tunnel origin synchronization
+
+`scripts/windows/qa-sync-tunnel.ps1` reads the current cloudflared process's URL announcement, atomically updates runtime/public-url.txt and a QA-only Nuxt origin overlay, and restarts the same app release only when the URL changes. The QA app runner loads that overlay after its protected secrets file. A named mutex serializes start/run callers. Origin equality, exact trusted host and proxy gates stay enabled; Production configuration is unchanged. `qa-install-tunnel.ps1` preserves runner backups before installing hooks. Live tunnel rotation and idempotency evidence are in docs/qa/wu68-public-viewer-clarity/08-MAP-ONLY-RECOVERY-QA.md. Historical copied URLs, emails and exported PDFs must be regenerated; they cannot follow a retired DNS name.

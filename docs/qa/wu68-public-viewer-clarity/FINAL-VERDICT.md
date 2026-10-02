@@ -1,72 +1,78 @@
-# FINAL VERDICT — PARTIAL / NOT ACCEPTED
+# WU-68 + 68-09 Final Verdict — PARTIAL / NOT ACCEPTED
 
-Implementation and all review P2 fixes are complete. Required audit/Verify is FAIL because patched node-forge>=1.4.1 is not obtainable from official npm. No audit exception or gate relaxation. PR27 remains OPEN/unmerged. Post-merge Verify, Windows exact-SHA activation, authenticated LIVE Preview and Final Acceptance are pending. Parent WU remains incomplete.
+PR27 updated for Map-only recovery. Mandatory audit/Verify remains FAIL; merge, post-merge Verify, Windows exact-SHA activation and Authenticated LIVE Final Acceptance are prohibited/pending. Production untouched. Historical Detail recovery is superseded and removed.
 
-## SHA / review evidence
-
-- Base dev:34c8b901a8dfd11a871e7f83e1c65bdae9ecbbb8
-- User-authorized revision base:8522ddadbae5fd2a8388b7110b5bc55fb37adaf8
-- Final implementation:2e636a3ddd6d4cbefb4c99558a0a1e023aa83687
-- Final evidence SHA:PR27 current head (documentation-only follow-up)
-- Merged SHA:none; dev remains base above
-- Windows remains4a90be0186666a0e2007029da85e5a0846539e2a; backups verified, no activation
-- Production/main remainsa58b4353bd108e6586f329080c772f69b8aaffda
+- Authorized PR revision base:66dadf0aa4dc31f478b6e2e116641f460df4fdf3
+- WU base/dev:34c8b901a8dfd11a871e7f83e1c65bdae9ecbbb8
+- Implementation:38533079622c2d3c10eabebee20ea8f9d944b1fd
+- Merged SHA:none
+- Windows app:4a90be0186666a0e2007029da85e5a0846539e2a (same SHA; only QA tunnel origin lifecycle repaired)
+- Production/main:a58b4353bd108e6586f329080c772f69b8aaffda
 - PR:https://github.com/NAOKI-Ko/digital-map/pull/27
+- New Codex review:pending. Earlier8 resolved P2s remain historical; clean earlier review does not prove the new implementation.
 
-Original3 P2s plus5 additional P2s fixed and all8 threads resolved. Codex re-review of final implementation2e636a3 completed2026-10-02T02:53:29.694884Z with no additional threads/findings. Re-review request:https://github.com/NAOKI-Ko/digital-map/pull/27#issuecomment-5944686771. Implementation Verify36957419742 FAIL only at mandatory production dependency audit. No forced merge.
+## All32 Acceptance Criteria
 
-## All20 Acceptance Criteria
+PASS below denotes tested local implementation. Exact-SHA Windows acceptance remains pending behind Verify.
 
-| AC | Status | Criterion | Evidence/limit |
-|---|---|---|---|
-| 1 | PASS | 390px高密度Mapの重なり解消 | 初期4 PIN、実矩形+10px gap。 |
-| 2 | PASS | selected PIN常時表示 | selected非抑制。focus中PINも非抑制。 |
-| 3 | PASS | active Category優先 | priority testsとfilter実画面。 |
-| 4 | PASS | featured > normal | priority testsとdense実画面。 |
-| 5 | PASS | 同順位stable | ID順。入力逆順でも同じ集合。 |
-| 6 | PASS | zoom in再表示 | 390px4→9。近接で分離不能なSpotは詳細ナビで回復。 |
-| 7 | PASS | zoom out再抑制 | 5サイズで初期集合へ戻る。 |
-| 8 | PASS | presentation-only | 入力不変テスト・公開JSON不変。座標/Category/importance/snapshot変更なし。 |
-| 9 | PASS | 非表示PIN focus除外 | inert/tabindex=-1。focus中PINは消えない。 |
-| 10 | PASS | 初期camera原則20°/0° | Primary dense20°/0°。空/invalid/broad fallbackはlevel0°/0°。 |
-| 11 | PASS | 初期zoomを寄せる | Primary390:whole-floor+0.65。contentがそのfitに収まらない場合はsafe fallback。 |
-| 12 | PASS | zoom安全上限 | +0.65 cap。fit zoomを最小値へ強制引き上げない。 |
-| 13 | PASS | Floor切替同じpolicy | 25 cases:15 valid-content20°、10 mobile broad fallback0°。 |
-| 14 | PASS | filter/detail/resizeでresetなし | detail最小pan完了後のclose/resizeでcenter/zoom完全保持。 |
-| 15 | PASS | overview0°/0°whole-floor | overview後のcompass復帰も0°。5サイズと25Floor cases。 |
-| 16 | PASS | 指定5サイズ主要フロー | dense/near recovery/fallback/多Floor実画面。 |
-| 17 | PASS | dense outdoor・multi-floor回帰 | dense36 Spot、5Floor×5サイズ。 |
-| 18 | PARTIAL | Public/LIVE Preview parity | 同一renderer実装維持。認証済み実画面未確認。 |
-| 19 | FAIL | tests/type/build/Prisma/Verify | 696 PASS/1任意SKIP、typecheck/build/Prisma PASS。audit/Verify FAIL。 |
-| 20 | PASS | Production untouched | main/dev未merge。Windows未activation。 |
+| AC | Status | Criterion / evidence |
+|---|---|---|
+| 1 | PASS | 390px high density:4 visible, zero actual target/artwork overlaps including10px gap. |
+| 2 | PASS | selected protected; normal selected via spiderfy remains visible in ordinary Detail. |
+| 3 | PASS | active Category priority3 replaces featured with center normal00 in5-size priority fixture. |
+| 4 | PASS | featured priority2 survives normal; unit and5-size browser evidence. |
+| 5 | PASS | distance→ID deterministic order;8px retention, same-camera stability and5px pan/return. |
+| 6 | PASS |390 zoom4→9→36; natural screen-space separation. |
+| 7 | PASS |390 zoom36→9, lower-zoom suppression preserved. |
+| 8 | PASS | no Spot/snapshot writes; immutable inputs, development-only cloned fixtures. |
+| 9 | PASS | hidden originals inert/tabindex-1/aria-hidden; focus protected; zero hidden-interactive violations. |
+| 10 | PASS | valid initial0°/20°; original safe empty/invalid/broad fallback0° fit/display aligned. |
+| 11 | PASS |390 content-aware initial whole-floor+.65; larger viewports respect actual content fit. |
+| 12 | PASS |+.65 upper allowance, relative maxZoom retained; no forced past-fit zoom. |
+| 13 | PASS | two-Floor recovery fixture applies0°/20° on switch in5 sizes; prior broad fallback evidence retained. |
+| 14 | PASS | filter preserves center/zoom; responsive focus resize preserves exact center/zoom; recovery from existing Detail also preserves camera for exact coordinates. Explicit group zoom remains user initiated. |
+| 15 | PASS |5-size explicit overview0°/0° whole-floor; fallback/date-line recovery20 cases. |
+| 16 | PASS |390×844 /768×1024 /1024×768 /1440×900 /1440×700 major flows. |
+| 17 | PASS | high-density outdoor and multi-Floor recovery fixture; historical Aquarium5-Floor evidence retained. |
+| 18 | PARTIAL | same Public/Authenticated LIVE renderer confirmed in source; authenticated exact-SHA browser gated. |
+| 19 | FAIL |699 tests PASS/1 optional SKIP, typecheck/build/Prisma PASS; prod audit/Verify FAIL on node-forge High. |
+| 20 | PASS | Production/main unchanged; no merge to dev, no app SHA activation on Windows. |
+| 21 | PASS | Detail collision UI/helper/emitted recovery ID navigation removed. |
+| 22 | PASS | featured wins normal collision in5-size browser priority fixture. |
+| 23 | PASS | active Category wins featured; same fixture normal00 becomes priority3 representative. |
+| 24 | PASS | initial same-priority winner matches measured nearest viewport center in all5 sizes; no3D depth. |
+| 25 | PASS | stable same-camera representative, stable ID ties and8px previous-winner retention. |
+| 26 | PASS | group separates with zoom;390 four→nine→all36. |
+| 27 | PASS | representative activation centers group and smooth zooms+1 before Detail selection. |
+| 28 | PASS | exact3 and near3 at actual maxZoom all reachable via Map spiderfy in5 sizes. |
+| 29 | PASS | spread consists solely of temporary DOM PINs/connectors; canonical fields and snapshots unchanged. |
+| 30 | PASS |5-size open/close/Enter/Escape/zoom/pan/Category/Floor/background; different groups390/Desktop; focus resize; reduced-motion duration0 unit check. |
+| 31 | PARTIAL | shared UX/code confirmed; Authenticated LIVE exact-SHA visual QA remains gated by Verify. |
+| 32 | PASS | valid initial/Floor0°/20°, explicit overview0°/0°, content-aware cap and no passive reset retained. |
 
-Totals18 PASS /1 PARTIAL /1 FAIL. PASS refers to tested local implementation, not pending exact-SHA Windows acceptance.
+Totals:29 PASS /2 PARTIAL(18,31) /1 FAIL(19). Final Acceptance is not complete.
 
-## 390px before/after and behavior
+## 390px before/after
 
-Before evidence/390-before.jpg:wu68-00…35 all36 rendered despite density hidden attribute (display:flex override). bearing0/pitch0; zoom14.609707646398311; center lng136.97123594617784,lat35.068358034016384.
+Before:`evidence/390-before.jpg`:36 overlapping PINs; bearing0°, pitch0°, zoom14.609707646398311, center lng136.97123594617784/lat35.068358034016384.
 
-After evidence/390-after.jpg:wu68-00/03/18/21; zero overlaps including10px gap. bearing0/pitch20; zoom15.259707646398311(+.65); center lng136.97076018598818,lat35.06792808243404. Zoom+1 reveals00/03/05/12/15/17/24/27/29. Category still collision-limited. Selected always displayed; focused never suppressed by density/collision.
+After:`evidence/map-only-dense-390.jpg`:displayed set{wu68-00,wu68-03,wu68-18,wu68-21}. Actual target/artwork union+10px gap has no overlap. Initial bearing0°, pitch20°, zoom15.259707646398311, center lng136.97076018598818/lat35.06792808243404. Whole-floor+.65 cap. Representative tap→zoom16.25970764639831 with9 PINs and no Detail; another zoom→36. Zoom out→9. Overview returns0°/0°, zoom14.609707646398313 and contains whole Floor.
 
-The detail navigation provides access to exact-coordinate and all actual screen-overlapping neighbors, including nearby coordinates inseparable at maximum allowed zoom. Measured rectangles include density-hidden candidate geometry; recovery IDs intersect currently published/Category-visible Floor Spots. No new cluster/search UI, Spot offset or canonical write. Five maxZoom fixtures show only00, then01/02 are reachable by Enter/click. evidence/p2-round3-near.json and p2-near-max-390.jpg.
+Collision order:selected > active Category > featured > normal > screen-space center distance > ID. Focus is additionally protected. Equal-priority previous winners have8px retention, permitting deliberate pan to change representatives while avoiding micro-pan flicker. Group processing and decluttering O(n²), rAF coalesced writes→geometry reads→visibility writes. No marker destruction for ordinary collision/selection.
 
-Collision:stable greedy O(n²), selected > active Category > featured > normal, stable Spot-ID ties; selected/focus are protected. requestAnimationFrame coalesces scale writes→one geometry pass→visibility writes. Target and scaled/rotated artwork union+10px gap. Hidden PINs inert/tabindex-1/aria-hidden. Collision does not rebuild marker DOM. Shared Public/LIVE renderer.
+Exact coordinates spread immediately. Near coordinates predicted inseparable go to maxZoom, then actual rectangles are rechecked before spreading. Otherwise group tap zooms one step at its center. Transient Map PINs are keyboard reachable; Escape focuses Map; pan/zoom/Category/Floor/background/different group close. Spot Detail contains exactly one Spot's information. Starting recovery dismisses an existing Detail without camera reset, ensuring it cannot cover recovered PINs.
 
-Initial camera:unfiltered Floor Spot bounds+.08 padding, converted through existing georeference. Longitudes unwrap relative to the first corner at180°. Eligible content camera never exceeds whole-floor+.65 or its fitted zoom. Content unable to fit at discovery minimum+.55 uses a level whole-floor fallback, as do empty/invalid/extreme bounds. Navigation home follows actual initial policy; explicit overview establishes0° home.
+Responsive initial/tap-zoom/additional-zoom PIN counts:390 4/9/36;768 9/36/36;1024 10/36/36;1440×900 18/36/36;1440×700 9/34/36. Zero initial actual overlaps and hidden-interactive violations.50 browser scenario records plus5 actual-geometry cases. See08-MAP-ONLY-RECOVERY-QA.md and evidence/map-only-responsive.json.
 
-Overview:0°/0°whole-floor; Primary zoom14.609707646398311 at390×844. Rotation then compass keeps level fit. After user zoom16.25970764639831, filter preserveszoom, detail performs only existing minimal panel-avoidance pan, and close/passive height resize preserve center lng136.970660312797,lat35.06646128712622 and zoom exactly. evidence/p2-round3-dense.json.
+## Audit, Windows URL and remaining debt
 
-Dense initial/zoom-in/zoom-out for390×844,768×1024,1024×768,1440×1000,1440×700:4/9/4,9/36/9,9/36/9,22/36/22,9/34/9. Zero non-protected overlaps/focus eligibility violations. Additional20 cases(empty/invalid/broad/dateline×five sizes)verifycontain, initial compass and heading recovery. Multi-floor25 cases verifyinitial/zoom/overview/Category/detail.
+Official npm node-forge latest1.4.0;1.4.1 HTTP404. listhen latest1.10.1 still^1.4.0; Nuxt latest4.5.2. Required pnpm audit --prod --audit-level high fails with one High GHSA-86w9-cpqp-85rv (patched:None). No audit exception, failing override, dependency reclassification or Verify reduction. Merge is forbidden until a resolvable patched dependency/upstream release and all Verify gates PASS.
 
-## Security and remaining Public Viewer debt
+QA-only URL following is implemented and live verified. Current-process announcement selection excludes historic logs; serialized, atomic QA origin updates feed run-app after protected secrets. Real tunnel rotation changed wide-maybe-votes-neighbors to reaches-see-permissions-comparable; public-url.txt, effective Nuxt origin and public response all follow. Idempotent repeat preserves PID26100. App SHA remains4a90be0; DB/media/publication and Production were not modified. Scripts backed up atC:\DigitalMap\backups\wu68-qa-tunnel-origin-20261002.
 
-Official npm node-forge latest is1.4.0; version1.4.1 endpoint HTTP404 and pnpm returnsERR_PNPM_PACKAGE_NOT_FOUND. Published stable versions have none>=1.4.1. Latest upstream listhen1.10.1 still depends on^1.4.0. Same-major refresh removed the other advisories; one high remains(GHSA-86w9-cpqp-85rv). No failing/unresolvable override, audit ignore, crypto patch or gate change has been committed. A published patched dependency is needed before merge can proceed.
+Current QA public MAP:https://reaches-see-permissions-comparable.trycloudflare.com/arimatsu-fon
+This Windows baseline does not yet contain the new Map-only PR code. Previously copied URLs/emails/PDFs cannot change retroactively; newly generated links/QR use the new origin after reload.
 
-Remaining debt:
-- Authenticated LIVE Preview browser parity and exact merged-SHA Windows acceptance remain pending. Existing QA credential-source use was previously rejected by automatic approval review for missing explicit source authorization; no bypass or retry with another credential path.
-- Mobile broad all-normal Floors(390/768)initially use level fallback and suppress normal PINs. Zoom+1 reveals11/4/6/9/7, or Category selection provides direct access; detail and overview PASS. This initial discovery limitation remains explicit.1024/1440 cases use20° and initially show11/4/6/9/7.
-- Generic dense discovery requires zoom/recovery detail navigation; no cluster/search by scope.
-- Category candidate DOM rebuild and existing current-location/georeference limitations remain; collision itself preserves DOM.
-- Stale Windows public tunnel pointer needs reconciliation before external-link QA.
+Remaining debt:mobile broad all-normal Floor fallback can initially suppress normal PINs under the existing density rule; zoom/Category discovery remains available. Authenticated LIVE and Windows exact-SHA visual acceptance are pending. Historical external link/exported-QR tunnel URLs require regeneration. No Search/full cluster engine/new importance/Placement schema/Production deployment added.
 
-Production untouched. No schema/migration, publication, coordinates, Category or importance mutation. Windows backup/digest evidence is inWINDOWS-QA.md. Resume only after patched dependency→audit/Verify PASS→merge dev→post-merge Verify→exact-SHA Windows QA→authenticated Preview→Final Acceptance.
+Next authorized order:final clean Codex review → resolvable patched node-forge/upstream → audit/Verify PASS → merge dev → post-merge Verify → Windows exact SHA deploy → Authenticated LIVE → Final Acceptance. Current unavailable patched release blocks this chain.

@@ -6,3 +6,7 @@ Initial: unfiltered current Floor Spot image bounds + .08 image padding; convert
 PR27 P2 amendment: empty/invalid/extreme whole-floor fallback is displayed at pitch0 to match its fitted camera. Valid-content initial policy remains pitch20.
 
 Second P2 amendment: when content cannot fit at whole-floor+.55, use level whole-floor fallback rather than force past content fit. Content longitude bounds unwrap at the antimeridian. Compass reset reads the current Floor policy (0° fallback/20° valid content).
+
+## 68-09 amendment (authoritative)
+
+Parent Product Decision/AC21–32 supersede stable-ID-only ties and Detail recovery. Final ties use screen-space viewport-center distance, then stable ID, with8px previous-winner retention for tiny pan. Recovery is Map-only: representative tap→bounded smooth zoom and actual re-evaluation; exact/practically inseparable at maximum zoom→transient spiderfy. Detail recovery is removed. See08-MAP-ONLY-RECOVERY-QA.md for the final implementation and evidence.
