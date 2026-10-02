@@ -9,7 +9,7 @@ PR27 updated for Map-only recovery. Mandatory audit/Verify remains FAIL; merge, 
 - Windows app:4a90be0186666a0e2007029da85e5a0846539e2a (same SHA; only QA tunnel origin lifecycle repaired)
 - Production/main:a58b4353bd108e6586f329080c772f69b8aaffda
 - PR:https://github.com/NAOKI-Ko/digital-map/pull/27
-- New Codex review:pending. Earlier8 resolved P2s remain historical; clean earlier review does not prove the new implementation.
+- Codex review:9ea58d879677c3d91b52b63671e5edfbdca55ebd completed2026-10-02T05:18:42Z with no new findings. https://github.com/NAOKI-Ko/digital-map/pull/27#issuecomment-5946052767. Prior8 P2s and2 amendment P1s are resolved; unresolved threads0. Later evidence-only commits do not change implementation3853307.
 
 ## All32 Acceptance Criteria
 
@@ -75,4 +75,6 @@ This Windows baseline does not yet contain the new Map-only PR code. Previously 
 
 Remaining debt:mobile broad all-normal Floor fallback can initially suppress normal PINs under the existing density rule; zoom/Category discovery remains available. Authenticated LIVE and Windows exact-SHA visual acceptance are pending. Historical external link/exported-QR tunnel URLs require regeneration. No Search/full cluster engine/new importance/Placement schema/Production deployment added.
 
-Next authorized order:final clean Codex review → resolvable patched node-forge/upstream → audit/Verify PASS → merge dev → post-merge Verify → Windows exact SHA deploy → Authenticated LIVE → Final Acceptance. Current unavailable patched release blocks this chain.
+Codex clean review completed. Verify run36968125956 on9ea58d8 FAIL at mandatory prod audit; later CI gates were skipped, not passed. Local tests/typecheck/build/Prisma PASS. Local audit reports patched None; CI advisory metadata lists>=1.4.1, but official registry1.4.1 is404.
+
+Next authorized order:resolvable patched node-forge/upstream → audit/Verify PASS → merge dev → post-merge Verify → Windows exact SHA deploy → Authenticated LIVE → Final Acceptance. Current unavailable patched release blocks this chain.

@@ -49,3 +49,7 @@ Live rotation verified: wide-maybe-votes-neighbors → reaches-see-permissions-c
 
 Current QA URL:https://reaches-see-permissions-comparable.trycloudflare.com/arimatsu-fon
 Existing copied URLs, historical emails and exported PDFs cannot update retroactively. Newly generated sharing links/QR use the current effective origin after page reload. Named Production origins are unchanged.
+
+## Review / Verify completion
+
+Reviewed head9ea58d879677c3d91b52b63671e5edfbdca55ebd (implementation3853307):Codex completed2026-10-02T05:18:42Z, no new findings. https://github.com/NAOKI-Ko/digital-map/pull/27#issuecomment-5946052767. The2 P1 threads on the old66dadf0, covering missing Map-only recovery and center ordering, were fixed and resolved with QA evidence; all10 historical threads resolved, unresolved0. Verify36968125956 FAIL solely at mandatory prod audit; subsequent CI gates skipped. Local699 tests/typecheck/build/Prisma PASS. Local advisory metadata says patched None, CI says>=1.4.1; required1.4.1 remains unavailable from official npm. Merge prohibited.
