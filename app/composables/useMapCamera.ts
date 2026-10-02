@@ -1,8 +1,9 @@
 import type { Ref } from 'vue'
+import { canUseVisitorContentCamera, clampVisitorInitialZoom, getVisitorContentBounds, VISITOR_INITIAL_PITCH, VISITOR_INITIAL_ZOOM_ALLOWANCE } from '~/utils/visitor-initial-camera'
 import { measureVisitorFitPadding } from '~/utils/visitor-floor-fit'
 import type { Map as MapLibreMap, MapOptions, StyleSpecification } from 'maplibre-gl'
 import { getFloorCorners, getGeoReferenceBounds, toImageCoordinates, type FloorCorners } from '~~/lib/geo'
-import type { MapViewerCameraState, MapViewerFloor } from '~~/shared/types/map-viewer'
+import type { MapViewerCameraState, MapViewerFloor, MapViewerSpot } from '~~/shared/types/map-viewer'
 import { getViewportOrientation, isViewportCoveredByPolygon, type MapCenter } from '~/utils/public-map-camera'
 
 export type MapViewerMode = 'view' | 'edit'
@@ -164,6 +165,7 @@ interface UseMapCameraOptions {
   mode: MapViewerMode
   floor: Readonly<Ref<MapViewerFloor>>
   visitorOverview?: Readonly<Ref<boolean>>
+  spots?: Readonly<Ref<readonly MapViewerSpot[]>>
   mobileCover?: Readonly<Ref<boolean>>
   isReady: Readonly<Ref<boolean>>
 }
@@ -178,6 +180,7 @@ export function useMapCamera(
   let largeViewportHeight = 0
   let largeViewportOrientation = ''
   let constraintLayoutKey = ''
+  let homePitch: number = VIEWER_CAMERA_CONSTRAINTS[options.mode].pitch
 
   function usesMobileCover() {
     return options.mode === 'view'
@@ -352,12 +355,19 @@ export function useMapCamera(
     const instance = map.value
     if (!instance) return
     if (options.mode === 'view' && options.visitorOverview?.value) {
-      // Floor changes are a new overview, never an animated carry-over of the previous Floor.
+      // Initial/Floor load applies content framing, never an animated carry-over.
       instance.stop()
       instance.resize()
-      instance.jumpTo({ bearing: 0, pitch: 0 })
+      instance.jumpTo({ bearing: 0, pitch: VISITOR_INITIAL_PITCH })
       const result = updateFloorZoomConstraints(corners)
-      if (result) instance.jumpTo({ center: result.camera.center, zoom: result.targetZoom, bearing: 0, pitch: 0 })
+      if (result) {
+        const bounds = getVisitorContentBounds(options.floor.value, options.spots?.value ?? [])
+        const fittedContent = bounds ? instance.cameraForBounds(bounds, { padding: measureVisitorFitPadding(container.value!), bearing: 0, maxZoom: result.targetZoom + VISITOR_INITIAL_ZOOM_ALLOWANCE }) : null
+        const content = fittedContent && canUseVisitorContentCamera(result.targetZoom, fittedContent.zoom) ? fittedContent : null
+        homePitch = content ? VISITOR_INITIAL_PITCH : 0
+        const zoom = content ? clampVisitorInitialZoom(result.targetZoom, content.zoom ?? result.targetZoom) : result.targetZoom
+        instance.jumpTo({ center: content?.center ?? result.camera.center, zoom, bearing: 0, pitch: homePitch })
+      }
       constraintLayoutKey = getConstraintLayoutKey()
       return
     }
@@ -389,11 +399,9 @@ export function useMapCamera(
     const instance = map.value
     const corners = getFloorCorners(options.floor.value)
     if (!instance || !corners || options.mode !== 'view') return
-    if (options.visitorOverview?.value) {
-      fitFloorBounds(corners, false)
-      return
-    }
-    // The explicit overview is an entire-image fit, never the initial mobile cover.
+
+    // Overview establishes a level home; heading recovery must preserve this fitted pitch.
+    homePitch = 0
     instance.jumpTo({ bearing: 0, pitch: 0 })
     const result = updateFloorZoomConstraints(corners)
     if (!result) return
@@ -456,6 +464,7 @@ export function useMapCamera(
   }
 
   return {
+    getHomePitch: () => homePitch,
     fitFloorBounds,
     showWholeFloor,
     comparePitch,

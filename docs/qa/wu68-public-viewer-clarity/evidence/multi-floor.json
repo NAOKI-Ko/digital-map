@@ -1,0 +1,4248 @@
+[
+  {
+    "width": 390,
+    "height": 844,
+    "floor": "北館 2F",
+    "initial": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": 0.0005682594951110786,
+          "lng": -0.0004073929944468091
+        },
+        "corners": [
+          {
+            "x": -21.953544862005213,
+            "y": 225.2713523365729
+          },
+          {
+            "x": 450.4438202934941,
+            "y": 225.2713523365729
+          },
+          {
+            "x": 487.81322050297666,
+            "y": 705.3400918815437
+          },
+          {
+            "x": -53.69212376182142,
+            "y": 705.3400918815437
+          }
+        ],
+        "floorId": "cmukrhmvm000hc8varaqaf5e3",
+        "maxZoom": 20.553561800992377,
+        "minZoom": 13.553561800992378,
+        "pitch": 20,
+        "zoom": 15.10356180099238
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktclah0015c8var8l162k5",
+        "cmuktdg9s001bc8vaiha6s9xx",
+        "cmukt2blb0014c8vazlil9c4k",
+        "cmuktdhcy001cc8va0p3q6kjw",
+        "cmuktd3lp0016c8va4vyu47ad",
+        "cmukth2kc001wc8vax120q81y",
+        "cmuktddxf0019c8vaz1dy7gr3",
+        "cmukth14y001vc8vas0at370p",
+        "cmuktd5u80018c8vaik5ppju7",
+        "cmuktd4q10017c8vaa0236mll"
+      ]
+    },
+    "selected": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.002010351042898151,
+          "lng": -0.0004073929944752308
+        },
+        "corners": [
+          {
+            "x": -15.04134958411043,
+            "y": 120.71944770980495
+          },
+          {
+            "x": 442.3053150244702,
+            "y": 120.71944770980495
+          },
+          {
+            "x": 477.16895475565474,
+            "y": 568.5977515579627
+          },
+          {
+            "x": -44.651736000052246,
+            "y": 568.5977515579627
+          }
+        ],
+        "floorId": "cmukrhmvm000hc8varaqaf5e3",
+        "maxZoom": 20.553561800992377,
+        "minZoom": 13.553561800992378,
+        "pitch": 20,
+        "zoom": 15.10356180099238
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktclah0015c8var8l162k5",
+        "cmuktdg9s001bc8vaiha6s9xx",
+        "cmukt2blb0014c8vazlil9c4k",
+        "cmuktdhcy001cc8va0p3q6kjw",
+        "cmuktd3lp0016c8va4vyu47ad",
+        "cmukth2kc001wc8vax120q81y",
+        "cmuktddxf0019c8vaz1dy7gr3",
+        "cmukth14y001vc8vas0at370p",
+        "cmuktd5u80018c8vaik5ppju7",
+        "cmuktd4q10017c8vaa0236mll"
+      ]
+    },
+    "close": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.002010351042898151,
+          "lng": -0.0004073929944752308
+        },
+        "corners": [
+          {
+            "x": -15.04134958411043,
+            "y": 120.71944770980495
+          },
+          {
+            "x": 442.3053150244702,
+            "y": 120.71944770980495
+          },
+          {
+            "x": 477.16895475565474,
+            "y": 568.5977515579627
+          },
+          {
+            "x": -44.651736000052246,
+            "y": 568.5977515579627
+          }
+        ],
+        "floorId": "cmukrhmvm000hc8varaqaf5e3",
+        "maxZoom": 20.553561800992377,
+        "minZoom": 13.553561800992378,
+        "pitch": 20,
+        "zoom": 15.10356180099238
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktclah0015c8var8l162k5",
+        "cmuktdg9s001bc8vaiha6s9xx",
+        "cmukt2blb0014c8vazlil9c4k",
+        "cmuktdhcy001cc8va0p3q6kjw",
+        "cmuktd3lp0016c8va4vyu47ad",
+        "cmukth2kc001wc8vax120q81y",
+        "cmuktddxf0019c8vaz1dy7gr3",
+        "cmukth14y001vc8vas0at370p",
+        "cmuktd5u80018c8vaik5ppju7",
+        "cmuktd4q10017c8vaa0236mll"
+      ]
+    },
+    "overview": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": 0.0024269005840409363,
+          "lng": 0
+        },
+        "corners": [
+          {
+            "x": 24,
+            "y": 333.9999997830504
+          },
+          {
+            "x": 366,
+            "y": 333.9999997830504
+          },
+          {
+            "x": 366,
+            "y": 676.0000002161963
+          },
+          {
+            "x": 24,
+            "y": 676.0000002161963
+          }
+        ],
+        "floorId": "cmukrhmvm000hc8varaqaf5e3",
+        "maxZoom": 20.55356180098884,
+        "minZoom": 13.553561800988842,
+        "pitch": 0,
+        "zoom": 14.553561800988842
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": []
+    }
+  },
+  {
+    "width": 390,
+    "height": 844,
+    "floor": "北館 3F",
+    "initial": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": 0.00002498305750009422,
+          "lng": -0.0008798283245141647
+        },
+        "corners": [
+          {
+            "x": 1.7043717448738676,
+            "y": 202.6755238962486
+          },
+          {
+            "x": 470.8489693000353,
+            "y": 202.6755238962486
+          },
+          {
+            "x": 510.88528388146386,
+            "y": 675.6793794970927
+          },
+          {
+            "x": -26.35027206891737,
+            "y": 675.6793794970927
+          }
+        ],
+        "floorId": "cmuksbnaj000lc8vasrlaoqww",
+        "maxZoom": 20.55356180098884,
+        "minZoom": 13.553561800988842,
+        "pitch": 20,
+        "zoom": 15.103561800988842
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmukth53k001yc8vax75t2x45",
+        "cmuktdp2i001ec8var5bsjmb7",
+        "cmuktdnza001dc8varu72qn0y",
+        "cmukth42e001xc8vabh6cya4s"
+      ]
+    },
+    "selected": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.00694832392206024,
+          "lng": -0.0008798283245141647
+        },
+        "corners": [
+          {
+            "x": 17.40092119442332,
+            "y": -61.96973264698739
+          },
+          {
+            "x": 448.4486852047822,
+            "y": -61.96973264698739
+          },
+          {
+            "x": 481.8530178128788,
+            "y": 332.6814304936184
+          },
+          {
+            "x": -6.006494372099493,
+            "y": 332.6814304936184
+          }
+        ],
+        "floorId": "cmuksbnaj000lc8vasrlaoqww",
+        "maxZoom": 20.55356180098884,
+        "minZoom": 13.553561800988842,
+        "pitch": 20,
+        "zoom": 15.103561800988842
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmukth53k001yc8vax75t2x45",
+        "cmuktdp2i001ec8var5bsjmb7",
+        "cmuktdnza001dc8varu72qn0y",
+        "cmukth42e001xc8vabh6cya4s"
+      ]
+    },
+    "close": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.00694832392206024,
+          "lng": -0.0008798283245141647
+        },
+        "corners": [
+          {
+            "x": 17.40092119442332,
+            "y": -61.96973264698739
+          },
+          {
+            "x": 448.4486852047822,
+            "y": -61.96973264698739
+          },
+          {
+            "x": 481.8530178128788,
+            "y": 332.6814304936184
+          },
+          {
+            "x": -6.006494372099493,
+            "y": 332.6814304936184
+          }
+        ],
+        "floorId": "cmuksbnaj000lc8vasrlaoqww",
+        "maxZoom": 20.55356180098884,
+        "minZoom": 13.553561800988842,
+        "pitch": 20,
+        "zoom": 15.103561800988842
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmukth53k001yc8vax75t2x45",
+        "cmuktdp2i001ec8var5bsjmb7",
+        "cmuktdnza001dc8varu72qn0y",
+        "cmukth42e001xc8vabh6cya4s"
+      ]
+    },
+    "overview": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": 0.002426900584069358,
+          "lng": 0
+        },
+        "corners": [
+          {
+            "x": 24,
+            "y": 333.9999997822971
+          },
+          {
+            "x": 366,
+            "y": 333.9999997822971
+          },
+          {
+            "x": 366,
+            "y": 676.0000002177029
+          },
+          {
+            "x": 24,
+            "y": 676.0000002177029
+          }
+        ],
+        "floorId": "cmuksbnaj000lc8vasrlaoqww",
+        "maxZoom": 20.55356180099604,
+        "minZoom": 13.55356180099604,
+        "pitch": 0,
+        "zoom": 14.55356180099604
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": []
+    }
+  },
+  {
+    "width": 390,
+    "height": 844,
+    "floor": "南館 1F",
+    "initial": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": 0.00014784027304415304,
+          "lng": -0.0002789699555023617
+        },
+        "corners": [
+          {
+            "x": -26.829992559106397,
+            "y": 207.75810246510144
+          },
+          {
+            "x": 443.04626424950266,
+            "y": 207.75810246510144
+          },
+          {
+            "x": 479.1116443406907,
+            "y": 682.345888537952
+          },
+          {
+            "x": -59.083584531219735,
+            "y": 682.345888537952
+          }
+        ],
+        "floorId": "cmukscq3b000pc8va9r87tgs4",
+        "maxZoom": 20.55356180099604,
+        "minZoom": 13.55356180099604,
+        "pitch": 20,
+        "zoom": 15.10356180099604
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmukte0xu001fc8va4a6c1pz3",
+        "cmukte4gt001ic8vakcr8vlwu",
+        "cmukte5j9001jc8va06nh86yc",
+        "cmukth62i001zc8va1psl2dbc",
+        "cmukte260001gc8vaw9c9zlee",
+        "cmukte39k001hc8vai0jivag4"
+      ]
+    },
+    "selected": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.005079891906348166,
+          "lng": -0.0002789699540244328
+        },
+        "corners": [
+          {
+            "x": -13.025174031918722,
+            "y": 4.630391959628942
+          },
+          {
+            "x": 427.60996704082675,
+            "y": 4.630391959628942
+          },
+          {
+            "x": 459.0418070673512,
+            "y": 418.24498126537856
+          },
+          {
+            "x": -41.13494970008323,
+            "y": 418.24498126537856
+          }
+        ],
+        "floorId": "cmukscq3b000pc8va9r87tgs4",
+        "maxZoom": 20.55356180099604,
+        "minZoom": 13.55356180099604,
+        "pitch": 20,
+        "zoom": 15.10356180099604
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmukte0xu001fc8va4a6c1pz3",
+        "cmukte4gt001ic8vakcr8vlwu",
+        "cmukth62i001zc8va1psl2dbc",
+        "cmukte260001gc8vaw9c9zlee",
+        "cmukte39k001hc8vai0jivag4"
+      ]
+    },
+    "close": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.005079891906348166,
+          "lng": -0.0002789699540244328
+        },
+        "corners": [
+          {
+            "x": -13.025174031918722,
+            "y": 4.630391959628942
+          },
+          {
+            "x": 427.60996704082675,
+            "y": 4.630391959628942
+          },
+          {
+            "x": 459.0418070673512,
+            "y": 418.24498126537856
+          },
+          {
+            "x": -41.13494970008323,
+            "y": 418.24498126537856
+          }
+        ],
+        "floorId": "cmukscq3b000pc8va9r87tgs4",
+        "maxZoom": 20.55356180099604,
+        "minZoom": 13.55356180099604,
+        "pitch": 20,
+        "zoom": 15.10356180099604
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmukte0xu001fc8va4a6c1pz3",
+        "cmukte4gt001ic8vakcr8vlwu",
+        "cmukth62i001zc8va1psl2dbc",
+        "cmukte260001gc8vaw9c9zlee",
+        "cmukte39k001hc8vai0jivag4"
+      ]
+    },
+    "overview": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": 0.0024269005840409363,
+          "lng": 0
+        },
+        "corners": [
+          {
+            "x": 24.000000000753296,
+            "y": 333.9999997815438
+          },
+          {
+            "x": 366.0000000007533,
+            "y": 333.9999997815438
+          },
+          {
+            "x": 366.0000000007533,
+            "y": 676.000000215443
+          },
+          {
+            "x": 24.000000000753296,
+            "y": 676.000000215443
+          }
+        ],
+        "floorId": "cmukscq3b000pc8va9r87tgs4",
+        "maxZoom": 20.553561800992505,
+        "minZoom": 13.553561800992505,
+        "pitch": 0,
+        "zoom": 14.553561800992505
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": []
+    }
+  },
+  {
+    "width": 390,
+    "height": 844,
+    "floor": "南館 2F",
+    "initial": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": 0.00037749165468881074,
+          "lng": -0.0007510729595026078
+        },
+        "corners": [
+          {
+            "x": -5.230708825998353,
+            "y": 217.3013719303671
+          },
+          {
+            "x": 466.019343050818,
+            "y": 217.3013719303671
+          },
+          {
+            "x": 505.5569775065629,
+            "y": 694.8713730107042
+          },
+          {
+            "x": -34.44134923011782,
+            "y": 694.8713730107042
+          }
+        ],
+        "floorId": "cmukshlyb000tc8van3dpun6a",
+        "maxZoom": 20.553561800992505,
+        "minZoom": 13.553561800992505,
+        "pitch": 20,
+        "zoom": 15.103561800992503
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktgg8r001nc8va7hnc92i9",
+        "cmuktgii8001pc8va3edshhrz",
+        "cmuktghey001oc8vacauz01ip",
+        "cmukthhne0022c8vat5a3176r",
+        "cmukthgf60021c8vazbuyojvy",
+        "cmuktge33001lc8va4w4zvm76",
+        "cmukthf510020c8vaoh1zcqix",
+        "cmuktgf50001mc8vazpkqmmdg",
+        "cmuktgcuf001kc8vavw5st4ki"
+      ]
+    },
+    "selected": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.005131033587474576,
+          "lng": -0.0005391877051579286
+        },
+        "corners": [
+          {
+            "x": -1.4394738291374898,
+            "y": 2.768038294897921
+          },
+          {
+            "x": 438.927573348928,
+            "y": 2.768038294897921
+          },
+          {
+            "x": 471.8659628349887,
+            "y": 415.8455119134506
+          },
+          {
+            "x": -27.96537990290849,
+            "y": 415.8455119134506
+          }
+        ],
+        "floorId": "cmukshlyb000tc8van3dpun6a",
+        "maxZoom": 20.553561800992505,
+        "minZoom": 13.553561800992505,
+        "pitch": 20,
+        "zoom": 15.103561800992503
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktgg8r001nc8va7hnc92i9",
+        "cmuktghey001oc8vacauz01ip",
+        "cmukthgf60021c8vazbuyojvy",
+        "cmuktge33001lc8va4w4zvm76",
+        "cmukthf510020c8vaoh1zcqix",
+        "cmuktgf50001mc8vazpkqmmdg",
+        "cmuktgcuf001kc8vavw5st4ki"
+      ]
+    },
+    "close": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.005131033587474576,
+          "lng": -0.0005391877051579286
+        },
+        "corners": [
+          {
+            "x": -1.4394738291374898,
+            "y": 2.768038294897921
+          },
+          {
+            "x": 438.927573348928,
+            "y": 2.768038294897921
+          },
+          {
+            "x": 471.8659628349887,
+            "y": 415.8455119134506
+          },
+          {
+            "x": -27.96537990290849,
+            "y": 415.8455119134506
+          }
+        ],
+        "floorId": "cmukshlyb000tc8van3dpun6a",
+        "maxZoom": 20.553561800992505,
+        "minZoom": 13.553561800992505,
+        "pitch": 20,
+        "zoom": 15.103561800992503
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktgg8r001nc8va7hnc92i9",
+        "cmuktghey001oc8vacauz01ip",
+        "cmukthgf60021c8vazbuyojvy",
+        "cmuktge33001lc8va4w4zvm76",
+        "cmukthf510020c8vaoh1zcqix",
+        "cmuktgf50001mc8vazpkqmmdg",
+        "cmuktgcuf001kc8vavw5st4ki"
+      ]
+    },
+    "overview": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": 0.00242690058409778,
+          "lng": 0
+        },
+        "corners": [
+          {
+            "x": 24.000000000753296,
+            "y": 333.9999997853103
+          },
+          {
+            "x": 366.0000000007533,
+            "y": 333.9999997853103
+          },
+          {
+            "x": 366.0000000007533,
+            "y": 676.0000002184562
+          },
+          {
+            "x": 24.000000000753296,
+            "y": 676.0000002184562
+          }
+        ],
+        "floorId": "cmukshlyb000tc8van3dpun6a",
+        "maxZoom": 20.55356180098897,
+        "minZoom": 13.553561800988968,
+        "pitch": 0,
+        "zoom": 14.553561800988968
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": []
+    }
+  },
+  {
+    "width": 390,
+    "height": 844,
+    "floor": "南館 3F",
+    "initial": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": 0.00034687147041267963,
+          "lng": -0.0008369098694913646
+        },
+        "corners": [
+          {
+            "x": -1.109194407868238,
+            "y": 216.02571302117153
+          },
+          {
+            "x": 469.9572208269107,
+            "y": 216.02571302117153
+          },
+          {
+            "x": 510.0514220841549,
+            "y": 693.1964614318937
+          },
+          {
+            "x": -29.705793854923225,
+            "y": 693.1964614318937
+          }
+        ],
+        "floorId": "cmuksihln000xc8vai4iwe2lh",
+        "maxZoom": 20.55356180098897,
+        "minZoom": 13.553561800988968,
+        "pitch": 20,
+        "zoom": 15.103561800988968
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktgr04001rc8vanmm2nvfc",
+        "cmuktgs3a001sc8va2nkzsx23",
+        "cmuktgu45001uc8vahsbg8tdq",
+        "cmukthkio0024c8vay1iqgr4p",
+        "cmuktgt33001tc8vakt808jtp",
+        "cmukthisp0023c8vaorpkq701",
+        "cmuktgpvb001qc8va1ki9mqut"
+      ]
+    },
+    "selected": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.001555194579225372,
+          "lng": -0.0006453973165889693
+        },
+        "corners": [
+          {
+            "x": -5.282636109887006,
+            "y": 138.68721882987745
+          },
+          {
+            "x": 454.650567147915,
+            "y": 138.68721882987745
+          },
+          {
+            "x": 491.4909547844784,
+            "y": 592.0072527024123
+          },
+          {
+            "x": -33.699635280280994,
+            "y": 592.0072527024123
+          }
+        ],
+        "floorId": "cmuksihln000xc8vai4iwe2lh",
+        "maxZoom": 20.55356180098897,
+        "minZoom": 13.553561800988968,
+        "pitch": 20,
+        "zoom": 15.103561800988968
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktgr04001rc8vanmm2nvfc",
+        "cmuktgs3a001sc8va2nkzsx23",
+        "cmuktgu45001uc8vahsbg8tdq",
+        "cmukthkio0024c8vay1iqgr4p",
+        "cmuktgt33001tc8vakt808jtp",
+        "cmukthisp0023c8vaorpkq701",
+        "cmuktgpvb001qc8va1ki9mqut"
+      ]
+    },
+    "close": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.001555194579225372,
+          "lng": -0.0006453973165889693
+        },
+        "corners": [
+          {
+            "x": -5.282636109887006,
+            "y": 138.68721882987745
+          },
+          {
+            "x": 454.650567147915,
+            "y": 138.68721882987745
+          },
+          {
+            "x": 491.4909547844784,
+            "y": 592.0072527024123
+          },
+          {
+            "x": -33.699635280280994,
+            "y": 592.0072527024123
+          }
+        ],
+        "floorId": "cmuksihln000xc8vai4iwe2lh",
+        "maxZoom": 20.55356180098897,
+        "minZoom": 13.553561800988968,
+        "pitch": 20,
+        "zoom": 15.103561800988968
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktgr04001rc8vanmm2nvfc",
+        "cmuktgs3a001sc8va2nkzsx23",
+        "cmuktgu45001uc8vahsbg8tdq",
+        "cmukthkio0024c8vay1iqgr4p",
+        "cmuktgt33001tc8vakt808jtp",
+        "cmukthisp0023c8vaorpkq701",
+        "cmuktgpvb001qc8va1ki9mqut"
+      ]
+    },
+    "overview": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": 0.0024269005840409363,
+          "lng": 0
+        },
+        "corners": [
+          {
+            "x": 23.999999999246704,
+            "y": 333.9999997830504
+          },
+          {
+            "x": 365.9999999992467,
+            "y": 333.9999997830504
+          },
+          {
+            "x": 365.9999999992467,
+            "y": 676.0000002177029
+          },
+          {
+            "x": 23.999999999246704,
+            "y": 676.0000002177029
+          }
+        ],
+        "floorId": "cmuksihln000xc8vai4iwe2lh",
+        "maxZoom": 20.553561800996167,
+        "minZoom": 13.553561800996167,
+        "pitch": 0,
+        "zoom": 14.553561800996167
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": []
+    }
+  },
+  {
+    "width": 768,
+    "height": 1024,
+    "floor": "北館 2F",
+    "initial": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0011979666819996735,
+          "lng": -0.0004073929944468091
+        },
+        "corners": [
+          {
+            "x": -35.431210497925484,
+            "y": -47.63982496924394
+          },
+          {
+            "x": 875.6661466038769,
+            "y": -47.63982496924394
+          },
+          {
+            "x": 1010.6435846410706,
+            "y": 897.6931823991667
+          },
+          {
+            "x": -150.07024785917844,
+            "y": 897.6931823991667
+          }
+        ],
+        "floorId": "cmukrhmvm000hc8varaqaf5e3",
+        "maxZoom": 21.62354931992953,
+        "minZoom": 14.623549319929532,
+        "pitch": 20,
+        "zoom": 16.17354931992953
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktclah0015c8var8l162k5",
+        "cmuktdg9s001bc8vaiha6s9xx",
+        "cmukt2blb0014c8vazlil9c4k",
+        "cmuktdhcy001cc8va0p3q6kjw",
+        "cmuktd3lp0016c8va4vyu47ad",
+        "cmukth2kc001wc8vax120q81y",
+        "cmuktddxf0019c8vaz1dy7gr3",
+        "cmukth14y001vc8vas0at370p",
+        "cmuktd5u80018c8vaik5ppju7",
+        "cmuktdf7c001ac8vaq1bea4c7",
+        "cmuktd4q10017c8vaa0236mll"
+      ]
+    },
+    "selected": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0011979666819996735,
+          "lng": -0.0004073929944468091
+        },
+        "corners": [
+          {
+            "x": -35.431210497925484,
+            "y": -47.63982496924394
+          },
+          {
+            "x": 875.6661466038769,
+            "y": -47.63982496924394
+          },
+          {
+            "x": 1010.6435846410706,
+            "y": 897.6931823991667
+          },
+          {
+            "x": -150.07024785917844,
+            "y": 897.6931823991667
+          }
+        ],
+        "floorId": "cmukrhmvm000hc8varaqaf5e3",
+        "maxZoom": 21.62354931992953,
+        "minZoom": 14.623549319929532,
+        "pitch": 20,
+        "zoom": 16.17354931992953
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktclah0015c8var8l162k5",
+        "cmuktdg9s001bc8vaiha6s9xx",
+        "cmukt2blb0014c8vazlil9c4k",
+        "cmuktdhcy001cc8va0p3q6kjw",
+        "cmuktd3lp0016c8va4vyu47ad",
+        "cmukth2kc001wc8vax120q81y",
+        "cmuktddxf0019c8vaz1dy7gr3",
+        "cmukth14y001vc8vas0at370p",
+        "cmuktd5u80018c8vaik5ppju7",
+        "cmuktdf7c001ac8vaq1bea4c7",
+        "cmuktd4q10017c8vaa0236mll"
+      ]
+    },
+    "close": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0011979666819996735,
+          "lng": -0.0004073929944468091
+        },
+        "corners": [
+          {
+            "x": -35.431210497925484,
+            "y": -47.63982496924394
+          },
+          {
+            "x": 875.6661466038769,
+            "y": -47.63982496924394
+          },
+          {
+            "x": 1010.6435846410706,
+            "y": 897.6931823991667
+          },
+          {
+            "x": -150.07024785917844,
+            "y": 897.6931823991667
+          }
+        ],
+        "floorId": "cmukrhmvm000hc8varaqaf5e3",
+        "maxZoom": 21.62354931992953,
+        "minZoom": 14.623549319929532,
+        "pitch": 20,
+        "zoom": 16.17354931992953
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktclah0015c8var8l162k5",
+        "cmuktdg9s001bc8vaiha6s9xx",
+        "cmukt2blb0014c8vazlil9c4k",
+        "cmuktdhcy001cc8va0p3q6kjw",
+        "cmuktd3lp0016c8va4vyu47ad",
+        "cmukth2kc001wc8vax120q81y",
+        "cmuktddxf0019c8vaz1dy7gr3",
+        "cmukth14y001vc8vas0at370p",
+        "cmuktd5u80018c8vaik5ppju7",
+        "cmuktdf7c001ac8vaq1bea4c7",
+        "cmuktd4q10017c8vaa0236mll"
+      ]
+    },
+    "overview": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.000139275766002811,
+          "lng": 0
+        },
+        "corners": [
+          {
+            "x": 24.000000002632643,
+            "y": 113.9999995471857
+          },
+          {
+            "x": 742.0000000026326,
+            "y": 113.9999995471857
+          },
+          {
+            "x": 742.0000000026326,
+            "y": 832.0000004580796
+          },
+          {
+            "x": 24.000000002632643,
+            "y": 832.0000004580796
+          }
+        ],
+        "floorId": "cmukrhmvm000hc8varaqaf5e3",
+        "maxZoom": 21.623549319926596,
+        "minZoom": 14.623549319926594,
+        "pitch": 0,
+        "zoom": 15.623549319926594
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": []
+    }
+  },
+  {
+    "width": 768,
+    "height": 1024,
+    "floor": "北館 3F",
+    "initial": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0015288533965645,
+          "lng": -0.0008798283245141647
+        },
+        "corners": [
+          {
+            "x": 10.264580757657166,
+            "y": -72.01929963448987
+          },
+          {
+            "x": 914.9245041752712,
+            "y": -72.01929963448987
+          },
+          {
+            "x": 1059.348426322201,
+            "y": 858.2015393648437
+          },
+          {
+            "x": -90.93758373534531,
+            "y": 858.2015393648437
+          }
+        ],
+        "floorId": "cmuksbnaj000lc8vasrlaoqww",
+        "maxZoom": 21.623549319926596,
+        "minZoom": 14.623549319926596,
+        "pitch": 20,
+        "zoom": 16.173549319926597
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmukth53k001yc8vax75t2x45",
+        "cmuktdp2i001ec8var5bsjmb7",
+        "cmuktdnza001dc8varu72qn0y",
+        "cmukth42e001xc8vabh6cya4s"
+      ]
+    },
+    "selected": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0015288533965645,
+          "lng": -0.0008798283245141647
+        },
+        "corners": [
+          {
+            "x": 10.264580757657166,
+            "y": -72.01929963448987
+          },
+          {
+            "x": 914.9245041752712,
+            "y": -72.01929963448987
+          },
+          {
+            "x": 1059.348426322201,
+            "y": 858.2015393648437
+          },
+          {
+            "x": -90.93758373534531,
+            "y": 858.2015393648437
+          }
+        ],
+        "floorId": "cmuksbnaj000lc8vasrlaoqww",
+        "maxZoom": 21.623549319926596,
+        "minZoom": 14.623549319926596,
+        "pitch": 20,
+        "zoom": 16.173549319926597
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmukth53k001yc8vax75t2x45",
+        "cmuktdp2i001ec8var5bsjmb7",
+        "cmuktdnza001dc8varu72qn0y",
+        "cmukth42e001xc8vabh6cya4s"
+      ]
+    },
+    "close": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0015288533965645,
+          "lng": -0.0008798283245141647
+        },
+        "corners": [
+          {
+            "x": 10.264580757657166,
+            "y": -72.01929963448987
+          },
+          {
+            "x": 914.9245041752712,
+            "y": -72.01929963448987
+          },
+          {
+            "x": 1059.348426322201,
+            "y": 858.2015393648437
+          },
+          {
+            "x": -90.93758373534531,
+            "y": 858.2015393648437
+          }
+        ],
+        "floorId": "cmuksbnaj000lc8vasrlaoqww",
+        "maxZoom": 21.623549319926596,
+        "minZoom": 14.623549319926596,
+        "pitch": 20,
+        "zoom": 16.173549319926597
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmukth53k001yc8vax75t2x45",
+        "cmuktdp2i001ec8var5bsjmb7",
+        "cmuktdnza001dc8varu72qn0y",
+        "cmukth42e001xc8vabh6cya4s"
+      ]
+    },
+    "overview": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.000139275766002811,
+          "lng": 0
+        },
+        "corners": [
+          {
+            "x": 23.999999997367357,
+            "y": 113.99999954455303
+          },
+          {
+            "x": 742.0000000026326,
+            "y": 113.99999954455303
+          },
+          {
+            "x": 742.0000000026326,
+            "y": 832.0000004580796
+          },
+          {
+            "x": 23.999999997367357,
+            "y": 832.0000004580796
+          }
+        ],
+        "floorId": "cmuksbnaj000lc8vasrlaoqww",
+        "maxZoom": 21.62354931993389,
+        "minZoom": 14.623549319933884,
+        "pitch": 0,
+        "zoom": 15.623549319933884
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": []
+    }
+  },
+  {
+    "width": 768,
+    "height": 1024,
+    "floor": "南館 1F",
+    "initial": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0011914234819982994,
+          "lng": -0.0002789699555023617
+        },
+        "corners": [
+          {
+            "x": -47.19233385193987,
+            "y": -47.15422823219537
+          },
+          {
+            "x": 864.0332457267341,
+            "y": -47.15422823219537
+          },
+          {
+            "x": 995.8472077135564,
+            "y": 898.4813403336574
+          },
+          {
+            "x": -165.0747389603363,
+            "y": 898.4813403336574
+          }
+        ],
+        "floorId": "cmukscq3b000pc8va9r87tgs4",
+        "maxZoom": 21.623549319926397,
+        "minZoom": 14.6235493199264,
+        "pitch": 20,
+        "zoom": 16.173549319926398
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmukte0xu001fc8va4a6c1pz3",
+        "cmukte4gt001ic8vakcr8vlwu",
+        "cmukte5j9001jc8va06nh86yc",
+        "cmukth62i001zc8va1psl2dbc",
+        "cmukte260001gc8vaw9c9zlee",
+        "cmukte39k001hc8vai0jivag4"
+      ]
+    },
+    "selected": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0011914234819982994,
+          "lng": -0.0002789699555023617
+        },
+        "corners": [
+          {
+            "x": -47.19233385193987,
+            "y": -47.15422823219537
+          },
+          {
+            "x": 864.0332457267341,
+            "y": -47.15422823219537
+          },
+          {
+            "x": 995.8472077135564,
+            "y": 898.4813403336574
+          },
+          {
+            "x": -165.0747389603363,
+            "y": 898.4813403336574
+          }
+        ],
+        "floorId": "cmukscq3b000pc8va9r87tgs4",
+        "maxZoom": 21.623549319926397,
+        "minZoom": 14.6235493199264,
+        "pitch": 20,
+        "zoom": 16.173549319926398
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmukte0xu001fc8va4a6c1pz3",
+        "cmukte4gt001ic8vakcr8vlwu",
+        "cmukte5j9001jc8va06nh86yc",
+        "cmukth62i001zc8va1psl2dbc",
+        "cmukte260001gc8vaw9c9zlee",
+        "cmukte39k001hc8vai0jivag4"
+      ]
+    },
+    "close": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0011914234819982994,
+          "lng": -0.0002789699555023617
+        },
+        "corners": [
+          {
+            "x": -47.19233385193987,
+            "y": -47.15422823219537
+          },
+          {
+            "x": 864.0332457267341,
+            "y": -47.15422823219537
+          },
+          {
+            "x": 995.8472077135564,
+            "y": 898.4813403336574
+          },
+          {
+            "x": -165.0747389603363,
+            "y": 898.4813403336574
+          }
+        ],
+        "floorId": "cmukscq3b000pc8va9r87tgs4",
+        "maxZoom": 21.623549319926397,
+        "minZoom": 14.6235493199264,
+        "pitch": 20,
+        "zoom": 16.173549319926398
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmukte0xu001fc8va4a6c1pz3",
+        "cmukte4gt001ic8vakcr8vlwu",
+        "cmukte5j9001jc8va06nh86yc",
+        "cmukth62i001zc8va1psl2dbc",
+        "cmukte260001gc8vaw9c9zlee",
+        "cmukte39k001hc8vai0jivag4"
+      ]
+    },
+    "overview": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0001392757660312327,
+          "lng": 0
+        },
+        "corners": [
+          {
+            "x": 24,
+            "y": 113.99999954192042
+          },
+          {
+            "x": 742.0000000026326,
+            "y": 113.99999954192042
+          },
+          {
+            "x": 742.0000000026326,
+            "y": 832.000000455447
+          },
+          {
+            "x": 24,
+            "y": 832.000000455447
+          }
+        ],
+        "floorId": "cmukscq3b000pc8va9r87tgs4",
+        "maxZoom": 21.623549319933684,
+        "minZoom": 14.623549319933684,
+        "pitch": 0,
+        "zoom": 15.623549319933684
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": []
+    }
+  },
+  {
+    "width": 768,
+    "height": 1024,
+    "floor": "南館 2F",
+    "initial": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0012093559840309354,
+          "lng": -0.0007510729595026078
+        },
+        "corners": [
+          {
+            "x": -4.023825264135733,
+            "y": -48.48474420504125
+          },
+          {
+            "x": 906.8504297511544,
+            "y": -48.48474420504125
+          },
+          {
+            "x": 1050.3267631880972,
+            "y": 896.3219634388045
+          },
+          {
+            "x": -110.02499706255098,
+            "y": 896.3219634388045
+          }
+        ],
+        "floorId": "cmukshlyb000tc8van3dpun6a",
+        "maxZoom": 21.6235493199262,
+        "minZoom": 14.623549319926198,
+        "pitch": 20,
+        "zoom": 16.1735493199262
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktgg8r001nc8va7hnc92i9",
+        "cmuktgii8001pc8va3edshhrz",
+        "cmuktghey001oc8vacauz01ip",
+        "cmukthhne0022c8vat5a3176r",
+        "cmukthgf60021c8vazbuyojvy",
+        "cmuktge33001lc8va4w4zvm76",
+        "cmukthf510020c8vaoh1zcqix",
+        "cmuktgf50001mc8vazpkqmmdg",
+        "cmuktgcuf001kc8vavw5st4ki"
+      ]
+    },
+    "selected": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0012093559840309354,
+          "lng": -0.0007510729595026078
+        },
+        "corners": [
+          {
+            "x": -4.023825264135733,
+            "y": -48.48474420504125
+          },
+          {
+            "x": 906.8504297511544,
+            "y": -48.48474420504125
+          },
+          {
+            "x": 1050.3267631880972,
+            "y": 896.3219634388045
+          },
+          {
+            "x": -110.02499706255098,
+            "y": 896.3219634388045
+          }
+        ],
+        "floorId": "cmukshlyb000tc8van3dpun6a",
+        "maxZoom": 21.6235493199262,
+        "minZoom": 14.623549319926198,
+        "pitch": 20,
+        "zoom": 16.1735493199262
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktgg8r001nc8va7hnc92i9",
+        "cmuktgii8001pc8va3edshhrz",
+        "cmuktghey001oc8vacauz01ip",
+        "cmukthhne0022c8vat5a3176r",
+        "cmukthgf60021c8vazbuyojvy",
+        "cmuktge33001lc8va4w4zvm76",
+        "cmukthf510020c8vaoh1zcqix",
+        "cmuktgf50001mc8vazpkqmmdg",
+        "cmuktgcuf001kc8vavw5st4ki"
+      ]
+    },
+    "close": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0012093559840309354,
+          "lng": -0.0007510729595026078
+        },
+        "corners": [
+          {
+            "x": -4.023825264135733,
+            "y": -48.48474420504125
+          },
+          {
+            "x": 906.8504297511544,
+            "y": -48.48474420504125
+          },
+          {
+            "x": 1050.3267631880972,
+            "y": 896.3219634388045
+          },
+          {
+            "x": -110.02499706255098,
+            "y": 896.3219634388045
+          }
+        ],
+        "floorId": "cmukshlyb000tc8van3dpun6a",
+        "maxZoom": 21.6235493199262,
+        "minZoom": 14.623549319926198,
+        "pitch": 20,
+        "zoom": 16.1735493199262
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktgg8r001nc8va7hnc92i9",
+        "cmuktgii8001pc8va3edshhrz",
+        "cmuktghey001oc8vacauz01ip",
+        "cmukthhne0022c8vat5a3176r",
+        "cmukthgf60021c8vazbuyojvy",
+        "cmuktge33001lc8va4w4zvm76",
+        "cmukthf510020c8vaoh1zcqix",
+        "cmuktgf50001mc8vazpkqmmdg",
+        "cmuktgcuf001kc8vavw5st4ki"
+      ]
+    },
+    "overview": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0001392757660312327,
+          "lng": 0
+        },
+        "corners": [
+          {
+            "x": 23.999999997367357,
+            "y": 113.99999954192042
+          },
+          {
+            "x": 742.0000000026326,
+            "y": 113.99999954192042
+          },
+          {
+            "x": 742.0000000026326,
+            "y": 832.0000004528143
+          },
+          {
+            "x": 23.999999997367357,
+            "y": 832.0000004528143
+          }
+        ],
+        "floorId": "cmukshlyb000tc8van3dpun6a",
+        "maxZoom": 21.62354931993349,
+        "minZoom": 14.623549319933488,
+        "pitch": 0,
+        "zoom": 15.623549319933488
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": []
+    }
+  },
+  {
+    "width": 768,
+    "height": 1024,
+    "floor": "南館 3F",
+    "initial": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0012069649837940233,
+          "lng": -0.0008369098695197863
+        },
+        "corners": [
+          {
+            "x": 3.775343124374136,
+            "y": -48.30740135588856
+          },
+          {
+            "x": 914.6964257589884,
+            "y": -48.30740135588856
+          },
+          {
+            "x": 1060.331220285454,
+            "y": 896.6097577969634
+          },
+          {
+            "x": -100.09653245519372,
+            "y": 896.6097577969634
+          }
+        ],
+        "floorId": "cmuksihln000xc8vai4iwe2lh",
+        "maxZoom": 21.623549319926,
+        "minZoom": 14.623549319926,
+        "pitch": 20,
+        "zoom": 16.173549319926
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktgr04001rc8vanmm2nvfc",
+        "cmuktgs3a001sc8va2nkzsx23",
+        "cmuktgu45001uc8vahsbg8tdq",
+        "cmukthkio0024c8vay1iqgr4p",
+        "cmuktgt33001tc8vakt808jtp",
+        "cmukthisp0023c8vaorpkq701",
+        "cmuktgpvb001qc8va1ki9mqut"
+      ]
+    },
+    "selected": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0012069649837940233,
+          "lng": -0.0008369098695197863
+        },
+        "corners": [
+          {
+            "x": 3.775343124374136,
+            "y": -48.30740135588856
+          },
+          {
+            "x": 914.6964257589884,
+            "y": -48.30740135588856
+          },
+          {
+            "x": 1060.331220285454,
+            "y": 896.6097577969634
+          },
+          {
+            "x": -100.09653245519372,
+            "y": 896.6097577969634
+          }
+        ],
+        "floorId": "cmuksihln000xc8vai4iwe2lh",
+        "maxZoom": 21.623549319926,
+        "minZoom": 14.623549319926,
+        "pitch": 20,
+        "zoom": 16.173549319926
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktgr04001rc8vanmm2nvfc",
+        "cmuktgs3a001sc8va2nkzsx23",
+        "cmuktgu45001uc8vahsbg8tdq",
+        "cmukthkio0024c8vay1iqgr4p",
+        "cmuktgt33001tc8vakt808jtp",
+        "cmukthisp0023c8vaorpkq701",
+        "cmuktgpvb001qc8va1ki9mqut"
+      ]
+    },
+    "close": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0012069649837940233,
+          "lng": -0.0008369098695197863
+        },
+        "corners": [
+          {
+            "x": 3.775343124374136,
+            "y": -48.30740135588856
+          },
+          {
+            "x": 914.6964257589884,
+            "y": -48.30740135588856
+          },
+          {
+            "x": 1060.331220285454,
+            "y": 896.6097577969634
+          },
+          {
+            "x": -100.09653245519372,
+            "y": 896.6097577969634
+          }
+        ],
+        "floorId": "cmuksihln000xc8vai4iwe2lh",
+        "maxZoom": 21.623549319926,
+        "minZoom": 14.623549319926,
+        "pitch": 20,
+        "zoom": 16.173549319926
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktgr04001rc8vanmm2nvfc",
+        "cmuktgs3a001sc8va2nkzsx23",
+        "cmuktgu45001uc8vahsbg8tdq",
+        "cmukthkio0024c8vay1iqgr4p",
+        "cmuktgt33001tc8vakt808jtp",
+        "cmukthisp0023c8vaorpkq701",
+        "cmuktgpvb001qc8va1ki9mqut"
+      ]
+    },
+    "overview": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0001392757660312327,
+          "lng": 0
+        },
+        "corners": [
+          {
+            "x": 24,
+            "y": 113.99999954192042
+          },
+          {
+            "x": 742.0000000026326,
+            "y": 113.99999954192042
+          },
+          {
+            "x": 742.0000000026326,
+            "y": 832.000000455447
+          },
+          {
+            "x": 24,
+            "y": 832.000000455447
+          }
+        ],
+        "floorId": "cmuksihln000xc8vai4iwe2lh",
+        "maxZoom": 21.62354931993329,
+        "minZoom": 14.623549319933288,
+        "pitch": 0,
+        "zoom": 15.623549319933288
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": []
+    }
+  },
+  {
+    "width": 1024,
+    "height": 768,
+    "floor": "北館 2F",
+    "initial": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0011880537832951177,
+          "lng": -0.0004073929944468091
+        },
+        "corners": [
+          {
+            "x": 177.93096408695246,
+            "y": -66.71094485580333
+          },
+          {
+            "x": 903.1596533917294,
+            "y": -66.71094485580333
+          },
+          {
+            "x": 1022.2263425547732,
+            "y": 693.6552960666457
+          },
+          {
+            "x": 76.80524392109123,
+            "y": 693.6552960666457
+          }
+        ],
+        "floorId": "cmukrhmvm000hc8varaqaf5e3",
+        "maxZoom": 21.21252488132655,
+        "minZoom": 14.212524881326551,
+        "pitch": 20,
+        "zoom": 15.862524881326554
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktclah0015c8var8l162k5",
+        "cmuktdg9s001bc8vaiha6s9xx",
+        "cmukt2blb0014c8vazlil9c4k",
+        "cmuktdhcy001cc8va0p3q6kjw",
+        "cmuktd3lp0016c8va4vyu47ad",
+        "cmukth2kc001wc8vax120q81y",
+        "cmuktddxf0019c8vaz1dy7gr3",
+        "cmukth14y001vc8vas0at370p",
+        "cmuktd5u80018c8vaik5ppju7",
+        "cmuktdf7c001ac8vaq1bea4c7",
+        "cmuktd4q10017c8vaa0236mll"
+      ]
+    },
+    "selected": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0011880537832951177,
+          "lng": -0.0004073929944468091
+        },
+        "corners": [
+          {
+            "x": 177.93096408695246,
+            "y": -66.71094485580333
+          },
+          {
+            "x": 903.1596533917294,
+            "y": -66.71094485580333
+          },
+          {
+            "x": 1022.2263425547732,
+            "y": 693.6552960666457
+          },
+          {
+            "x": 76.80524392109123,
+            "y": 693.6552960666457
+          }
+        ],
+        "floorId": "cmukrhmvm000hc8varaqaf5e3",
+        "maxZoom": 21.21252488132655,
+        "minZoom": 14.212524881326551,
+        "pitch": 20,
+        "zoom": 15.862524881326554
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktclah0015c8var8l162k5",
+        "cmuktdg9s001bc8vaiha6s9xx",
+        "cmukt2blb0014c8vazlil9c4k",
+        "cmuktdhcy001cc8va0p3q6kjw",
+        "cmuktd3lp0016c8va4vyu47ad",
+        "cmukth2kc001wc8vax120q81y",
+        "cmuktddxf0019c8vaz1dy7gr3",
+        "cmukth14y001vc8vas0at370p",
+        "cmuktd5u80018c8vaik5ppju7",
+        "cmuktdf7c001ac8vaq1bea4c7",
+        "cmuktd4q10017c8vaa0236mll"
+      ]
+    },
+    "close": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0011880537832951177,
+          "lng": -0.0004073929944468091
+        },
+        "corners": [
+          {
+            "x": 177.93096408695246,
+            "y": -66.71094485580333
+          },
+          {
+            "x": 903.1596533917294,
+            "y": -66.71094485580333
+          },
+          {
+            "x": 1022.2263425547732,
+            "y": 693.6552960666457
+          },
+          {
+            "x": 76.80524392109123,
+            "y": 693.6552960666457
+          }
+        ],
+        "floorId": "cmukrhmvm000hc8varaqaf5e3",
+        "maxZoom": 21.21252488132655,
+        "minZoom": 14.212524881326551,
+        "pitch": 20,
+        "zoom": 15.862524881326554
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktclah0015c8var8l162k5",
+        "cmuktdg9s001bc8vaiha6s9xx",
+        "cmukt2blb0014c8vazlil9c4k",
+        "cmuktdhcy001cc8va0p3q6kjw",
+        "cmuktd3lp0016c8va4vyu47ad",
+        "cmukth2kc001wc8vax120q81y",
+        "cmuktddxf0019c8vaz1dy7gr3",
+        "cmukth14y001vc8vas0at370p",
+        "cmuktd5u80018c8vaik5ppju7",
+        "cmuktdf7c001ac8vaq1bea4c7",
+        "cmuktd4q10017c8vaa0236mll"
+      ]
+    },
+    "overview": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.00018518518550081353,
+          "lng": 0
+        },
+        "corners": [
+          {
+            "x": 241.00000034386,
+            "y": 74.99999999641813
+          },
+          {
+            "x": 780.9999996579309,
+            "y": 74.99999999641813
+          },
+          {
+            "x": 780.9999996579309,
+            "y": 614.9999999964181
+          },
+          {
+            "x": 241.00000034386,
+            "y": 614.9999999964181
+          }
+        ],
+        "floorId": "cmukrhmvm000hc8varaqaf5e3",
+        "maxZoom": 21.212524881325947,
+        "minZoom": 14.212524881325946,
+        "pitch": 0,
+        "zoom": 15.212524881325946
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": []
+    }
+  },
+  {
+    "width": 1024,
+    "height": 768,
+    "floor": "北館 3F",
+    "initial": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0015343238866734057,
+          "lng": -0.000879828324485743
+        },
+        "corners": [
+          {
+            "x": 214.5838579682566,
+            "y": -86.7463934643882
+          },
+          {
+            "x": 934.0105357376418,
+            "y": -86.7463934643882
+          },
+          {
+            "x": 1061.107882207685,
+            "y": 659.6891659788319
+          },
+          {
+            "x": 125.52294359314436,
+            "y": 659.6891659788319
+          }
+        ],
+        "floorId": "cmuksbnaj000lc8vasrlaoqww",
+        "maxZoom": 21.212524881325947,
+        "minZoom": 14.212524881325946,
+        "pitch": 20,
+        "zoom": 15.862524881325946
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmukth53k001yc8vax75t2x45",
+        "cmuktdp2i001ec8var5bsjmb7",
+        "cmuktdnza001dc8varu72qn0y",
+        "cmukth42e001xc8vabh6cya4s"
+      ]
+    },
+    "selected": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0015343238866734057,
+          "lng": -0.000879828324485743
+        },
+        "corners": [
+          {
+            "x": 214.5838579682566,
+            "y": -86.7463934643882
+          },
+          {
+            "x": 934.0105357376418,
+            "y": -86.7463934643882
+          },
+          {
+            "x": 1061.107882207685,
+            "y": 659.6891659788319
+          },
+          {
+            "x": 125.52294359314436,
+            "y": 659.6891659788319
+          }
+        ],
+        "floorId": "cmuksbnaj000lc8vasrlaoqww",
+        "maxZoom": 21.212524881325947,
+        "minZoom": 14.212524881325946,
+        "pitch": 20,
+        "zoom": 15.862524881325946
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmukth53k001yc8vax75t2x45",
+        "cmuktdp2i001ec8var5bsjmb7",
+        "cmuktdnza001dc8varu72qn0y",
+        "cmukth42e001xc8vabh6cya4s"
+      ]
+    },
+    "close": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0015343238866734057,
+          "lng": -0.000879828324485743
+        },
+        "corners": [
+          {
+            "x": 214.5838579682566,
+            "y": -86.7463934643882
+          },
+          {
+            "x": 934.0105357376418,
+            "y": -86.7463934643882
+          },
+          {
+            "x": 1061.107882207685,
+            "y": 659.6891659788319
+          },
+          {
+            "x": 125.52294359314436,
+            "y": 659.6891659788319
+          }
+        ],
+        "floorId": "cmuksbnaj000lc8vasrlaoqww",
+        "maxZoom": 21.212524881325947,
+        "minZoom": 14.212524881325946,
+        "pitch": 20,
+        "zoom": 15.862524881325946
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmukth53k001yc8vax75t2x45",
+        "cmuktdp2i001ec8var5bsjmb7",
+        "cmuktdnza001dc8varu72qn0y",
+        "cmukth42e001xc8vabh6cya4s"
+      ]
+    },
+    "overview": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.00018518518545818097,
+          "lng": 0
+        },
+        "corners": [
+          {
+            "x": 241.00000034386,
+            "y": 74.99999999820906
+          },
+          {
+            "x": 780.9999996579309,
+            "y": 74.99999999820906
+          },
+          {
+            "x": 780.9999996579309,
+            "y": 614.9999999982091
+          },
+          {
+            "x": 241.00000034386,
+            "y": 614.9999999982091
+          }
+        ],
+        "floorId": "cmuksbnaj000lc8vasrlaoqww",
+        "maxZoom": 21.212524881325336,
+        "minZoom": 14.212524881325338,
+        "pitch": 0,
+        "zoom": 15.212524881325338
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": []
+    }
+  },
+  {
+    "width": 1024,
+    "height": 768,
+    "floor": "南館 1F",
+    "initial": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0012124354737892418,
+          "lng": -0.0002789699555023617
+        },
+        "corners": [
+          {
+            "x": 168.8116717470087,
+            "y": -68.13225801931652
+          },
+          {
+            "x": 893.6287668053445,
+            "y": -68.13225801931652
+          },
+          {
+            "x": 1009.7157722978508,
+            "y": 691.2403047277219
+          },
+          {
+            "x": 64.9940244932064,
+            "y": 691.2403047277219
+          }
+        ],
+        "floorId": "cmukscq3b000pc8va9r87tgs4",
+        "maxZoom": 21.212524881325336,
+        "minZoom": 14.212524881325338,
+        "pitch": 20,
+        "zoom": 15.86252488132534
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmukte0xu001fc8va4a6c1pz3",
+        "cmukte4gt001ic8vakcr8vlwu",
+        "cmukte5j9001jc8va06nh86yc",
+        "cmukth62i001zc8va1psl2dbc",
+        "cmukte260001gc8vaw9c9zlee",
+        "cmukte39k001hc8vai0jivag4"
+      ]
+    },
+    "selected": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0012124354737892418,
+          "lng": -0.0002789699555023617
+        },
+        "corners": [
+          {
+            "x": 168.8116717470087,
+            "y": -68.13225801931652
+          },
+          {
+            "x": 893.6287668053445,
+            "y": -68.13225801931652
+          },
+          {
+            "x": 1009.7157722978508,
+            "y": 691.2403047277219
+          },
+          {
+            "x": 64.9940244932064,
+            "y": 691.2403047277219
+          }
+        ],
+        "floorId": "cmukscq3b000pc8va9r87tgs4",
+        "maxZoom": 21.212524881325336,
+        "minZoom": 14.212524881325338,
+        "pitch": 20,
+        "zoom": 15.86252488132534
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmukte0xu001fc8va4a6c1pz3",
+        "cmukte4gt001ic8vakcr8vlwu",
+        "cmukte5j9001jc8va06nh86yc",
+        "cmukth62i001zc8va1psl2dbc",
+        "cmukte260001gc8vaw9c9zlee",
+        "cmukte39k001hc8vai0jivag4"
+      ]
+    },
+    "close": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0012124354737892418,
+          "lng": -0.0002789699555023617
+        },
+        "corners": [
+          {
+            "x": 168.8116717470087,
+            "y": -68.13225801931652
+          },
+          {
+            "x": 893.6287668053445,
+            "y": -68.13225801931652
+          },
+          {
+            "x": 1009.7157722978508,
+            "y": 691.2403047277219
+          },
+          {
+            "x": 64.9940244932064,
+            "y": 691.2403047277219
+          }
+        ],
+        "floorId": "cmukscq3b000pc8va9r87tgs4",
+        "maxZoom": 21.212524881325336,
+        "minZoom": 14.212524881325338,
+        "pitch": 20,
+        "zoom": 15.86252488132534
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmukte0xu001fc8va4a6c1pz3",
+        "cmukte4gt001ic8vakcr8vlwu",
+        "cmukte5j9001jc8va06nh86yc",
+        "cmukth62i001zc8va1psl2dbc",
+        "cmukte260001gc8vaw9c9zlee",
+        "cmukte39k001hc8vai0jivag4"
+      ]
+    },
+    "overview": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.00018518518550081353,
+          "lng": 0
+        },
+        "corners": [
+          {
+            "x": 241.0000003420691,
+            "y": 74.99999999641813
+          },
+          {
+            "x": 780.99999965614,
+            "y": 74.99999999641813
+          },
+          {
+            "x": 780.99999965614,
+            "y": 614.9999999964181
+          },
+          {
+            "x": 241.0000003420691,
+            "y": 614.9999999964181
+          }
+        ],
+        "floorId": "cmukscq3b000pc8va9r87tgs4",
+        "maxZoom": 21.212524881324732,
+        "minZoom": 14.21252488132473,
+        "pitch": 0,
+        "zoom": 15.21252488132473
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": []
+    }
+  },
+  {
+    "width": 1024,
+    "height": 768,
+    "floor": "南館 2F",
+    "initial": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0012124354738460852,
+          "lng": -0.0007510729595026078
+        },
+        "corners": [
+          {
+            "x": 203.03050454461513,
+            "y": -68.13225802232947
+          },
+          {
+            "x": 927.8475995993448,
+            "y": -68.13225802232947
+          },
+          {
+            "x": 1054.3163698076153,
+            "y": 691.2403047230545
+          },
+          {
+            "x": 109.5946220078854,
+            "y": 691.2403047230545
+          }
+        ],
+        "floorId": "cmukshlyb000tc8van3dpun6a",
+        "maxZoom": 21.212524881324732,
+        "minZoom": 14.21252488132473,
+        "pitch": 20,
+        "zoom": 15.862524881324733
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktgg8r001nc8va7hnc92i9",
+        "cmuktgii8001pc8va3edshhrz",
+        "cmuktghey001oc8vacauz01ip",
+        "cmukthhne0022c8vat5a3176r",
+        "cmukthgf60021c8vazbuyojvy",
+        "cmuktge33001lc8va4w4zvm76",
+        "cmukthf510020c8vaoh1zcqix",
+        "cmuktgf50001mc8vazpkqmmdg",
+        "cmuktgcuf001kc8vavw5st4ki"
+      ]
+    },
+    "selected": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0012124354738460852,
+          "lng": -0.0007510729595026078
+        },
+        "corners": [
+          {
+            "x": 203.03050454461513,
+            "y": -68.13225802232947
+          },
+          {
+            "x": 927.8475995993448,
+            "y": -68.13225802232947
+          },
+          {
+            "x": 1054.3163698076153,
+            "y": 691.2403047230545
+          },
+          {
+            "x": 109.5946220078854,
+            "y": 691.2403047230545
+          }
+        ],
+        "floorId": "cmukshlyb000tc8van3dpun6a",
+        "maxZoom": 21.212524881324732,
+        "minZoom": 14.21252488132473,
+        "pitch": 20,
+        "zoom": 15.862524881324733
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktgg8r001nc8va7hnc92i9",
+        "cmuktgii8001pc8va3edshhrz",
+        "cmuktghey001oc8vacauz01ip",
+        "cmukthhne0022c8vat5a3176r",
+        "cmukthgf60021c8vazbuyojvy",
+        "cmuktge33001lc8va4w4zvm76",
+        "cmukthf510020c8vaoh1zcqix",
+        "cmuktgf50001mc8vazpkqmmdg",
+        "cmuktgcuf001kc8vavw5st4ki"
+      ]
+    },
+    "close": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0012124354738460852,
+          "lng": -0.0007510729595026078
+        },
+        "corners": [
+          {
+            "x": 203.03050454461513,
+            "y": -68.13225802232947
+          },
+          {
+            "x": 927.8475995993448,
+            "y": -68.13225802232947
+          },
+          {
+            "x": 1054.3163698076153,
+            "y": 691.2403047230545
+          },
+          {
+            "x": 109.5946220078854,
+            "y": 691.2403047230545
+          }
+        ],
+        "floorId": "cmukshlyb000tc8van3dpun6a",
+        "maxZoom": 21.212524881324732,
+        "minZoom": 14.21252488132473,
+        "pitch": 20,
+        "zoom": 15.862524881324733
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktgg8r001nc8va7hnc92i9",
+        "cmuktgii8001pc8va3edshhrz",
+        "cmuktghey001oc8vacauz01ip",
+        "cmukthhne0022c8vat5a3176r",
+        "cmukthgf60021c8vazbuyojvy",
+        "cmuktge33001lc8va4w4zvm76",
+        "cmukthf510020c8vaoh1zcqix",
+        "cmuktgf50001mc8vazpkqmmdg",
+        "cmuktgcuf001kc8vavw5st4ki"
+      ]
+    },
+    "overview": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.00018518518545818097,
+          "lng": 0
+        },
+        "corners": [
+          {
+            "x": 241.00000034386,
+            "y": 75.00000000179094
+          },
+          {
+            "x": 780.9999996579309,
+            "y": 75.00000000179094
+          },
+          {
+            "x": 780.9999996579309,
+            "y": 615
+          },
+          {
+            "x": 241.00000034386,
+            "y": 615
+          }
+        ],
+        "floorId": "cmukshlyb000tc8van3dpun6a",
+        "maxZoom": 21.21252488132412,
+        "minZoom": 14.212524881324123,
+        "pitch": 0,
+        "zoom": 15.212524881324123
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": []
+    }
+  },
+  {
+    "width": 1024,
+    "height": 768,
+    "floor": "南館 3F",
+    "initial": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0012124354738460852,
+          "lng": -0.0008369098695197863
+        },
+        "corners": [
+          {
+            "x": 209.25211051743153,
+            "y": -68.13225802381045
+          },
+          {
+            "x": 934.0692055762148,
+            "y": -68.13225802381045
+          },
+          {
+            "x": 1062.425569373411,
+            "y": 691.2403047223805
+          },
+          {
+            "x": 117.70382156861211,
+            "y": 691.2403047223805
+          }
+        ],
+        "floorId": "cmuksihln000xc8vai4iwe2lh",
+        "maxZoom": 21.212524881329102,
+        "minZoom": 14.2125248813291,
+        "pitch": 20,
+        "zoom": 15.8625248813291
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktgr04001rc8vanmm2nvfc",
+        "cmuktgs3a001sc8va2nkzsx23",
+        "cmuktgu45001uc8vahsbg8tdq",
+        "cmukthkio0024c8vay1iqgr4p",
+        "cmuktgt33001tc8vakt808jtp",
+        "cmukthisp0023c8vaorpkq701",
+        "cmuktgpvb001qc8va1ki9mqut"
+      ]
+    },
+    "selected": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0012124354738460852,
+          "lng": -0.0008369098695197863
+        },
+        "corners": [
+          {
+            "x": 209.25211051743153,
+            "y": -68.13225802381045
+          },
+          {
+            "x": 934.0692055762148,
+            "y": -68.13225802381045
+          },
+          {
+            "x": 1062.425569373411,
+            "y": 691.2403047223805
+          },
+          {
+            "x": 117.70382156861211,
+            "y": 691.2403047223805
+          }
+        ],
+        "floorId": "cmuksihln000xc8vai4iwe2lh",
+        "maxZoom": 21.212524881329102,
+        "minZoom": 14.2125248813291,
+        "pitch": 20,
+        "zoom": 15.8625248813291
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktgr04001rc8vanmm2nvfc",
+        "cmuktgs3a001sc8va2nkzsx23",
+        "cmuktgu45001uc8vahsbg8tdq",
+        "cmukthkio0024c8vay1iqgr4p",
+        "cmuktgt33001tc8vakt808jtp",
+        "cmukthisp0023c8vaorpkq701",
+        "cmuktgpvb001qc8va1ki9mqut"
+      ]
+    },
+    "close": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0012124354738460852,
+          "lng": -0.0008369098695197863
+        },
+        "corners": [
+          {
+            "x": 209.25211051743153,
+            "y": -68.13225802381045
+          },
+          {
+            "x": 934.0692055762148,
+            "y": -68.13225802381045
+          },
+          {
+            "x": 1062.425569373411,
+            "y": 691.2403047223805
+          },
+          {
+            "x": 117.70382156861211,
+            "y": 691.2403047223805
+          }
+        ],
+        "floorId": "cmuksihln000xc8vai4iwe2lh",
+        "maxZoom": 21.212524881329102,
+        "minZoom": 14.2125248813291,
+        "pitch": 20,
+        "zoom": 15.8625248813291
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktgr04001rc8vanmm2nvfc",
+        "cmuktgs3a001sc8va2nkzsx23",
+        "cmuktgu45001uc8vahsbg8tdq",
+        "cmukthkio0024c8vay1iqgr4p",
+        "cmuktgt33001tc8vakt808jtp",
+        "cmukthisp0023c8vaorpkq701",
+        "cmuktgpvb001qc8va1ki9mqut"
+      ]
+    },
+    "overview": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.00018518518545818097,
+          "lng": 0
+        },
+        "corners": [
+          {
+            "x": 241.00000034386,
+            "y": 74.99999999820906
+          },
+          {
+            "x": 780.9999996579309,
+            "y": 74.99999999820906
+          },
+          {
+            "x": 780.9999996579309,
+            "y": 614.9999999982091
+          },
+          {
+            "x": 241.00000034386,
+            "y": 614.9999999982091
+          }
+        ],
+        "floorId": "cmuksihln000xc8vai4iwe2lh",
+        "maxZoom": 21.21252488132849,
+        "minZoom": 14.212524881328491,
+        "pitch": 0,
+        "zoom": 15.212524881328491
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": []
+    }
+  },
+  {
+    "width": 1440,
+    "height": 1000,
+    "floor": "北館 2F",
+    "initial": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0011525881738378985,
+          "lng": -0.0004073929944468091
+        },
+        "corners": [
+          {
+            "x": 247.68182742114504,
+            "y": -122.33308313773614
+          },
+          {
+            "x": 1273.9359179806352,
+            "y": -122.33308313773614
+          },
+          {
+            "x": 1457.3466438700498,
+            "y": 964.6587780040236
+          },
+          {
+            "x": 91.90743013411569,
+            "y": 964.6587780040236
+          }
+        ],
+        "floorId": "cmukrhmvm000hc8varaqaf5e3",
+        "maxZoom": 21.728166321543803,
+        "minZoom": 14.728166321543805,
+        "pitch": 20,
+        "zoom": 16.3781663215438
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktclah0015c8var8l162k5",
+        "cmuktdg9s001bc8vaiha6s9xx",
+        "cmukt2blb0014c8vazlil9c4k",
+        "cmuktdhcy001cc8va0p3q6kjw",
+        "cmuktd3lp0016c8va4vyu47ad",
+        "cmukth2kc001wc8vax120q81y",
+        "cmuktddxf0019c8vaz1dy7gr3",
+        "cmukth14y001vc8vas0at370p",
+        "cmuktd5u80018c8vaik5ppju7",
+        "cmuktdf7c001ac8vaq1bea4c7",
+        "cmuktd4q10017c8vaa0236mll"
+      ]
+    },
+    "selected": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0011525881738378985,
+          "lng": -0.0004073929944468091
+        },
+        "corners": [
+          {
+            "x": 247.68182742114504,
+            "y": -122.33308313773614
+          },
+          {
+            "x": 1273.9359179806352,
+            "y": -122.33308313773614
+          },
+          {
+            "x": 1457.3466438700498,
+            "y": 964.6587780040236
+          },
+          {
+            "x": 91.90743013411569,
+            "y": 964.6587780040236
+          }
+        ],
+        "floorId": "cmukrhmvm000hc8varaqaf5e3",
+        "maxZoom": 21.728166321543803,
+        "minZoom": 14.728166321543805,
+        "pitch": 20,
+        "zoom": 16.3781663215438
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktclah0015c8var8l162k5",
+        "cmuktdg9s001bc8vaiha6s9xx",
+        "cmukt2blb0014c8vazlil9c4k",
+        "cmuktdhcy001cc8va0p3q6kjw",
+        "cmuktd3lp0016c8va4vyu47ad",
+        "cmukth2kc001wc8vax120q81y",
+        "cmuktddxf0019c8vaz1dy7gr3",
+        "cmukth14y001vc8vas0at370p",
+        "cmuktd5u80018c8vaik5ppju7",
+        "cmuktdf7c001ac8vaq1bea4c7",
+        "cmuktd4q10017c8vaa0236mll"
+      ]
+    },
+    "close": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0011525881738378985,
+          "lng": -0.0004073929944468091
+        },
+        "corners": [
+          {
+            "x": 247.68182742114504,
+            "y": -122.33308313773614
+          },
+          {
+            "x": 1273.9359179806352,
+            "y": -122.33308313773614
+          },
+          {
+            "x": 1457.3466438700498,
+            "y": 964.6587780040236
+          },
+          {
+            "x": 91.90743013411569,
+            "y": 964.6587780040236
+          }
+        ],
+        "floorId": "cmukrhmvm000hc8varaqaf5e3",
+        "maxZoom": 21.728166321543803,
+        "minZoom": 14.728166321543805,
+        "pitch": 20,
+        "zoom": 16.3781663215438
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktclah0015c8var8l162k5",
+        "cmuktdg9s001bc8vaiha6s9xx",
+        "cmukt2blb0014c8vazlil9c4k",
+        "cmuktdhcy001cc8va0p3q6kjw",
+        "cmuktd3lp0016c8va4vyu47ad",
+        "cmukth2kc001wc8vax120q81y",
+        "cmuktddxf0019c8vaz1dy7gr3",
+        "cmukth14y001vc8vas0at370p",
+        "cmuktd5u80018c8vaik5ppju7",
+        "cmuktdf7c001ac8vaq1bea4c7",
+        "cmuktd4q10017c8vaa0236mll"
+      ]
+    },
+    "overview": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.00012953367897239332,
+          "lng": 0
+        },
+        "corners": [
+          {
+            "x": 333.0000004886484,
+            "y": 74.99999999730028
+          },
+          {
+            "x": 1104.999999508652,
+            "y": 74.99999999730028
+          },
+          {
+            "x": 1104.999999508652,
+            "y": 846.9999999946006
+          },
+          {
+            "x": 333.0000004886484,
+            "y": 846.9999999946006
+          }
+        ],
+        "floorId": "cmukrhmvm000hc8varaqaf5e3",
+        "maxZoom": 21.72816632154301,
+        "minZoom": 14.72816632154301,
+        "pitch": 0,
+        "zoom": 15.72816632154301
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": []
+    }
+  },
+  {
+    "width": 1440,
+    "height": 1000,
+    "floor": "北館 3F",
+    "initial": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0014988582771309211,
+          "lng": -0.000879828324485743
+        },
+        "corners": [
+          {
+            "x": 299.7717317659845,
+            "y": -150.38122944923902
+          },
+          {
+            "x": 1317.2736740356638,
+            "y": -150.38122944923902
+          },
+          {
+            "x": 1512.7705084421543,
+            "y": 915.146067667927
+          },
+          {
+            "x": 162.7812491638912,
+            "y": 915.146067667927
+          }
+        ],
+        "floorId": "cmuksbnaj000lc8vasrlaoqww",
+        "maxZoom": 21.72816632154649,
+        "minZoom": 14.72816632154649,
+        "pitch": 20,
+        "zoom": 16.37816632154649
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmukth53k001yc8vax75t2x45",
+        "cmuktdp2i001ec8var5bsjmb7",
+        "cmuktdnza001dc8varu72qn0y",
+        "cmukth42e001xc8vabh6cya4s"
+      ]
+    },
+    "selected": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0014988582771309211,
+          "lng": -0.000879828324485743
+        },
+        "corners": [
+          {
+            "x": 299.7717317659845,
+            "y": -150.38122944923902
+          },
+          {
+            "x": 1317.2736740356638,
+            "y": -150.38122944923902
+          },
+          {
+            "x": 1512.7705084421543,
+            "y": 915.146067667927
+          },
+          {
+            "x": 162.7812491638912,
+            "y": 915.146067667927
+          }
+        ],
+        "floorId": "cmuksbnaj000lc8vasrlaoqww",
+        "maxZoom": 21.72816632154649,
+        "minZoom": 14.72816632154649,
+        "pitch": 20,
+        "zoom": 16.37816632154649
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmukth53k001yc8vax75t2x45",
+        "cmuktdp2i001ec8var5bsjmb7",
+        "cmuktdnza001dc8varu72qn0y",
+        "cmukth42e001xc8vabh6cya4s"
+      ]
+    },
+    "close": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0014988582771309211,
+          "lng": -0.000879828324485743
+        },
+        "corners": [
+          {
+            "x": 299.7717317659845,
+            "y": -150.38122944923902
+          },
+          {
+            "x": 1317.2736740356638,
+            "y": -150.38122944923902
+          },
+          {
+            "x": 1512.7705084421543,
+            "y": 915.146067667927
+          },
+          {
+            "x": 162.7812491638912,
+            "y": 915.146067667927
+          }
+        ],
+        "floorId": "cmuksbnaj000lc8vasrlaoqww",
+        "maxZoom": 21.72816632154649,
+        "minZoom": 14.72816632154649,
+        "pitch": 20,
+        "zoom": 16.37816632154649
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmukth53k001yc8vax75t2x45",
+        "cmuktdp2i001ec8var5bsjmb7",
+        "cmuktdnza001dc8varu72qn0y",
+        "cmukth42e001xc8vabh6cya4s"
+      ]
+    },
+    "overview": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.00012953367897239332,
+          "lng": 0
+        },
+        "corners": [
+          {
+            "x": 333.00000049134815,
+            "y": 74.99999999730028
+          },
+          {
+            "x": 1104.9999995113517,
+            "y": 74.99999999730028
+          },
+          {
+            "x": 1104.9999995113517,
+            "y": 846.9999999946006
+          },
+          {
+            "x": 333.00000049134815,
+            "y": 846.9999999946006
+          }
+        ],
+        "floorId": "cmuksbnaj000lc8vasrlaoqww",
+        "maxZoom": 21.728166321541263,
+        "minZoom": 14.728166321541266,
+        "pitch": 0,
+        "zoom": 15.728166321541266
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": []
+    }
+  },
+  {
+    "width": 1440,
+    "height": 1000,
+    "floor": "南館 1F",
+    "initial": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0011769698643320226,
+          "lng": -0.00027896995547394
+        },
+        "corners": [
+          {
+            "x": 234.7956232947789,
+            "y": -124.32380085383016
+          },
+          {
+            "x": 1260.428529965738,
+            "y": -124.32380085383016
+          },
+          {
+            "x": 1439.23087184825,
+            "y": 961.135412098764
+          },
+          {
+            "x": 74.89108979798543,
+            "y": 961.135412098764
+          }
+        ],
+        "floorId": "cmukscq3b000pc8va9r87tgs4",
+        "maxZoom": 21.728166321544748,
+        "minZoom": 14.728166321544748,
+        "pitch": 20,
+        "zoom": 16.378166321544747
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmukte0xu001fc8va4a6c1pz3",
+        "cmukte4gt001ic8vakcr8vlwu",
+        "cmukte5j9001jc8va06nh86yc",
+        "cmukth62i001zc8va1psl2dbc",
+        "cmukte260001gc8vaw9c9zlee",
+        "cmukte39k001hc8vai0jivag4"
+      ]
+    },
+    "selected": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0011769698643320226,
+          "lng": -0.00027896995547394
+        },
+        "corners": [
+          {
+            "x": 234.7956232947789,
+            "y": -124.32380085383016
+          },
+          {
+            "x": 1260.428529965738,
+            "y": -124.32380085383016
+          },
+          {
+            "x": 1439.23087184825,
+            "y": 961.135412098764
+          },
+          {
+            "x": 74.89108979798543,
+            "y": 961.135412098764
+          }
+        ],
+        "floorId": "cmukscq3b000pc8va9r87tgs4",
+        "maxZoom": 21.728166321544748,
+        "minZoom": 14.728166321544748,
+        "pitch": 20,
+        "zoom": 16.378166321544747
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmukte0xu001fc8va4a6c1pz3",
+        "cmukte4gt001ic8vakcr8vlwu",
+        "cmukte5j9001jc8va06nh86yc",
+        "cmukth62i001zc8va1psl2dbc",
+        "cmukte260001gc8vaw9c9zlee",
+        "cmukte39k001hc8vai0jivag4"
+      ]
+    },
+    "close": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0011769698643320226,
+          "lng": -0.00027896995547394
+        },
+        "corners": [
+          {
+            "x": 234.7956232947789,
+            "y": -124.32380085383016
+          },
+          {
+            "x": 1260.428529965738,
+            "y": -124.32380085383016
+          },
+          {
+            "x": 1439.23087184825,
+            "y": 961.135412098764
+          },
+          {
+            "x": 74.89108979798543,
+            "y": 961.135412098764
+          }
+        ],
+        "floorId": "cmukscq3b000pc8va9r87tgs4",
+        "maxZoom": 21.728166321544748,
+        "minZoom": 14.728166321544748,
+        "pitch": 20,
+        "zoom": 16.378166321544747
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmukte0xu001fc8va4a6c1pz3",
+        "cmukte4gt001ic8vakcr8vlwu",
+        "cmukte5j9001jc8va06nh86yc",
+        "cmukth62i001zc8va1psl2dbc",
+        "cmukte260001gc8vaw9c9zlee",
+        "cmukte39k001hc8vai0jivag4"
+      ]
+    },
+    "overview": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0001295336789439716,
+          "lng": 0
+        },
+        "corners": [
+          {
+            "x": 333.00000049134815,
+            "y": 74.99999999730028
+          },
+          {
+            "x": 1104.9999995113517,
+            "y": 74.99999999730028
+          },
+          {
+            "x": 1104.9999995113517,
+            "y": 846.9999999973003
+          },
+          {
+            "x": 333.00000049134815,
+            "y": 846.9999999973003
+          }
+        ],
+        "floorId": "cmukscq3b000pc8va9r87tgs4",
+        "maxZoom": 21.72816632154396,
+        "minZoom": 14.728166321543958,
+        "pitch": 0,
+        "zoom": 15.728166321543958
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": []
+    }
+  },
+  {
+    "width": 1440,
+    "height": 1000,
+    "floor": "南館 2F",
+    "initial": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0011769698643604445,
+          "lng": -0.0007510729595310295
+        },
+        "corners": [
+          {
+            "x": 283.21606092341176,
+            "y": -124.32380085826286
+          },
+          {
+            "x": 1308.8489675909404,
+            "y": -124.32380085826286
+          },
+          {
+            "x": 1503.6417628107831,
+            "y": 961.1354120912558
+          },
+          {
+            "x": 139.3019807625441,
+            "y": 961.1354120912558
+          }
+        ],
+        "floorId": "cmukshlyb000tc8van3dpun6a",
+        "maxZoom": 21.72816632154396,
+        "minZoom": 14.728166321543958,
+        "pitch": 20,
+        "zoom": 16.378166321543958
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktgg8r001nc8va7hnc92i9",
+        "cmuktgii8001pc8va3edshhrz",
+        "cmuktghey001oc8vacauz01ip",
+        "cmukthhne0022c8vat5a3176r",
+        "cmukthgf60021c8vazbuyojvy",
+        "cmuktge33001lc8va4w4zvm76",
+        "cmukthf510020c8vaoh1zcqix",
+        "cmuktgf50001mc8vazpkqmmdg",
+        "cmuktgcuf001kc8vavw5st4ki"
+      ]
+    },
+    "selected": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0011769698643604445,
+          "lng": 0.0012442380560742097
+        },
+        "corners": [
+          {
+            "x": 78.57039726181043,
+            "y": -124.32380085826286
+          },
+          {
+            "x": 1104.2033039293392,
+            "y": -124.32380085826286
+          },
+          {
+            "x": 1231.4135431997754,
+            "y": 961.1354120912558
+          },
+          {
+            "x": -132.92623884846353,
+            "y": 961.1354120912558
+          }
+        ],
+        "floorId": "cmukshlyb000tc8van3dpun6a",
+        "maxZoom": 21.72816632154396,
+        "minZoom": 14.728166321543958,
+        "pitch": 20,
+        "zoom": 16.378166321543958
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktgg8r001nc8va7hnc92i9",
+        "cmuktgii8001pc8va3edshhrz",
+        "cmuktghey001oc8vacauz01ip",
+        "cmukthhne0022c8vat5a3176r",
+        "cmukthgf60021c8vazbuyojvy",
+        "cmuktge33001lc8va4w4zvm76",
+        "cmukthf510020c8vaoh1zcqix",
+        "cmuktgf50001mc8vazpkqmmdg",
+        "cmuktgcuf001kc8vavw5st4ki"
+      ]
+    },
+    "close": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0011769698643604445,
+          "lng": 0.0012442380560742097
+        },
+        "corners": [
+          {
+            "x": 78.57039726181043,
+            "y": -124.32380085826286
+          },
+          {
+            "x": 1104.2033039293392,
+            "y": -124.32380085826286
+          },
+          {
+            "x": 1231.4135431997754,
+            "y": 961.1354120912558
+          },
+          {
+            "x": -132.92623884846353,
+            "y": 961.1354120912558
+          }
+        ],
+        "floorId": "cmukshlyb000tc8van3dpun6a",
+        "maxZoom": 21.72816632154396,
+        "minZoom": 14.728166321543958,
+        "pitch": 20,
+        "zoom": 16.378166321543958
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktgg8r001nc8va7hnc92i9",
+        "cmuktgii8001pc8va3edshhrz",
+        "cmuktghey001oc8vacauz01ip",
+        "cmukthhne0022c8vat5a3176r",
+        "cmukthgf60021c8vazbuyojvy",
+        "cmuktge33001lc8va4w4zvm76",
+        "cmukthf510020c8vaoh1zcqix",
+        "cmuktgf50001mc8vazpkqmmdg",
+        "cmuktgcuf001kc8vavw5st4ki"
+      ]
+    },
+    "overview": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0001295336789439716,
+          "lng": 0
+        },
+        "corners": [
+          {
+            "x": 333.0000004886484,
+            "y": 74.99999999730028
+          },
+          {
+            "x": 1104.999999508652,
+            "y": 74.99999999730028
+          },
+          {
+            "x": 1104.999999508652,
+            "y": 846.9999999946006
+          },
+          {
+            "x": 333.0000004886484,
+            "y": 846.9999999946006
+          }
+        ],
+        "floorId": "cmukshlyb000tc8van3dpun6a",
+        "maxZoom": 21.728166321543167,
+        "minZoom": 14.728166321543169,
+        "pitch": 0,
+        "zoom": 15.728166321543169
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": []
+    }
+  },
+  {
+    "width": 1440,
+    "height": 1000,
+    "floor": "南館 3F",
+    "initial": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0011769698643604445,
+          "lng": -0.0008369098694913646
+        },
+        "corners": [
+          {
+            "x": 292.0197768723089,
+            "y": -124.3238008560465
+          },
+          {
+            "x": 1317.6526835426955,
+            "y": -124.3238008560465
+          },
+          {
+            "x": 1515.3528339190786,
+            "y": 961.135412098764
+          },
+          {
+            "x": 151.01305186881407,
+            "y": 961.135412098764
+          }
+        ],
+        "floorId": "cmuksihln000xc8vai4iwe2lh",
+        "maxZoom": 21.728166321546645,
+        "minZoom": 14.728166321546649,
+        "pitch": 20,
+        "zoom": 16.378166321546647
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktgr04001rc8vanmm2nvfc",
+        "cmuktgs3a001sc8va2nkzsx23",
+        "cmuktgu45001uc8vahsbg8tdq",
+        "cmukthkio0024c8vay1iqgr4p",
+        "cmuktgt33001tc8vakt808jtp",
+        "cmukthisp0023c8vaorpkq701",
+        "cmuktgpvb001qc8va1ki9mqut"
+      ]
+    },
+    "selected": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0011769698643604445,
+          "lng": 0.0010016709131832613
+        },
+        "corners": [
+          {
+            "x": 103.44888164318036,
+            "y": -124.3238008560465
+          },
+          {
+            "x": 1129.0817883135671,
+            "y": -124.3238008560465
+          },
+          {
+            "x": 1264.5079434863517,
+            "y": 961.135412098764
+          },
+          {
+            "x": -99.83183856391292,
+            "y": 961.135412098764
+          }
+        ],
+        "floorId": "cmuksihln000xc8vai4iwe2lh",
+        "maxZoom": 21.728166321546645,
+        "minZoom": 14.728166321546649,
+        "pitch": 20,
+        "zoom": 16.378166321546647
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktgr04001rc8vanmm2nvfc",
+        "cmuktgs3a001sc8va2nkzsx23",
+        "cmuktgu45001uc8vahsbg8tdq",
+        "cmukthkio0024c8vay1iqgr4p",
+        "cmuktgt33001tc8vakt808jtp",
+        "cmukthisp0023c8vaorpkq701",
+        "cmuktgpvb001qc8va1ki9mqut"
+      ]
+    },
+    "close": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0011769698643604445,
+          "lng": 0.0010016709131832613
+        },
+        "corners": [
+          {
+            "x": 103.44888164318036,
+            "y": -124.3238008560465
+          },
+          {
+            "x": 1129.0817883135671,
+            "y": -124.3238008560465
+          },
+          {
+            "x": 1264.5079434863517,
+            "y": 961.135412098764
+          },
+          {
+            "x": -99.83183856391292,
+            "y": 961.135412098764
+          }
+        ],
+        "floorId": "cmuksihln000xc8vai4iwe2lh",
+        "maxZoom": 21.728166321546645,
+        "minZoom": 14.728166321546649,
+        "pitch": 20,
+        "zoom": 16.378166321546647
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktgr04001rc8vanmm2nvfc",
+        "cmuktgs3a001sc8va2nkzsx23",
+        "cmuktgu45001uc8vahsbg8tdq",
+        "cmukthkio0024c8vay1iqgr4p",
+        "cmuktgt33001tc8vakt808jtp",
+        "cmukthisp0023c8vaorpkq701",
+        "cmuktgpvb001qc8va1ki9mqut"
+      ]
+    },
+    "overview": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.00012953367897239332,
+          "lng": 0
+        },
+        "corners": [
+          {
+            "x": 333.0000004886484,
+            "y": 74.99999999730028
+          },
+          {
+            "x": 1104.999999508652,
+            "y": 74.99999999730028
+          },
+          {
+            "x": 1104.999999508652,
+            "y": 846.9999999946006
+          },
+          {
+            "x": 333.0000004886484,
+            "y": 846.9999999946006
+          }
+        ],
+        "floorId": "cmuksihln000xc8vai4iwe2lh",
+        "maxZoom": 21.728166321541423,
+        "minZoom": 14.728166321541424,
+        "pitch": 0,
+        "zoom": 15.728166321541424
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": []
+    }
+  },
+  {
+    "width": 1440,
+    "height": 700,
+    "floor": "北館 2F",
+    "initial": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.001205055926035925,
+          "lng": -0.0004073929944468091
+        },
+        "corners": [
+          {
+            "x": 426.5796283004351,
+            "y": -50.261451173980305
+          },
+          {
+            "x": 1063.299407162309,
+            "y": -50.261451173980305
+          },
+          {
+            "x": 1163.9106580427704,
+            "y": 614.4107846516196
+          },
+          {
+            "x": 341.12848093682567,
+            "y": 614.4107846516196
+          }
+        ],
+        "floorId": "cmukrhmvm000hc8varaqaf5e3",
+        "maxZoom": 21.01835233363756,
+        "minZoom": 14.018352333637562,
+        "pitch": 20,
+        "zoom": 15.668352333637564
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktclah0015c8var8l162k5",
+        "cmuktdg9s001bc8vaiha6s9xx",
+        "cmukt2blb0014c8vazlil9c4k",
+        "cmuktdhcy001cc8va0p3q6kjw",
+        "cmuktd3lp0016c8va4vyu47ad",
+        "cmukth2kc001wc8vax120q81y",
+        "cmuktddxf0019c8vaz1dy7gr3",
+        "cmukth14y001vc8vas0at370p",
+        "cmuktd5u80018c8vaik5ppju7",
+        "cmuktdf7c001ac8vaq1bea4c7",
+        "cmuktd4q10017c8vaa0236mll"
+      ]
+    },
+    "selected": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.001205055926035925,
+          "lng": -0.0004073929944468091
+        },
+        "corners": [
+          {
+            "x": 426.5796283004351,
+            "y": -50.261451173980305
+          },
+          {
+            "x": 1063.299407162309,
+            "y": -50.261451173980305
+          },
+          {
+            "x": 1163.9106580427704,
+            "y": 614.4107846516196
+          },
+          {
+            "x": 341.12848093682567,
+            "y": 614.4107846516196
+          }
+        ],
+        "floorId": "cmukrhmvm000hc8varaqaf5e3",
+        "maxZoom": 21.01835233363756,
+        "minZoom": 14.018352333637562,
+        "pitch": 20,
+        "zoom": 15.668352333637564
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktclah0015c8var8l162k5",
+        "cmuktdg9s001bc8vaiha6s9xx",
+        "cmukt2blb0014c8vazlil9c4k",
+        "cmuktdhcy001cc8va0p3q6kjw",
+        "cmuktd3lp0016c8va4vyu47ad",
+        "cmukth2kc001wc8vax120q81y",
+        "cmuktddxf0019c8vaz1dy7gr3",
+        "cmukth14y001vc8vas0at370p",
+        "cmuktd5u80018c8vaik5ppju7",
+        "cmuktdf7c001ac8vaq1bea4c7",
+        "cmuktd4q10017c8vaa0236mll"
+      ]
+    },
+    "close": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.001205055926035925,
+          "lng": -0.0004073929944468091
+        },
+        "corners": [
+          {
+            "x": 426.5796283004351,
+            "y": -50.261451173980305
+          },
+          {
+            "x": 1063.299407162309,
+            "y": -50.261451173980305
+          },
+          {
+            "x": 1163.9106580427704,
+            "y": 614.4107846516196
+          },
+          {
+            "x": 341.12848093682567,
+            "y": 614.4107846516196
+          }
+        ],
+        "floorId": "cmukrhmvm000hc8varaqaf5e3",
+        "maxZoom": 21.01835233363756,
+        "minZoom": 14.018352333637562,
+        "pitch": 20,
+        "zoom": 15.668352333637564
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktclah0015c8var8l162k5",
+        "cmuktdg9s001bc8vaiha6s9xx",
+        "cmukt2blb0014c8vazlil9c4k",
+        "cmuktdhcy001cc8va0p3q6kjw",
+        "cmuktd3lp0016c8va4vyu47ad",
+        "cmukth2kc001wc8vax120q81y",
+        "cmuktddxf0019c8vaz1dy7gr3",
+        "cmukth14y001vc8vas0at370p",
+        "cmuktd5u80018c8vaik5ppju7",
+        "cmuktdf7c001ac8vaq1bea4c7",
+        "cmuktd4q10017c8vaa0236mll"
+      ]
+    },
+    "overview": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.00021186440703502285,
+          "lng": 0
+        },
+        "corners": [
+          {
+            "x": 483.00000029907545,
+            "y": 75
+          },
+          {
+            "x": 954.9999996999344,
+            "y": 75
+          },
+          {
+            "x": 954.9999996999344,
+            "y": 547
+          },
+          {
+            "x": 483.00000029907545,
+            "y": 547
+          }
+        ],
+        "floorId": "cmukrhmvm000hc8varaqaf5e3",
+        "maxZoom": 21.018352333635853,
+        "minZoom": 14.018352333635852,
+        "pitch": 0,
+        "zoom": 15.018352333635852
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": []
+    }
+  },
+  {
+    "width": 1440,
+    "height": 700,
+    "floor": "北館 3F",
+    "initial": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.001551326029400002,
+          "lng": -0.0008798283245141647
+        },
+        "corners": [
+          {
+            "x": 458.6988051353691,
+            "y": -67.93397224651616
+          },
+          {
+            "x": 1090.4714965804312,
+            "y": -67.93397224651616
+          },
+          {
+            "x": 1197.9355833632744,
+            "y": 584.9674732403312
+          },
+          {
+            "x": 383.39550339521617,
+            "y": 584.9674732403312
+          }
+        ],
+        "floorId": "cmuksbnaj000lc8vasrlaoqww",
+        "maxZoom": 21.018352333635853,
+        "minZoom": 14.018352333635852,
+        "pitch": 20,
+        "zoom": 15.668352333635852
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmukth53k001yc8vax75t2x45",
+        "cmuktdp2i001ec8var5bsjmb7",
+        "cmuktdnza001dc8varu72qn0y",
+        "cmukth42e001xc8vabh6cya4s"
+      ]
+    },
+    "selected": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.001551326029400002,
+          "lng": -0.0008798283245141647
+        },
+        "corners": [
+          {
+            "x": 458.6988051353691,
+            "y": -67.93397224651616
+          },
+          {
+            "x": 1090.4714965804312,
+            "y": -67.93397224651616
+          },
+          {
+            "x": 1197.9355833632744,
+            "y": 584.9674732403312
+          },
+          {
+            "x": 383.39550339521617,
+            "y": 584.9674732403312
+          }
+        ],
+        "floorId": "cmuksbnaj000lc8vasrlaoqww",
+        "maxZoom": 21.018352333635853,
+        "minZoom": 14.018352333635852,
+        "pitch": 20,
+        "zoom": 15.668352333635852
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmukth53k001yc8vax75t2x45",
+        "cmuktdp2i001ec8var5bsjmb7",
+        "cmuktdnza001dc8varu72qn0y",
+        "cmukth42e001xc8vabh6cya4s"
+      ]
+    },
+    "close": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.001551326029400002,
+          "lng": -0.0008798283245141647
+        },
+        "corners": [
+          {
+            "x": 458.6988051353691,
+            "y": -67.93397224651616
+          },
+          {
+            "x": 1090.4714965804312,
+            "y": -67.93397224651616
+          },
+          {
+            "x": 1197.9355833632744,
+            "y": 584.9674732403312
+          },
+          {
+            "x": 383.39550339521617,
+            "y": 584.9674732403312
+          }
+        ],
+        "floorId": "cmuksbnaj000lc8vasrlaoqww",
+        "maxZoom": 21.018352333635853,
+        "minZoom": 14.018352333635852,
+        "pitch": 20,
+        "zoom": 15.668352333635852
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmukth53k001yc8vax75t2x45",
+        "cmuktdp2i001ec8var5bsjmb7",
+        "cmuktdnza001dc8varu72qn0y",
+        "cmukth42e001xc8vabh6cya4s"
+      ]
+    },
+    "overview": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.00021186440703502285,
+          "lng": 0
+        },
+        "corners": [
+          {
+            "x": 483.0000003000658,
+            "y": 75
+          },
+          {
+            "x": 954.9999996999344,
+            "y": 75
+          },
+          {
+            "x": 954.9999996999344,
+            "y": 547
+          },
+          {
+            "x": 483.0000003000658,
+            "y": 547
+          }
+        ],
+        "floorId": "cmuksbnaj000lc8vasrlaoqww",
+        "maxZoom": 21.018352333637772,
+        "minZoom": 14.01835233363777,
+        "pitch": 0,
+        "zoom": 15.01835233363777
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": []
+    }
+  },
+  {
+    "width": 1440,
+    "height": 700,
+    "floor": "南館 1F",
+    "initial": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0012294376165726817,
+          "lng": -0.0002789699555023617
+        },
+        "corners": [
+          {
+            "x": 418.568326288484,
+            "y": -51.514867735781586
+          },
+          {
+            "x": 1054.9372349334474,
+            "y": -51.514867735781586
+          },
+          {
+            "x": 1153.0349970262976,
+            "y": 612.3181251493372
+          },
+          {
+            "x": 330.8386202944345,
+            "y": 612.3181251493372
+          }
+        ],
+        "floorId": "cmukscq3b000pc8va9r87tgs4",
+        "maxZoom": 21.018352333637772,
+        "minZoom": 14.01835233363777,
+        "pitch": 20,
+        "zoom": 15.66835233363777
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmukte0xu001fc8va4a6c1pz3",
+        "cmukte4gt001ic8vakcr8vlwu",
+        "cmukte5j9001jc8va06nh86yc",
+        "cmukth62i001zc8va1psl2dbc",
+        "cmukte260001gc8vaw9c9zlee",
+        "cmukte39k001hc8vai0jivag4"
+      ]
+    },
+    "selected": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0012294376165726817,
+          "lng": -0.0002789699555023617
+        },
+        "corners": [
+          {
+            "x": 418.568326288484,
+            "y": -51.514867735781586
+          },
+          {
+            "x": 1054.9372349334474,
+            "y": -51.514867735781586
+          },
+          {
+            "x": 1153.0349970262976,
+            "y": 612.3181251493372
+          },
+          {
+            "x": 330.8386202944345,
+            "y": 612.3181251493372
+          }
+        ],
+        "floorId": "cmukscq3b000pc8va9r87tgs4",
+        "maxZoom": 21.018352333637772,
+        "minZoom": 14.01835233363777,
+        "pitch": 20,
+        "zoom": 15.66835233363777
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmukte0xu001fc8va4a6c1pz3",
+        "cmukte4gt001ic8vakcr8vlwu",
+        "cmukte5j9001jc8va06nh86yc",
+        "cmukth62i001zc8va1psl2dbc",
+        "cmukte260001gc8vaw9c9zlee",
+        "cmukte39k001hc8vai0jivag4"
+      ]
+    },
+    "close": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0012294376165726817,
+          "lng": -0.0002789699555023617
+        },
+        "corners": [
+          {
+            "x": 418.568326288484,
+            "y": -51.514867735781586
+          },
+          {
+            "x": 1054.9372349334474,
+            "y": -51.514867735781586
+          },
+          {
+            "x": 1153.0349970262976,
+            "y": 612.3181251493372
+          },
+          {
+            "x": 330.8386202944345,
+            "y": 612.3181251493372
+          }
+        ],
+        "floorId": "cmukscq3b000pc8va9r87tgs4",
+        "maxZoom": 21.018352333637772,
+        "minZoom": 14.01835233363777,
+        "pitch": 20,
+        "zoom": 15.66835233363777
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmukte0xu001fc8va4a6c1pz3",
+        "cmukte4gt001ic8vakcr8vlwu",
+        "cmukte5j9001jc8va06nh86yc",
+        "cmukth62i001zc8va1psl2dbc",
+        "cmukte260001gc8vaw9c9zlee",
+        "cmukte39k001hc8vai0jivag4"
+      ]
+    },
+    "overview": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.000211864407120288,
+          "lng": 0
+        },
+        "corners": [
+          {
+            "x": 483.0000003000658,
+            "y": 74.99999999603874
+          },
+          {
+            "x": 954.9999996999344,
+            "y": 74.99999999603874
+          },
+          {
+            "x": 954.9999996999344,
+            "y": 546.9999999960387
+          },
+          {
+            "x": 483.0000003000658,
+            "y": 546.9999999960387
+          }
+        ],
+        "floorId": "cmukscq3b000pc8va9r87tgs4",
+        "maxZoom": 21.01835233363606,
+        "minZoom": 14.01835233363606,
+        "pitch": 0,
+        "zoom": 15.01835233363606
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": []
+    }
+  },
+  {
+    "width": 1440,
+    "height": 700,
+    "floor": "南館 2F",
+    "initial": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0012294376166011034,
+          "lng": -0.0007510729595026078
+        },
+        "corners": [
+          {
+            "x": 448.61149363241594,
+            "y": -51.51486774080129
+          },
+          {
+            "x": 1084.98040227462,
+            "y": -51.51486774080129
+          },
+          {
+            "x": 1191.8511349578512,
+            "y": 612.3181251414263
+          },
+          {
+            "x": 369.654758232151,
+            "y": 612.3181251414263
+          }
+        ],
+        "floorId": "cmukshlyb000tc8van3dpun6a",
+        "maxZoom": 21.01835233363606,
+        "minZoom": 14.01835233363606,
+        "pitch": 20,
+        "zoom": 15.66835233363606
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktgg8r001nc8va7hnc92i9",
+        "cmuktgii8001pc8va3edshhrz",
+        "cmuktghey001oc8vacauz01ip",
+        "cmukthhne0022c8vat5a3176r",
+        "cmukthgf60021c8vazbuyojvy",
+        "cmuktge33001lc8va4w4zvm76",
+        "cmukthf510020c8vaoh1zcqix",
+        "cmuktgf50001mc8vazpkqmmdg",
+        "cmuktgcuf001kc8vavw5st4ki"
+      ]
+    },
+    "selected": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0012294376166011034,
+          "lng": 0.00047662481870247575
+        },
+        "corners": [
+          {
+            "x": 370.4846241075535,
+            "y": -51.51486774080129
+          },
+          {
+            "x": 1006.8535327497576,
+            "y": -51.51486774080129
+          },
+          {
+            "x": 1090.9102684634584,
+            "y": 612.3181251414263
+          },
+          {
+            "x": 268.71389173775805,
+            "y": 612.3181251414263
+          }
+        ],
+        "floorId": "cmukshlyb000tc8van3dpun6a",
+        "maxZoom": 21.01835233363606,
+        "minZoom": 14.01835233363606,
+        "pitch": 20,
+        "zoom": 15.66835233363606
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktgg8r001nc8va7hnc92i9",
+        "cmuktgii8001pc8va3edshhrz",
+        "cmuktghey001oc8vacauz01ip",
+        "cmukthhne0022c8vat5a3176r",
+        "cmukthgf60021c8vazbuyojvy",
+        "cmuktge33001lc8va4w4zvm76",
+        "cmukthf510020c8vaoh1zcqix",
+        "cmuktgf50001mc8vazpkqmmdg",
+        "cmuktgcuf001kc8vavw5st4ki"
+      ]
+    },
+    "close": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0012294376166011034,
+          "lng": 0.00047662481870247575
+        },
+        "corners": [
+          {
+            "x": 370.4846241075535,
+            "y": -51.51486774080129
+          },
+          {
+            "x": 1006.8535327497576,
+            "y": -51.51486774080129
+          },
+          {
+            "x": 1090.9102684634584,
+            "y": 612.3181251414263
+          },
+          {
+            "x": 268.71389173775805,
+            "y": 612.3181251414263
+          }
+        ],
+        "floorId": "cmukshlyb000tc8van3dpun6a",
+        "maxZoom": 21.01835233363606,
+        "minZoom": 14.01835233363606,
+        "pitch": 20,
+        "zoom": 15.66835233363606
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktgg8r001nc8va7hnc92i9",
+        "cmuktgii8001pc8va3edshhrz",
+        "cmuktghey001oc8vacauz01ip",
+        "cmukthhne0022c8vat5a3176r",
+        "cmukthgf60021c8vazbuyojvy",
+        "cmuktge33001lc8va4w4zvm76",
+        "cmukthf510020c8vaoh1zcqix",
+        "cmuktgf50001mc8vazpkqmmdg",
+        "cmuktgcuf001kc8vavw5st4ki"
+      ]
+    },
+    "overview": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.00021186440703502285,
+          "lng": 0
+        },
+        "corners": [
+          {
+            "x": 483.00000029907545,
+            "y": 75
+          },
+          {
+            "x": 954.9999996999344,
+            "y": 75
+          },
+          {
+            "x": 954.9999996999344,
+            "y": 547
+          },
+          {
+            "x": 483.00000029907545,
+            "y": 547
+          }
+        ],
+        "floorId": "cmukshlyb000tc8van3dpun6a",
+        "maxZoom": 21.018352333637974,
+        "minZoom": 14.018352333637978,
+        "pitch": 0,
+        "zoom": 15.018352333637978
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": []
+    }
+  },
+  {
+    "width": 1440,
+    "height": 700,
+    "floor": "南館 3F",
+    "initial": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0012294376165726817,
+          "lng": -0.0008369098695197863
+        },
+        "corners": [
+          {
+            "x": 454.0738877063502,
+            "y": -51.514867735781586
+          },
+          {
+            "x": 1090.4427963513135,
+            "y": -51.514867735781586
+          },
+          {
+            "x": 1198.908614600985,
+            "y": 612.3181251515359
+          },
+          {
+            "x": 376.7122378691219,
+            "y": 612.3181251515359
+          }
+        ],
+        "floorId": "cmuksihln000xc8vai4iwe2lh",
+        "maxZoom": 21.018352333637974,
+        "minZoom": 14.018352333637978,
+        "pitch": 20,
+        "zoom": 15.668352333637978
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktgr04001rc8vanmm2nvfc",
+        "cmuktgs3a001sc8va2nkzsx23",
+        "cmuktgu45001uc8vahsbg8tdq",
+        "cmukthkio0024c8vay1iqgr4p",
+        "cmuktgt33001tc8vakt808jtp",
+        "cmukthisp0023c8vaorpkq701",
+        "cmuktgpvb001qc8va1ki9mqut"
+      ]
+    },
+    "selected": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0012294376165726817,
+          "lng": 0.0002628049734312299
+        },
+        "corners": [
+          {
+            "x": 384.09145426556177,
+            "y": -51.514867735781586
+          },
+          {
+            "x": 1020.4603629105252,
+            "y": -51.514867735781586
+          },
+          {
+            "x": 1108.490458672508,
+            "y": 612.3181251515359
+          },
+          {
+            "x": 286.29408194064496,
+            "y": 612.3181251515359
+          }
+        ],
+        "floorId": "cmuksihln000xc8vai4iwe2lh",
+        "maxZoom": 21.018352333637974,
+        "minZoom": 14.018352333637978,
+        "pitch": 20,
+        "zoom": 15.668352333637978
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktgr04001rc8vanmm2nvfc",
+        "cmuktgs3a001sc8va2nkzsx23",
+        "cmuktgu45001uc8vahsbg8tdq",
+        "cmukthkio0024c8vay1iqgr4p",
+        "cmuktgt33001tc8vakt808jtp",
+        "cmukthisp0023c8vaorpkq701",
+        "cmuktgpvb001qc8va1ki9mqut"
+      ]
+    },
+    "close": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.0012294376165726817,
+          "lng": 0.0002628049734312299
+        },
+        "corners": [
+          {
+            "x": 384.09145426556177,
+            "y": -51.514867735781586
+          },
+          {
+            "x": 1020.4603629105252,
+            "y": -51.514867735781586
+          },
+          {
+            "x": 1108.490458672508,
+            "y": 612.3181251515359
+          },
+          {
+            "x": 286.29408194064496,
+            "y": 612.3181251515359
+          }
+        ],
+        "floorId": "cmuksihln000xc8vai4iwe2lh",
+        "maxZoom": 21.018352333637974,
+        "minZoom": 14.018352333637978,
+        "pitch": 20,
+        "zoom": 15.668352333637978
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": [
+        "cmuktgr04001rc8vanmm2nvfc",
+        "cmuktgs3a001sc8va2nkzsx23",
+        "cmuktgu45001uc8vahsbg8tdq",
+        "cmukthkio0024c8vay1iqgr4p",
+        "cmuktgt33001tc8vakt808jtp",
+        "cmukthisp0023c8vaorpkq701",
+        "cmuktgpvb001qc8va1ki9mqut"
+      ]
+    },
+    "overview": {
+      "camera": {
+        "bearing": 0,
+        "center": {
+          "lat": -0.00021186440703502285,
+          "lng": 0
+        },
+        "corners": [
+          {
+            "x": 483.00000029907545,
+            "y": 75
+          },
+          {
+            "x": 954.999999698944,
+            "y": 75
+          },
+          {
+            "x": 954.999999698944,
+            "y": 547
+          },
+          {
+            "x": 483.00000029907545,
+            "y": 547
+          }
+        ],
+        "floorId": "cmuksihln000xc8vai4iwe2lh",
+        "maxZoom": 21.01835233363627,
+        "minZoom": 14.018352333636267,
+        "pitch": 0,
+        "zoom": 15.018352333636267
+      },
+      "hiddenInvalid": 0,
+      "overlaps": 0,
+      "pins": []
+    }
+  }
+]

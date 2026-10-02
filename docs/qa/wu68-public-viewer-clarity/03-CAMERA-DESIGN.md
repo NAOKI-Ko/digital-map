@@ -1,0 +1,8 @@
+# Camera design
+Initial and explicit Floor switch: stop old motion, resize, bearing 0/pitch 20, calculate whole-floor baseline with measured top/bottom UI padding, fit unfiltered Floor Spot image bounds padded by .08 per edge, convert with existing imageToRenderCoordinates. Content zoom clamped to baseline+.55 through baseline+.65. The lower bound gives all-normal floors visible candidates under the existing fit+.5 density threshold. Empty/nonfinite/out-of-image/extreme (.95 image span) bounds use baseline fallback; single/identical positions receive nonzero padding and the same cap.
+Overview separately resets heading to 0/0 and whole-floor fit. Passive resize only refreshes constraints and clamps invalid hard bounds, preserving center/valid zoom/heading. Filter/detail never initiate initial fit; existing minimal selected-Spot pan to avoid the detail panel remains. Native MapLibre cameraForBounds calculates a level bounding rectangle; the modest pitch and image padding/cap are verified visually across responsive sizes.
+DOM data-viewer-camera and data-viewer-moving expose current rendered camera/corners and settled state for exact-SHA browser verification; there is no debug UI or separate Preview implementation. Existing geolocation and georeference conversion remain unchanged.
+
+PR27 P2 amendment: empty/invalid/extreme whole-floor fallback is displayed at pitch0 to match its fitted camera. Valid-content initial policy remains pitch20.
+
+Second P2 amendment: when content cannot fit at whole-floor+.55, use level whole-floor fallback rather than force past content fit. Content longitude bounds unwrap at the antimeridian. Compass reset reads the current Floor policy (0° fallback/20° valid content).

@@ -103,6 +103,11 @@ function selectSpot(spot: MapViewerSpot) {
   if (props.analyticsEnabled !== false && data.value?.map.id && mapSlug.value !== '__qa_arimatsu') sendPublicAnalytics({ type: 'SPOT_VIEW', mapId: data.value.map.id, spotId: spot.id })
 }
 
+function beginMapRecovery() {
+  clearPendingSpotClose()
+  overlay.value = null
+}
+
 function ensureSelectedSpotVisible() {
   if (!selectedSpotId.value) return
   const panel = document.querySelector<HTMLElement>('.spot-detail-sheet')?.getBoundingClientRect() ?? null
@@ -123,7 +128,8 @@ function closeSpot(source: 'pointer' | 'other' = 'other') {
     const fallbackMarker = [...document.querySelectorAll<HTMLElement>('.map-viewer-marker[data-spot-id]')]
       .find(element => element.dataset.spotId === closingSpotId)
     const mapEntry = document.querySelector<HTMLElement>('.map-viewer-frame [role="region"]')
-    ;(closingTrigger?.isConnected ? closingTrigger : fallbackMarker ?? mapEntry)?.focus({ preventScroll: true })
+    const trigger = closingTrigger?.isConnected ? closingTrigger : fallbackMarker
+    ;(trigger && !trigger.inert && getComputedStyle(trigger).visibility !== 'hidden' ? trigger : mapEntry)?.focus({ preventScroll: true })
     if (spotTriggerId === closingSpotId) {
       spotTrigger = null
       spotTriggerId = null
@@ -277,6 +283,7 @@ onBeforeUnmount(clearPendingSpotClose)
             class="h-full"
             :floor="selectedFloor"
             :spots="visibleSpots"
+            :initial-spots="selectedFloor.spots"
             :decorations="displayedDecorations"
             mode="view"
             :selected-spot-id="selectedSpotId"
@@ -285,6 +292,7 @@ onBeforeUnmount(clearPendingSpotClose)
             height="100%"
             :label="`${data.map.name} ${selectedFloor.name}`"
             @spot-selected="selectSpot"
+            @collision-started="beginMapRecovery"
           />
           <template #fallback>
             <div class="h-full animate-pulse bg-stone-200" />
