@@ -15,3 +15,5 @@
 `interaction-results.json` のtab-walkはF19発見時のbeforeを含む。修正後は同じ入口から直接CANVASへ移ることを実測。前後を取り違えない。
 
 screen reader実機、touch gesture、safe-area実値、Windowsでの完全S11は未検証。AC17は主要candidateフローPASS、最終提供環境ではPARTIAL。全a11y適合を主張しない。
+
+最終code SHA: `4a0d80cd9eeeba13bbb1447bf78b78ffa6a54747`。LIVE背後の編集Mapへfocusを戻さないようvisitor内にselectorを限定。near spiderfy→Enter Spot02→Escapeでvisitor CANVASへ復帰を実測。最終codeでtypecheck/build/685 unit・702 integration（1 skip）PASS。

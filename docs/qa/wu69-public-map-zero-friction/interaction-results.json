@@ -218,5 +218,12 @@
     "overviewBearing": 0,
     "overviewPitch": 0,
     "stageDelta": 1.0000000000000018
+  },
+  {
+    "check": "visitor-scoped-return-focus-final",
+    "code_sha": "4a0d80cd9eeeba13bbb1447bf78b78ffa6a54747",
+    "flow": "near spiderfy -> Enter Spot02 -> Detail -> Escape",
+    "focused_tag": "CANVAS",
+    "inside_visitor": true
   }
 ]

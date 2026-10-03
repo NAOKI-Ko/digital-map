@@ -1,7 +1,7 @@
 Loaded Prisma config from prisma.config.ts.
 
 Prisma schema loaded from prisma/schema.prisma.
-Datasource "db": PostgreSQL database "digital_map_test_wu69_20261003_1125", schema "public" at "127.0.0.1:5432"
+Datasource "db": PostgreSQL database "digital_map_test_wu65_wu69_final_20261003", schema "public" at "127.0.0.1:5432"
 
 32 migrations found in prisma/migrations
 
@@ -38,16 +38,6 @@ Applying migration `20260920020000_map_tenant_unique`
 Applying migration `20260921010000_paper_map_easy_builder`
 Applying migration `20260929010000_category_pin_defaults`
 
-┌─────────────────────────────────────────────────────────┐
-│  Update available 7.10.0 -> 8.0.0-rc.19                 │
-│                                                         │
-│  This is a major update - please follow the guide at    │
-│  https://pris.ly/d/major-version-upgrade                │
-│                                                         │
-│  Run the following to update                            │
-│    npm i --save-dev prisma@latest                       │
-│    npm i @prisma/client@latest                          │
-└─────────────────────────────────────────────────────────┘
 The following migration(s) have been applied:
 
 migrations/
