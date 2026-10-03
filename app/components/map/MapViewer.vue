@@ -60,6 +60,10 @@ const placementEnabled = toRef(props, 'placementEnabled')
 const prioritizeVisibleSpots = toRef(props, 'prioritizeVisibleSpots')
 const mobileCover = toRef(props, 'mobileCover')
 const visitorOverview = toRef(props, 'visitorOverview')
+function setVisitorCanvasLabel(canvas?: HTMLCanvasElement | null) {
+  if (props.visitorOverview) canvas?.setAttribute('aria-label', `${props.label}（矢印キーで移動、プラス・マイナスで拡大縮小）`)
+}
+watch(() => props.label, () => setVisitorCanvasLabel(container.value?.querySelector('canvas')))
 const viewer = useMapViewer(container, {
   floor,
   spots,
@@ -77,7 +81,7 @@ const viewer = useMapViewer(container, {
   initialCamera: props.initialCamera,
   onCameraChanged: camera => emit('cameraChanged', camera),
   onReady: map => {
-    if (props.visitorOverview) map.getCanvas().setAttribute('aria-label', `${props.label}（矢印キーで移動、プラス・マイナスで拡大縮小）`)
+    setVisitorCanvasLabel(map.getCanvas())
     const report = () => {
       if (container.value) container.value.dataset.viewerMoving = String(map.isMoving())
       if (container.value) container.value.dataset.viewerCamera = JSON.stringify({ floorId: props.floor.id, corners: getFloorCorners(props.floor) ? toImageCoordinates(getFloorCorners(props.floor)!).map(point => map.project(point)) : [], center: map.getCenter(), zoom: map.getZoom(), bearing: map.getBearing(), pitch: map.getPitch(), minZoom: map.getMinZoom(), maxZoom: map.getMaxZoom() })
