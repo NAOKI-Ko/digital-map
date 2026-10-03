@@ -5,7 +5,7 @@ WU-69親Acceptance Criteriaと69-01〜69-08を正本とし、AS ISのF01〜F16�
 ## Mapと探索文脈
 
 - 390×844でMapを基盤として見せる。初期の巨大な上下余白を減らし、最初からSpotを探索できる倍率にする。全画像を完全に収めることだけを初期cameraの目的にしない。
-- 追加のユーザー要求（2026-10-03）により初期cameraはbearing0°／pitch25°とする（以前の20°からの明示的更新）。Overviewは0°／0°を維持する。whole-floor fitからの安全上限はMobile +1.3、Desktop +0.65を超えない。
+- 追加のユーザー要求（2026-10-03）により初期cameraはbearing0°／pitch25°とする（以前の20°からの明示的更新）。Overviewは0°／0°を維持する。whole-floor fitからの安全上限は全幅 +0.65を超えない。
 - Map名と現在Floorを小さく、読める文脈表示にする。Floorを切り替えると古いDetailを閉じ、選んだFloorへ予測可能に移る。Categoryの条件は保持し、結果なしは分かるようにする。
 - 非探索のInfo open／closeでcameraを変えない。Detail前のcameraを保存し、Closeで復元する。ただしDetail中にuserが明示的にPan／Zoomしたときはその意図を優先する。
 
@@ -49,3 +49,7 @@ Floor切替に伴い、操作可能canvasのアクセシブル名も現在Floor�
 Map領域外はvisitor rendererだけ淡い暖色neutral（#eeeae4）にする。模様・texture・強いgradientはIllustrationの線画と競合するため採用しない。collision代表PINの小さな20px件数badgeはgroup件数を示す。Cluster entityや集約地点を作らず、WU-68 priority、分離可能なZoom-in、maxZoomで分離不能なSpiderfyを維持する。768pxの判定はborder内canvas幅ではなくvisitor stage幅に合わせる。
 
 69-09正本化・実画面比較(2026-10-03): 初期20°/25°を同一center/zoomで比較し25°採用。初期姿勢では向き回復を表示しない。暖色neutral#eeeae4を白/寒色との比較で採用。根拠とAC24–32は11-69-09-VERIFICATION.md。
+
+Codex review corrections: collision group件数はon-screenの既存priority順で選ぶ1代表へ集約。他の可視PINは直接Detail。declutter visibility／group membership／staged Zoom／maxZoom Spiderfyは保持。Mobile Floorは共通下部操作列、CategoryなしFloorはdock height0、同URL写真のloaded/errorを再利用。Locale変更はMapLibre labels/canvasを追従させcameraをremountしない。
+
+Locale refresh中は表示中のMapをloading画面へ置き換えず、探索cameraを維持する。error時は既存error表示へ移る。

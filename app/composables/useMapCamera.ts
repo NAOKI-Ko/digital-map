@@ -54,7 +54,7 @@ export function createMapViewerStyle(_mode: MapViewerMode, visitor = false): Sty
   }
 }
 
-export function createMapViewerOptions(container: HTMLElement | string, mode: MapViewerMode, visitor = false): MapOptions {
+export function createMapViewerOptions(container: HTMLElement | string, mode: MapViewerMode, visitor = false, locale: 'ja' | 'en' = 'ja'): MapOptions {
   const camera = VIEWER_CAMERA_CONSTRAINTS[mode]
   return {
     container,
@@ -65,7 +65,7 @@ export function createMapViewerOptions(container: HTMLElement | string, mode: Ma
     maxZoom: ABSOLUTE_ZOOM_LIMITS.maxZoom,
     // Visitor double-tap/double-click zoom stays native; editing keeps placement gestures unambiguous.
     doubleClickZoom: mode === 'view' && visitor,
-    locale: visitor ? {
+    locale: visitor && locale === 'ja' ? {
       'GeolocateControl.FindMyLocation': '現在地を表示',
       'GeolocateControl.LocationNotAvailable': '現在地を取得できません',
       'AttributionControl.ToggleAttribution': '地図のクレジットを表示',

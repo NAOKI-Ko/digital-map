@@ -1,8 +1,17 @@
 // @vitest-environment happy-dom
 import { describe, expect, it } from 'vitest'
-import { applyPinVisibility, declutterPins, getCollisionGroup, measurePinRect } from '../app/utils/marker-collision'
+import { applyPinVisibility, declutterPins, getCollisionGroup, getCollisionRepresentatives, measurePinRect } from '../app/utils/marker-collision'
 const pin = (id: string, priority: number, left = 0, size = 60) => ({ id, priority, rect: { left, top: 0, right: left + size, bottom: size } })
 describe('screen-space decluttering', () => {
+  it('a chain with two visible winners shows one count without changing visibility or recovery membership', () => {
+    const chain = [pin('a', 2, 0), pin('b', 1, 60), pin('c', 1, 120), pin('separate', 1, 300)]
+    const visible = declutterPins(chain)
+    expect([...visible]).toEqual(['a', 'c', 'separate'])
+    expect([...getCollisionRepresentatives(chain, visible)]).toEqual([['a', 3]])
+    expect(getCollisionGroup('a', chain).map(pin => pin.id)).toEqual(['a', 'b', 'c'])
+    const focused = chain.map(pin => ({ ...pin, protected: pin.id === 'c' }))
+    expect([...getCollisionRepresentatives(focused, declutterPins(focused))]).toEqual([['c', 3]])
+  })
   it('selected > active Category > featured > normal, independent of input order', () => {
     const pins = [pin('normal',1),pin('featured',2),pin('filter',3),pin('selected',4)]
     expect([...declutterPins(pins)]).toEqual(['selected'])

@@ -3,9 +3,9 @@ import type { MapViewerFloor, MapViewerSpot } from '~~/shared/types/map-viewer'
 
 export const VISITOR_INITIAL_PITCH = 25
 export const VISITOR_INITIAL_ZOOM_ALLOWANCE = 0.65
-export const VISITOR_MOBILE_INITIAL_ZOOM_ALLOWANCE = 1.3
+export const VISITOR_MOBILE_INITIAL_ZOOM_ALLOWANCE = VISITOR_INITIAL_ZOOM_ALLOWANCE
 export const VISITOR_INITIAL_FALLBACK_ZOOM_OFFSET = 0.2
-export const VISITOR_MOBILE_INITIAL_FALLBACK_ZOOM_OFFSET = 1.15
+export const VISITOR_MOBILE_INITIAL_FALLBACK_ZOOM_OFFSET = 0.65
 export const VISITOR_INITIAL_ZOOM_MINIMUM = 0.55
 
 /** Full Floor's unfiltered content only; filter/detail never feeds initial framing. */
@@ -30,7 +30,7 @@ export function getVisitorContentBounds(floor: MapViewerFloor, spots: readonly M
 
 export function clampVisitorInitialZoom(fitZoom: number, contentZoom: number, allowance = VISITOR_INITIAL_ZOOM_ALLOWANCE) {
   if (!Number.isFinite(contentZoom)) return fitZoom
-  return Math.min(fitZoom + allowance, contentZoom)
+  return Math.min(fitZoom + Math.min(allowance, VISITOR_INITIAL_ZOOM_ALLOWANCE), contentZoom)
 }
 
 /** Broad content uses bounded whole-floor discovery instead of a misleading compact-content fit. */

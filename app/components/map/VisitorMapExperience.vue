@@ -16,7 +16,10 @@ import { createPublicMapDecorationFixture } from '~/utils/public-map-decoration-
 const LazyMapViewer = defineAsyncComponent(() => import('~/components/map/MapViewer.vue'))
 
 const props = defineProps<{ response: PublicMapResponse | null | undefined, status: string, error: boolean, analyticsEnabled?: boolean }>()
-const data = computed(() => props.response)
+const lastResponse = shallowRef(props.response)
+watch(() => props.response, response => { if (response?.map) lastResponse.value = response })
+// A locale refresh keeps the visitor's mounted map and exploration context.
+const data = computed(() => props.response ?? (props.status === 'pending' ? lastResponse.value : null))
 const status = computed(() => props.status)
 const error = computed(() => props.error)
 const route = useRoute()
@@ -36,7 +39,7 @@ watch(categoryDock, (element, _previous, onCleanup) => {
   let frame: number | null = null
   const measure = () => {
     const height = Math.ceil(element.getBoundingClientRect().height)
-    if (height > 0) categoryDockHeight.value = height
+    if (height > 0 || !categories.value.length) categoryDockHeight.value = height
   }
   const observer = new ResizeObserver(() => {
     if (frame !== null) cancelAnimationFrame(frame)
@@ -245,7 +248,7 @@ onBeforeUnmount(clearPendingSpotClose)
 
 <template>
   <main class="fixed inset-0 h-[100dvh] w-screen overflow-hidden bg-stone-100 text-stone-900 md:static md:w-auto">
-    <div v-if="status === 'pending'" class="grid h-full place-items-center px-6 text-sm text-stone-600">
+    <div v-if="status === 'pending' && !data?.map" class="grid h-full place-items-center px-6 text-sm text-stone-600">
       {{ t.loading }}
     </div>
     <div v-else-if="error" class="grid h-full place-items-center px-6">
@@ -282,7 +285,7 @@ onBeforeUnmount(clearPendingSpotClose)
             <h1 class="truncate text-sm font-bold">{{ data.map.name }}</h1>
             <p v-if="!showFloorSelector" class="truncate text-xs text-stone-600">{{ selectedFloor.name }}</p>
           </div>
-          <div v-if="showFloorSelector" data-map-fit-edge="top" class="pointer-events-auto absolute left-[calc(env(safe-area-inset-left)+0.75rem)] top-[calc(env(safe-area-inset-top)+3.5rem)] " :class="data.map.enabledLocales.includes('en') ? 'max-w-[calc(100vw-10rem)]' : 'max-w-[calc(100vw-5.5rem)]'">
+          <div v-if="showFloorSelector" v-show="!selectedSpot" data-map-fit-edge="bottom" class="pointer-events-auto absolute bottom-[calc(env(safe-area-inset-bottom)+2rem+var(--visitor-category-height,52px)+1.5rem)] left-[calc(env(safe-area-inset-left)+0.75rem)] max-w-[calc(100vw-10.5rem)]">
           <button type="button" class="flex h-11 max-w-full items-center gap-2 rounded-full border border-white/70 bg-white/85 px-4 text-sm font-bold shadow-sm backdrop-blur" data-visitor-action="floor" aria-haspopup="dialog" :aria-expanded="floorSelectorOpen" @click="openFloorSelector">
             <span class="truncate">{{ selectedFloor.name }}</span> <span class="shrink-0" aria-hidden="true">⌄</span>
           </button>
@@ -319,6 +322,7 @@ onBeforeUnmount(clearPendingSpotClose)
             ref="mapViewerRef"
             class="h-full"
             :floor="selectedFloor"
+            :locale="data.map.locale"
             :spots="visibleSpots"
             :initial-spots="selectedFloor.spots"
             :decorations="displayedDecorations"

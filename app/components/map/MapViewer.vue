@@ -20,6 +20,7 @@ const props = withDefaults(defineProps<{
   initialCamera?: MapViewerCameraState | null
   prioritizeVisibleSpots?: boolean
   visitorOverview?: boolean
+  locale?: 'ja' | 'en'
   initialSpots?: readonly MapViewerSpot[]
   mobileCover?: boolean
 }>(), {
@@ -38,6 +39,7 @@ const props = withDefaults(defineProps<{
   prioritizeVisibleSpots: false,
   mobileCover: false,
   visitorOverview: false,
+  locale: 'ja',
 })
 
 const emit = defineEmits<{
@@ -61,9 +63,9 @@ const prioritizeVisibleSpots = toRef(props, 'prioritizeVisibleSpots')
 const mobileCover = toRef(props, 'mobileCover')
 const visitorOverview = toRef(props, 'visitorOverview')
 function setVisitorCanvasLabel(canvas?: HTMLCanvasElement | null) {
-  if (props.visitorOverview) canvas?.setAttribute('aria-label', `${props.label}（矢印キーで移動、プラス・マイナスで拡大縮小）`)
+  if (props.visitorOverview) canvas?.setAttribute('aria-label', props.locale === 'en' ? `${props.label} (arrow keys to pan, plus/minus to zoom)` : `${props.label}（矢印キーで移動、プラス・マイナスで拡大縮小）`)
 }
-watch(() => props.label, () => setVisitorCanvasLabel(container.value?.querySelector('canvas')))
+watch([() => props.label, () => props.locale], () => setVisitorCanvasLabel(container.value?.querySelector('canvas')))
 const viewer = useMapViewer(container, {
   floor,
   spots,
@@ -76,6 +78,7 @@ const viewer = useMapViewer(container, {
   prioritizeVisibleSpots,
   mobileCover,
   visitorOverview,
+  locale: toRef(props, 'locale'),
   initialSpots: computed(() => props.initialSpots ?? props.spots),
   mode: props.mode,
   initialCamera: props.initialCamera,

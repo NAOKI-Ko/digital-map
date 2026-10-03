@@ -71,3 +71,9 @@ P2。keyboardでRecovery2Fへ切替後、外側regionとFloor buttonは2Fだが�
 ## 69-09 iteration F25
 
 F25 P3: 初期pitch25°なのに「向きを戻す」が表示され、向きが異常なのか迷う。homePitchを初期jumpTo前に設定し、pitch event時点から初期姿勢を基準にする。390px reloadで不要なNが消えたことを確認。全jump時点のbaseline回帰テストPASS。Finding ID25件、F09はNOT REPRODUCIBLE、confirmed24件はcandidateでFIXED。
+
+## Codex review Findings F26–F31
+
+F26 P2 Preview multi-floor banner overlap;F27 P2 retained-photo loading overlay;F28 P1 mobile zoom safety cap regression;F29 P2 repeated count badges on connected-chain visible winners;F30 P3 zero-category stale dock height;F31 P2 English MapLibre labels. All corrected and verified in11-69-09-VERIFICATION.md. Finding IDs31, F09 NOT REPRODUCIBLE, confirmed30 FIXED in candidate.
+
+F32 P2: 言語変更前にZoomするとMapが初期cameraへ戻る。pending locale取得中は直前の有効responseとMapを保持し、Zoom後のJA→ENでcamera JSON一致を実測。Finding IDs32、F09 NOT REPRODUCIBLE、confirmed31 FIXED in candidate。

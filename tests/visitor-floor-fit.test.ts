@@ -30,7 +30,7 @@ describe('visitor viewport safe fit', () => {
     expect(eventHomePitches.every(pitch => pitch === 25)).toBe(true)
     expect(instance.cameraForBounds).toHaveBeenCalledOnce()
     expect(instance.cameraForBounds).toHaveBeenLastCalledWith(expect.anything(), expect.objectContaining({ pitch: 0 }))
-    expect(instance.jumpTo).toHaveBeenLastCalledWith({ center: [0,0], zoom: 15.15, bearing: 0, pitch: 25 })
+    expect(instance.jumpTo).toHaveBeenLastCalledWith({ center: [0,0], zoom: 14.65, bearing: 0, pitch: 25 })
     expect(camera.getHomePitch()).toBe(25)
     // At the md boundary, the border leaves a 766px canvas inside a 768px stage.
     container.value = { ...container.value, clientWidth: 766, closest: () => ({ clientWidth: 768, querySelectorAll: () => [] }) } as unknown as HTMLElement
@@ -46,7 +46,7 @@ describe('visitor viewport safe fit', () => {
     camera.fitFloorBounds(getFloorCorners(floor.value)!,true)
     expect(instance.stop).toHaveBeenCalledOnce()
     expect(instance.cameraForBounds).toHaveBeenCalledWith(expect.anything(),expect.objectContaining({bearing:0,pitch:0,padding:{top:24,bottom:24,left:24,right:24}}))
-    expect(instance.jumpTo).toHaveBeenLastCalledWith({center:[0,0],zoom:15.15,bearing:0,pitch:25})
+    expect(instance.jumpTo).toHaveBeenLastCalledWith({center:[0,0],zoom:14.65,bearing:0,pitch:25})
     camera.showWholeFloor()
     expect(camera.getHomePitch()).toBe(0)
     expect(instance.easeTo).toHaveBeenLastCalledWith(expect.objectContaining({zoom:14,bearing:0,pitch:0}))
@@ -59,6 +59,6 @@ describe('visitor viewport safe fit', () => {
     floor.value={...floor.value,id:'wide',imageWidth:2560,imageHeight:640}
     camera.fitFloorBounds(getFloorCorners(floor.value)!,true)
     expect(instance.stop).toHaveBeenCalledTimes(2)
-    expect(instance.jumpTo).toHaveBeenLastCalledWith({center:[0,0],zoom:15.15,bearing:0,pitch:25})
+    expect(instance.jumpTo).toHaveBeenLastCalledWith({center:[0,0],zoom:14.65,bearing:0,pitch:25})
   })
 })

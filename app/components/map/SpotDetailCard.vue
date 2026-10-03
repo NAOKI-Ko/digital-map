@@ -81,7 +81,8 @@ function removeBodyTouchMoveListener() {
 }
 
 watch(() => props.spot.id, () => {
-  photoStates.value = {}
+  // A retained URL reuses its image and may not emit another load/error event.
+  photoStates.value = Object.fromEntries(Object.entries(photoStates.value).filter(([url]) => props.spot.photos.includes(url)))
   sheetState.value = visibleHeight.value < 500 ? 'expanded' : 'detail'
   nextTick(() => scrollBody.value?.scrollTo({ top: 0 }))
 })

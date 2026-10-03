@@ -76,7 +76,7 @@ describe('公開Mapのモバイル契約', () => {
   })
 
   it('top controls、Map controls、Category、attributionへ独立した配置zoneを持つ', () => {
-    expect(publicPage).toContain('max-w-[calc(100vw-5.5rem)]')
+    expect(publicPage).toContain('max-w-[calc(100vw-10.5rem)]')
     expect(publicPage).toContain('bottom-[calc(env(safe-area-inset-bottom)+2rem)]')
     expect(publicPage).toContain('right-[calc(env(safe-area-inset-right)+0.75rem)]')
     expect(mapViewer).toContain('margin-top: calc(env(safe-area-inset-top) + 4.5rem) !important;')

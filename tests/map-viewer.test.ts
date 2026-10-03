@@ -96,6 +96,11 @@ describe('MapViewerのカメラ制約', () => {
     expect(createMapViewerOptions('map', 'edit').doubleClickZoom).toBe(false)
   })
 
+  it('English visitor maps retain native English MapLibre labels', () => {
+    expect(createMapViewerOptions('map', 'view', true, 'en').locale).toBeUndefined()
+    expect(createMapViewerOptions('map', 'view', true, 'ja').locale).toMatchObject({ 'GeolocateControl.FindMyLocation': '現在地を表示' })
+  })
+
   it('編集モードはピン配置しやすい真上視点に固定する', () => {
     expect(createMapViewerOptions('map', 'edit')).toMatchObject({
       bearing: 0,

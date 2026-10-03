@@ -1,3 +1,5 @@
+HISTORICAL first69-09 iteration. **11-69-09-VERIFICATION.md supersedes the mobile+1.3 safety claim, repeated badges and first QA counts below. Final whole-floor cap is+.65 at all widths.**
+
 # WU-69 追加要求の実装・検証記録
 
 2026-10-03。対象は未mergeのDraft PR #28にある修正候補。Windows／Productionはこの作業で変更していない。最終Deliveryは必須Verifyを通過するまで完了としない。

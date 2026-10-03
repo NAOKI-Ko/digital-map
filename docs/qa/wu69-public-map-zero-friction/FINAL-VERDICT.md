@@ -1,4 +1,4 @@
-2026-10-03 69-09最新: **11-69-09-VERIFICATION.md** と **delivery-status-69-09.json** が最新32AC/QA正本。以下は旧23AC時点の履歴。最新認証LIVE/Public実画面比較は5幅PASS、F25も回収。最終Windows未反映・Verify FAILの完了禁止は継続。
+2026-10-03 69-09最新: **11-69-09-VERIFICATION.md** と **delivery-status-69-09.json** が最新32AC/QA正本。以下は旧23AC時点の履歴。最新認証LIVE/Public実画面比較は5幅PASS、F25〜F32も回収。最終Mobile safety capは+.65へ修復。最終Windows未反映・Verify FAILの完了禁止は継続。
 
 # WU-69 final verdict — NOT COMPLETE
 
