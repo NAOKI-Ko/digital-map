@@ -16,7 +16,7 @@ These choices follow Platinumaps continuous category exploration and Google Maps
 
 ## Regression evidence
 
-- Tests704 PASS /1 SKIP,106 files PASS /1 SKIP. DB integration tests use new digital_map_test_wu65_wu69_09_20261003 in existing local Compose Postgres. Skip is WU65 separate before/after migration equivalence. Canonical digital_map DB unchanged.
+- Tests714 PASS /1 SKIP,108 files PASS /1 SKIP. DB integration tests use new digital_map_test_wu65_wu69_09_20261003 in existing local Compose Postgres. Skip is WU65 separate before/after migration equivalence. Canonical digital_map DB unchanged.
 - typecheck PASS; build PASS; Prisma validate PASS; diff whitespace PASS. No package/lock/workflow/schema/migration changes.
 - 390×844 /768×1024 /1024×768 /1440×900 /1440×700: actual inner dimensions checked; no document horizontal overflow; final camera0°/25°. (An initial viewport pass targeted a second tab; invalid measurements were removed and all widths repeated with measured dimensions.)
 - Authenticated LIVE Preview and Public Release rendered in isolated local DB/storage with an Arimatsu-derived20-spot fixture. Login uses a disposable fictitious account, no existing credential modifications. Same camera JSON at all five widths; Category Space→PIN Enter→Escape preserves camera on both routes. Chip names/states, badges, background and controls match, except the intentional Preview banner. QA release is a fixture snapshot, not a test of the publish pipeline or a Windows deployment.
@@ -34,9 +34,13 @@ Local read-only Codex review of141865b completed with2 P2; its own attempt to ru
 - F30 P3: categories-less Floor retained old dock height. Record0 when no categories; retain height only while an existing dock is temporarily hidden by Detail. Empty2F has CSS height0px and lower aligned floor/map controls at y744/742.
 - F31 P2: English maps inherited Japanese MapLibre overrides. Pass resolved map locale into shared viewer, retain native English labels, localize canvas instructions, and synchronize control aria-label/title on runtime locale changes without remounting camera. Actual English Public/LIVE and EN→JA switch verified with camera preservation.
 
-Finding IDs32; F09 NOT REPRODUCIBLE;31 confirmed Findings fixed in candidate. FINAL-SAFE evidence supersedes prior screenshots and first review iteration. New review is required on the final pushed SHA; no review is described as approval until a result exists.
+Finding IDs34; F09 NOT REPRODUCIBLE;33 confirmed Findings fixed in candidate. FINAL-SAFE evidence supersedes prior screenshots and first review iteration. New review is required on the final pushed SHA; no review is described as approval until a result exists.
 
 F32 P2 (follow-up actual exploration): initial-camera EN→JA equality had hidden a refresh/remount defect. Zoom16.2597→language change reset15.2597 before the fix. Shared visitor retains its last valid response during pending locale fetch and does not replace a populated Map with the loading branch. Repeated zoomed JA→EN now preserves the entire camera JSON and active native labels. No Public/API/Admin source change.
+
+F33 P2 (second local Codex review): retaining a refreshed response could leave same-ID raster/georeference/geolocation resources stale. Visitor rendering watches only image URL and canonical geometry fields, excluding translated names. Image-only refresh replaces raster without refitting; geometry refresh resynchronizes raster, PINs, controls and fit. Editor retains its existing floor-ID-only watch. Actual390×844 image refresh during language switch preserves zoom16.2597 / center / bearing / pitch exactly; removing a reference clears geolocation and aligns fallback image/PINs. Disposable fixture restored afterward. Seven watcher regressions PASS.
+
+F34 P2 (GitHub Codex review25c6c4b): English visitor Overview still showed Japanese 全体 / 地図全体を表示. Shared navigation now shows EN All / Show whole map, JA 全体 / 地図全体を表示, and localizes zoom/heading labels. Initial and runtime locale changes keep the same DOM/camera. Actual390 English→Japanese equality PASS; three DOM regressions PASS including unchanged non-visitor presentation. Both F33/F34 are candidate FIXED, awaiting latest-SHA review.
 
 Final reduced-motion source regression: latest unit tests cover duration0 recovery/Sheet behavior. A new real-screen reduce check after all review corrections was prevented by the Mac locking; previous actual reduce=true evidence is from the first69-09 iteration, not a claim that the final source was re-operated under reduce. This is recorded as a verification limit.
 
@@ -46,17 +50,17 @@ Candidate describes local evidence; Final includes Windows exact SHA / black-box
 
 | AC | Canonical criterion | Candidate | Final | Evidence / remaining limit |
 | --- | --- | --- | --- | --- |
-| 1 | Category UI | PASS | FAIL | 候補のMap探索面積を改善。WindowsはAS ISの小さいMap。 |
-| 2 | Collision marker count | PARTIAL | PARTIAL | 候補S1〜S10のpointer経路を実施。physical pinch/初見別人/Windows final未了。 |
-| 3 | Initial camera | PASS | FAIL | 候補のknown P1/P2を回収。Windows baselineは未反映。 |
-| 4 | Outside-map background | PASS | FAIL | F25 P3 also fixed;32 Finding IDs, F09 not reproducible,31 confirmed fixed locally; Windows unmodified. |
-| 5 | frictionを優先順に修正 | PASS | FAIL | Native chip scroller, partial chip/fade, fixed one-action clear, wrapped names; Windows unmodified. |
-| 6 | 390px反復QA | PASS | PARTIAL | selected/focused名と既存normal/featuredの形・priority。Windows最終比較未了。 |
-| 7 | responsive/accessibility回帰 | PASS | PARTIAL | dense +1段、near maxZoom、3本spiderfyから個別選択。Windows未了。 |
-| 8 | PR / Verify / merge | PASS | FAIL | 全5幅でClose camera一致、user Panは保持。Windows baselineは元cameraを失う。 |
-| 9 | Windows exact SHA | PARTIAL | PARTIAL | pointer/keyboardとnative設定を確認、physical pinch未検証。 |
-| 10 | Black-box Final Acceptance | PASS | PARTIAL | 2-floorでCategory保持、旧Detail閉じ、Floor0/25。Windows未了。 |
-| 11 | Overview recoveryが見つけやすく、実行後の状態が予測可能 | PASS | FAIL | 「全体」/overview0/0。Windowsは発見しにくい記号のまま。 |
+| 1 | 390pxでMapが常に画面の主役として認識できる | PASS | FAIL | 候補のMap探索面積を改善。WindowsはAS ISの小さいMap。 |
+| 2 | 初見ユーザーが説明なしでS1〜S10を完遂可能 | PARTIAL | PARTIAL | 候補S1〜S10のpointer経路を実施。physical pinch/初見別人/Windows final未了。 |
+| 3 | Public Map主要操作に既知P1/P2を残さない | PASS | FAIL | 候補のknown P1/P2を回収。Windows baselineは未反映。 |
+| 4 | 再現可能なP3も、合理的に修正可能なものは残さない | PASS | FAIL | F25 P3 also fixed;34 Finding IDs, F09 not reproducible,33 confirmed fixed locally; Windows unmodified. |
+| 5 | Category UIの選択状態・横方向の追加項目・解除方法が明確 | PASS | FAIL | Native chip scroller, partial chip/fade, fixed one-action clear, wrapped names; Windows unmodified. |
+| 6 | PINのnormal / featured / selected / focusedが過剰でなく判別可能 | PASS | PARTIAL | selected/focused名と既存normal/featuredの形・priority。Windows最終比較未了。 |
+| 7 | WU-68 collision / staged zoom / spiderfyが自然で、仕組みを意識させない | PASS | PARTIAL | dense +1段、near maxZoom、3本spiderfyから個別選択。Windows未了。 |
+| 8 | Detail open/closeでMap contextを失わない | PASS | FAIL | 全5幅でClose camera一致、user Panは保持。Windows baselineは元cameraを失う。 |
+| 9 | Map pan/pinch/zoomをfloating UIが不必要に阻害しない | PARTIAL | PARTIAL | pointer/keyboardとnative設定を確認、physical pinch未検証。 |
+| 10 | Floor切替後の探索が自然 | PASS | PARTIAL | 2-floorでCategory保持、旧Detail閉じ、Floor0/25。Windows未了。 |
+| 11 | Overview recoveryが見つけやすく、実行後の状態が予測可能 | PASS | FAIL | JA「全体」/EN「All」, accessible Show whole map; overview0/0。Windowsは発見しにくい記号のまま。 |
 | 12 | Mobileで不要なZoom +/-等が操作を邪魔しない。必要性を実画面で判断 | PASS | FAIL | 実390画面でmobile +/-を隠し、Desktop/keyboardを維持。Windows未反映。 |
 | 13 | controlsの位置・見た目・役割が統一されている | PASS | PARTIAL | 44px基本サイズ、下部controls、Category/Detail役割整理。Windows未了。 |
 | 14 | touch targetは原則44px以上 | PASS | PARTIAL | candidateの主要button44px、PIN60px。Windows final未了。 |
@@ -67,7 +71,7 @@ Candidate describes local evidence; Final includes Windows exact SHA / black-box
 | 19 | Public Release / Authenticated LIVE Preview parity維持 | PASS | PARTIAL | Authenticated local LIVE vs Public Release, camera JSON identical at all5 widths; Windows final pending. |
 | 20 | Google Maps / PlatinumapsとのBenchmarkで、基本操作に明白な劣化UXがある場合は理由なく残さない | PASS | PARTIAL | 14軸比較と採用/不採用理由を記録。提供環境のrecheck未了。 |
 | 21 | Benchmarkを真似た結果Digital Map固有のIllustration Map UXが悪化していない | PASS | PARTIAL | Illustration保持、写真PIN全面化/全文panel/新domain不採用。Windows未了。 |
-| 22 | tests / typecheck / build / Prisma validate / Verifyの既存品質ゲートを通す | FAIL | FAIL | Latest local tests702/1skip, typecheck/build/Prisma PASS; required Verify/security audit remains FAIL. |
+| 22 | tests / typecheck / build / Prisma validate / Verifyの既存品質ゲートを通す | FAIL | FAIL | Latest local tests714/1skip, typecheck/build/Prisma PASS; required Verify/security audit remains FAIL. |
 | 23 | Production untouched | PASS | PASS | main/Production/Publicationは操作なし。Windows runtimeも未変更。 |
 | 24 | 左右矢印に依存せずCategoryをtouch scrollで探索できる。 | PARTIAL | PARTIAL | Native horizontal scroll and CSS touch scroller verified; actual finger swipe not performed. |
 | 25 | 「すべて/クリア」はCategory scroll位置に関係なく1操作で到達できる。 | PASS | PARTIAL | Local browser/automated evidence above; Windows exact-SHA acceptance pending. |

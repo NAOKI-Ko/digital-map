@@ -18,6 +18,7 @@ import {
 } from './useMapCamera'
 import { useMapCollisionRecovery } from './useMapCollisionRecovery'
 import { useMapGeolocation } from './useMapGeolocation'
+import { watchViewerFloorRendering } from './watchViewerFloorRendering'
 
 export interface UseMapViewerOptions {
   mode: MapViewerMode
@@ -109,6 +110,27 @@ function createControlButton(label: string, text: string, action: () => void) {
   return button
 }
 
+export function syncMapNavigationLabels(container: HTMLElement, locale: 'ja' | 'en') {
+  const labels = [
+    ['.map-viewer-zoom-in', '拡大', 'Zoom in'],
+    ['.map-viewer-zoom-out', '縮小', 'Zoom out'],
+    ['.map-viewer-compass', '向きを戻す', 'Reset heading'],
+    ['.map-viewer-overview-control', '地図全体を表示', 'Show whole map'],
+  ] as const
+  for (const [selector, ja, en] of labels) {
+    const button = container.querySelector<HTMLElement>(selector)
+    if (!button) continue
+    const label = locale === 'en' ? en : ja
+    for (const attribute of ['title', 'aria-label']) {
+      if (button.getAttribute(attribute) !== label) button.setAttribute(attribute, label)
+    }
+    if (selector === '.map-viewer-overview-control') {
+      const text = locale === 'en' ? 'All' : '全体'
+      if (button.textContent !== text) button.textContent = text
+    }
+  }
+}
+
 export class MapNavigationControl implements IControl {
   private map: MapLibreMap | null = null
   private container: HTMLElement | null = null
@@ -121,6 +143,7 @@ export class MapNavigationControl implements IControl {
     private readonly showWholeFloor?: () => void,
     private readonly onInteraction: () => void = () => {},
     private readonly visitor = false,
+    private readonly locale: () => 'ja' | 'en' = () => 'ja',
   ) {}
 
   onAdd(map: MapLibreMap) {
@@ -141,8 +164,8 @@ export class MapNavigationControl implements IControl {
     }
     const zoomIn = createControlButton('拡大', '+', () => zoom(1))
     const zoomOut = createControlButton('縮小', '−', () => zoom(-1))
-    zoomIn.className = 'map-viewer-zoom-control'
-    zoomOut.className = 'map-viewer-zoom-control'
+    zoomIn.className = 'map-viewer-zoom-control map-viewer-zoom-in'
+    zoomOut.className = 'map-viewer-zoom-control map-viewer-zoom-out'
     const compass = createControlButton('向きを戻す', 'N', () => { this.onInteraction(); this.map?.easeTo({ bearing: 0, pitch: this.homePitch(), duration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : this.visitor ? 180 : 250 }) })
     compass.className = 'map-viewer-compass'
     this.updateCompass = () => { compass.hidden = !needsHeadingReset(map.getBearing(), map.getPitch(), this.homePitch()) }
@@ -159,6 +182,7 @@ export class MapNavigationControl implements IControl {
     map.on('moveend', this.finishZoom)
     this.updateCompass()
     this.container = container
+    if (this.visitor) syncMapNavigationLabels(container, this.locale())
     return container
   }
 
@@ -222,6 +246,7 @@ export function useMapViewer(
   let localeObserver: MutationObserver | null = null
   function syncVisitorControlLabels() {
     if (!options.visitorOverview?.value) return
+    if (container.value) syncMapNavigationLabels(container.value, options.locale?.value ?? 'ja')
     const labels = [['Find my location', '現在地を表示'], ['Location not available', '現在地を取得できません'], ['Toggle attribution', '地図のクレジットを表示']]
     container.value?.querySelectorAll<HTMLElement>('.maplibregl-ctrl-geolocate, .maplibregl-ctrl-attrib-button').forEach(button => {
       for (const attribute of ['aria-label', 'title']) {
@@ -281,7 +306,7 @@ export function useMapViewer(
     createBaseControls: () => [new MapNavigationControl(mapCamera.getHomePitch, options.mode === 'view' ? () => {
       if (options.visitorOverview?.value) options.onCollisionStarted?.()
       mapCamera.showWholeFloor()
-    } : undefined, discardDetailContext, Boolean(options.visitorOverview?.value))],
+    } : undefined, discardDetailContext, Boolean(options.visitorOverview?.value), () => options.locale?.value ?? 'ja')],
     createControlGroup: controls => {
       const group = new HorizontalMapControlGroup(controls)
       return {
@@ -613,14 +638,17 @@ export function useMapViewer(
     })
   }
 
-  function showFloor(floor: MapViewerFloor, animate = true) {
+  function showFloor(floor: MapViewerFloor, animate = true, refit = true) {
     const instance = map.value
     const corners = getFloorCorners(floor)
     if (!instance || !isReady.value) return false
 
     recovery.close()
     removeFloorImage()
-    mapCamera.resetFloorCamera()
+    if (refit) {
+      if (options.visitorOverview?.value) discardDetailContext()
+      mapCamera.resetFloorCamera()
+    }
 
     if (!corners) {
       floorError.value = 'このフロアは2点合わせが未設定、または正しくありません。'
@@ -645,7 +673,7 @@ export function useMapViewer(
     activeLayerId = layerId
     syncDecorations()
 
-    mapCamera.fitFloorBounds(corners, animate)
+    if (refit) mapCamera.fitFloorBounds(corners, animate)
     return true
   }
 
@@ -679,14 +707,13 @@ export function useMapViewer(
     syncDraftMarker(options.position.value)
   })
   if (options.prioritizeVisibleSpots) watch(() => options.prioritizeVisibleSpots?.value, () => { recovery.close(); previousWinners.clear(); syncMarkerDensity() })
-  watch(() => options.floor.value.id, () => {
+  watchViewerFloorRendering(options.floor, () => Boolean(options.visitorOverview?.value), (floor, refit) => {
     if (!isReady.value) return
-    const floor = options.floor.value
-    syncGeolocateControl(floor)
-    showFloor(floor, true)
+    if (refit) syncGeolocateControl(floor)
+    showFloor(floor, true, refit)
     syncSpotMarkers()
     syncDraftMarker(options.position.value)
-  }, { flush: 'post' })
+  })
 
   return {
     map: readonly(map),

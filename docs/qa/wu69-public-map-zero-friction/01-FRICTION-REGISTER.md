@@ -77,3 +77,7 @@ F25 P3: 初期pitch25°なのに「向きを戻す」が表示され、向きが
 F26 P2 Preview multi-floor banner overlap;F27 P2 retained-photo loading overlay;F28 P1 mobile zoom safety cap regression;F29 P2 repeated count badges on connected-chain visible winners;F30 P3 zero-category stale dock height;F31 P2 English MapLibre labels. All corrected and verified in11-69-09-VERIFICATION.md. Finding IDs31, F09 NOT REPRODUCIBLE, confirmed30 FIXED in candidate.
 
 F32 P2: 言語変更前にZoomするとMapが初期cameraへ戻る。pending locale取得中は直前の有効responseとMapを保持し、Zoom後のJA→ENでcamera JSON一致を実測。Finding IDs32、F09 NOT REPRODUCIBLE、confirmed31 FIXED in candidate。
+
+F33 P2: locale refresh後、同IDフロアの新画像／georeferenceがrendererへ同期されない。描画用fieldだけを監視し、画像のみの変更ではcamera維持、座標変更ではPIN／現在地controlも再同期。実390と7回帰tests PASS。
+
+F34 P2: ENのOverviewが全体／日本語aria名のまま。All／Show whole mapに変更しruntime言語追従、camera維持を実390で確認。non-visitor表示は維持。Finding IDs34、F09 NOT REPRODUCIBLE、confirmed33 FIXED in candidate。

@@ -53,3 +53,7 @@ Map領域外はvisitor rendererだけ淡い暖色neutral（#eeeae4）にする�
 Codex review corrections: collision group件数はon-screenの既存priority順で選ぶ1代表へ集約。他の可視PINは直接Detail。declutter visibility／group membership／staged Zoom／maxZoom Spiderfyは保持。Mobile Floorは共通下部操作列、CategoryなしFloorはdock height0、同URL写真のloaded/errorを再利用。Locale変更はMapLibre labels/canvasを追従させcameraをremountしない。
 
 Locale refresh中は表示中のMapをloading画面へ置き換えず、探索cameraを維持する。error時は既存error表示へ移る。
+
+### Retained renderer / locale contract (69-09 review corrections)
+
+Language-only response refresh preserves camera and rendering resources. An image URL refresh replaces raster without refitting; geometry or floor-ID changes resynchronize image/PIN/valid geolocation controls and fit. Visitor-only resource watching excludes translated names; editor behavior remains floor-ID-only. Navigation is JA 全体／地図全体を表示, EN All／Show whole map, with active-language zoom/heading labels and preserved control DOM.
