@@ -3,12 +3,26 @@
   "branch": "feat/wu69-public-map-ux-20261003",
   "main_sha_observed": "a58b4353bd108e6586f329080c772f69b8aaffda",
   "windows_deployed_sha": "ad4f4bde269b16c5575b836add444b5e6fa88399",
-  "pr_url": null,
-  "verify": null,
+  "pr_url": "https://github.com/NAOKI-Ko/digital-map/pull/28",
+  "verify": {
+    "head_sha": "1df511c8e20195135f7bd419c43cd393bd97fde3",
+    "run_id": 37090800163,
+    "url": "https://github.com/NAOKI-Ko/digital-map/actions/runs/37090800163",
+    "conclusion": "failure",
+    "failed_step": "pnpm audit --prod --audit-level high",
+    "later_quality_steps": "skipped",
+    "high_count": 2
+  },
   "merged": false,
   "post_merge_verify": false,
   "windows_exact_sha_candidate": false,
   "production_changed": false,
   "implementation_sha": "4a0d80cd9eeeba13bbb1447bf78b78ffa6a54747",
-  "initial_implementation_sha": "d875fe39f712478a9def844ff30f41a85f8f2a5a"
+  "initial_implementation_sha": "d875fe39f712478a9def844ff30f41a85f8f2a5a",
+  "evidence_sha": "1df511c8e20195135f7bd419c43cd393bd97fde3",
+  "merge_state": "BLOCKED",
+  "dev_protection": {
+    "required_check": "verify",
+    "enforce_admins": true
+  }
 }
