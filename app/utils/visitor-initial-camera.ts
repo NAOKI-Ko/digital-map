@@ -1,8 +1,11 @@
 import { imageToRenderCoordinates } from '~~/lib/geo'
 import type { MapViewerFloor, MapViewerSpot } from '~~/shared/types/map-viewer'
 
-export const VISITOR_INITIAL_PITCH = 20
+export const VISITOR_INITIAL_PITCH = 25
 export const VISITOR_INITIAL_ZOOM_ALLOWANCE = 0.65
+export const VISITOR_MOBILE_INITIAL_ZOOM_ALLOWANCE = 1.3
+export const VISITOR_INITIAL_FALLBACK_ZOOM_OFFSET = 0.2
+export const VISITOR_MOBILE_INITIAL_FALLBACK_ZOOM_OFFSET = 1.15
 export const VISITOR_INITIAL_ZOOM_MINIMUM = 0.55
 
 /** Full Floor's unfiltered content only; filter/detail never feeds initial framing. */
@@ -30,7 +33,7 @@ export function clampVisitorInitialZoom(fitZoom: number, contentZoom: number, al
   return Math.min(fitZoom + allowance, contentZoom)
 }
 
-/** Broad content is a level whole-floor fallback rather than forced past its fitted zoom. */
+/** Broad content uses bounded whole-floor discovery instead of a misleading compact-content fit. */
 export function canUseVisitorContentCamera(fitZoom: number, contentZoom: number | undefined) {
   return contentZoom !== undefined && Number.isFinite(contentZoom) && contentZoom >= fitZoom + VISITOR_INITIAL_ZOOM_MINIMUM
 }

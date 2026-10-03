@@ -66,6 +66,8 @@ describe('MapViewerのカメラ制約', () => {
   it('PIN編集workspaceは実地図sourceを持たずイラスト専用背景にする', () => {
     const style = createMapViewerStyle('edit')
     expect(style.sources).toEqual({})
+    expect(style.layers).toMatchObject([{ paint: { 'background-color': '#f5f5f4' } }])
+    expect(createMapViewerStyle('view', true).layers).toMatchObject([{ paint: { 'background-color': '#eeeae4' } }])
     expect(JSON.stringify(style)).not.toContain('openstreetmap')
   })
 

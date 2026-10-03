@@ -58,3 +58,12 @@ F15の定量再現、S8、S10、実touch pinchは追加検証が必要。未検�
 ## F22 — Floor切替後のcanvas読み上げ名
 
 P2。keyboardでRecovery2Fへ切替後、外側regionとFloor buttonは2Fだが、Map canvas名は有松・桶狭間のまま。画面は正しいのに支援技術へ旧Floorを伝える。visitor canvas labelをprops.label変更へ追従させた。1F→2FをTab/Enterで実操作し、canvas名がRecovery2Fへ更新、Category保持、Floor focus復帰を確認。FIXED in candidate。
+
+## 追加要求の反復QA（2026-10-03）
+
+| ID | Severity | Finding | Candidate disposition |
+| --- | --- | --- | --- |
+| F23 | P2 | 全6カテゴリ選択名を省略せず表示した初版でMap controlsがchip列に重なった。 | FIXED。dock実測104pxに追従しcontrols下端684／dock上端708、24px間隔。390x400もcontrols下端240／dock上端264。camera維持。 |
+| F24 | P2 | 768px stageの内枠canvas766pxをMobileと誤認し、Desktopより深い初期zoomを適用。 | FIXED。stage幅でbreakpoint判定。768px初期zoom15.879695、whole-floor fit比+0.2、Desktop上限+0.65以内。border境界回帰テストPASS。 |
+
+追加後のFinding IDは24件、F09はNOT REPRODUCIBLE、confirmed23件はcandidateでFIXED。既存F07の送り矢印は追加ユーザー要求により廃止、native横スクロールへ更新。

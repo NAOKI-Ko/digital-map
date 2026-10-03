@@ -1,5 +1,5 @@
 import type { Ref } from 'vue'
-import { canUseVisitorContentCamera, clampVisitorInitialZoom, getVisitorContentBounds, VISITOR_INITIAL_PITCH, VISITOR_INITIAL_ZOOM_ALLOWANCE } from '~/utils/visitor-initial-camera'
+import { canUseVisitorContentCamera, clampVisitorInitialZoom, getVisitorContentBounds, VISITOR_INITIAL_PITCH, VISITOR_INITIAL_ZOOM_ALLOWANCE, VISITOR_MOBILE_INITIAL_ZOOM_ALLOWANCE, VISITOR_INITIAL_FALLBACK_ZOOM_OFFSET, VISITOR_MOBILE_INITIAL_FALLBACK_ZOOM_OFFSET } from '~/utils/visitor-initial-camera'
 import { measureVisitorFitPadding } from '~/utils/visitor-floor-fit'
 import type { Map as MapLibreMap, MapOptions, StyleSpecification } from 'maplibre-gl'
 import { getFloorCorners, getGeoReferenceBounds, toImageCoordinates, type FloorCorners } from '~~/lib/geo'
@@ -42,14 +42,14 @@ export interface ZoomConstraints {
   maxZoom: number
 }
 
-export function createMapViewerStyle(_mode: MapViewerMode): StyleSpecification {
+export function createMapViewerStyle(_mode: MapViewerMode, visitor = false): StyleSpecification {
   return {
     version: 8,
     sources: {},
     layers: [{
       id: 'background',
       type: 'background',
-      paint: { 'background-color': '#f5f5f4' },
+      paint: { 'background-color': visitor ? '#eeeae4' : '#f5f5f4' },
     }],
   }
 }
@@ -58,7 +58,7 @@ export function createMapViewerOptions(container: HTMLElement | string, mode: Ma
   const camera = VIEWER_CAMERA_CONSTRAINTS[mode]
   return {
     container,
-    style: createMapViewerStyle(mode),
+    style: createMapViewerStyle(mode, visitor),
     center: [0, 0],
     zoom: 1,
     minZoom: ABSOLUTE_ZOOM_LIMITS.minZoom,
@@ -367,11 +367,16 @@ export function useMapCamera(
       const result = updateFloorZoomConstraints(corners)
       if (result) {
         const bounds = getVisitorContentBounds(options.floor.value, options.spots?.value ?? [])
-        const allowance = (container.value?.clientWidth ?? 1024) < 768 ? 1.3 : VISITOR_INITIAL_ZOOM_ALLOWANCE
+        // Match the visitor stage's responsive breakpoint. The canvas container's
+        // border makes a 768px stage 766px wide and must not choose mobile zoom.
+        const width = container.value?.closest<HTMLElement>('.public-map-stage')?.clientWidth ?? container.value?.clientWidth ?? 1024
+        const mobile = width < 768
+        const allowance = mobile ? VISITOR_MOBILE_INITIAL_ZOOM_ALLOWANCE : VISITOR_INITIAL_ZOOM_ALLOWANCE
         const fittedContent = bounds ? instance.cameraForBounds(bounds, { padding: measureVisitorFitPadding(container.value!), bearing: 0, maxZoom: result.targetZoom + allowance }) : null
         const content = fittedContent && canUseVisitorContentCamera(result.targetZoom, fittedContent.zoom) ? fittedContent : null
         homePitch = VISITOR_INITIAL_PITCH
-        const zoom = content ? clampVisitorInitialZoom(result.targetZoom, content.zoom ?? result.targetZoom, allowance) : result.targetZoom + (allowance > VISITOR_INITIAL_ZOOM_ALLOWANCE ? 1 : 0)
+        const requestedZoom = content?.zoom ?? result.targetZoom + (mobile ? VISITOR_MOBILE_INITIAL_FALLBACK_ZOOM_OFFSET : VISITOR_INITIAL_FALLBACK_ZOOM_OFFSET)
+        const zoom = clampVisitorInitialZoom(result.targetZoom, requestedZoom, allowance)
         instance.jumpTo({ center: content?.center ?? result.camera.center, zoom, bearing: 0, pitch: homePitch })
       }
       constraintLayoutKey = getConstraintLayoutKey()

@@ -27,6 +27,28 @@ const selectedFloorId = ref('')
 const overlay = ref<PublicOverlay>(null)
 const selectedSpotId = computed(() => selectedSpotIdFromOverlay(overlay.value))
 const selectedCategoryIds = ref<string[]>([])
+const categoryDock = useTemplateRef<HTMLElement>('categoryDock')
+const categoryDockHeight = ref(52)
+// Selection names may wrap. Keep Map controls above the actual Category dock,
+// without refitting or moving the user's camera when this UI changes height.
+watch(categoryDock, (element, _previous, onCleanup) => {
+  if (!element) return
+  let frame: number | null = null
+  const measure = () => {
+    const height = Math.ceil(element.getBoundingClientRect().height)
+    if (height > 0) categoryDockHeight.value = height
+  }
+  const observer = new ResizeObserver(() => {
+    if (frame !== null) cancelAnimationFrame(frame)
+    frame = requestAnimationFrame(() => { frame = null; measure() })
+  })
+  measure()
+  observer.observe(element)
+  onCleanup(() => {
+    observer.disconnect()
+    if (frame !== null) cancelAnimationFrame(frame)
+  })
+}, { flush: 'post' })
 const mapViewerRef = ref<{ ensureSpotVisible: (spotId: string, panel: DOMRect | null) => boolean, compareCamera: (pitch: 0 | 20 | 45, fit: boolean) => void, captureDetailContext: () => void, restoreDetailContext: () => void, discardDetailContext: () => void } | null>(null)
 const cameraComparisonEnabled = computed(() => import.meta.dev && route.query.cameraCompare === '1')
 const cameraComparisonMode = ref<'same' | 'fit'>('same')
@@ -254,7 +276,7 @@ onBeforeUnmount(clearPendingSpotClose)
         </nav>
       </header>
 
-      <section class="public-map-stage relative h-[100dvh] min-h-0 md:h-[calc(100dvh-3.5rem)]" :class="{ 'public-map-locked': appModalOpen, 'public-map-has-spot': Boolean(selectedSpot) }">
+      <section class="public-map-stage relative h-[100dvh] min-h-0 md:h-[calc(100dvh-3.5rem)]" :style="{ '--visitor-category-height': `${categoryDockHeight}px` }" :class="{ 'public-map-locked': appModalOpen, 'public-map-has-spot': Boolean(selectedSpot) }">
         <div v-show="!appModalOpen" class="pointer-events-none absolute inset-0 z-20 md:hidden" aria-label="公開マップ操作">
           <div data-map-fit-edge="top" class="absolute left-[calc(env(safe-area-inset-left)+0.75rem)] top-[calc(env(safe-area-inset-top)+0.75rem)] rounded-xl bg-white/90 px-3 py-2 shadow-sm backdrop-blur" :class="data.map.enabledLocales.includes('en') ? 'max-w-[calc(100vw-10rem)]' : 'max-w-[calc(100vw-7rem)]'">
             <h1 class="truncate text-sm font-bold">{{ data.map.name }}</h1>
@@ -278,14 +300,15 @@ onBeforeUnmount(clearPendingSpotClose)
         </div>
 
         <div
+          ref="categoryDock"
           data-map-fit-edge="bottom"
           v-show="!appModalOpen && !selectedSpot"
           class="pointer-events-none absolute bottom-[calc(env(safe-area-inset-bottom)+2rem)] left-[calc(env(safe-area-inset-left)+0.75rem)] right-[calc(env(safe-area-inset-right)+0.75rem)] z-20 md:left-1/2 md:right-auto md:w-[min(50vw,44rem)] md:-translate-x-1/2"
         >
           <div class="pointer-events-auto">
             <CategoryFilter v-model="selectedCategoryIds" :categories="categories" />
-            <p v-if="selectedCategoryIds.length" role="status" :title="selectedCategoryNames" class="mt-1 flex max-w-full items-center gap-2 rounded-full bg-white/95 px-3 py-1 text-xs font-semibold text-stone-800">
-              <span class="min-w-0 flex-1 truncate">{{ selectedCategoryNames }}</span>
+            <p v-if="selectedCategoryIds.length" role="status" class="mt-1 flex max-w-full items-start gap-2 rounded-xl bg-white/95 px-3 py-1 text-xs font-semibold leading-5 text-stone-800">
+              <span class="min-w-0 flex-1 break-words">{{ selectedCategoryNames }}</span>
               <span class="shrink-0">{{ selectedCategoryIds.length }}カテゴリ · {{ visibleSpots.length }}件</span>
             </p>
           </div>

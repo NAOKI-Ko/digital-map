@@ -470,7 +470,7 @@ defineExpose({
 
 .visitor-map-viewer .maplibregl-ctrl-top-right {
   top: auto;
-  bottom: calc(env(safe-area-inset-bottom) + 6.75rem);
+  bottom: calc(env(safe-area-inset-bottom) + 2rem + var(--visitor-category-height, 52px) + 1.5rem);
 }
 .visitor-map-viewer .map-viewer-control-group {
   flex-direction: row;

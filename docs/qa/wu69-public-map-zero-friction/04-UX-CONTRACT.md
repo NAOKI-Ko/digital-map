@@ -5,14 +5,14 @@ WU-69親Acceptance Criteriaと69-01〜69-08を正本とし、AS ISのF01〜F16�
 ## Mapと探索文脈
 
 - 390×844でMapを基盤として見せる。初期の巨大な上下余白を減らし、最初からSpotを探索できる倍率にする。全画像を完全に収めることだけを初期cameraの目的にしない。
-- 初期cameraはbearing0°／pitch20°、Overviewは0°／0°を維持する。
+- 追加のユーザー要求（2026-10-03）により初期cameraはbearing0°／pitch25°とする（以前の20°からの明示的更新）。Overviewは0°／0°を維持する。whole-floor fitからの安全上限はMobile +1.3、Desktop +0.65を超えない。
 - Map名と現在Floorを小さく、読める文脈表示にする。Floorを切り替えると古いDetailを閉じ、選んだFloorへ予測可能に移る。Categoryの条件は保持し、結果なしは分かるようにする。
 - 非探索のInfo open／closeでcameraを変えない。Detail前のcameraを保存し、Closeで復元する。ただしDetail中にuserが明示的にPan／Zoomしたときはその意図を優先する。
 
 ## Categoryと操作群
 
-- Categoryは名称付き44px以上の操作領域。選択、複数選択、横方向の追加項目が分かる。
-- 横送りしてもfilter中であることと解除方法を見失わない。解除は常時見つかる一操作。選択件数だけでなく、必要な選択文脈を伝える。
+- Categoryは名称付き44px以上のchipをnative横スクロールする。左右送り矢印は廃止し、端に覗くchip・edge fade・薄いscrollbarから続きが分かる。keyboard focusで対象chipを表示する。
+- スクロールしても左固定の「すべて」／「クリア」を見失わない。複数選択名は省略せず折り返し、カテゴリ数・結果数と表示する。dock実測高さに追従してMap controlsとの重なりを避け、cameraは動かさない。
 - 390pxの頻用Overviewは下部の親指の届く場所へ置き、「全体」のラベルで意味を伝える。Mobileの+/−は実touch gestureとkeyboard経路を確認して必要性を判断。隠す場合もkeyboardでZoomできる経路を残す。
 - 同じ種類のcontrolはサイズ、形、spacing、focusをそろえる。safe area、short viewportを考慮し、地図へのpointer入力を大きな透明overlayで奪わない。
 
@@ -43,3 +43,7 @@ Search、Routing、Current-location新規機能、Admin、Paper、domain、schem
 optional PIN flagsが省略されたときはfalseとし、spiderfyの個別PINを必ずpointer/keyboardで選択可能にする。MapへのTab入口は1つとし、hidden PINからClose/Escapeで戻す先も操作可能なcanvasにする。selected PINと名前は表示中chromeより下に保ち、必要最小のPanのみ行う。resize observerの再計測を同一frame内でlayout更新のloopにしない。
 
 Floor切替に伴い、操作可能canvasのアクセシブル名も現在Floorへ更新する。視覚表示だけを更新して支援技術に旧Floorを残さない。
+
+## 追加要求の背景とcount
+
+Map領域外はvisitor rendererだけ淡い暖色neutral（#eeeae4）にする。模様・texture・強いgradientはIllustrationの線画と競合するため採用しない。collision代表PINの小さな20px件数badgeはgroup件数を示す。Cluster entityや集約地点を作らず、WU-68 priority、分離可能なZoom-in、maxZoomで分離不能なSpiderfyを維持する。768pxの判定はborder内canvas幅ではなくvisitor stage幅に合わせる。
