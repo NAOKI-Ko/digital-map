@@ -3,9 +3,9 @@ export interface Size { width: number, height: number }
 export interface OccludingPanel { left: number, top: number }
 
 /** MapLibre panBy screen-pixel offset. A visible PIN must never trigger a camera move. */
-export function getMinimalSpotPan(point: Point, viewport: Size, panel: OccludingPanel | null, margin = 44): [number, number] {
+export function getMinimalSpotPan(point: Point, viewport: Size, panel: OccludingPanel | null, margin = 44, topMargin = margin): [number, number] {
   const left = margin
-  const top = margin
+  const top = topMargin
   let right = viewport.width - margin
   let bottom = viewport.height - margin
   if (panel && panel.left > viewport.width / 2) right = Math.min(right, panel.left - margin)

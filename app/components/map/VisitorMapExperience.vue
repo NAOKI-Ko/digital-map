@@ -16,7 +16,10 @@ import { createPublicMapDecorationFixture } from '~/utils/public-map-decoration-
 const LazyMapViewer = defineAsyncComponent(() => import('~/components/map/MapViewer.vue'))
 
 const props = defineProps<{ response: PublicMapResponse | null | undefined, status: string, error: boolean, analyticsEnabled?: boolean }>()
-const data = computed(() => props.response)
+const lastResponse = shallowRef(props.response)
+watch(() => props.response, response => { if (response?.map) lastResponse.value = response })
+// A locale refresh keeps the visitor's mounted map and exploration context.
+const data = computed(() => props.response ?? (props.status === 'pending' ? lastResponse.value : null))
 const status = computed(() => props.status)
 const error = computed(() => props.error)
 const route = useRoute()
@@ -27,7 +30,29 @@ const selectedFloorId = ref('')
 const overlay = ref<PublicOverlay>(null)
 const selectedSpotId = computed(() => selectedSpotIdFromOverlay(overlay.value))
 const selectedCategoryIds = ref<string[]>([])
-const mapViewerRef = ref<{ ensureSpotVisible: (spotId: string, panel: DOMRect | null) => boolean, compareCamera: (pitch: 0 | 20 | 45, fit: boolean) => void } | null>(null)
+const categoryDock = useTemplateRef<HTMLElement>('categoryDock')
+const categoryDockHeight = ref(52)
+// Selection names may wrap. Keep Map controls above the actual Category dock,
+// without refitting or moving the user's camera when this UI changes height.
+watch(categoryDock, (element, _previous, onCleanup) => {
+  if (!element) return
+  let frame: number | null = null
+  const measure = () => {
+    const height = Math.ceil(element.getBoundingClientRect().height)
+    if (height > 0 || !categories.value.length) categoryDockHeight.value = height
+  }
+  const observer = new ResizeObserver(() => {
+    if (frame !== null) cancelAnimationFrame(frame)
+    frame = requestAnimationFrame(() => { frame = null; measure() })
+  })
+  measure()
+  observer.observe(element)
+  onCleanup(() => {
+    observer.disconnect()
+    if (frame !== null) cancelAnimationFrame(frame)
+  })
+}, { flush: 'post' })
+const mapViewerRef = ref<{ ensureSpotVisible: (spotId: string, panel: DOMRect | null) => boolean, compareCamera: (pitch: 0 | 20 | 25 | 45, fit: boolean) => void, captureDetailContext: () => void, restoreDetailContext: () => void, discardDetailContext: () => void } | null>(null)
 const cameraComparisonEnabled = computed(() => import.meta.dev && route.query.cameraCompare === '1')
 const cameraComparisonMode = ref<'same' | 'fit'>('same')
 const floorSelectorOpen = computed(() => overlay.value?.type === 'floor')
@@ -63,6 +88,7 @@ const categories = computed(() => (
   collectSpotCategories(selectedFloor.value?.spots ?? [])
 ))
 const visibleSpots = computed(() => filterSpotsByCategoryIds(selectedFloor.value?.spots ?? [], selectedCategoryIds.value))
+const selectedCategoryNames = computed(() => categories.value.filter(category => selectedCategoryIds.value.includes(category.id)).map(category => category.name).join('・'))
 const showFloorSelector = computed(() => shouldShowFloorSelector(data.value?.map.floors.length ?? 0))
 const appModalOpen = computed(() => overlay.value?.type === 'floor' || overlay.value?.type === 'info')
 watch(() => data.value?.map.floors, (floors) => {
@@ -86,8 +112,10 @@ watch(appModalOpen, (open, wasOpen) => {
 })
 
 watch(selectedFloorId, () => {
+  mapViewerRef.value?.discardDetailContext()
   overlay.value = null
-  selectedCategoryIds.value = []
+  const available = new Set(categories.value.map(category => category.id))
+  selectedCategoryIds.value = selectedCategoryIds.value.filter(id => available.has(id))
 })
 
 watch(selectedCategoryIds, () => {
@@ -95,7 +123,8 @@ watch(selectedCategoryIds, () => {
 })
 
 function selectSpot(spot: MapViewerSpot) {
-  spotTrigger = [...document.querySelectorAll<HTMLElement>('.map-viewer-marker[data-spot-id]')]
+  if (!selectedSpotId.value) mapViewerRef.value?.captureDetailContext()
+  spotTrigger = [...document.querySelectorAll<HTMLElement>('.visitor-map-viewer .map-viewer-marker[data-spot-id]')]
     .find(element => element.dataset.spotId === spot.id) ?? null
   spotTriggerId = spot.id
   overlay.value = { type: 'spot', spotId: spot.id }
@@ -104,6 +133,7 @@ function selectSpot(spot: MapViewerSpot) {
 }
 
 function beginMapRecovery() {
+  mapViewerRef.value?.discardDetailContext()
   clearPendingSpotClose()
   overlay.value = null
 }
@@ -114,7 +144,7 @@ function ensureSelectedSpotVisible() {
   mapViewerRef.value?.ensureSpotVisible(selectedSpotId.value, panel)
 }
 
-function compareCamera(pitch: 0 | 20 | 45) {
+function compareCamera(pitch: 0 | 20 | 25 | 45) {
   mapViewerRef.value?.compareCamera(pitch, cameraComparisonMode.value === 'fit')
 }
 
@@ -123,11 +153,12 @@ function closeSpot(source: 'pointer' | 'other' = 'other') {
   clearPendingSpotClose()
   const closingSpotId = selectedSpotId.value
   const closingTrigger = spotTrigger
+  mapViewerRef.value?.restoreDetailContext()
   overlay.value = null
   const restoreFocus = () => {
-    const fallbackMarker = [...document.querySelectorAll<HTMLElement>('.map-viewer-marker[data-spot-id]')]
+    const fallbackMarker = [...document.querySelectorAll<HTMLElement>('.visitor-map-viewer .map-viewer-marker[data-spot-id]')]
       .find(element => element.dataset.spotId === closingSpotId)
-    const mapEntry = document.querySelector<HTMLElement>('.map-viewer-frame [role="region"]')
+    const mapEntry = document.querySelector<HTMLElement>('.visitor-map-viewer canvas[tabindex="0"]')
     const trigger = closingTrigger?.isConnected ? closingTrigger : fallbackMarker
     ;(trigger && !trigger.inert && getComputedStyle(trigger).visibility !== 'hidden' ? trigger : mapEntry)?.focus({ preventScroll: true })
     if (spotTriggerId === closingSpotId) {
@@ -184,12 +215,14 @@ function closeSpot(source: 'pointer' | 'other' = 'other') {
 }
 
 function openFloorSelector(event: MouseEvent) {
+  mapViewerRef.value?.restoreDetailContext()
   modalTrigger = event.currentTarget as HTMLElement
   modalAction = modalTrigger.dataset.visitorAction
   overlay.value = { type: 'floor' }
 }
 
 function openInfo(event: MouseEvent) {
+  mapViewerRef.value?.restoreDetailContext()
   modalTrigger = event.currentTarget as HTMLElement
   modalAction = modalTrigger.dataset.visitorAction
   overlay.value = { type: 'info' }
@@ -199,7 +232,6 @@ function selectFloor(floorId: string) {
   overlay.value = null
   const state = createFloorSwitchState(selectedFloorId.value, floorId)
   if (!state) return
-  selectedCategoryIds.value = state.selectedCategoryIds
   selectedFloorId.value = state.floorId
 }
 
@@ -216,7 +248,7 @@ onBeforeUnmount(clearPendingSpotClose)
 
 <template>
   <main class="fixed inset-0 h-[100dvh] w-screen overflow-hidden bg-stone-100 text-stone-900 md:static md:w-auto">
-    <div v-if="status === 'pending'" class="grid h-full place-items-center px-6 text-sm text-stone-600">
+    <div v-if="status === 'pending' && !data?.map" class="grid h-full place-items-center px-6 text-sm text-stone-600">
       {{ t.loading }}
     </div>
     <div v-else-if="error" class="grid h-full place-items-center px-6">
@@ -247,9 +279,13 @@ onBeforeUnmount(clearPendingSpotClose)
         </nav>
       </header>
 
-      <section class="public-map-stage relative h-[100dvh] min-h-0 md:h-[calc(100dvh-3.5rem)]" :class="{ 'public-map-locked': appModalOpen, 'public-map-has-spot': Boolean(selectedSpot) }">
+      <section class="public-map-stage relative h-[100dvh] min-h-0 md:h-[calc(100dvh-3.5rem)]" :style="{ '--visitor-category-height': `${categoryDockHeight}px` }" :class="{ 'public-map-locked': appModalOpen, 'public-map-has-spot': Boolean(selectedSpot) }">
         <div v-show="!appModalOpen" class="pointer-events-none absolute inset-0 z-20 md:hidden" aria-label="公開マップ操作">
-          <div v-if="showFloorSelector" data-map-fit-edge="top" class="pointer-events-auto absolute left-[calc(env(safe-area-inset-left)+0.75rem)] top-[calc(env(safe-area-inset-top)+0.75rem)] " :class="data.map.enabledLocales.includes('en') ? 'max-w-[calc(100vw-10rem)]' : 'max-w-[calc(100vw-5.5rem)]'">
+          <div data-map-fit-edge="top" class="absolute left-[calc(env(safe-area-inset-left)+0.75rem)] top-[calc(env(safe-area-inset-top)+0.75rem)] rounded-xl bg-white/90 px-3 py-2 shadow-sm backdrop-blur" :class="data.map.enabledLocales.includes('en') ? 'max-w-[calc(100vw-10rem)]' : 'max-w-[calc(100vw-7rem)]'">
+            <h1 class="truncate text-sm font-bold">{{ data.map.name }}</h1>
+            <p v-if="!showFloorSelector" class="truncate text-xs text-stone-600">{{ selectedFloor.name }}</p>
+          </div>
+          <div v-if="showFloorSelector" v-show="!selectedSpot" data-map-fit-edge="bottom" class="pointer-events-auto absolute bottom-[calc(env(safe-area-inset-bottom)+2rem+var(--visitor-category-height,52px)+1.5rem)] left-[calc(env(safe-area-inset-left)+0.75rem)] max-w-[calc(100vw-10.5rem)]">
           <button type="button" class="flex h-11 max-w-full items-center gap-2 rounded-full border border-white/70 bg-white/85 px-4 text-sm font-bold shadow-sm backdrop-blur" data-visitor-action="floor" aria-haspopup="dialog" :aria-expanded="floorSelectorOpen" @click="openFloorSelector">
             <span class="truncate">{{ selectedFloor.name }}</span> <span class="shrink-0" aria-hidden="true">⌄</span>
           </button>
@@ -267,13 +303,17 @@ onBeforeUnmount(clearPendingSpotClose)
         </div>
 
         <div
+          ref="categoryDock"
           data-map-fit-edge="bottom"
           v-show="!appModalOpen && !selectedSpot"
           class="pointer-events-none absolute bottom-[calc(env(safe-area-inset-bottom)+2rem)] left-[calc(env(safe-area-inset-left)+0.75rem)] right-[calc(env(safe-area-inset-right)+0.75rem)] z-20 md:left-1/2 md:right-auto md:w-[min(50vw,44rem)] md:-translate-x-1/2"
         >
           <div class="pointer-events-auto">
             <CategoryFilter v-model="selectedCategoryIds" :categories="categories" />
-            <p v-if="selectedCategoryIds.length" role="status" class="mt-1 w-fit rounded-full bg-white px-3 py-1 text-xs font-semibold text-stone-800">{{ selectedFloor.name }} · {{ visibleSpots.length }}件を表示</p>
+            <p v-if="selectedCategoryIds.length" role="status" class="mt-1 flex max-w-full items-start gap-2 rounded-xl bg-white/95 px-3 py-1 text-xs font-semibold leading-5 text-stone-800">
+              <span class="min-w-0 flex-1 break-words">{{ selectedCategoryNames }}</span>
+              <span class="shrink-0">{{ selectedCategoryIds.length }}カテゴリ · {{ visibleSpots.length }}件</span>
+            </p>
           </div>
         </div>
 
@@ -282,6 +322,7 @@ onBeforeUnmount(clearPendingSpotClose)
             ref="mapViewerRef"
             class="h-full"
             :floor="selectedFloor"
+            :locale="data.map.locale"
             :spots="visibleSpots"
             :initial-spots="selectedFloor.spots"
             :decorations="displayedDecorations"
@@ -304,7 +345,7 @@ onBeforeUnmount(clearPendingSpotClose)
           <label class="mr-2"><input v-model="cameraComparisonMode" type="radio" value="same"> center/zoom固定</label>
           <label><input v-model="cameraComparisonMode" type="radio" value="fit"> 角度別fit</label>
           <div class="mt-2 flex gap-2">
-            <button v-for="pitch in ([0, 20, 45] as const)" :key="pitch" type="button" class="rounded border border-stone-300 px-3 py-2" @click="compareCamera(pitch)">{{ pitch }}°</button>
+            <button v-for="pitch in ([0, 20, 25, 45] as const)" :key="pitch" type="button" class="rounded border border-stone-300 px-3 py-2" @click="compareCamera(pitch)">{{ pitch }}°</button>
           </div>
         </div>
 

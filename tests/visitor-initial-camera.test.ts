@@ -27,6 +27,10 @@ describe('visitor initial content framing',()=>{
     for(const spots of [[],[spot(NaN,.5)],[spot(-.1,.5)],[spot(0,0),spot(1,1)]])expect(getVisitorContentBounds(floor,spots)).toBeNull()
     const spots=[spot(.4,.4)];const before=JSON.stringify(spots);getVisitorContentBounds(floor,spots);expect(JSON.stringify(spots)).toBe(before)
   })
+  it('a mobile allowance cannot exceed the preserved whole-floor safety cap', () => {
+    expect(clampVisitorInitialZoom(14, 24, 1.3)).toBe(14.65)
+    expect(clampVisitorInitialZoom(14, 14.8, 1.3)).toBe(14.65)
+  })
   it('zoom never exceeds whole-floor + .65, handles huge/single content and invalid camera',()=>{
     expect(clampVisitorInitialZoom(14,24)).toBe(14.65)
     expect(clampVisitorInitialZoom(14,14.4)).toBe(14.4)

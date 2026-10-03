@@ -1,0 +1,42 @@
+┌─────────────────────┬────────────────────────────────────────────────────────┐
+│ high                │ node-forge RSA PKCS#1 v1.5 signature verification      │
+│                     │ accepts extra nested DigestAlgorithm elements          │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ Package             │ node-forge                                             │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ Vulnerable versions │ <=1.4.0                                                │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ Patched versions    │ None                                                   │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ Paths               │ .>nuxt>@nuxt/cli>listhen>node-forge                    │
+│                     │                                                        │
+│                     │ .>nuxt>@nuxt/nitro-server>nitropack>listhen>node-forge │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ More info           │ https://github.com/advisories/GHSA-86w9-cpqp-85rv      │
+└─────────────────────┴────────────────────────────────────────────────────────┘
+┌─────────────────────┬────────────────────────────────────────────────────────┐
+│ high                │ braces vulnerable to stack-exhaustion denial of        │
+│                     │ service through deeply nested patterns                 │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ Package             │ braces                                                 │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ Vulnerable versions │ <=3.0.3                                                │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ Patched versions    │ None                                                   │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ Paths               │ .>@nuxtjs/tailwindcss>tailwind-config-                 │
+│                     │ viewer>tailwindcss>chokidar>braces                     │
+│                     │                                                        │
+│                     │ .>@nuxtjs/tailwindcss>tailwind-config-                 │
+│                     │ viewer>tailwindcss>fast-glob>micromatch>braces         │
+│                     │                                                        │
+│                     │ .>@nuxtjs/tailwindcss>tailwind-config-                 │
+│                     │ viewer>tailwindcss>micromatch>braces                   │
+│                     │                                                        │
+│                     │ ... Found 8 paths, run `pnpm why braces` for more      │
+│                     │ information                                            │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ More info           │ https://github.com/advisories/GHSA-vfj7-8cjw-p6xm      │
+└─────────────────────┴────────────────────────────────────────────────────────┘
+2 vulnerabilities found
+Severity: 2 high

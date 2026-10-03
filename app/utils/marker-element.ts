@@ -27,6 +27,7 @@ export function getSpotMarkerPresentation(spot: MapViewerSpot) {
 
 export interface CreateSpotMarkerElementOptions {
   mode: 'view' | 'edit'
+  visitor?: boolean
   selected: boolean
   draggable?: boolean
   dimmed?: boolean
@@ -50,9 +51,9 @@ export function createSpotMarkerElement(
   element.classList.toggle('map-viewer-marker--illustration', presentation.type === 'illustration')
   element.classList.toggle('map-viewer-marker--selected', options.selected)
   element.classList.toggle('map-viewer-marker--featured', spot.importance === 'featured')
-  element.classList.toggle('map-viewer-marker--dimmed', options.dimmed)
-  element.classList.toggle('map-viewer-marker--strongly-dimmed', options.stronglyDimmed)
-  element.classList.toggle('map-viewer-marker--ghost', options.ghost)
+  element.classList.toggle('map-viewer-marker--dimmed', Boolean(options.dimmed))
+  element.classList.toggle('map-viewer-marker--strongly-dimmed', Boolean(options.stronglyDimmed))
+  element.classList.toggle('map-viewer-marker--ghost', Boolean(options.ghost))
   element.classList.toggle('map-viewer-marker--candidate', Boolean(options.candidate))
   element.classList.toggle('map-viewer-marker--move-candidate', options.candidate === 'move')
   element.setAttribute('data-spot-importance', spot.importance)
@@ -114,6 +115,19 @@ export function createSpotMarkerElement(
       shape.append(content)
     }
     element.append(shape)
+  }
+
+  if (options.mode === 'view' && options.visitor) {
+    const badge = ownerDocument.createElement('span')
+    badge.className = 'map-viewer-marker__collision-badge'
+    badge.hidden = true
+    badge.setAttribute('aria-hidden', 'true')
+    element.append(badge)
+    const name = ownerDocument.createElement('span')
+    name.className = 'map-viewer-marker__name'
+    name.setAttribute('aria-hidden', 'true')
+    name.textContent = spot.name
+    element.append(name)
   }
 
   element.addEventListener('click', (event) => {

@@ -1,0 +1,50 @@
+verify	Run pnpm audit --prod --audit-level high	﻿2026-10-03T02:44:23.9042468Z ##[group]Run pnpm audit --prod --audit-level high
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:23.9043238Z ^[[36;1mpnpm audit --prod --audit-level high^[[0m
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:23.9108981Z shell: /usr/bin/bash -e {0}
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:23.9109249Z env:
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:23.9109758Z   DATABASE_URL: ***127.0.0.1:5432/digital_map_ci
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:23.9110138Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:23.9110463Z ##[endgroup]
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:24.6123000Z ┌─────────────────────┬────────────────────────────────────────────────────────┐
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:24.6124111Z │ high                │ node-forge RSA PKCS#1 v1.5 signature verification      │
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:24.6124964Z │                     │ accepts extra nested DigestAlgorithm elements          │
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:24.6125789Z ├─────────────────────┼────────────────────────────────────────────────────────┤
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:24.6126574Z │ Package             │ node-forge                                             │
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:24.6127362Z ├─────────────────────┼────────────────────────────────────────────────────────┤
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:24.6128199Z │ Vulnerable versions │ <=1.4.0                                                │
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:24.6129293Z ├─────────────────────┼────────────────────────────────────────────────────────┤
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:24.6130477Z │ Patched versions    │ >=1.4.1                                                │
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:24.6131772Z ├─────────────────────┼────────────────────────────────────────────────────────┤
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:24.6133308Z │ Paths               │ .>nuxt>@nuxt/cli>listhen>node-forge                    │
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:24.6134434Z │                     │                                                        │
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:24.6135564Z │                     │ .>nuxt>@nuxt/nitro-server>nitropack>listhen>node-forge │
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:24.6136828Z ├─────────────────────┼────────────────────────────────────────────────────────┤
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:24.6137998Z │ More info           │ https://github.com/advisories/GHSA-86w9-cpqp-85rv      │
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:24.6139377Z └─────────────────────┴────────────────────────────────────────────────────────┘
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:24.6140576Z ┌─────────────────────┬────────────────────────────────────────────────────────┐
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:24.6141809Z │ high                │ braces vulnerable to stack-exhaustion denial of        │
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:24.6143181Z │                     │ service through deeply nested patterns                 │
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:24.6144007Z ├─────────────────────┼────────────────────────────────────────────────────────┤
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:24.6144620Z │ Package             │ braces                                                 │
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:24.6145202Z ├─────────────────────┼────────────────────────────────────────────────────────┤
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:24.6145769Z │ Vulnerable versions │ <=3.0.3                                                │
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:24.6146743Z ├─────────────────────┼────────────────────────────────────────────────────────┤
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:24.6147532Z │ Patched versions    │ >=3.0.4                                                │
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:24.6148123Z ├─────────────────────┼────────────────────────────────────────────────────────┤
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:24.6148748Z │ Paths               │ .>@nuxtjs/tailwindcss>tailwind-config-                 │
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:24.6149321Z │                     │ viewer>tailwindcss>chokidar>braces                     │
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:24.6149834Z │                     │                                                        │
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:24.6150379Z │                     │ .>@nuxtjs/tailwindcss>tailwind-config-                 │
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:24.6150938Z │                     │ viewer>tailwindcss>fast-glob>micromatch>braces         │
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:24.6151451Z │                     │                                                        │
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:24.6152012Z │                     │ .>@nuxtjs/tailwindcss>tailwind-config-                 │
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:24.6152576Z │                     │ viewer>tailwindcss>micromatch>braces                   │
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:24.6153452Z │                     │                                                        │
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:24.6154008Z │                     │ ... Found 8 paths, run `pnpm why braces` for more      │
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:24.6154621Z │                     │ information                                            │
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:24.6155240Z ├─────────────────────┼────────────────────────────────────────────────────────┤
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:24.6155837Z │ More info           │ https://github.com/advisories/GHSA-vfj7-8cjw-p6xm      │
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:24.6156482Z └─────────────────────┴────────────────────────────────────────────────────────┘
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:24.6156926Z 2 vulnerabilities found
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:24.6157203Z Severity: 2 high
+verify	Run pnpm audit --prod --audit-level high	2026-10-03T02:44:24.6312458Z ##[error]Process completed with exit code 1.

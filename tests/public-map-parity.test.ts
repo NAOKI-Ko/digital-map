@@ -13,6 +13,10 @@ describe('地図を見ながら詳細を読むカメラ契約', () => {
     expect(getMinimalSpotPan({ x: 180, y: 410 }, viewport, { left: 0, top: 338 })).toEqual([0, -116])
   })
 
+  it('上端付近の選択PINと名前を訪問者向けchromeの下へ最小限動かす', () => {
+    expect(getMinimalSpotPan({ x: 250, y: 55 }, viewport, { left: 0, top: 537 }, 44, 156)).toEqual([0, 101])
+  })
+
   it('デスクトップの側面詳細に隠れるPINを最小限左へ動かす', () => {
     expect(getMinimalSpotPan({ x: 1080, y: 360 }, { width: 1440, height: 800 }, { left: 930, top: 20 })).toEqual([-194, 0])
   })

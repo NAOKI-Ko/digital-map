@@ -1,5 +1,5 @@
 import type { Ref } from 'vue'
-import { canUseVisitorContentCamera, clampVisitorInitialZoom, getVisitorContentBounds, VISITOR_INITIAL_PITCH, VISITOR_INITIAL_ZOOM_ALLOWANCE } from '~/utils/visitor-initial-camera'
+import { canUseVisitorContentCamera, clampVisitorInitialZoom, getVisitorContentBounds, VISITOR_INITIAL_PITCH, VISITOR_INITIAL_ZOOM_ALLOWANCE, VISITOR_MOBILE_INITIAL_ZOOM_ALLOWANCE, VISITOR_INITIAL_FALLBACK_ZOOM_OFFSET, VISITOR_MOBILE_INITIAL_FALLBACK_ZOOM_OFFSET } from '~/utils/visitor-initial-camera'
 import { measureVisitorFitPadding } from '~/utils/visitor-floor-fit'
 import type { Map as MapLibreMap, MapOptions, StyleSpecification } from 'maplibre-gl'
 import { getFloorCorners, getGeoReferenceBounds, toImageCoordinates, type FloorCorners } from '~~/lib/geo'
@@ -42,29 +42,34 @@ export interface ZoomConstraints {
   maxZoom: number
 }
 
-export function createMapViewerStyle(_mode: MapViewerMode): StyleSpecification {
+export function createMapViewerStyle(_mode: MapViewerMode, visitor = false): StyleSpecification {
   return {
     version: 8,
     sources: {},
     layers: [{
       id: 'background',
       type: 'background',
-      paint: { 'background-color': '#f5f5f4' },
+      paint: { 'background-color': visitor ? '#eeeae4' : '#f5f5f4' },
     }],
   }
 }
 
-export function createMapViewerOptions(container: HTMLElement | string, mode: MapViewerMode): MapOptions {
+export function createMapViewerOptions(container: HTMLElement | string, mode: MapViewerMode, visitor = false, locale: 'ja' | 'en' = 'ja'): MapOptions {
   const camera = VIEWER_CAMERA_CONSTRAINTS[mode]
   return {
     container,
-    style: createMapViewerStyle(mode),
+    style: createMapViewerStyle(mode, visitor),
     center: [0, 0],
     zoom: 1,
     minZoom: ABSOLUTE_ZOOM_LIMITS.minZoom,
     maxZoom: ABSOLUTE_ZOOM_LIMITS.maxZoom,
-    // Disable conflicting double-click gestures; buttons and pinch/touch zoom remain native MapLibre controls.
-    doubleClickZoom: false,
+    // Visitor double-tap/double-click zoom stays native; editing keeps placement gestures unambiguous.
+    doubleClickZoom: mode === 'view' && visitor,
+    locale: visitor && locale === 'ja' ? {
+      'GeolocateControl.FindMyLocation': '現在地を表示',
+      'GeolocateControl.LocationNotAvailable': '現在地を取得できません',
+      'AttributionControl.ToggleAttribution': '地図のクレジットを表示',
+    } : undefined,
     ...camera,
   }
 }
@@ -358,14 +363,21 @@ export function useMapCamera(
       // Initial/Floor load applies content framing, never an animated carry-over.
       instance.stop()
       instance.resize()
+      // Establish the recovery baseline before pitch events update the compass.
+      homePitch = VISITOR_INITIAL_PITCH
       instance.jumpTo({ bearing: 0, pitch: VISITOR_INITIAL_PITCH })
       const result = updateFloorZoomConstraints(corners)
       if (result) {
         const bounds = getVisitorContentBounds(options.floor.value, options.spots?.value ?? [])
-        const fittedContent = bounds ? instance.cameraForBounds(bounds, { padding: measureVisitorFitPadding(container.value!), bearing: 0, maxZoom: result.targetZoom + VISITOR_INITIAL_ZOOM_ALLOWANCE }) : null
+        // Match the visitor stage's responsive breakpoint. The canvas container's
+        // border makes a 768px stage 766px wide and must not choose mobile zoom.
+        const width = container.value?.closest<HTMLElement>('.public-map-stage')?.clientWidth ?? container.value?.clientWidth ?? 1024
+        const mobile = width < 768
+        const allowance = mobile ? VISITOR_MOBILE_INITIAL_ZOOM_ALLOWANCE : VISITOR_INITIAL_ZOOM_ALLOWANCE
+        const fittedContent = bounds ? instance.cameraForBounds(bounds, { padding: measureVisitorFitPadding(container.value!), bearing: 0, maxZoom: result.targetZoom + allowance }) : null
         const content = fittedContent && canUseVisitorContentCamera(result.targetZoom, fittedContent.zoom) ? fittedContent : null
-        homePitch = content ? VISITOR_INITIAL_PITCH : 0
-        const zoom = content ? clampVisitorInitialZoom(result.targetZoom, content.zoom ?? result.targetZoom) : result.targetZoom
+        const requestedZoom = content?.zoom ?? result.targetZoom + (mobile ? VISITOR_MOBILE_INITIAL_FALLBACK_ZOOM_OFFSET : VISITOR_INITIAL_FALLBACK_ZOOM_OFFSET)
+        const zoom = clampVisitorInitialZoom(result.targetZoom, requestedZoom, allowance)
         instance.jumpTo({ center: content?.center ?? result.camera.center, zoom, bearing: 0, pitch: homePitch })
       }
       constraintLayoutKey = getConstraintLayoutKey()
@@ -414,7 +426,7 @@ export function useMapCamera(
     })
   }
 
-  function comparePitch(pitch: 0 | 20 | 45, fit: boolean, baseline?: MapViewerCameraState) {
+  function comparePitch(pitch: 0 | 20 | 25 | 45, fit: boolean, baseline?: MapViewerCameraState) {
     const instance = map.value
     const corners = getFloorCorners(options.floor.value)
     if (!instance || !corners || options.mode !== 'view') return

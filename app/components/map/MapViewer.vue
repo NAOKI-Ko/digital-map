@@ -20,6 +20,7 @@ const props = withDefaults(defineProps<{
   initialCamera?: MapViewerCameraState | null
   prioritizeVisibleSpots?: boolean
   visitorOverview?: boolean
+  locale?: 'ja' | 'en'
   initialSpots?: readonly MapViewerSpot[]
   mobileCover?: boolean
 }>(), {
@@ -38,6 +39,7 @@ const props = withDefaults(defineProps<{
   prioritizeVisibleSpots: false,
   mobileCover: false,
   visitorOverview: false,
+  locale: 'ja',
 })
 
 const emit = defineEmits<{
@@ -60,6 +62,10 @@ const placementEnabled = toRef(props, 'placementEnabled')
 const prioritizeVisibleSpots = toRef(props, 'prioritizeVisibleSpots')
 const mobileCover = toRef(props, 'mobileCover')
 const visitorOverview = toRef(props, 'visitorOverview')
+function setVisitorCanvasLabel(canvas?: HTMLCanvasElement | null) {
+  if (props.visitorOverview) canvas?.setAttribute('aria-label', props.locale === 'en' ? `${props.label} (arrow keys to pan, plus/minus to zoom)` : `${props.label}（矢印キーで移動、プラス・マイナスで拡大縮小）`)
+}
+watch([() => props.label, () => props.locale], () => setVisitorCanvasLabel(container.value?.querySelector('canvas')))
 const viewer = useMapViewer(container, {
   floor,
   spots,
@@ -72,11 +78,13 @@ const viewer = useMapViewer(container, {
   prioritizeVisibleSpots,
   mobileCover,
   visitorOverview,
+  locale: toRef(props, 'locale'),
   initialSpots: computed(() => props.initialSpots ?? props.spots),
   mode: props.mode,
   initialCamera: props.initialCamera,
   onCameraChanged: camera => emit('cameraChanged', camera),
   onReady: map => {
+    setVisitorCanvasLabel(map.getCanvas())
     const report = () => {
       if (container.value) container.value.dataset.viewerMoving = String(map.isMoving())
       if (container.value) container.value.dataset.viewerCamera = JSON.stringify({ floorId: props.floor.id, corners: getFloorCorners(props.floor) ? toImageCoordinates(getFloorCorners(props.floor)!).map(point => map.project(point)) : [], center: map.getCenter(), zoom: map.getZoom(), bearing: map.getBearing(), pitch: map.getPitch(), minZoom: map.getMinZoom(), maxZoom: map.getMaxZoom() })
@@ -98,11 +106,14 @@ defineExpose({
   resize: viewer.resize,
   ensureSpotVisible: viewer.ensureSpotVisible,
   compareCamera: viewer.compareCamera,
+  captureDetailContext: viewer.captureDetailContext,
+  restoreDetailContext: viewer.restoreDetailContext,
+  discardDetailContext: viewer.discardDetailContext,
 })
 </script>
 
 <template>
-  <div :class="{ 'public-map-viewer h-full': mode === 'view' }">
+  <div :class="{ 'public-map-viewer h-full': mode === 'view', 'visitor-map-viewer': visitorOverview }">
     <div class="map-viewer-frame relative overflow-hidden rounded-xl border border-stone-300 bg-stone-100" :style="{ height }" :aria-busy="!isReady">
       <div
         ref="container"
@@ -110,7 +121,7 @@ defineExpose({
         :class="[mode === 'edit' && placementEnabled ? 'cursor-crosshair' : 'cursor-grab', isReady ? 'opacity-100' : 'opacity-0']"
         :aria-label="label"
         role="region"
-        tabindex="0"
+        :tabindex="visitorOverview ? -1 : 0"
       />
       <div v-if="!isReady && !mapError" class="pointer-events-none absolute inset-0 animate-pulse bg-stone-200" aria-hidden="true" />
       <div
@@ -456,5 +467,96 @@ defineExpose({
 </style>
 
 <style>
-.maplibregl-marker.map-viewer-marker[hidden] { display: none; }
+.maplibregl-marker.map-viewer-marker[hidden] {
+  display: none;
+}
+
+.visitor-map-viewer .maplibregl-ctrl-top-right {
+  top: auto;
+  bottom: calc(env(safe-area-inset-bottom) + 2rem + var(--visitor-category-height, 52px) + 1.5rem);
+}
+.visitor-map-viewer .map-viewer-control-group {
+  flex-direction: row;
+  margin: 0 0.75rem 0 0 !important;
+  align-items: center;
+}
+.visitor-map-viewer .map-viewer-navigation-control {
+  flex-direction: row;
+}
+.visitor-map-viewer .map-viewer-overview-control {
+  width: auto;
+  min-width: 3.75rem;
+  padding: 0 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+.visitor-map-viewer .map-viewer-control-group > .maplibregl-ctrl-group {
+  overflow: hidden;
+  border-radius: 0.75rem;
+  background: rgb(255 255 255 / 92%);
+}
+.visitor-map-viewer .map-viewer-marker__collision-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 4;
+  display: grid;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 0.25rem;
+  place-items: center;
+  border: 1px solid #d6d3d1;
+  border-radius: 999px;
+  background: white;
+  color: #292524;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  pointer-events: none;
+}
+.map-viewer-marker__collision-badge[hidden] {
+  display: none;
+}
+.map-viewer-marker__name {
+  display: none;
+}
+.visitor-map-viewer .map-viewer-marker__name {
+  position: absolute;
+  bottom: calc(100% + 0.25rem);
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 10rem;
+  width: max-content;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border-radius: 0.375rem;
+  background: white;
+  padding: 0.25rem 0.5rem;
+  color: #292524;
+  font-size: 0.75rem;
+  font-weight: 700;
+  box-shadow: 0 1px 4px rgb(28 25 23 / 20%);
+  pointer-events: none;
+}
+.visitor-map-viewer .map-viewer-marker:focus-visible .map-viewer-marker__name,
+.visitor-map-viewer .map-viewer-marker--selected .map-viewer-marker__name {
+  display: block;
+}
+@media (max-width: 767px) {
+  .visitor-map-viewer .map-viewer-zoom-control {
+    display: none;
+  }
+  .visitor-map-viewer .map-viewer-navigation-control button + button {
+    border: 0;
+  }
+  .public-map-has-spot .visitor-map-viewer .map-viewer-control-group {
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .visitor-map-viewer [role="region"] {
+    transition: none;
+  }
+}
 </style>

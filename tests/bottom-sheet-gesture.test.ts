@@ -8,9 +8,9 @@ describe('Spot bottom sheet gesture thresholds', () => {
     expect(isVerticalSheetGesture(8, 11)).toBe(true)
   })
 
-  it('80pxの下dragはdetail/expandedのどちらからも直接閉じる', () => {
+  it('80pxの下dragはexpandedを縮小しdetailから閉じる', () => {
     expect(getBottomSheetGestureOutcome({ source: 'header', state: 'detail', dx: 0, dy: 80, velocityY: 0 })).toBe('close')
-    expect(getBottomSheetGestureOutcome({ source: 'body', state: 'expanded', dx: 0, dy: 100, velocityY: 0 })).toBe('close')
+    expect(getBottomSheetGestureOutcome({ source: 'body', state: 'expanded', dx: 0, dy: 100, velocityY: 0 })).toBe('collapse')
   })
 
   it('24px以上かつ直近速度0.5px/ms以上の下flickを閉じる', () => {

@@ -45,7 +45,7 @@ describe('公開Mapのモバイル契約', () => {
 
   it('PINからsummaryを挟まずdetail/expandedの本文Dialogを直接開く', () => {
     expect(detail).toContain("const sheetState = ref<BottomSheetState>('detail')")
-    expect(detail).toContain("sheetState.value === 'expanded' ? 0.92 : 0.6")
+    expect(detail).toContain("sheetState.value === 'expanded' ? 0.92 : 0.55")
     expect(detail).toContain('<DialogContent')
     expect(detail).toContain('spot-detail-sheet__body min-h-0 flex-1 overflow-y-auto')
     expect(detail).not.toContain('詳細を見る')
@@ -68,7 +68,7 @@ describe('公開Mapのモバイル契約', () => {
     expect(publicPage).not.toContain('mobile-cover')
     expect(category).toContain('overflow-x-auto')
     expect(category).toContain('text-sm')
-    expect(category).toContain('h-8')
+    expect(category).toContain('カテゴリの絞り込みを解除')
     expect(category).toContain('min-h-11')
     expect(category).not.toContain('overflowCategories')
     expect(mapViewer).toContain(':style="{ height }"')
@@ -76,7 +76,7 @@ describe('公開Mapのモバイル契約', () => {
   })
 
   it('top controls、Map controls、Category、attributionへ独立した配置zoneを持つ', () => {
-    expect(publicPage).toContain('max-w-[calc(100vw-5.5rem)]')
+    expect(publicPage).toContain('max-w-[calc(100vw-10.5rem)]')
     expect(publicPage).toContain('bottom-[calc(env(safe-area-inset-bottom)+2rem)]')
     expect(publicPage).toContain('right-[calc(env(safe-area-inset-right)+0.75rem)]')
     expect(mapViewer).toContain('margin-top: calc(env(safe-area-inset-top) + 4.5rem) !important;')
@@ -87,8 +87,8 @@ describe('公開Mapのモバイル契約', () => {
     const viewer = readFileSync(new URL('../app/composables/useMapViewer.ts', import.meta.url), 'utf8')
     expect(mapViewer).toContain('@media (hover: none) and (pointer: coarse)')
     expect(mapViewer).toContain('.public-map-viewer .map-viewer-zoom-control')
-    expect(viewer).toContain("zoomIn.className = 'map-viewer-zoom-control'")
-    expect(viewer).toContain("zoomOut.className = 'map-viewer-zoom-control'")
+    expect(viewer).toContain("zoomIn.className = 'map-viewer-zoom-control map-viewer-zoom-in'")
+    expect(viewer).toContain("zoomOut.className = 'map-viewer-zoom-control map-viewer-zoom-out'")
     expect(viewer).toContain('syncGeolocateControl')
     expect(mapViewer).not.toContain('.public-map-viewer .map-viewer-control-group {\n    display: none')
   })

@@ -53,3 +53,18 @@ export function getCollisionGroup(id: string, candidates: readonly CollisionCand
   }
   return group
 }
+
+/** One visible representative owns each connected group's count and recovery. */
+export function getCollisionRepresentatives(candidates: readonly CollisionCandidate[], visible: ReadonlySet<string>) {
+  const counts = new Map<string, number>()
+  const seen = new Set<string>()
+  for (const candidate of candidates) {
+    if (seen.has(candidate.id)) continue
+    const group = getCollisionGroup(candidate.id, candidates)
+    group.forEach(pin => seen.add(pin.id))
+    // Set insertion order is the existing declutter priority/tie order.
+    const representative = [...visible].find(id => group.some(pin => pin.id === id))
+    if (representative && group.length > 1) counts.set(representative, group.length)
+  }
+  return counts
+}

@@ -1,0 +1,794 @@
+[
+  {
+    "check": "pitch20 same center and zoom",
+    "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":-144.98414092992897,\"y\":93.8071709019711},{\"x\":539.1245409416912,\"y\":97.99272397918115},{\"x\":590.2581432014226,\"y\":605.9468986900101},{\"x\":-203.92544760695202,\"y\":600.3063692346875}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.06531955966577},\"zoom\":15.759707646398311,\"bearing\":0,\"pitch\":20,\"minZoom\":13.609707646398311,\"maxZoom\":20.609707646398313}"
+  },
+  {
+    "check": "pitch25 same center and zoom",
+    "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":-137.58906837523048,\"y\":112.35198942996847},{\"x\":531.7328195215968,\"y\":116.21620958897354},{\"x\":595.2461264797405,\"y\":601.6506018943159},{\"x\":-208.80345288523296,\"y\":596.0744529563696}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.06531955966577},\"zoom\":15.759707646398311,\"bearing\":0,\"pitch\":25,\"minZoom\":13.609707646398311,\"maxZoom\":20.609707646398313}"
+  },
+  {
+    "check": "before source52a397b",
+    "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":-114.2926783768007,\"y\":123.43419379037074},{\"x\":508.0217654664472,\"y\":127.27725431929679},{\"x\":549.3759359731633,\"y\":586.9209649793303},{\"x\":-162.720911126136,\"y\":581.889315776807}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.06531955966577},\"zoom\":15.609707646398311,\"bearing\":0,\"pitch\":20,\"minZoom\":13.609707646398311,\"maxZoom\":20.609707646398313}"
+  },
+  {
+    "check": "white background comparator",
+    "headingVisible": 0,
+    "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":-137.58906837523048,\"y\":112.35198942996847},{\"x\":531.7328195215968,\"y\":116.21620958897354},{\"x\":595.2461264797405,\"y\":601.6506018943159},{\"x\":-208.80345288523296,\"y\":596.0744529563696}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.06531955966577},\"zoom\":15.759707646398311,\"bearing\":0,\"pitch\":25,\"minZoom\":13.609707646398311,\"maxZoom\":20.609707646398313}"
+  },
+  {
+    "check": "after initial25 neutral warm no compass",
+    "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":-137.58906837523048,\"y\":112.35198942996847},{\"x\":531.7328195215968,\"y\":116.21620958897354},{\"x\":595.2461264797405,\"y\":601.6506018943159},{\"x\":-208.80345288523296,\"y\":596.0744529563696}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.06531955966577},\"zoom\":15.759707646398311,\"bearing\":0,\"pitch\":25,\"minZoom\":13.609707646398311,\"maxZoom\":20.609707646398313}",
+    "headingVisible": 0
+  },
+  {
+    "check": "after native horizontal scroll",
+    "value": {
+      "clientWidth": 290,
+      "scrollLeft": 316.5,
+      "scrollWidth": 607
+    },
+    "selectedText": [
+      "有松マップ | デジタルマップ",
+      "歴史・文化・有松絞り2カテゴリ · 10件"
+    ]
+  },
+  {
+    "check": "one click clear after end scroll",
+    "allPressed": "true",
+    "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":-137.58906837523048,\"y\":112.35198942996847},{\"x\":531.7328195215968,\"y\":116.21620958897354},{\"x\":595.2461264797405,\"y\":601.6506018943159},{\"x\":-208.80345288523296,\"y\":596.0744529563696}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.06531955966577},\"zoom\":15.759707646398311,\"bearing\":0,\"pitch\":25,\"minZoom\":13.609707646398311,\"maxZoom\":20.609707646398313}"
+  },
+  {
+    "check": "collision-before",
+    "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":-137.58906837523048,\"y\":112.35198942996847},{\"x\":531.7328195215968,\"y\":116.21620958897354},{\"x\":595.2461264797405,\"y\":601.6506018943159},{\"x\":-208.80345288523296,\"y\":596.0744529563696}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.06531955966577},\"zoom\":15.759707646398311,\"bearing\":0,\"pitch\":25,\"minZoom\":13.609707646398311,\"maxZoom\":20.609707646398313}"
+  },
+  {
+    "check": "collision-tap-staged-zoom",
+    "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":-472.15655719511125,\"y\":-2.0970437023564164},{\"x\":803.6224875546428,\"y\":4.9236295907081145},{\"x\":1079.7942828198038,\"y\":1085.8415655956403},{\"x\":-794.6583599063005,\"y\":1070.6852037001665}],\"center\":{\"lng\":136.97148848963843,\"lat\":35.066443560385906},\"zoom\":16.75970764639831,\"bearing\":0,\"pitch\":25,\"minZoom\":13.609707646398311,\"maxZoom\":20.609707646398313}",
+    "dom": "- generic \"通知\"\n- status: 有松マップ | デジタルマップ\n- main:\n  - generic \"公開マップ操作\":\n    - heading \"有松マップ\" [level=1]\n    - paragraph: 有松・桶狭間\n    - button \"マップ情報を開く\": i\n  - group \"カテゴリで絞り込み\":\n    - button \"すべてのカテゴリを表示\" [pressed]: すべて\n    - button \"歴史・文化\":\n      - generic: 歴史・文化\n    - button \"有松絞り\":\n      - generic: 有松絞り\n    - button \"寺社\":\n      - generic: 寺社\n    - button \"交通\":\n      - generic: 交通\n    - button \"ショップ\":\n      - generic: ショップ\n    - button \"グルメ\":\n      - generic: グルメ\n  - region \"有松マップ 有松・桶狭間\":\n    - region \"有松マップ 有松・桶狭間（矢印キーで移動、プラス・マイナスで拡大縮小）\"\n    - button \"まり木綿の詳細を表示\":\n      - generic: 買\n    - button \"カフェ庄九郎の詳細を表示\"\n    - button \"井桁屋の周辺ピンを表示（2件）\":\n      - generic: \"2\"\n    - button \"寿限無茶屋の詳細を表示\":\n      - generic: 食\n    - button \"小塚邸の詳細を表示\":\n      - generic: 観\n    - button \"岡家住宅の詳細を表示\":\n      - generic: 観\n    - button \"常夜燈の詳細を表示\":\n      - generic: 観\n    - button \"戦評の松の詳細を表示\":\n      - generic: 観\n    - button \"有松・鳴海絞会館の詳細を表示\"\n    - button \"有松天満社の詳細を表示\"\n    - button \"有松山車会館の詳細を表示\"\n    - button \"有松神社の詳細を表示\":\n      - generic: 観\n    - button \"有松駅の詳細を表示\"\n    - button \"服部邸の詳細を表示\":\n      - generic: 観\n    - button \"桶狭間古戦場公園の詳細を表示\":\n      - generic: 観\n    - button \"桶狭間神明社の詳細を表示\":\n      - generic: 観\n    - button \"祇園寺の詳細を表示\":\n      - generic: 観\n    - button \"竹田邸の詳細を表示\":\n      - generic: 観\n    - button \"長福寺の詳細を表示\":\n      - generic: 観\n    - button \"地図全体を表示\": 全体\n    - button \"現在地を表示\"\n    - generic \"地図のクレジットを表示\"\n    - link \"MapLibre\":\n      - /url: https://maplibre.org/\n- button \"Toggle Nuxt DevTools\":\n- generic \"Page load time\":\n  - generic: \"23\"\n  - generic: ms\n- button \"Toggle Component Inspector\":"
+  },
+  {
+    "check": "overview-level",
+    "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":25.832945245137147,\"y\":248.21975699194235},{\"x\":366.0000000015066,\"y\":250.66368904083637},{\"x\":364.16705476088924,\"y\":505.78024300956423},{\"x\":24.000000001506596,\"y\":503.33648678100127}],\"center\":{\"lng\":136.97123594617779,\"lat\":35.06531955966577},\"zoom\":14.609707646395313,\"bearing\":0,\"pitch\":0,\"minZoom\":13.609707646395313,\"maxZoom\":20.609707646395314}"
+  },
+  {
+    "check": "viewport-768x1024",
+    "layout": {
+      "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":16.906773668695163,\"y\":164.08864718399948},{\"x\":753.6316154087754,\"y\":168.3967172505185},{\"x\":820.1617259934557,\"y\":705.4071339051352},{\"x\":-58.085992845506084,\"y\":699.2852828990489}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.065576937985625},\"zoom\":15.879695165335464,\"bearing\":0,\"pitch\":25,\"minZoom\":14.679695165335465,\"maxZoom\":21.679695165335467}",
+      "h": 1024,
+      "overflow": false,
+      "w": 768
+    }
+  },
+  {
+    "check": "viewport-1024x768",
+    "layout": {
+      "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":170.1088511632249,\"y\":55.580876720390535},{\"x\":856.2594802851362,\"y\":59.46671006178188},{\"x\":940.3110156875009,\"y\":570.3127024547598},{\"x\":78.10271126895783,\"y\":564.1772232904017}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.065545908899},\"zoom\":15.823307992186637,\"bearing\":0,\"pitch\":25,\"minZoom\":14.623307992186637,\"maxZoom\":21.62330799218664}",
+      "h": 768,
+      "overflow": false,
+      "w": 1024
+    }
+  },
+  {
+    "check": "viewport-1440x900",
+    "layout": {
+      "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":292.21094958560155,\"y\":62.41234098606328},{\"x\":1151.305272823248,\"y\":67.2706192058988},{\"x\":1264.3692832985312,\"y\":715.3217909813529},{\"x\":169.1710322330182,\"y\":707.426545713279}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.06570979746786},\"zoom\":16.14966833338926,\"bearing\":0,\"pitch\":25,\"minZoom\":14.949668333389262,\"maxZoom\":21.949668333389262}",
+      "h": 900,
+      "overflow": false,
+      "w": 1440
+    }
+  },
+  {
+    "check": "viewport-1440x700",
+    "layout": {
+      "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":422.3882845142162,\"y\":52.06614676515444},{\"x\":1019.3904364179986,\"y\":55.45039447785105},{\"x\":1088.9259950614703,\"y\":496.0440178428974},{\"x\":345.9407092927167,\"y\":490.8025948767437}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.065424123964945},\"zoom\":15.62111914157337,\"bearing\":0,\"pitch\":25,\"minZoom\":14.42111914157337,\"maxZoom\":21.42111914157337}",
+      "h": 700,
+      "overflow": false,
+      "w": 1440
+    }
+  },
+  {
+    "check": "coincident-spiderfy",
+    "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":-176.618761430121,\"y\":129.2208136632918},{\"x\":571.3197338443599,\"y\":133.56960499865795},{\"x\":653.1525556454811,\"y\":693.2377194359868},{\"x\":-267.0957567766888,\"y\":686.654705202078}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.06593472814595},\"zoom\":15.909707646398312,\"bearing\":0,\"pitch\":25,\"minZoom\":13.609707646398311,\"maxZoom\":20.609707646398313}",
+    "dom": "- generic \"通知\"\n- status: 有松マップ | デジタルマップ\n- main:\n  - generic \"公開マップ操作\":\n    - heading \"WU-68 高密度 outdoor\" [level=1]\n    - paragraph: 有松・桶狭間\n    - button \"マップ情報を開く\": i\n  - region \"WU-68 高密度 outdoor 有松・桶狭間\":\n    - region \"WU-68 高密度 outdoor 有松・桶狭間（矢印キーで移動、プラス・マイナスで拡大縮小）\"\n    - button \"地図全体を表示\": 全体\n    - button \"現在地を表示\"\n    - generic \"地図のクレジットを表示\"\n    - link \"MapLibre\":\n      - /url: https://maplibre.org/\n    - group \"重なったスポットのピン\":\n      - button \"Spot 00の詳細を表示\" [active]:\n        - generic: ●\n        - generic: Spot 00\n      - button \"Spot 01の詳細を表示\":\n        - generic: ●\n      - button \"Spot 02の詳細を表示\":\n        - generic: ●\n- button \"Toggle Nuxt DevTools\":\n- generic \"Page load time\":\n  - generic: \"8\"\n  - generic: ms\n- button \"Toggle Component Inspector\":"
+  },
+  {
+    "check": "keyboard-detail-Escape-context",
+    "equal": true,
+    "focus": {
+      "label": "WU-68 高密度 outdoor 有松・桶狭間（矢印キーで移動、プラス・マイナスで拡大縮小）",
+      "role": "region"
+    }
+  },
+  {
+    "check": "authenticated-LIVE-context",
+    "equal": true
+  },
+  {
+    "check": "Public-Release-Authenticated-LIVE-parity-390",
+    "cameraEqual": true,
+    "liveCamera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":-137.58906837523048,\"y\":112.35198942996847},{\"x\":531.7328195215968,\"y\":116.21620958897354},{\"x\":595.2461264797405,\"y\":601.6506018943159},{\"x\":-208.80345288523296,\"y\":596.0744529563696}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.06531955966577},\"zoom\":15.759707646398311,\"bearing\":0,\"pitch\":25,\"minZoom\":13.609707646398311,\"maxZoom\":20.609707646398313}",
+    "publicCamera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":-137.58906837523048,\"y\":112.35198942996847},{\"x\":531.7328195215968,\"y\":116.21620958897354},{\"x\":595.2461264797405,\"y\":601.6506018943159},{\"x\":-208.80345288523296,\"y\":596.0744529563696}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.06531955966577},\"zoom\":15.759707646398311,\"bearing\":0,\"pitch\":25,\"minZoom\":13.609707646398311,\"maxZoom\":20.609707646398313}",
+    "liveDOM": "- generic \"通知\"\n- status: 有松マップ | 編集中の内容\n- main:\n  - generic \"公開マップ操作\":\n    - heading \"有松マップ\" [level=1]\n    - paragraph: 有松・桶狭間\n    - button \"マップ情報を開く\": i\n  - group \"カテゴリで絞り込み\":\n    - button \"すべてのカテゴリを表示\" [pressed]: すべて\n    - button \"歴史・文化\":\n      - generic: 歴史・文化\n    - button \"有松絞り\":\n      - generic: 有松絞り\n    - button \"寺社\":\n      - generic: 寺社\n    - button \"交通\":\n      - generic: 交通\n    - button \"ショップ\":\n      - generic: ショップ\n    - button \"グルメ\":\n      - generic: グルメ\n  - region \"有松マップ 有松・桶狭間\":\n    - region \"有松マップ 有松・桶狭間（矢印キーで移動、プラス・マイナスで拡大縮小）\"\n    - button \"カフェ庄九郎の周辺ピンを表示（19件）\":\n      - generic: \"19\"\n    - button \"小塚邸の周辺ピンを表示（19件）\":\n      - generic: 観\n      - generic: \"19\"\n    - button \"戦評の松の周辺ピンを表示（19件）\":\n      - generic: 観\n      - generic: \"19\"\n    - button \"有松・鳴海絞会館の周辺ピンを表示（19件）\":\n      - generic: \"19\"\n    - button \"有松天満社の詳細を表示\"\n    - button \"有松山車会館の周辺ピンを表示（19件）\":\n      - generic: \"19\"\n    - button \"桶狭間古戦場公園の周辺ピンを表示（19件）\":\n      - generic: 観\n      - generic: \"19\"\n    - button \"地図全体を表示\": 全体\n    - button \"現在地を表示\"\n    - generic \"地図のクレジットを表示\"\n    - link \"MapLibre\":\n      - /url: https://maplibre.org/\n- complementary \"来館者プレビュー\":\n  - strong: 来館者プレビュー\n  - generic: 編集中の内容\n  - link \"管理画面に戻る\":\n    - /url: /admin/maps/cmu9s675a0004ssu1b14j9snq\n- button \"Toggle Nuxt DevTools\":\n- generic \"Page load time\":\n  - generic: \"117\"\n  - generic: ms\n- button \"Toggle Component Inspector\":",
+    "publicDOM": "- generic \"通知\"\n- status: 有松マップ | デジタルマップ\n- main:\n  - generic \"公開マップ操作\":\n    - heading \"有松マップ\" [level=1]\n    - paragraph: 有松・桶狭間\n    - button \"マップ情報を開く\": i\n  - group \"カテゴリで絞り込み\":\n    - button \"すべてのカテゴリを表示\" [pressed]: すべて\n    - button \"歴史・文化\":\n      - generic: 歴史・文化\n    - button \"有松絞り\":\n      - generic: 有松絞り\n    - button \"寺社\":\n      - generic: 寺社\n    - button \"交通\":\n      - generic: 交通\n    - button \"ショップ\":\n      - generic: ショップ\n    - button \"グルメ\":\n      - generic: グルメ\n  - region \"有松マップ 有松・桶狭間\":\n    - region \"有松マップ 有松・桶狭間（矢印キーで移動、プラス・マイナスで拡大縮小）\"\n    - button \"カフェ庄九郎の周辺ピンを表示（19件）\":\n      - generic: \"19\"\n    - button \"小塚邸の周辺ピンを表示（19件）\":\n      - generic: 観\n      - generic: \"19\"\n    - button \"戦評の松の周辺ピンを表示（19件）\":\n      - generic: 観\n      - generic: \"19\"\n    - button \"有松・鳴海絞会館の周辺ピンを表示（19件）\":\n      - generic: \"19\"\n    - button \"有松天満社の詳細を表示\"\n    - button \"有松山車会館の周辺ピンを表示（19件）\":\n      - generic: \"19\"\n    - button \"桶狭間古戦場公園の周辺ピンを表示（19件）\":\n      - generic: 観\n      - generic: \"19\"\n    - button \"地図全体を表示\": 全体\n    - button \"現在地を表示\"\n    - generic \"地図のクレジットを表示\"\n    - link \"MapLibre\":\n      - /url: https://maplibre.org/\n- button \"Toggle Nuxt DevTools\":\n- generic \"Page load time\":\n  - generic: \"12\"\n  - generic: ms\n- button \"Toggle Component Inspector\":"
+  },
+  {
+    "check": "Public-LIVE-parity-768x1024",
+    "cameraEqual": true,
+    "measurements": [
+      {
+        "route": "http://localhost:3000/wu69-parity",
+        "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":16.906773668695163,\"y\":164.08864718399948},{\"x\":753.6316154087754,\"y\":168.3967172505185},{\"x\":820.1617259934557,\"y\":705.4071339051352},{\"x\":-58.085992845506084,\"y\":699.2852828990489}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.065576937985625},\"zoom\":15.879695165335464,\"bearing\":0,\"pitch\":25,\"minZoom\":14.679695165335465,\"maxZoom\":21.679695165335467}",
+        "contextPreserved": true
+      },
+      {
+        "route": "http://localhost:3000/admin/maps/cmu9s675a0004ssu1b14j9snq/preview",
+        "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":16.906773668695163,\"y\":164.08864718399948},{\"x\":753.6316154087754,\"y\":168.3967172505185},{\"x\":820.1617259934557,\"y\":705.4071339051352},{\"x\":-58.085992845506084,\"y\":699.2852828990489}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.065576937985625},\"zoom\":15.879695165335464,\"bearing\":0,\"pitch\":25,\"minZoom\":14.679695165335465,\"maxZoom\":21.679695165335467}",
+        "contextPreserved": true
+      }
+    ]
+  },
+  {
+    "check": "Public-LIVE-parity-1024x768",
+    "cameraEqual": true,
+    "measurements": [
+      {
+        "route": "http://localhost:3000/wu69-parity",
+        "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":170.1088511632249,\"y\":55.580876720390535},{\"x\":856.2594802851362,\"y\":59.46671006178188},{\"x\":940.3110156875009,\"y\":570.3127024547598},{\"x\":78.10271126895783,\"y\":564.1772232904017}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.065545908899},\"zoom\":15.823307992186637,\"bearing\":0,\"pitch\":25,\"minZoom\":14.623307992186637,\"maxZoom\":21.62330799218664}",
+        "contextPreserved": true
+      },
+      {
+        "route": "http://localhost:3000/admin/maps/cmu9s675a0004ssu1b14j9snq/preview",
+        "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":170.1088511632249,\"y\":55.580876720390535},{\"x\":856.2594802851362,\"y\":59.46671006178188},{\"x\":940.3110156875009,\"y\":570.3127024547598},{\"x\":78.10271126895783,\"y\":564.1772232904017}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.065545908899},\"zoom\":15.823307992186637,\"bearing\":0,\"pitch\":25,\"minZoom\":14.623307992186637,\"maxZoom\":21.62330799218664}",
+        "contextPreserved": true
+      }
+    ]
+  },
+  {
+    "check": "Public-LIVE-parity-1440x900",
+    "cameraEqual": true,
+    "measurements": [
+      {
+        "route": "http://localhost:3000/wu69-parity",
+        "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":292.21094958560155,\"y\":62.41234098606328},{\"x\":1151.305272823248,\"y\":67.2706192058988},{\"x\":1264.3692832985312,\"y\":715.3217909813529},{\"x\":169.1710322330182,\"y\":707.426545713279}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.06570979746786},\"zoom\":16.14966833338926,\"bearing\":0,\"pitch\":25,\"minZoom\":14.949668333389262,\"maxZoom\":21.949668333389262}",
+        "contextPreserved": true
+      },
+      {
+        "route": "http://localhost:3000/admin/maps/cmu9s675a0004ssu1b14j9snq/preview",
+        "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":292.21094958560155,\"y\":62.41234098606328},{\"x\":1151.305272823248,\"y\":67.2706192058988},{\"x\":1264.3692832985312,\"y\":715.3217909813529},{\"x\":169.1710322330182,\"y\":707.426545713279}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.06570979746786},\"zoom\":16.14966833338926,\"bearing\":0,\"pitch\":25,\"minZoom\":14.949668333389262,\"maxZoom\":21.949668333389262}",
+        "contextPreserved": true
+      }
+    ]
+  },
+  {
+    "check": "Public-LIVE-parity-1440x700",
+    "cameraEqual": true,
+    "measurements": [
+      {
+        "route": "http://localhost:3000/wu69-parity",
+        "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":422.3882845142162,\"y\":52.06614676515444},{\"x\":1019.3904364179986,\"y\":55.45039447785105},{\"x\":1088.9259950614703,\"y\":496.0440178428974},{\"x\":345.9407092927167,\"y\":490.8025948767437}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.065424123964945},\"zoom\":15.62111914157337,\"bearing\":0,\"pitch\":25,\"minZoom\":14.42111914157337,\"maxZoom\":21.42111914157337}",
+        "contextPreserved": true
+      },
+      {
+        "route": "http://localhost:3000/admin/maps/cmu9s675a0004ssu1b14j9snq/preview",
+        "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":422.3882845142162,\"y\":52.06614676515444},{\"x\":1019.3904364179986,\"y\":55.45039447785105},{\"x\":1088.9259950614703,\"y\":496.0440178428974},{\"x\":345.9407092927167,\"y\":490.8025948767437}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.065424123964945},\"zoom\":15.62111914157337,\"bearing\":0,\"pitch\":25,\"minZoom\":14.42111914157337,\"maxZoom\":21.42111914157337}",
+        "contextPreserved": true
+      }
+    ]
+  },
+  {
+    "check": "reduced-motion-collision",
+    "observation": {
+      "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":-472.15655719511125,\"y\":-2.0970437023564164},{\"x\":803.6224875546428,\"y\":4.9236295907081145},{\"x\":1079.7942828198038,\"y\":1085.8415655956403},{\"x\":-794.6583599063005,\"y\":1070.6852037001665}],\"center\":{\"lng\":136.97148848963843,\"lat\":35.066443560385906},\"zoom\":16.75970764639831,\"bearing\":0,\"pitch\":25,\"minZoom\":13.609707646395313,\"maxZoom\":20.609707646398313}",
+      "moving": "false",
+      "reduced": true
+    }
+  },
+  {
+    "check": "reduced-motion-overview",
+    "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":25.832945245137147,\"y\":248.21975699194235},{\"x\":366.0000000015066,\"y\":250.66368904083637},{\"x\":364.16705476088924,\"y\":505.78024300956423},{\"x\":24.000000001506596,\"y\":503.33648678100127}],\"center\":{\"lng\":136.97123594617779,\"lat\":35.06531955966577},\"zoom\":14.609707646395313,\"bearing\":0,\"pitch\":0,\"minZoom\":13.609707646395313,\"maxZoom\":20.609707646395314}"
+  },
+  {
+    "check": "near-staged-maxZoom-spiderfy",
+    "steps": [
+      {
+        "floorId": "cmu9s675h000bssu1qjc0297q",
+        "corners": [
+          {
+            "x": -176.61950803266342,
+            "y": 129.22080932697932
+          },
+          {
+            "x": 571.3189845598326,
+            "y": 133.56960064675988
+          },
+          {
+            "x": 653.1516333602102,
+            "y": 693.2377128449682
+          },
+          {
+            "x": -267.0966750019819,
+            "y": 686.6546986400881
+          }
+        ],
+        "center": {
+          "lng": 136.97123595574465,
+          "lat": 35.065934728089715
+        },
+        "zoom": 15.909707646398312,
+        "bearing": 0,
+        "pitch": 25,
+        "minZoom": 13.609707646398311,
+        "maxZoom": 20.609707646398313
+      },
+      {
+        "floorId": "cmu9s675h000bssu1qjc0297q",
+        "corners": [
+          {
+            "x": -2691.0938891445758,
+            "y": -1569.2184240067763
+          },
+          {
+            "x": 3153.53219949338,
+            "y": -1559.0029220378756
+          },
+          {
+            "x": -5986.949372919072,
+            "y": -3843.159969424879
+          },
+          {
+            "x": 6635.971159143744,
+            "y": -3890.794131333005
+          }
+        ],
+        "center": {
+          "lng": 136.97123595574465,
+          "lat": 35.06635541483348
+        },
+        "zoom": 20.609707646398313,
+        "bearing": 0,
+        "pitch": 25,
+        "minZoom": 13.609707646398311,
+        "maxZoom": 20.609707646398313
+      }
+    ],
+    "dom": "- generic \"通知\"\n- status: 有松マップ | デジタルマップ\n- main:\n  - generic \"公開マップ操作\":\n    - heading \"WU-68 高密度 outdoor\" [level=1]\n    - paragraph: 有松・桶狭間\n    - button \"マップ情報を開く\": i\n  - region \"WU-68 高密度 outdoor 有松・桶狭間\":\n    - region \"WU-68 高密度 outdoor 有松・桶狭間（矢印キーで移動、プラス・マイナスで拡大縮小）\"\n    - button \"地図全体を表示\": 全体\n    - button \"現在地を表示\"\n    - generic \"地図のクレジットを表示\"\n    - link \"MapLibre\":\n      - /url: https://maplibre.org/\n    - group \"重なったスポットのピン\":\n      - button \"Spot 00の詳細を表示\" [active]:\n        - generic: ●\n        - generic: Spot 00\n      - button \"Spot 01の詳細を表示\":\n        - generic: ●\n      - button \"Spot 02の詳細を表示\":\n        - generic: ●\n- button \"Toggle Nuxt DevTools\":\n- generic \"Page load time\":\n  - generic: \"5\"\n  - generic: ms\n- button \"Toggle Component Inspector\":"
+  },
+  {
+    "check": "review-F26-before",
+    "rects": {
+      "centerHit": "来館者プレビュー",
+      "floor": {
+        "h": 44,
+        "w": 134.4296875,
+        "x": 12,
+        "y": 56
+      },
+      "preview": {
+        "h": 50,
+        "w": 237.640625,
+        "x": 12,
+        "y": 68
+      }
+    }
+  },
+  {
+    "check": "review-F27-before-shared-photo",
+    "observation": {
+      "imgs": [
+        {
+          "complete": true,
+          "naturalWidth": 1448,
+          "src": "/__qa__/arimatsu/map-illustration.png"
+        }
+      ],
+      "loading": [
+        "写真を読み込み中"
+      ]
+    }
+  },
+  {
+    "check": "review-F26-after",
+    "rects": {
+      "centerHit": "floor",
+      "floor": {
+        "h": 44,
+        "w": 134.4296875,
+        "x": 12,
+        "y": 692
+      },
+      "preview": {
+        "h": 50,
+        "w": 237.640625,
+        "x": 12,
+        "y": 68
+      }
+    }
+  },
+  {
+    "check": "review-F26-keyboard-Floor-roundtrip",
+    "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":-136.71823298626464,\"y\":106.05407224881296},{\"x\":530.8497215747977,\"y\":109.89806695118955},{\"x\":593.9856256247143,\"y\":592.5346081527464},{\"x\":-207.53419099921842,\"y\":586.9934923817062}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.065227482919795},\"zoom\":15.759707646399395,\"bearing\":0,\"pitch\":25,\"minZoom\":13.609707646399395,\"maxZoom\":20.609707646399393}"
+  },
+  {
+    "check": "review-F27-after-shared-photo",
+    "observation": {
+      "imgs": [
+        {
+          "complete": true,
+          "naturalWidth": 1448,
+          "src": "/__qa__/arimatsu/map-illustration.png"
+        }
+      ],
+      "loading": []
+    }
+  },
+  {
+    "check": "FINAL-review-fixes-Public-LIVE-390x844",
+    "cameraEqual": true,
+    "measurements": [
+      {
+        "route": "http://localhost:3000/wu69-parity",
+        "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":-136.7182329836021,\"y\":106.05407224881296},{\"x\":530.8497215774645,\"y\":109.89806694985614},{\"x\":593.9856256274524,\"y\":592.534608150682},{\"x\":-207.53419100241473,\"y\":586.9934923817062}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.065227482919795},\"zoom\":15.759707646398311,\"bearing\":0,\"pitch\":25,\"minZoom\":13.609707646398311,\"maxZoom\":20.609707646398313}",
+        "contextPreserved": true,
+        "floor": {
+          "h": 844,
+          "hit": "floor",
+          "rect": {
+            "h": 44,
+            "w": 134.4296875,
+            "x": 12,
+            "y": 692
+          },
+          "w": 390
+        }
+      },
+      {
+        "route": "http://localhost:3000/admin/maps/cmu9s675a0004ssu1b14j9snq/preview",
+        "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":-136.7182329836021,\"y\":106.05407224881296},{\"x\":530.8497215774645,\"y\":109.89806694985614},{\"x\":593.9856256274524,\"y\":592.534608150682},{\"x\":-207.53419100241473,\"y\":586.9934923817062}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.065227482919795},\"zoom\":15.759707646398311,\"bearing\":0,\"pitch\":25,\"minZoom\":13.609707646398311,\"maxZoom\":20.609707646398313}",
+        "contextPreserved": true,
+        "floor": {
+          "h": 844,
+          "hit": "floor",
+          "rect": {
+            "h": 44,
+            "w": 134.4296875,
+            "x": 12,
+            "y": 692
+          },
+          "w": 390
+        }
+      }
+    ]
+  },
+  {
+    "check": "FINAL-review-fixes-Public-LIVE-768x1024",
+    "cameraEqual": true,
+    "measurements": [
+      {
+        "route": "http://localhost:3000/wu69-parity",
+        "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":14.078433339100206,\"y\":185.6317065233769},{\"x\":756.4994761897315,\"y\":190.0066519853828},{\"x\":824.2008238420985,\"y\":736.1723582749514},{\"x\":-62.15378678512152,\"y\":729.9369665270236}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.065856533021076},\"zoom\":15.879695165335464,\"bearing\":0,\"pitch\":25,\"minZoom\":14.679695165335465,\"maxZoom\":21.679695165335467}",
+        "contextPreserved": true,
+        "floor": {
+          "h": 1024,
+          "hit": "floor",
+          "rect": {
+            "h": 44,
+            "w": 134.4296875,
+            "x": 20,
+            "y": 76
+          },
+          "w": 768
+        }
+      },
+      {
+        "route": "http://localhost:3000/admin/maps/cmu9s675a0004ssu1b14j9snq/preview",
+        "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":14.078433339100206,\"y\":185.6317065233769},{\"x\":756.4994761897315,\"y\":190.0066519853828},{\"x\":824.2008238420985,\"y\":736.1723582749514},{\"x\":-62.15378678512152,\"y\":729.9369665270236}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.065856533021076},\"zoom\":15.879695165335464,\"bearing\":0,\"pitch\":25,\"minZoom\":14.679695165335465,\"maxZoom\":21.679695165335467}",
+        "contextPreserved": true,
+        "floor": {
+          "h": 1024,
+          "hit": "floor",
+          "rect": {
+            "h": 44,
+            "w": 134.4296875,
+            "x": 20,
+            "y": 76
+          },
+          "w": 768
+        }
+      }
+    ]
+  },
+  {
+    "check": "FINAL-review-fixes-Public-LIVE-1024x768",
+    "cameraEqual": true,
+    "measurements": [
+      {
+        "route": "http://localhost:3000/wu69-parity",
+        "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":197.20382131029274,\"y\":96.49318406147758},{\"x\":828.7678469568766,\"y\":100.14333594205728},{\"x\":898.2055122261976,\"y\":570.3127024567196},{\"x\":120.46591435791134,\"y\":564.7776395038043}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.0657802362208},\"zoom\":15.67438429167356,\"bearing\":0,\"pitch\":25,\"minZoom\":14.47438429167356,\"maxZoom\":21.47438429167356}",
+        "contextPreserved": true,
+        "floor": {
+          "h": 768,
+          "hit": "floor",
+          "rect": {
+            "h": 44,
+            "w": 134.4296875,
+            "x": 20,
+            "y": 76
+          },
+          "w": 1024
+        }
+      },
+      {
+        "route": "http://localhost:3000/admin/maps/cmu9s675a0004ssu1b14j9snq/preview",
+        "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":197.20382131029274,\"y\":96.49318406147758},{\"x\":828.7678469568766,\"y\":100.14333594205728},{\"x\":898.2055122261976,\"y\":570.3127024567196},{\"x\":120.46591435791134,\"y\":564.7776395038043}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.0657802362208},\"zoom\":15.67438429167356,\"bearing\":0,\"pitch\":25,\"minZoom\":14.47438429167356,\"maxZoom\":21.47438429167356}",
+        "contextPreserved": true,
+        "floor": {
+          "h": 768,
+          "hit": "floor",
+          "rect": {
+            "h": 44,
+            "w": 134.4296875,
+            "x": 20,
+            "y": 76
+          },
+          "w": 1024
+        }
+      }
+    ]
+  },
+  {
+    "check": "FINAL-review-fixes-Public-LIVE-1440x900",
+    "cameraEqual": true,
+    "measurements": [
+      {
+        "route": "http://localhost:3000/wu69-parity",
+        "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":318.78809328291237,\"y\":103.07052622253902},{\"x\":1124.3324374774934,\"y\":107.70449464285983},{\"x\":1221.7100295460825,\"y\":715.3217909819377},{\"x\":212.07487043095765,\"y\":708.0426215200039}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.06590656554957},\"zoom\":16.03216135986937,\"bearing\":0,\"pitch\":25,\"minZoom\":14.832161359869371,\"maxZoom\":21.83216135986937}",
+        "contextPreserved": true,
+        "floor": {
+          "h": 900,
+          "hit": "floor",
+          "rect": {
+            "h": 44,
+            "w": 134.4296875,
+            "x": 20,
+            "y": 76
+          },
+          "w": 1440
+        }
+      },
+      {
+        "route": "http://localhost:3000/admin/maps/cmu9s675a0004ssu1b14j9snq/preview",
+        "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":318.78809328291237,\"y\":103.07052622253902},{\"x\":1124.3324374774934,\"y\":107.70449464285983},{\"x\":1221.7100295460825,\"y\":715.3217909819377},{\"x\":212.07487043095765,\"y\":708.0426215200039}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.06590656554957},\"zoom\":16.03216135986937,\"bearing\":0,\"pitch\":25,\"minZoom\":14.832161359869371,\"maxZoom\":21.83216135986937}",
+        "contextPreserved": true,
+        "floor": {
+          "h": 900,
+          "hit": "floor",
+          "rect": {
+            "h": 44,
+            "w": 134.4296875,
+            "x": 20,
+            "y": 76
+          },
+          "w": 1440
+        }
+      }
+    ]
+  },
+  {
+    "check": "FINAL-review-fixes-Public-LIVE-1440x700",
+    "cameraEqual": true,
+    "measurements": [
+      {
+        "route": "http://localhost:3000/wu69-parity",
+        "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":449.83657490104616,\"y\":93.15162279656907},{\"x\":991.5449463327003,\"y\":96.2923917060896},{\"x\":1047.1865575686447,\"y\":496.0440178428974},{\"x\":387.94628631155433,\"y\":491.39276647072313}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.0656826991149},\"zoom\":15.448398605613102,\"bearing\":0,\"pitch\":25,\"minZoom\":14.248398605613103,\"maxZoom\":21.248398605613104}",
+        "contextPreserved": true,
+        "floor": {
+          "h": 700,
+          "hit": "floor",
+          "rect": {
+            "h": 44,
+            "w": 134.4296875,
+            "x": 20,
+            "y": 76
+          },
+          "w": 1440
+        }
+      },
+      {
+        "route": "http://localhost:3000/admin/maps/cmu9s675a0004ssu1b14j9snq/preview",
+        "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":449.83657490104616,\"y\":93.15162279656907},{\"x\":991.5449463327003,\"y\":96.2923917060896},{\"x\":1047.1865575686447,\"y\":496.0440178428974},{\"x\":387.94628631155433,\"y\":491.39276647072313}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.0656826991149},\"zoom\":15.448398605613102,\"bearing\":0,\"pitch\":25,\"minZoom\":14.248398605613103,\"maxZoom\":21.248398605613104}",
+        "contextPreserved": true,
+        "floor": {
+          "h": 700,
+          "hit": "floor",
+          "rect": {
+            "h": 44,
+            "w": 134.4296875,
+            "x": 20,
+            "y": 76
+          },
+          "w": 1440
+        }
+      }
+    ]
+  },
+  {
+    "check": "FINAL-all-categories-Floor-clearance-390",
+    "layout": {
+      "floor": {
+        "bottom": 684,
+        "height": 44,
+        "left": 12,
+        "right": 146.4296875,
+        "top": 640,
+        "width": 134.4296875,
+        "x": 12,
+        "y": 640
+      },
+      "selected": [
+        "歴史・文化",
+        "有松絞り",
+        "寺社",
+        "交通",
+        "ショップ",
+        "グルメ"
+      ],
+      "floorContainer": {
+        "bottom": 684,
+        "height": 44,
+        "left": 12,
+        "right": 146.4296875,
+        "top": 640,
+        "width": 134.4296875,
+        "x": 12,
+        "y": 640
+      }
+    }
+  },
+  {
+    "check": "FINAL-safe-pitch-20",
+    "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":-52.23767942106818,\"y\":183.33700458560304},{\"x\":445.1579197307225,\"y\":186.4661263453213},{\"x\":470.22662443906626,\"y\":550.0861251645382},{\"x\":-82.91023042236289,\"y\":546.2166035208853}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.06531955966577},\"zoom\":15.259707646398311,\"bearing\":0,\"pitch\":20,\"minZoom\":13.609707646398311,\"maxZoom\":20.609707646398313}"
+  },
+  {
+    "check": "FINAL-safe-pitch-25",
+    "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":-48.30363672374945,\"y\":195.47876331574332},{\"x\":441.22877915432645,\"y\":198.40204627225842},{\"x\":472.6358810630871,\"y\":546.6169540211964},{\"x\":-85.26886075227851,\"y\":542.8202858797011}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.06531955966577},\"zoom\":15.259707646398311,\"bearing\":0,\"pitch\":25,\"minZoom\":13.609707646398872,\"maxZoom\":20.609707646398313}"
+  },
+  {
+    "check": "FINAL-safe-initial-and-single-representative",
+    "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":-48.30363672374945,\"y\":195.47876331574332},{\"x\":441.22877915432645,\"y\":198.40204627225842},{\"x\":472.6358810630871,\"y\":546.6169540211964},{\"x\":-85.26886075227851,\"y\":542.8202858797011}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.06531955966577},\"zoom\":15.259707646398311,\"bearing\":0,\"pitch\":25,\"minZoom\":13.609707646398311,\"maxZoom\":20.609707646398313}",
+    "badges": [
+      "20"
+    ]
+  },
+  {
+    "check": "FINAL-safe-staged-zoom",
+    "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":-302.5198590234124,\"y\":114.97898389245412},{\"x\":645.3360152238464,\"y\":120.45942059382651},{\"x\":778.9646342365206,\"y\":872.5349116172418},{\"x\":-463.7848053098244,\"y\":863.1139410586482}],\"center\":{\"lng\":136.97150525863833,\"lat\":35.06651826232368},\"zoom\":16.25970764639831,\"bearing\":0,\"pitch\":25,\"minZoom\":13.609707646398311,\"maxZoom\":20.609707646398313}",
+    "dom": "- generic \"通知\"\n- status: 有松マップ | デジタルマップ\n- main:\n  - generic \"公開マップ操作\":\n    - heading \"有松マップ\" [level=1]\n    - paragraph: 有松・桶狭間\n    - button \"マップ情報を開く\": i\n  - group \"カテゴリで絞り込み\":\n    - button \"すべてのカテゴリを表示\" [pressed]: すべて\n    - button \"歴史・文化\":\n      - generic: 歴史・文化\n    - button \"有松絞り\":\n      - generic: 有松絞り\n    - button \"寺社\":\n      - generic: 寺社\n    - button \"交通\":\n      - generic: 交通\n    - button \"ショップ\":\n      - generic: ショップ\n    - button \"グルメ\":\n      - generic: グルメ\n  - region \"有松マップ 有松・桶狭間\":\n    - region \"有松マップ 有松・桶狭間（矢印キーで移動、プラス・マイナスで拡大縮小）\"\n    - button \"カフェ庄九郎の周辺ピンを表示（15件）\" [active]:\n      - generic: \"15\"\n      - generic: カフェ庄九郎\n    - button \"井桁屋の詳細を表示\"\n    - button \"岡家住宅の詳細を表示\":\n      - generic: 観\n    - button \"常夜燈の詳細を表示\":\n      - generic: 観\n    - button \"戦評の松の詳細を表示\":\n      - generic: 観\n    - button \"有松・鳴海絞会館の詳細を表示\"\n    - button \"有松天満社の詳細を表示\"\n    - button \"有松山車会館の詳細を表示\"\n    - button \"桶狭間古戦場公園の詳細を表示\":\n      - generic: 観\n    - button \"祇園寺の詳細を表示\":\n      - generic: 観\n    - button \"地図全体を表示\": 全体\n    - button \"現在地を表示\"\n    - generic \"地図のクレジットを表示\"\n    - link \"MapLibre\":\n      - /url: https://maplibre.org/\n- button \"Toggle Nuxt DevTools\":\n- generic \"Page load time\":\n  - generic: \"5\"\n  - generic: ms\n- button \"Toggle Component Inspector\":"
+  },
+  {
+    "check": "FINAL-English-Public",
+    "dom": "- generic \"通知\"\n- status: 有松マップ | デジタルマップ\n- main:\n  - generic \"公開マップ操作\":\n    - heading \"有松マップ\" [level=1]\n    - button \"有松・桶狭間\":\n      - generic: 有松・桶狭間\n      - generic: ⌄\n    - generic: Language\n    - combobox \"Language\":\n      - option \"JA\"\n      - option \"EN\" [selected]\n    - button \"マップ情報を開く\": i\n  - group \"カテゴリで絞り込み\":\n    - button \"すべてのカテゴリを表示\" [pressed]: すべて\n    - button \"歴史・文化\":\n      - generic: 歴史・文化\n    - button \"有松絞り\":\n      - generic: 有松絞り\n    - button \"寺社\":\n      - generic: 寺社\n    - button \"交通\":\n      - generic: 交通\n    - button \"ショップ\":\n      - generic: ショップ\n    - button \"グルメ\":\n      - generic: グルメ\n  - region \"有松マップ 有松・桶狭間\":\n    - region \"有松マップ 有松・桶狭間 (arrow keys to pan, plus/minus to zoom)\"\n    - button \"カフェ庄九郎の周辺ピンを表示（20件）\":\n      - generic: \"20\"\n    - button \"小塚邸の詳細を表示\":\n      - generic: 観\n    - button \"有松・鳴海絞会館の詳細を表示\"\n    - button \"有松天満社の詳細を表示\"\n    - button \"有松駅の詳細を表示\"\n    - button \"桶狭間古戦場公園の詳細を表示\":\n      - generic: 観\n    - button \"地図全体を表示\": 全体\n    - button \"Find my location\"\n    - generic \"Toggle attribution\"\n    - link \"MapLibre\":\n      - /url: https://maplibre.org/\n- button \"Toggle Nuxt DevTools\":\n- generic \"Page load time\":\n  - generic: \"7\"\n  - generic: ms\n- button \"Toggle Component Inspector\":"
+  },
+  {
+    "check": "FINAL-English-JA-switch-context",
+    "cameraEqual": true,
+    "dom": "- generic \"通知\"\n- status: 有松マップ | デジタルマップ\n- main:\n  - generic \"公開マップ操作\":\n    - heading \"有松マップ\" [level=1]\n    - button \"有松・桶狭間\":\n      - generic: 有松・桶狭間\n      - generic: ⌄\n    - generic: 言語\n    - combobox \"言語\":\n      - option \"JA\" [selected]\n      - option \"EN\"\n    - button \"マップ情報を開く\": i\n  - group \"カテゴリで絞り込み\":\n    - button \"すべてのカテゴリを表示\" [pressed]: すべて\n    - button \"歴史・文化\":\n      - generic: 歴史・文化\n    - button \"有松絞り\":\n      - generic: 有松絞り\n    - button \"寺社\":\n      - generic: 寺社\n    - button \"交通\":\n      - generic: 交通\n    - button \"ショップ\":\n      - generic: ショップ\n    - button \"グルメ\":\n      - generic: グルメ\n  - region \"有松マップ 有松・桶狭間\":\n    - region \"有松マップ 有松・桶狭間（矢印キーで移動、プラス・マイナスで拡大縮小）\"\n    - button \"カフェ庄九郎の周辺ピンを表示（20件）\":\n      - generic: \"20\"\n    - button \"小塚邸の詳細を表示\":\n      - generic: 観\n    - button \"有松・鳴海絞会館の詳細を表示\"\n    - button \"有松天満社の詳細を表示\"\n    - button \"有松駅の詳細を表示\"\n    - button \"桶狭間古戦場公園の詳細を表示\":\n      - generic: 観\n    - button \"地図全体を表示\": 全体\n    - button \"現在地を表示\"\n    - generic \"地図のクレジットを表示\"\n    - link \"MapLibre\":\n      - /url: https://maplibre.org/\n- button \"Toggle Nuxt DevTools\":\n- generic \"Page load time\":\n  - generic: \"-\"\n- button \"Toggle Component Inspector\":"
+  },
+  {
+    "check": "FINAL-categoryless-Floor-zero-dock",
+    "layout": {
+      "controls": {
+        "bottom": 788,
+        "height": 46,
+        "left": 264,
+        "right": 390,
+        "top": 742,
+        "width": 126,
+        "x": 264,
+        "y": 742
+      },
+      "floor": {
+        "bottom": 788,
+        "height": 44,
+        "left": 12,
+        "right": 79.5,
+        "top": 744,
+        "width": 67.5,
+        "x": 12,
+        "y": 744
+      },
+      "height": "0px"
+    }
+  },
+  {
+    "check": "FINAL-English-auth-LIVE",
+    "dom": "- generic \"通知\"\n- status: 有松マップ | 編集中の内容\n- main:\n  - generic \"公開マップ操作\":\n    - heading \"有松マップ\" [level=1]\n    - button \"有松・桶狭間\":\n      - generic: 有松・桶狭間\n      - generic: ⌄\n    - generic: Language\n    - combobox \"Language\":\n      - option \"JA\"\n      - option \"EN\" [selected]\n    - button \"マップ情報を開く\": i\n  - group \"カテゴリで絞り込み\":\n    - button \"すべてのカテゴリを表示\" [pressed]: すべて\n    - button \"歴史・文化\":\n      - generic: 歴史・文化\n    - button \"有松絞り\":\n      - generic: 有松絞り\n    - button \"寺社\":\n      - generic: 寺社\n    - button \"交通\":\n      - generic: 交通\n    - button \"ショップ\":\n      - generic: ショップ\n    - button \"グルメ\":\n      - generic: グルメ\n  - region \"有松マップ 有松・桶狭間\":\n    - region \"有松マップ 有松・桶狭間 (arrow keys to pan, plus/minus to zoom)\"\n    - button \"カフェ庄九郎の周辺ピンを表示（20件）\":\n      - generic: \"20\"\n    - button \"小塚邸の詳細を表示\":\n      - generic: 観\n    - button \"有松・鳴海絞会館の詳細を表示\"\n    - button \"有松天満社の詳細を表示\"\n    - button \"有松駅の詳細を表示\"\n    - button \"桶狭間古戦場公園の詳細を表示\":\n      - generic: 観\n    - button \"地図全体を表示\": 全体\n    - button \"Find my location\"\n    - generic \"Toggle attribution\"\n    - link \"MapLibre\":\n      - /url: https://maplibre.org/\n- complementary \"来館者プレビュー\":\n  - strong: 来館者プレビュー\n  - generic: 編集中の内容\n  - link \"管理画面に戻る\":\n    - /url: /admin/maps/cmu9s675a0004ssu1b14j9snq\n- button \"Toggle Nuxt DevTools\":\n- generic \"Page load time\":\n  - generic: \"7\"\n  - generic: ms\n- button \"Toggle Component Inspector\":"
+  },
+  {
+    "check": "FINAL-SAFE-Public-LIVE-390x844",
+    "cameraEqual": true,
+    "measurements": [
+      {
+        "route": "http://localhost:3000/wu69-parity",
+        "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":-47.83727520696243,\"y\":190.7089807613264},{\"x\":440.75625737231104,\"y\":193.62106127286827},{\"x\":472.0287824443905,\"y\":540.4077616514954},{\"x\":-84.6568223125938,\"y\":536.6276684402612}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.065227482919795},\"zoom\":15.259707646398311,\"bearing\":0,\"pitch\":25,\"minZoom\":13.609707646398311,\"maxZoom\":20.609707646398313}",
+        "contextPreserved": true,
+        "deltaFromWholeFloor": 0.6500000000000004,
+        "layout": {
+          "badges": [
+            "20"
+          ],
+          "h": 844,
+          "overflow": false,
+          "w": 390
+        }
+      },
+      {
+        "route": "http://localhost:3000/admin/maps/cmu9s675a0004ssu1b14j9snq/preview",
+        "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":-47.83727520696243,\"y\":190.7089807613264},{\"x\":440.75625737231104,\"y\":193.62106127286827},{\"x\":472.0287824443905,\"y\":540.4077616514954},{\"x\":-84.6568223125938,\"y\":536.6276684402612}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.065227482919795},\"zoom\":15.259707646398311,\"bearing\":0,\"pitch\":25,\"minZoom\":13.609707646398311,\"maxZoom\":20.609707646398313}",
+        "contextPreserved": true,
+        "deltaFromWholeFloor": 0.6500000000000004,
+        "layout": {
+          "badges": [
+            "20"
+          ],
+          "h": 844,
+          "overflow": false,
+          "w": 390
+        }
+      }
+    ]
+  },
+  {
+    "check": "FINAL-SAFE-Public-LIVE-768x1024",
+    "cameraEqual": true,
+    "measurements": [
+      {
+        "route": "http://localhost:3000/wu69-parity",
+        "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":14.078433339100206,\"y\":185.6317065233769},{\"x\":756.4994761897315,\"y\":190.0066519853828},{\"x\":824.2008238420985,\"y\":736.1723582749514},{\"x\":-62.15378678512152,\"y\":729.9369665270236}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.065856533021076},\"zoom\":15.879695165335464,\"bearing\":0,\"pitch\":25,\"minZoom\":14.679695165335465,\"maxZoom\":21.679695165335467}",
+        "contextPreserved": true,
+        "deltaFromWholeFloor": 0.1999999999999993,
+        "layout": {
+          "badges": [
+            "19"
+          ],
+          "h": 1024,
+          "overflow": false,
+          "w": 768
+        }
+      },
+      {
+        "route": "http://localhost:3000/admin/maps/cmu9s675a0004ssu1b14j9snq/preview",
+        "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":14.078433339100206,\"y\":185.6317065233769},{\"x\":756.4994761897315,\"y\":190.0066519853828},{\"x\":824.2008238420985,\"y\":736.1723582749514},{\"x\":-62.15378678512152,\"y\":729.9369665270236}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.065856533021076},\"zoom\":15.879695165335464,\"bearing\":0,\"pitch\":25,\"minZoom\":14.679695165335465,\"maxZoom\":21.679695165335467}",
+        "contextPreserved": true,
+        "deltaFromWholeFloor": 0.1999999999999993,
+        "layout": {
+          "badges": [
+            "19"
+          ],
+          "h": 1024,
+          "overflow": false,
+          "w": 768
+        }
+      }
+    ]
+  },
+  {
+    "check": "FINAL-SAFE-Public-LIVE-1024x768",
+    "cameraEqual": true,
+    "measurements": [
+      {
+        "route": "http://localhost:3000/wu69-parity",
+        "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":197.20382131029274,\"y\":96.49318406147758},{\"x\":828.7678469568766,\"y\":100.14333594205728},{\"x\":898.2055122261976,\"y\":570.3127024567196},{\"x\":120.46591435791134,\"y\":564.7776395038043}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.0657802362208},\"zoom\":15.67438429167356,\"bearing\":0,\"pitch\":25,\"minZoom\":14.47438429167356,\"maxZoom\":21.47438429167356}",
+        "contextPreserved": true,
+        "deltaFromWholeFloor": 0.1999999999999993,
+        "layout": {
+          "badges": [
+            "19"
+          ],
+          "h": 768,
+          "overflow": false,
+          "w": 1024
+        }
+      },
+      {
+        "route": "http://localhost:3000/admin/maps/cmu9s675a0004ssu1b14j9snq/preview",
+        "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":197.20382131029274,\"y\":96.49318406147758},{\"x\":828.7678469568766,\"y\":100.14333594205728},{\"x\":898.2055122261976,\"y\":570.3127024567196},{\"x\":120.46591435791134,\"y\":564.7776395038043}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.0657802362208},\"zoom\":15.67438429167356,\"bearing\":0,\"pitch\":25,\"minZoom\":14.47438429167356,\"maxZoom\":21.47438429167356}",
+        "contextPreserved": true,
+        "deltaFromWholeFloor": 0.1999999999999993,
+        "layout": {
+          "badges": [
+            "19"
+          ],
+          "h": 768,
+          "overflow": false,
+          "w": 1024
+        }
+      }
+    ]
+  },
+  {
+    "check": "FINAL-SAFE-Public-LIVE-1440x900",
+    "cameraEqual": true,
+    "measurements": [
+      {
+        "route": "http://localhost:3000/wu69-parity",
+        "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":318.78809328291237,\"y\":103.07052622253902},{\"x\":1124.3324374774934,\"y\":107.70449464285983},{\"x\":1221.7100295460825,\"y\":715.3217909819377},{\"x\":212.07487043095765,\"y\":708.0426215200039}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.06590656554957},\"zoom\":16.03216135986937,\"bearing\":0,\"pitch\":25,\"minZoom\":14.832161359869371,\"maxZoom\":21.83216135986937}",
+        "contextPreserved": true,
+        "deltaFromWholeFloor": 0.1999999999999993,
+        "layout": {
+          "badges": [
+            "19"
+          ],
+          "h": 900,
+          "overflow": false,
+          "w": 1440
+        }
+      },
+      {
+        "route": "http://localhost:3000/admin/maps/cmu9s675a0004ssu1b14j9snq/preview",
+        "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":318.78809328291237,\"y\":103.07052622253902},{\"x\":1124.3324374774934,\"y\":107.70449464285983},{\"x\":1221.7100295460825,\"y\":715.3217909819377},{\"x\":212.07487043095765,\"y\":708.0426215200039}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.06590656554957},\"zoom\":16.03216135986937,\"bearing\":0,\"pitch\":25,\"minZoom\":14.832161359869371,\"maxZoom\":21.83216135986937}",
+        "contextPreserved": true,
+        "deltaFromWholeFloor": 0.1999999999999993,
+        "layout": {
+          "badges": [
+            "19"
+          ],
+          "h": 900,
+          "overflow": false,
+          "w": 1440
+        }
+      }
+    ]
+  },
+  {
+    "check": "FINAL-SAFE-Public-LIVE-1440x700",
+    "cameraEqual": true,
+    "measurements": [
+      {
+        "route": "http://localhost:3000/wu69-parity",
+        "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":449.83657490104616,\"y\":93.15162279656907},{\"x\":991.5449463327003,\"y\":96.2923917060896},{\"x\":1047.1865575686447,\"y\":496.0440178428974},{\"x\":387.94628631155433,\"y\":491.39276647072313}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.0656826991149},\"zoom\":15.448398605613102,\"bearing\":0,\"pitch\":25,\"minZoom\":14.248398605613103,\"maxZoom\":21.248398605613104}",
+        "contextPreserved": true,
+        "deltaFromWholeFloor": 0.1999999999999993,
+        "layout": {
+          "badges": [
+            "20"
+          ],
+          "h": 700,
+          "overflow": false,
+          "w": 1440
+        }
+      },
+      {
+        "route": "http://localhost:3000/admin/maps/cmu9s675a0004ssu1b14j9snq/preview",
+        "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":449.83657490104616,\"y\":93.15162279656907},{\"x\":991.5449463327003,\"y\":96.2923917060896},{\"x\":1047.1865575686447,\"y\":496.0440178428974},{\"x\":387.94628631155433,\"y\":491.39276647072313}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.0656826991149},\"zoom\":15.448398605613102,\"bearing\":0,\"pitch\":25,\"minZoom\":14.248398605613103,\"maxZoom\":21.248398605613104}",
+        "contextPreserved": true,
+        "deltaFromWholeFloor": 0.1999999999999993,
+        "layout": {
+          "badges": [
+            "20"
+          ],
+          "h": 700,
+          "overflow": false,
+          "w": 1440
+        }
+      }
+    ]
+  },
+  {
+    "check": "FINAL-SAFE-near-maxZoom-spiderfy",
+    "camera": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":-2691.0938891445758,\"y\":-1569.2184240067763},{\"x\":3153.53219949338,\"y\":-1559.0029220378756},{\"x\":-5986.949372919072,\"y\":-3843.159969424879},{\"x\":6635.971159143744,\"y\":-3890.794131333005}],\"center\":{\"lng\":136.97123595574465,\"lat\":35.06635541483348},\"zoom\":20.609707646398313,\"bearing\":0,\"pitch\":25,\"minZoom\":13.609707646398311,\"maxZoom\":20.609707646398313}",
+    "dom": "- generic \"通知\"\n- status: 有松マップ | デジタルマップ\n- main:\n  - generic \"公開マップ操作\":\n    - heading \"WU-68 高密度 outdoor\" [level=1]\n    - paragraph: 有松・桶狭間\n    - button \"マップ情報を開く\": i\n  - region \"WU-68 高密度 outdoor 有松・桶狭間\":\n    - region \"WU-68 高密度 outdoor 有松・桶狭間（矢印キーで移動、プラス・マイナスで拡大縮小）\"\n    - button \"地図全体を表示\": 全体\n    - button \"現在地を表示\"\n    - generic \"地図のクレジットを表示\"\n    - link \"MapLibre\":\n      - /url: https://maplibre.org/\n    - group \"重なったスポットのピン\":\n      - button \"Spot 00の詳細を表示\" [active]:\n        - generic: ●\n        - generic: Spot 00\n      - button \"Spot 01の詳細を表示\":\n        - generic: ●\n      - button \"Spot 02の詳細を表示\":\n        - generic: ●\n- button \"Toggle Nuxt DevTools\":\n- generic \"Page load time\":\n  - generic: \"4\"\n  - generic: ms\n- button \"Toggle Component Inspector\":"
+  },
+  {
+    "check": "FINAL-zoomed-language-switch-context",
+    "before": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":-252.54721369118724,\"y\":-4.2675535500750055},{\"x\":648.3749941134656,\"y\":0.682955596002783},{\"x\":774.3237909591201,\"y\":669.6148245423536},{\"x\":-388.96940469048593,\"y\":661.3614099857236}],\"center\":{\"lng\":136.97123594617779,\"lat\":35.06522748291981},\"zoom\":16.25970764639831,\"bearing\":0,\"pitch\":25,\"minZoom\":13.609707646398311,\"maxZoom\":20.609707646398313}",
+    "after": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":-47.83727520696243,\"y\":190.7089807613264},{\"x\":440.75625737231104,\"y\":193.62106127286827},{\"x\":472.0287824443905,\"y\":540.4077616514954},{\"x\":-84.6568223125938,\"y\":536.6276684402612}],\"center\":{\"lng\":136.97123594617784,\"lat\":35.065227482919795},\"zoom\":15.259707646398311,\"bearing\":0,\"pitch\":25,\"minZoom\":13.609707646398311,\"maxZoom\":20.609707646398313}"
+  },
+  {
+    "check": "F32-after-zoomed-language-switch",
+    "equal": true,
+    "before": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":-252.54721369118724,\"y\":-4.2675535500750055},{\"x\":648.3749941134656,\"y\":0.682955596002783},{\"x\":774.3237909591201,\"y\":669.6148245423536},{\"x\":-388.96940469048593,\"y\":661.3614099857236}],\"center\":{\"lng\":136.97123594617779,\"lat\":35.06522748291981},\"zoom\":16.25970764639831,\"bearing\":0,\"pitch\":25,\"minZoom\":13.609707646398311,\"maxZoom\":20.609707646398313}",
+    "after": "{\"floorId\":\"cmu9s675h000bssu1qjc0297q\",\"corners\":[{\"x\":-252.54721369118724,\"y\":-4.2675535500750055},{\"x\":648.3749941134656,\"y\":0.682955596002783},{\"x\":774.3237909591201,\"y\":669.6148245423536},{\"x\":-388.96940469048593,\"y\":661.3614099857236}],\"center\":{\"lng\":136.97123594617779,\"lat\":35.06522748291981},\"zoom\":16.25970764639831,\"bearing\":0,\"pitch\":25,\"minZoom\":13.609707646398311,\"maxZoom\":20.609707646398313}",
+    "dom": "- generic \"通知\"\n- status: 有松マップ | デジタルマップ\n- main:\n  - generic \"公開マップ操作\":\n    - heading \"有松マップ\" [level=1]\n    - button \"有松・桶狭間\":\n      - generic: 有松・桶狭間\n      - generic: ⌄\n    - generic: Language\n    - combobox \"Language\":\n      - option \"JA\"\n      - option \"EN\" [selected]\n    - button \"マップ情報を開く\": i\n  - group \"カテゴリで絞り込み\":\n    - button \"すべてのカテゴリを表示\" [pressed]: すべて\n    - button \"歴史・文化\":\n      - generic: 歴史・文化\n    - button \"有松絞り\":\n      - generic: 有松絞り\n    - button \"寺社\":\n      - generic: 寺社\n    - button \"交通\":\n      - generic: 交通\n    - button \"ショップ\":\n      - generic: ショップ\n    - button \"グルメ\":\n      - generic: グルメ\n  - region \"有松マップ 有松・桶狭間\":\n    - region \"有松マップ 有松・桶狭間 (arrow keys to pan, plus/minus to zoom)\" [active]\n    - button \"カフェ庄九郎の周辺ピンを表示（15件）\":\n      - generic: \"15\"\n    - button \"井桁屋の詳細を表示\"\n    - button \"岡家住宅の詳細を表示\":\n      - generic: 観\n    - button \"常夜燈の詳細を表示\":\n      - generic: 観\n    - button \"戦評の松の詳細を表示\":\n      - generic: 観\n    - button \"有松・鳴海絞会館の詳細を表示\"\n    - button \"有松天満社の詳細を表示\"\n    - button \"有松山車会館の詳細を表示\"\n    - button \"桶狭間古戦場公園の詳細を表示\":\n      - generic: 観\n    - button \"祇園寺の詳細を表示\":\n      - generic: 観\n    - button \"地図全体を表示\": 全体\n    - button \"Find my location\"\n    - generic \"Toggle attribution\"\n    - link \"MapLibre\":\n      - /url: https://maplibre.org/\n- button \"Toggle Nuxt DevTools\":\n- generic \"Page load time\":\n  - generic: \"-\"\n- button \"Toggle Component Inspector\":"
+  }
+]

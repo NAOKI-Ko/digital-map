@@ -1,0 +1,10 @@
+$ node --import tsx scripts/audit-image-spatial-migration.ts
+{
+  "schema": "IMAGE",
+  "invalidFloors": [],
+  "invalidReferences": [],
+  "partialSpots": [],
+  "outsideSpots": [],
+  "publishedUnpositionedSpots": []
+}
+IMAGE spatial migration audit passed with zero unresolved exceptions.

@@ -1,0 +1,195 @@
+[
+  {
+    "name": "braces",
+    "version": "3.0.3",
+    "path": "/Users/naoki/Documents/Codex/2026-09-28/digital-map-aqua-uat-admin-remediation/wu63/node_modules/.pnpm/braces@3.0.3/node_modules/braces",
+    "dependents": [
+      {
+        "name": "chokidar",
+        "version": "3.6.0",
+        "dependents": [
+          {
+            "name": "tailwindcss",
+            "version": "3.4.19",
+            "peersSuffixHash": "fbfd",
+            "dependents": [
+              {
+                "name": "@nuxtjs/tailwindcss",
+                "version": "6.14.0",
+                "peersSuffixHash": "b639",
+                "dependents": [
+                  {
+                    "name": "digital-map",
+                    "version": "",
+                    "depField": "dependencies"
+                  }
+                ]
+              },
+              {
+                "name": "tailwind-config-viewer",
+                "version": "2.0.4",
+                "peersSuffixHash": "3c2a",
+                "dependents": [
+                  {
+                    "name": "@nuxtjs/tailwindcss",
+                    "version": "6.14.0",
+                    "peersSuffixHash": "b639",
+                    "deduped": true
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "micromatch",
+        "version": "4.0.8",
+        "dependents": [
+          {
+            "name": "fast-glob",
+            "version": "3.3.3",
+            "dependents": [
+              {
+                "name": "globby",
+                "version": "16.2.4",
+                "dependents": [
+                  {
+                    "name": "nitropack",
+                    "version": "2.13.4",
+                    "peersSuffixHash": "fdba",
+                    "dependents": [
+                      {
+                        "name": "@nuxt/nitro-server",
+                        "version": "4.5.2",
+                        "peersSuffixHash": "f45e",
+                        "dependents": [
+                          {
+                            "name": "nuxt",
+                            "version": "4.5.2",
+                            "peersSuffixHash": "7e83",
+                            "dependents": [
+                              {
+                                "name": "@nuxt/nitro-server",
+                                "version": "4.5.2",
+                                "circular": true
+                              },
+                              {
+                                "name": "@nuxt/vite-builder",
+                                "version": "4.5.2",
+                                "peersSuffixHash": "2fd0",
+                                "dependents": [
+                                  {
+                                    "name": "nuxt",
+                                    "version": "4.5.2",
+                                    "circular": true
+                                  }
+                                ]
+                              },
+                              {
+                                "name": "digital-map",
+                                "version": "",
+                                "depField": "dependencies"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "name": "tailwindcss",
+                "version": "3.4.19",
+                "peersSuffixHash": "fbfd",
+                "deduped": true
+              }
+            ]
+          },
+          {
+            "name": "globby",
+            "version": "16.2.4",
+            "deduped": true
+          },
+          {
+            "name": "tailwindcss",
+            "version": "3.4.19",
+            "peersSuffixHash": "fbfd",
+            "deduped": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "node-forge",
+    "version": "1.4.0",
+    "path": "/Users/naoki/Documents/Codex/2026-09-28/digital-map-aqua-uat-admin-remediation/wu63/node_modules/.pnpm/node-forge@1.4.0/node_modules/node-forge",
+    "dependents": [
+      {
+        "name": "listhen",
+        "version": "1.10.1",
+        "peersSuffixHash": "8ee8",
+        "dependents": [
+          {
+            "name": "@nuxt/cli",
+            "version": "3.37.0",
+            "peersSuffixHash": "6ff2",
+            "dependents": [
+              {
+                "name": "nuxt",
+                "version": "4.5.2",
+                "peersSuffixHash": "7e83",
+                "dependents": [
+                  {
+                    "name": "@nuxt/nitro-server",
+                    "version": "4.5.2",
+                    "peersSuffixHash": "f45e",
+                    "dependents": [
+                      {
+                        "name": "nuxt",
+                        "version": "4.5.2",
+                        "circular": true
+                      }
+                    ]
+                  },
+                  {
+                    "name": "@nuxt/vite-builder",
+                    "version": "4.5.2",
+                    "peersSuffixHash": "2fd0",
+                    "dependents": [
+                      {
+                        "name": "nuxt",
+                        "version": "4.5.2",
+                        "circular": true
+                      }
+                    ]
+                  },
+                  {
+                    "name": "digital-map",
+                    "version": "",
+                    "depField": "dependencies"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "nitropack",
+            "version": "2.13.4",
+            "peersSuffixHash": "fdba",
+            "dependents": [
+              {
+                "name": "@nuxt/nitro-server",
+                "version": "4.5.2",
+                "peersSuffixHash": "f45e",
+                "deduped": true
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]
