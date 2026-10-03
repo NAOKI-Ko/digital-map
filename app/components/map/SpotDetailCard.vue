@@ -200,6 +200,11 @@ onBeforeUnmount(() => {
   --sheet-motion-duration: 180ms;
 }
 
+/* The title receives announcement focus; only actionable controls need a ring. */
+.spot-detail-sheet [data-spot-detail-title]:focus {
+  outline: none;
+}
+
 .spot-detail-sheet__drag-region {
   touch-action: none;
   user-select: none;

@@ -7,6 +7,15 @@ describe('公開MapのPIN優先度・サイズ・密度', () => {
     expect(getMarkerDensityPresentation('featured', 'medium', 14.5, 14.5)).toMatchObject({ visible: true, priority: 2 })
   })
 
+  it('visitor normal PINs remain collision-eligible below the old zoom cliff without priority inflation', () => {
+    for (const zoom of [13, 14.5, 15.99, 16]) {
+      expect(getMarkerDensityPresentation('normal','medium',zoom,14.5,false,false,true)).toEqual({visible:true,scale:1,priority:1})
+      expect(getMarkerDensityPresentation('featured','medium',zoom,14.5,false,false,true).priority).toBe(2)
+    }
+    expect(getMarkerDensityPresentation('normal','medium',13,14.5,false,true,true).priority).toBe(3)
+    expect(getMarkerDensityPresentation('normal','medium',13,14.5,true,false,true).priority).toBe(4)
+  })
+
   it('nearではnormalも表示する', () => {
     expect(getMarkerDensityPresentation('normal', 'medium', 16, 14.5)).toEqual({ visible: true, scale: 1, priority: 1 })
   })

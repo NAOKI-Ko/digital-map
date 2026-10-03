@@ -1,11 +1,12 @@
 import { onBeforeUnmount, onMounted, readonly, ref, shallowRef, watch, type Ref } from 'vue'
-import type { IControl, Map as MapLibreMap, Marker, MarkerOptions } from 'maplibre-gl'
+import type { IControl, ImageSource, Map as MapLibreMap, Marker, MarkerOptions } from 'maplibre-gl'
 import { getFloorCorners, imageToRenderCoordinates, isValidImagePosition, renderToImageCoordinates, toImageCoordinates, type ImagePosition, type LatLng } from '~~/lib/geo'
 import { getDecorationRenderCoordinates } from '~~/lib/decoration'
 import type { MapViewerCameraState, MapViewerDecoration, MapViewerFloor, MapViewerSpot } from '~~/shared/types/map-viewer'
 import { createSpotMarkerElement } from '~/utils/marker-element'
 import { applyMarkerDensityPresentation, getMarkerDensityPresentation } from '~/utils/marker-density'
 import { applyPinVisibility, declutterPins, getCollisionRepresentatives, measurePinRect } from '~/utils/marker-collision'
+import { monitorFloorImage } from '~/utils/floor-image-state'
 import { getMinimalSpotPan, needsHeadingReset } from '~/utils/public-map-exploration'
 import { measureVisitorFitPadding } from '~/utils/visitor-floor-fit'
 import {
@@ -231,6 +232,7 @@ export function useMapViewer(
   const maplibre = shallowRef<typeof import('maplibre-gl') | null>(null)
   const mapError = ref('')
   const floorError = ref('')
+  const floorImageState = ref<'idle' | 'loading' | 'loaded' | 'error'>('idle')
   const isReady = ref(false)
   let draftMarker: Marker | null = null
   let spotMarkers: Marker[] = []
@@ -469,7 +471,7 @@ export function useMapViewer(
       const instance = map.value
       if (!instance) return
       const presentations = spotMarkerElements.map(({ element, spot }) => {
-        const presentation = getMarkerDensityPresentation(spot.importance, spot.pinSize ?? 'medium', instance.getZoom(), instance.getMinZoom(), options.mode === 'edit' || spot.id === options.selectedSpotId.value, options.prioritizeVisibleSpots?.value ?? false)
+        const presentation = getMarkerDensityPresentation(spot.importance, spot.pinSize ?? 'medium', instance.getZoom(), instance.getMinZoom(), options.mode === 'edit' || spot.id === options.selectedSpotId.value, options.prioritizeVisibleSpots?.value ?? false, options.visitorOverview?.value ?? false)
         if (element.contains(element.ownerDocument.activeElement)) presentation.visible = true
         if (options.mode === 'edit') applyMarkerDensityPresentation(element, presentation)
         else {
@@ -616,6 +618,7 @@ export function useMapViewer(
     }
     activeLayerId = null
     activeSourceId = null
+    floorImageState.value = 'idle'
   }
 
   function syncDecorations() {
@@ -671,6 +674,11 @@ export function useMapViewer(
     })
     activeSourceId = sourceId
     activeLayerId = layerId
+    if (options.visitorOverview?.value) {
+      const source = instance.getSource<ImageSource>(sourceId)!
+      monitorFloorImage(source, () => map.value === instance && activeSourceId === sourceId && instance.getSource(sourceId) === source,
+        state => { floorImageState.value = state })
+    }
     syncDecorations()
 
     if (refit) mapCamera.fitFloorBounds(corners, animate)
@@ -719,6 +727,7 @@ export function useMapViewer(
     map: readonly(map),
     mapError: readonly(mapError),
     floorError: readonly(floorError),
+    floorImageState: readonly(floorImageState),
     isReady: readonly(isReady),
     geolocationAvailable: geolocation.geolocationAvailable,
     geolocationAreaMessage: geolocation.geolocationAreaMessage,
