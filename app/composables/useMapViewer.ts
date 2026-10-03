@@ -546,7 +546,7 @@ export function useMapViewer(
     return true
   }
 
-  function compareCamera(pitch: 0 | 20 | 45, fit: boolean) {
+  function compareCamera(pitch: 0 | 20 | 25 | 45, fit: boolean) {
     if (options.mode !== 'view') return
     mapCamera.comparePitch(pitch, fit, comparisonBaseline ?? undefined)
   }

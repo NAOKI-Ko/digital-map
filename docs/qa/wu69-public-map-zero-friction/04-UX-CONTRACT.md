@@ -47,3 +47,5 @@ Floor切替に伴い、操作可能canvasのアクセシブル名も現在Floor�
 ## 追加要求の背景とcount
 
 Map領域外はvisitor rendererだけ淡い暖色neutral（#eeeae4）にする。模様・texture・強いgradientはIllustrationの線画と競合するため採用しない。collision代表PINの小さな20px件数badgeはgroup件数を示す。Cluster entityや集約地点を作らず、WU-68 priority、分離可能なZoom-in、maxZoomで分離不能なSpiderfyを維持する。768pxの判定はborder内canvas幅ではなくvisitor stage幅に合わせる。
+
+69-09正本化・実画面比較(2026-10-03): 初期20°/25°を同一center/zoomで比較し25°採用。初期姿勢では向き回復を表示しない。暖色neutral#eeeae4を白/寒色との比較で採用。根拠とAC24–32は11-69-09-VERIFICATION.md。

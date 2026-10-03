@@ -1,3 +1,5 @@
+2026-10-03 69-09最新: **11-69-09-VERIFICATION.md** と **delivery-status-69-09.json** が最新32AC/QA正本。以下は旧23AC時点の履歴。最新認証LIVE/Public実画面比較は5幅PASS、F25も回収。最終Windows未反映・Verify FAILの完了禁止は継続。
+
 # WU-69 final verdict — NOT COMPLETE
 
 2026-10-03追加要求: 最新のcandidateは `10-USER-ADDENDUM.md` を参照。矢印を廃止、初期0°／25°・安全上限維持、neutral背景、選択名折り返し。confirmed Findingは23件に更新。下記6a4f9369／52a397bのCI・702テストは前回SHAの履歴であり、追加変更の最新検証と混同しない。Windows未反映の最終23AC判定は変更なし。

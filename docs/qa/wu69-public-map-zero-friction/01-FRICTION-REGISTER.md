@@ -67,3 +67,7 @@ P2。keyboardでRecovery2Fへ切替後、外側regionとFloor buttonは2Fだが�
 | F24 | P2 | 768px stageの内枠canvas766pxをMobileと誤認し、Desktopより深い初期zoomを適用。 | FIXED。stage幅でbreakpoint判定。768px初期zoom15.879695、whole-floor fit比+0.2、Desktop上限+0.65以内。border境界回帰テストPASS。 |
 
 追加後のFinding IDは24件、F09はNOT REPRODUCIBLE、confirmed23件はcandidateでFIXED。既存F07の送り矢印は追加ユーザー要求により廃止、native横スクロールへ更新。
+
+## 69-09 iteration F25
+
+F25 P3: 初期pitch25°なのに「向きを戻す」が表示され、向きが異常なのか迷う。homePitchを初期jumpTo前に設定し、pitch event時点から初期姿勢を基準にする。390px reloadで不要なNが消えたことを確認。全jump時点のbaseline回帰テストPASS。Finding ID25件、F09はNOT REPRODUCIBLE、confirmed24件はcandidateでFIXED。

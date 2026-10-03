@@ -24,7 +24,10 @@ describe('visitor viewport safe fit', () => {
     const container = ref({ clientWidth: 390, clientHeight: 844, closest: () => null, getBoundingClientRect: () => rect(390,844) } as unknown as HTMLElement)
     const instance = { stop: vi.fn(), resize: vi.fn(), getZoom: () => 14, getMaxZoom: () => 23, setMinZoom: vi.fn(), setMaxZoom: vi.fn(), cameraForBounds: vi.fn(() => ({ center: [0,0], zoom: 14 })), jumpTo: vi.fn() }
     const camera = useMapCamera(container, ref(instance as unknown as MapLibreMap), { mode: 'view', floor, spots: ref(spots as import('../shared/types/map-viewer').MapViewerSpot[]), isReady: ref(true), visitorOverview: ref(true) })
+    const eventHomePitches: number[] = []
+    instance.jumpTo.mockImplementation(() => { eventHomePitches.push(camera.getHomePitch()) })
     camera.fitFloorBounds(getFloorCorners(floor.value)!, false)
+    expect(eventHomePitches.every(pitch => pitch === 25)).toBe(true)
     expect(instance.cameraForBounds).toHaveBeenCalledOnce()
     expect(instance.cameraForBounds).toHaveBeenLastCalledWith(expect.anything(), expect.objectContaining({ pitch: 0 }))
     expect(instance.jumpTo).toHaveBeenLastCalledWith({ center: [0,0], zoom: 15.15, bearing: 0, pitch: 25 })

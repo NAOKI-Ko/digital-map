@@ -49,7 +49,7 @@ watch(categoryDock, (element, _previous, onCleanup) => {
     if (frame !== null) cancelAnimationFrame(frame)
   })
 }, { flush: 'post' })
-const mapViewerRef = ref<{ ensureSpotVisible: (spotId: string, panel: DOMRect | null) => boolean, compareCamera: (pitch: 0 | 20 | 45, fit: boolean) => void, captureDetailContext: () => void, restoreDetailContext: () => void, discardDetailContext: () => void } | null>(null)
+const mapViewerRef = ref<{ ensureSpotVisible: (spotId: string, panel: DOMRect | null) => boolean, compareCamera: (pitch: 0 | 20 | 25 | 45, fit: boolean) => void, captureDetailContext: () => void, restoreDetailContext: () => void, discardDetailContext: () => void } | null>(null)
 const cameraComparisonEnabled = computed(() => import.meta.dev && route.query.cameraCompare === '1')
 const cameraComparisonMode = ref<'same' | 'fit'>('same')
 const floorSelectorOpen = computed(() => overlay.value?.type === 'floor')
@@ -141,7 +141,7 @@ function ensureSelectedSpotVisible() {
   mapViewerRef.value?.ensureSpotVisible(selectedSpotId.value, panel)
 }
 
-function compareCamera(pitch: 0 | 20 | 45) {
+function compareCamera(pitch: 0 | 20 | 25 | 45) {
   mapViewerRef.value?.compareCamera(pitch, cameraComparisonMode.value === 'fit')
 }
 
@@ -341,7 +341,7 @@ onBeforeUnmount(clearPendingSpotClose)
           <label class="mr-2"><input v-model="cameraComparisonMode" type="radio" value="same"> center/zoom固定</label>
           <label><input v-model="cameraComparisonMode" type="radio" value="fit"> 角度別fit</label>
           <div class="mt-2 flex gap-2">
-            <button v-for="pitch in ([0, 20, 45] as const)" :key="pitch" type="button" class="rounded border border-stone-300 px-3 py-2" @click="compareCamera(pitch)">{{ pitch }}°</button>
+            <button v-for="pitch in ([0, 20, 25, 45] as const)" :key="pitch" type="button" class="rounded border border-stone-300 px-3 py-2" @click="compareCamera(pitch)">{{ pitch }}°</button>
           </div>
         </div>
 

@@ -363,6 +363,8 @@ export function useMapCamera(
       // Initial/Floor load applies content framing, never an animated carry-over.
       instance.stop()
       instance.resize()
+      // Establish the recovery baseline before pitch events update the compass.
+      homePitch = VISITOR_INITIAL_PITCH
       instance.jumpTo({ bearing: 0, pitch: VISITOR_INITIAL_PITCH })
       const result = updateFloorZoomConstraints(corners)
       if (result) {
@@ -374,7 +376,6 @@ export function useMapCamera(
         const allowance = mobile ? VISITOR_MOBILE_INITIAL_ZOOM_ALLOWANCE : VISITOR_INITIAL_ZOOM_ALLOWANCE
         const fittedContent = bounds ? instance.cameraForBounds(bounds, { padding: measureVisitorFitPadding(container.value!), bearing: 0, maxZoom: result.targetZoom + allowance }) : null
         const content = fittedContent && canUseVisitorContentCamera(result.targetZoom, fittedContent.zoom) ? fittedContent : null
-        homePitch = VISITOR_INITIAL_PITCH
         const requestedZoom = content?.zoom ?? result.targetZoom + (mobile ? VISITOR_MOBILE_INITIAL_FALLBACK_ZOOM_OFFSET : VISITOR_INITIAL_FALLBACK_ZOOM_OFFSET)
         const zoom = clampVisitorInitialZoom(result.targetZoom, requestedZoom, allowance)
         instance.jumpTo({ center: content?.center ?? result.camera.center, zoom, bearing: 0, pitch: homePitch })
@@ -425,7 +426,7 @@ export function useMapCamera(
     })
   }
 
-  function comparePitch(pitch: 0 | 20 | 45, fit: boolean, baseline?: MapViewerCameraState) {
+  function comparePitch(pitch: 0 | 20 | 25 | 45, fit: boolean, baseline?: MapViewerCameraState) {
     const instance = map.value
     const corners = getFloorCorners(options.floor.value)
     if (!instance || !corners || options.mode !== 'view') return
