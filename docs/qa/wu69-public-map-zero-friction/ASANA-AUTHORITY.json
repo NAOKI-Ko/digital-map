@@ -1,0 +1,59 @@
+{
+  "parent": {
+    "gid": "1219125292154655",
+    "name": "WU-69｜Public Map UX Polish — Zero-Friction Visitor Experience",
+    "notes": "WU-69 — Public Map UX Polish / Zero-Friction Visitor Experience\n\n目的\nユーザー側のPublic Mapだけを対象に、実際に触ったときの小さなストレスまで潰し、「説明なしで気持ちよく使える」ラインまで仕上げる。\n\n今回は新しい大機能を増やすことより、既存のMap体験を徹底的に触って、少しでも引っかかる箇所を発見・改善することを優先する。\n\nBenchmark\n- Google Maps\n- Platinumaps\n\n参考にするのは操作原則・情報階層・Map-first UX・Progressive Disclosure・Category/Spot探索・Spot Detailへの遷移・戻りやすさ・Zoom/Panの気持ちよさ・Mobile layout。\nブランド、Visual identity、固有UIのコピーは禁止。Digital Map固有のIllustration Map / Floor / Category / PINモデルに最適化する。\n\nBenchmarkで確認する観点\nGoogle Maps:\n- Mapが常に主役\n- pan / pinch / double-tap等の地図操作が阻害されない\n- 場所選択→Detail→Map復帰が自然\n- 検索/Category等の探索意図が地図表示へ即反映\n- Progressive Disclosure\n- 片手操作、touch target、アクセシビリティ\nGoogle Mapsはカテゴリチップ、場所詳細、ドラッグ・ズーム、モバイル探索の成熟したReferenceとして扱う。\n\nPlatinumaps:\n- 観光/施設向けDigital Mapとしてのカテゴリ切替\n- ピン表示レベル・優先表示\n- スマートフォン利用時のレイアウト\n- Spot詳細への導線\n- 全体図→詳細へのZoom探索\n- 情報量とMap視認性のバランス\nPlatinumapsは「多数Spotをカテゴリー・表示レベルで整理し、スマートフォンから目的地を探す」競合Referenceとして扱う。\n\nCore Principle\nPublic Mapは「システムのViewer」ではなく「その場で使う地図」である。\n\n優先順位:\n1. Mapを見たい\n2. 目的Spotを見つけたい\n3. Spot情報を確認したい\n4. またMapへ戻りたい\n\nユーザーがUIの仕組みを理解しないと使えない状態はFAIL。\n\nZERO-FRICTION CONTRACT\n以下のどれかを感じたらFindingとして扱う。\n- どこを押せばいいか一瞬迷う\n- 地図よりUI chromeが目立つ\n- 操作したのに反応が分かりづらい\n- 戻り方が分からない\n- PINやCategoryが何を意味するか分からない\n- 同じ操作を何度も要求される\n- Mapが勝手に動いて意図を奪う\n- Detailを開いたことで現在見ていた場所を失う\n- 小さいボタン・誤タップ・横スクロールに気づかない\n- Zoom/Pan/Floor/Category/Spiderfyがカクつく、ちらつく、不安定\n- DesktopとMobileで操作原則が変わりすぎる\n- 画面に空白や不要UIが多く、Mapが小さく感じる\n- 一般ユーザーが説明なしで完遂できない\n\nPrimary Device\n390x844をPrimary。\n片手操作・屋外利用・移動中利用を想定。\n\n必須シナリオ\nS1 初見でMapを開き、現在見ているMap/Floorを理解する\nS2 PINを見つけてSpot Detailを開く\nS3 Detailを閉じ、元のMap contextへ戻る\nS4 Categoryを切り替え、目的カテゴリーのSpotを探す\nS5 Zoom/Panして別Spotを探索する\nS6 featured/normal混在の高密度Mapを探索する\nS7 collision groupをZoomで分離する\nS8 maxZoomで分離不能なgroupをMap上でspiderfyし、個別Spotを選ぶ\nS9 「地図全体を表示」で回復し、再度探索する\nS10 multi-floor MapでFloor切替→Spot探索→Detail→戻る\nS11 keyboardだけで主要操作を完遂する\nS12 DesktopでもMap-firstで自然に操作する\n\nWU-68契約は維持\n- selected > active Category > featured > normal > viewport-center > stable ID\n- Map-only collision recovery\n- initial bearing0 / pitch20\n- overview bearing0 / pitch0\n- Public/Preview共通renderer\nこれらを壊さず、必要ならpolishする。\n\n改善を許可する範囲\n- Public Map layout\n- floating controls配置\n- Category UI\n- PIN visual hierarchy\n- selected / focused / featured表現\n- Spot Detail Bottom Sheet / Desktop panel\n- control visibility\n- spacing / safe area\n- touch target\n- gesture conflict\n- animation duration/easing\n- Map viewport utilization\n- responsive behavior\n- keyboard/focus\n- copy/labels\n- small interaction affordance\n- WU-68 collision/spiderfyのpolish\n\n必要であれば小規模なInteraction機能追加は許可。ただし大きな新機能へ拡張しない。\n\nOut of Scope\n- Search機能の新規実装\n- Routing\n- Current-location機能の新規実装\n- Admin UI\n- Paper Map\n- Content/Placement/Building domain変更\n- Base Map制作\n- Event/Course/Article\n- Production deployment\n既存の現在地機能等がある場合、そのUX回帰確認は可。\n\n評価方法\nまず修正前に、コードを読まずにPublic Mapを一般ユーザーとして触る。\n最初のExploratory QAでは操作方法・内部仕様を参照しない。\nBenchmarkも先に答えをコピーするのではなく、自製品のfrictionを先に記録する。\n\nFinding severity:\n- P1: 主要操作が完遂不能 / userが詰む\n- P2: 完遂可能だが明確なストレス・迷い・誤操作がある\n- P3: polish不足。小さいが繰り返し利用で気になる\n本WUではP3も原則回収対象。\n「回避できるからOK」はAcceptance理由にしない。\n\nAcceptance Criteria\n1. 390pxでMapが常に画面の主役として認識できる\n2. 初見ユーザーが説明なしでS1〜S10を完遂可能\n3. Public Map主要操作に既知P1/P2を残さない\n4. 再現可能なP3も、合理的に修正可能なものは残さない\n5. Category UIの選択状態・横方向の追加項目・解除方法が明確\n6. PINのnormal / featured / selected / focusedが過剰でなく判別可能\n7. WU-68 collision / staged zoom / spiderfyが自然で、仕組みを意識させない\n8. Detail open/closeでMap contextを失わない\n9. Map pan/pinch/zoomをfloating UIが不必要に阻害しない\n10. Floor切替後の探索が自然\n11. Overview recoveryが見つけやすく、実行後の状態が予測可能\n12. Mobileで不要なZoom +/-等が操作を邪魔しない。必要性を実画面で判断\n13. controlsの位置・見た目・役割が統一されている\n14. touch targetは原則44px以上\n15. safe-area / browser chrome / short viewportで重要UIが欠けない\n16. 390 / 768 / 1024 / 1440 / 1440x700で主要操作PASS\n17. keyboard/focus/Escapeの主要フローPASS\n18. prefers-reduced-motionで操作可能\n19. Public Release / Authenticated LIVE Preview parity維持\n20. Google Maps / PlatinumapsとのBenchmarkで、基本操作に明白な劣化UXがある場合は理由なく残さない\n21. Benchmarkを真似た結果Digital Map固有のIllustration Map UXが悪化していない\n22. tests / typecheck / build / Prisma validate / Verifyの既存品質ゲートを通す\n23. Production untouched\n\nBenchmark final report\nGoogle Maps / Platinumaps / Digital Mapについて少なくとも以下を比較:\n- first impression\n- map viewport utilization\n- control discoverability\n- category discovery\n- PIN readability\n- progressive disclosure\n- pan/zoom feel\n- selection feedback\n- detail transition\n- context preservation\n- recovery\n- one-hand mobile operation\n- desktop responsiveness\n- accessibility\n評価はCOPY対象ではなく、Digital Mapに採用/不採用した理由を記録する。\n\nEvidence\ndocs/qa/wu69-public-map-zero-friction/\n最低:\n00-AS-IS-EXPLORATORY.md\n01-FRICTION-REGISTER.md\n02-GOOGLE-MAPS-BENCHMARK.md\n03-PLATINUMAPS-BENCHMARK.md\n04-UX-CONTRACT.md\n05-IMPLEMENTATION-PLAN.md\n06-MOBILE-QA.md\n07-DESKTOP-QA.md\n08-ACCESSIBILITY-QA.md\n09-BENCHMARK-RECHECK.md\nWINDOWS-QA.md\nFINAL-VERDICT.md\n\n実施順\n1. AS-IS exploratory QA\n2. friction register作成\n3. Google Maps / Platinumaps benchmark\n4. UX contract確定\n5. frictionを優先順に修正\n6. 390px反復QA\n7. responsive/accessibility回帰\n8. PR / Verify / merge\n9. Windows exact SHA\n10. Black-box Final Acceptance\n\n停止条件\n- P0/P1で安全に継続不能\n- schema/migrationが必要\n- 大規模な新機能・Product Decisionが必要\nそれ以外は小さなUX判断で停止せず、自律的に改善を続ける。\n\nFinal question\n「旅行中・施設内で片手でこのMapを5分使ったとき、少しでも“使いづらい”“邪魔”“分かりにくい”と感じる箇所が残っているか？」\nYESなら、合理的に修正可能な限りWU-69は完了扱いにしない。",
+    "permalink_url": "https://app.asana.com/1/1217082051589915/project/1217511165231924/task/1219125292154655"
+  },
+  "children": [
+    {
+      "gid": "1219125526917254",
+      "name": "69-01｜AS-IS Exploratory QA",
+      "notes": "コード・仕様を先に読まず、一般ユーザーとしてPublic Mapを390px Primaryで操作。S1〜S10を実施し、迷い・誤タップ・無駄な操作・カメラの違和感・UI chromeの邪魔・Detail復帰・Category/Pin探索の摩擦をFinding化。P3も記録。",
+      "permalink_url": "https://app.asana.com/1/1217082051589915/task/1219125526917254"
+    },
+    {
+      "gid": "1219125292166198",
+      "name": "69-02｜Google Maps UX Benchmark",
+      "notes": "Google MapsのMap-first、Category chip、place selection→detail→map、pan/zoom、片手操作、accessibility等をReferenceとして比較。コピーではなく採用/不採用理由を記録。",
+      "permalink_url": "https://app.asana.com/1/1217082051589915/task/1219125292166198"
+    },
+    {
+      "gid": "1219125364197523",
+      "name": "69-03｜Platinumaps UX Benchmark",
+      "notes": "Platinumapsの観光/施設Mapとしてのカテゴリ切替、画像/優先PIN、表示レベル、Spot詳細、全体→詳細Zoom、MobileレイアウトをReferenceとして比較。Digital Mapに必要な差分を整理。",
+      "permalink_url": "https://app.asana.com/1/1217082051589915/task/1219125364197523"
+    },
+    {
+      "gid": "1219125365610510",
+      "name": "69-04｜Zero-Friction UX Contract",
+      "notes": "AS-IS FindingとBenchmarkからPublic MapのUX Contractを確定。floating controls、Category、PIN hierarchy、Detail、overview、Floor、gesture、spacing/safe-area、keyboard/focusを明文化。",
+      "permalink_url": "https://app.asana.com/1/1217082051589915/task/1219125365610510"
+    },
+    {
+      "gid": "1219125364141942",
+      "name": "69-05｜Mobile 390px UX Polish",
+      "notes": "390x844をPrimaryに、Map viewport utilization、floating controls、Category UI、PIN visual hierarchy、Spot Detail、touch/gesture、WU-68 collision/spiderfyを反復改善。小さなストレスも合理的に除去。",
+      "permalink_url": "https://app.asana.com/1/1217082051589915/task/1219125364141942"
+    },
+    {
+      "gid": "1219125364198694",
+      "name": "69-06｜Desktop / Responsive / Accessibility",
+      "notes": "768/1024/1440/1440x700でMap-firstを維持。keyboard/focus/Escape、44px targets、reduced motion、short viewport、安全領域を確認。Mobileと操作原則を揃える。",
+      "permalink_url": "https://app.asana.com/1/1217082051589915/task/1219125364198694"
+    },
+    {
+      "gid": "1219125292144814",
+      "name": "69-07｜PR / Verify / Windows QA",
+      "notes": "tests/typecheck/build/Prisma validate→PR→Verify→merge→post-merge Verify→Windows exact SHA deploy。Public Release / Authenticated LIVE Preview parityを確認。Production untouched。",
+      "permalink_url": "https://app.asana.com/1/1217082051589915/task/1219125292144814"
+    },
+    {
+      "gid": "1219125365489759",
+      "name": "69-08｜Black-box Final Acceptance",
+      "notes": "Windows上で実装知識なしのBlack-box QAを再実施。S1〜S12を完遂し、P1/P2ゼロ、合理的に直せるP3も残さない。Google Maps / Platinumaps Benchmark再評価とFINAL-VERDICTを作成。",
+      "permalink_url": "https://app.asana.com/1/1217082051589915/task/1219125365489759"
+    }
+  ],
+  "retrieved_at": "2026-10-03"
+}

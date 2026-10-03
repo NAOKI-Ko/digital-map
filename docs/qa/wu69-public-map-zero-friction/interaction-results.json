@@ -1,0 +1,222 @@
+[
+  {
+    "case": "expanded-drag",
+    "height": 464,
+    "stillOpen": true
+  },
+  {
+    "width": 768,
+    "flow": "寺社→Detail→Escape",
+    "cameraRestored": true
+  },
+  {
+    "width": 1024,
+    "height": 768,
+    "cameraRestored": true
+  },
+  {
+    "width": 1440,
+    "height": 900,
+    "cameraRestored": true
+  },
+  {
+    "width": 1440,
+    "height": 700,
+    "cameraRestored": true
+  },
+  {
+    "case": "rapid-three-zoom",
+    "before": 15.42111914157337,
+    "after": 18.42111914157337,
+    "delta": 3
+  },
+  {
+    "case": "reduced-motion",
+    "observed": "true via DevTools; near recovery maxZoom spread3; native Enter selects Spot02; sheet transition0s; Escape restores focus"
+  },
+  {
+    "check": "tab-walk-390",
+    "focus": [
+      {
+        "label": "すべてのカテゴリを表示",
+        "rect": {
+          "bottom": 808,
+          "height": 44,
+          "left": 12,
+          "right": 79.0234375,
+          "top": 764,
+          "width": 67.0234375,
+          "x": 12,
+          "y": 764
+        },
+        "tag": "BUTTON"
+      },
+      {
+        "label": "歴史・文化",
+        "rect": {
+          "bottom": 808,
+          "height": 44,
+          "left": 87.0234375,
+          "right": 205.0234375,
+          "top": 764,
+          "width": 118,
+          "x": 87.0234375,
+          "y": 764
+        },
+        "tag": "BUTTON"
+      },
+      {
+        "label": "有松絞り",
+        "rect": {
+          "bottom": 808,
+          "height": 44,
+          "left": 213.0234375,
+          "right": 317.0234375,
+          "top": 764,
+          "width": 104,
+          "x": 213.0234375,
+          "y": 764
+        },
+        "tag": "BUTTON"
+      },
+      {
+        "label": "寺社",
+        "rect": {
+          "bottom": 808,
+          "height": 44,
+          "left": 250.0234375,
+          "right": 326.0234375,
+          "top": 764,
+          "width": 76,
+          "x": 250.0234375,
+          "y": 764
+        },
+        "tag": "BUTTON"
+      },
+      {
+        "label": "交通",
+        "rect": {
+          "bottom": 808,
+          "height": 44,
+          "left": 168.5234375,
+          "right": 244.5234375,
+          "top": 764,
+          "width": 76,
+          "x": 168.5234375,
+          "y": 764
+        },
+        "tag": "BUTTON"
+      },
+      {
+        "label": "ショップ",
+        "rect": {
+          "bottom": 808,
+          "height": 44,
+          "left": 222.0234375,
+          "right": 326.0234375,
+          "top": 764,
+          "width": 104,
+          "x": 222.0234375,
+          "y": 764
+        },
+        "tag": "BUTTON"
+      },
+      {
+        "label": "グルメ",
+        "rect": {
+          "bottom": 808,
+          "height": 44,
+          "left": 237.5234375,
+          "right": 326.265625,
+          "top": 764,
+          "width": 88.7421875,
+          "x": 237.5234375,
+          "y": 764
+        },
+        "tag": "BUTTON"
+      },
+      {
+        "label": "最初のカテゴリへ戻る",
+        "rect": {
+          "bottom": 808,
+          "height": 44,
+          "left": 334,
+          "right": 378,
+          "top": 764,
+          "width": 44,
+          "x": 334,
+          "y": 764
+        },
+        "tag": "BUTTON"
+      },
+      {
+        "label": "有松マップ 有松・桶狭間",
+        "rect": {
+          "bottom": 844,
+          "height": 844,
+          "left": 0,
+          "right": 390,
+          "top": 0,
+          "width": 390,
+          "x": 0,
+          "y": 0
+        },
+        "tag": "DIV"
+      },
+      {
+        "label": "Map",
+        "rect": {
+          "bottom": 844,
+          "height": 844,
+          "left": 0,
+          "right": 390,
+          "top": 0,
+          "width": 390,
+          "x": 0,
+          "y": 0
+        },
+        "tag": "CANVAS"
+      },
+      {
+        "label": "カフェ庄九郎の周辺ピンを表示（19件）",
+        "rect": {
+          "bottom": 362.43853759765625,
+          "height": 60,
+          "left": 164.81983947753906,
+          "right": 224.81983947753903,
+          "top": 302.43853759765625,
+          "width": 60,
+          "x": 164.81983947753906,
+          "y": 302.43853759765625
+        },
+        "tag": "BUTTON"
+      },
+      {
+        "label": "小塚邸の周辺ピンを表示（19件）",
+        "rect": {
+          "bottom": 344.66961669921875,
+          "height": 60,
+          "left": 264.7454833984375,
+          "right": 324.7454833984375,
+          "top": 284.66961669921875,
+          "width": 60,
+          "x": 264.7454833984375,
+          "y": 284.66961669921875
+        },
+        "tag": "BUTTON"
+      }
+    ]
+  },
+  {
+    "check": "selected-edge-pin-390",
+    "cameraRestored": true
+  },
+  {
+    "check": "dense-stage-390",
+    "initialZoom": 15.730001880130372,
+    "stageZoom": 16.730001880130374,
+    "overviewBearing": 0,
+    "overviewPitch": 0,
+    "stageDelta": 1.0000000000000018
+  }
+]

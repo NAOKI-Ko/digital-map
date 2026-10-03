@@ -1,0 +1,13 @@
+{
+  "base_sha": "ad4f4bde269b16c5575b836add444b5e6fa88399",
+  "branch": "feat/wu69-public-map-ux-20261003",
+  "main_sha_observed": "a58b4353bd108e6586f329080c772f69b8aaffda",
+  "windows_deployed_sha": "ad4f4bde269b16c5575b836add444b5e6fa88399",
+  "pr_url": null,
+  "verify": null,
+  "merged": false,
+  "post_merge_verify": false,
+  "windows_exact_sha_candidate": false,
+  "production_changed": false,
+  "implementation_sha": "d875fe39f712478a9def844ff30f41a85f8f2a5a"
+}

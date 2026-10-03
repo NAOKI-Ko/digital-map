@@ -1,0 +1,10 @@
+$ vitest run
+
+ RUN  v4.1.11 /Users/naoki/Documents/Codex/2026-09-28/digital-map-aqua-uat-admin-remediation/wu63
+
+
+ Test Files  102 passed | 5 skipped (107)
+      Tests  685 passed | 18 skipped (703)
+   Start at  11:17:24
+   Duration  8.31s (transform 4.77s, setup 0ms, import 14.94s, tests 25.72s, environment 3.34s)
+
