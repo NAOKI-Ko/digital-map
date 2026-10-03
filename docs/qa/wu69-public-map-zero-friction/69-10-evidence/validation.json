@@ -73,5 +73,44 @@
       "packageUnchanged": true,
       "lockUnchanged": true
     }
-  ]
+  ],
+  "expiryGuardTests": [
+    {
+      "utcDate": "2026-11-01",
+      "exit": 0,
+      "auditCalls": [
+        "AUDIT_CALL audit --prod --audit-level high --ignore GHSA-86w9-cpqp-85rv --ignore GHSA-vfj7-8cjw-p6xm",
+        "AUDIT_CALL audit --prod --audit-level high"
+      ],
+      "stderr": ""
+    },
+    {
+      "utcDate": "2026-11-02",
+      "exit": 0,
+      "auditCalls": [
+        "AUDIT_CALL audit --prod --audit-level high --ignore GHSA-86w9-cpqp-85rv --ignore GHSA-vfj7-8cjw-p6xm",
+        "AUDIT_CALL audit --prod --audit-level high"
+      ],
+      "stderr": ""
+    },
+    {
+      "utcDate": "2026-11-03",
+      "exit": 1,
+      "auditCalls": [],
+      "stderr": "WU-69 security exception expired (2026-11-02 UTC)"
+    },
+    {
+      "utcDate": "2026-12-01",
+      "exit": 1,
+      "auditCalls": [],
+      "stderr": "WU-69 security exception expired (2026-11-02 UTC)"
+    },
+    {
+      "utcDate": "clock-error",
+      "exit": 42,
+      "auditCalls": [],
+      "stderr": ""
+    }
+  ],
+  "codexExpiryFinding": "P1 on71f9705, fixed before merge"
 }

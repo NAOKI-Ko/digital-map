@@ -43,6 +43,8 @@ Only the existing audit step changes. Its first command is the requested exact c
 
 ```yaml
 - run: |
+    security_exception_today="$(date -u +%F)"
+    [[ "$security_exception_today" < "2026-11-03" ]] || { echo "WU-69 security exception expired (2026-11-02 UTC)" >&2; exit 1; }
     pnpm audit --prod --audit-level high --ignore GHSA-86w9-cpqp-85rv --ignore GHSA-vfj7-8cjw-p6xm
     pnpm audit --prod --audit-level high
 ```
@@ -71,7 +73,9 @@ The last three cases use a loopback mock npm bulk endpoint and synthetic `GHSA-2
 
 Remove the affected GHSA immediately when an official patched release becomes available, even before expiry, and update the affected dependency/lockfile to a verified safe published release through the normal review/Verify process. Re-run the unfiltered audit. When both advisories are removed, restore the original single audit command.
 
-The owner must remove the exception no later than 2026-11-02. An extension requires a new explicit security decision; it must not silently renew. pnpm's ignore entries have no built-in expiry: this date is an explicit maintenance obligation, not a claim of automatic time enforcement. New High/Critical advisories remain blocking throughout. Never substitute unpublished versions, fabricated metadata or an unverified fork.
+The owner must remove the exception no later than 2026-11-02 UTC. An extension requires a new explicit security decision; it must not silently renew. pnpm's ignore entries have no built-in expiry, so the existing audit step now enforces the date before registering any exemption. It fails closed at 2026-11-03T00:00:00Z and later, including if the date command fails. Removing or renewing the expired guard requires a reviewed implementation and explicit approval; the workflow cannot keep re-registering an expired exemption. New High/Critical advisories remain blocking throughout. Never substitute unpublished versions, fabricated metadata or an unverified fork.
+
+GitHub Codex review of71f9705 found P1 expiry enforcement missing. This was fixed before merge. Bash execution tests cover 2026-11-01 and the expiry day (two audit commands execute), 2026-11-03 and later (exit1, no audit command invoked), and a failing date command (nonzero exit, no audit command invoked). Clock simulation is confined to a test shell, not system time or the actual workflow environment. The synthetic High/Critical tests above remain applicable to the unchanged audit commands. See expiry-results.json and check-expiry.py.
 
 ## Delivery gates
 

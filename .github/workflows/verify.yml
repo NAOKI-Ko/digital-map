@@ -39,6 +39,8 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: |
+          security_exception_today="$(date -u +%F)"
+          [[ "$security_exception_today" < "2026-11-03" ]] || { echo "WU-69 security exception expired (2026-11-02 UTC)" >&2; exit 1; }
           pnpm audit --prod --audit-level high --ignore GHSA-86w9-cpqp-85rv --ignore GHSA-vfj7-8cjw-p6xm
           pnpm audit --prod --audit-level high
       - run: pnpm prisma:validate
