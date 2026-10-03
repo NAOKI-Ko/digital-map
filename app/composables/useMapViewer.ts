@@ -490,13 +490,9 @@ export function useMapViewer(
           centerDistance: Math.hypot((rect.left+rect.right)/2-frame.left-frame.width/2,(rect.top+rect.bottom)/2-frame.top-frame.height/2) }
       })
       const eligible = new Set(presentations.filter(item => item.presentation.visible).map(item => item.spot.id))
-      const visible = declutterPins(collisionCandidates.filter(pin => eligible.has(pin.id)), undefined, previousWinners)
+      const visible = declutterPins(collisionCandidates.filter(pin => eligible.has(pin.id)), undefined, previousWinners, frame)
       previousWinners = visible
-      const onscreenVisible = new Set([...visible].filter(id => {
-        const rect = collisionCandidates.find(pin => pin.id === id)!.rect
-        return rect.right > frame.left && rect.left < frame.right && rect.bottom > frame.top && rect.top < frame.bottom
-      }))
-      const groupSizes = getCollisionRepresentatives(collisionCandidates, onscreenVisible)
+      const groupSizes = getCollisionRepresentatives(collisionCandidates, visible)
       presentations.forEach(({ element, spot }) => {
         // Spread clones are the visible, keyboard reachable representation while open.
         applyPinVisibility(element, recovery.isOpen() ? !recovery.hasMember(spot.id) && visible.has(spot.id) : visible.has(spot.id))

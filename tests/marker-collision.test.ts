@@ -61,6 +61,23 @@ describe('screen-space decluttering', () => {
     expect([...declutterPins([pin('a',2),pin('b',1,66)],10)]).toEqual(['a'])
     for (const x of [0,40,59.9,60,65.9]) expect([...declutterPins([pin('a',2),pin('b',1,x)])]).toEqual(['a'])
   })
+  it('hands recovery to an onscreen neighbor when a retained winner pans beyond any viewport edge', () => {
+    const viewport = { left: 0, top: 0, right: 390, bottom: 844 }
+    for (const [outside, inside] of [
+      [pin('a',2,-65),pin('b',2,0)],
+      [pin('a',2,395),pin('b',2,330)],
+      [{...pin('a',2),rect:{left:100,right:160,top:-65,bottom:-5}}, {...pin('b',2),rect:{left:100,right:160,top:0,bottom:60}}],
+      [{...pin('a',2),rect:{left:100,right:160,top:849,bottom:909}}, {...pin('b',2),rect:{left:100,right:160,top:784,bottom:844}}],
+    ]) {
+      const candidates = [outside!,inside!]
+      const visible = declutterPins(candidates,6,new Set(['a']),viewport)
+      expect([...visible]).toEqual(['b'])
+      expect([...getCollisionRepresentatives(candidates,visible)]).toEqual([['b',2]])
+    }
+    // A partly visible winner stays stable; a target exactly outside is excluded.
+    expect([...declutterPins([pin('a',2,-59),pin('b',2,6)],6,new Set(['a']),viewport)]).toEqual(['a'])
+    expect([...declutterPins([pin('a',4,-60),pin('b',1,5)],6,new Set(['a']),viewport)]).toEqual(['b'])
+  })
   it('larger actual artwork suppresses more neighbors without mutating canonical candidates', () => {
     const pins=[pin('a',2,0,80),pin('b',1,75)]
     const before=JSON.stringify(pins)

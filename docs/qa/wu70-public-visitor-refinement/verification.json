@@ -49,11 +49,18 @@
       "finding": "Floor image loading/failure leaves unexplained blank map behind pins",
       "fix": "Visitor loading status and image-specific retry; stale floor/source events ignored",
       "result": "Real image load error shown; retry available with exact camera preserved; normal image hides status"
+    },
+    {
+      "id": "R01",
+      "severity": "P2",
+      "finding": "Retained offscreen winner can hide an onscreen neighbor during pan",
+      "fix": "Exclude fully offscreen candidates before decluttering; keep all candidates in recovery groups",
+      "result": "Reproduced in 390x844 dense fixture; visible neighbor and recovery badge return after edge pan. Four-edge and partial-target regression tests pass."
     }
   ],
   "verification": {
     "tests": {
-      "pass": 702,
+      "pass": 703,
       "skip": 18,
       "fail": 0,
       "note": "Full local Vitest run; DB-dependent/optional skipped cases not claimed passed"
@@ -92,7 +99,8 @@
       "Physical one-hand touch/pinch, real mobile browser chrome and safe-area hardware not exercised",
       "No candidate deployment to Windows; candidate visual QA runs local renderer over read-only Windows public JSON with byte-identical local floor raster and Windows photos",
       "Synthetic high-density/Floor/Spiderfy cases use existing dev-only public fixture routes"
-    ]
+    ],
+    "reviewFixQA": "390x844 edge-pan before/after, recovery badge, detail, category clear, overview and maxZoom Spiderfy repeated after R01 fix"
   },
   "guardrails": {
     "productionTouched": false,

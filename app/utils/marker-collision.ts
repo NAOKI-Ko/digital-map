@@ -10,13 +10,15 @@ export function rectanglesCollide(a: ScreenRect, b: ScreenRect, gap = PIN_COLLIS
 const isProtected = (pin: CollisionCandidate) => Boolean(pin.protected) || pin.priority === 4
 
 /** Protect selection/focus first; preserve the normal priority order and stable ID ties. */
-export function declutterPins(candidates: readonly CollisionCandidate[], gap = PIN_COLLISION_GAP, previousWinners: ReadonlySet<string> = new Set()) {
+export function declutterPins(candidates: readonly CollisionCandidate[], gap = PIN_COLLISION_GAP, previousWinners: ReadonlySet<string> = new Set(), viewport?: ScreenRect) {
   const accepted: CollisionCandidate[] = []
   // Retain equal-priority winners and their order while panning. Center distance
   // chooses new winners; it must not continually move a group's badge between PINs.
   const retainedOrder = new Map([...previousWinners].map((id, index) => [id, index]))
   const rank = (id: string) => retainedOrder.get(id) ?? previousWinners.size
-  for (const candidate of [...candidates].sort((a, b) => Number(isProtected(b)) - Number(isProtected(a)) || b.priority - a.priority || rank(a.id) - rank(b.id) || (a.centerDistance ?? 0) - (b.centerDistance ?? 0) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))) {
+  // Offscreen winners cannot block reachable neighbors or own their recovery badge.
+  const onscreen = candidates.filter(pin => !viewport || rectanglesCollide(pin.rect, viewport, 0))
+  for (const candidate of onscreen.sort((a, b) => Number(isProtected(b)) - Number(isProtected(a)) || b.priority - a.priority || rank(a.id) - rank(b.id) || (a.centerDistance ?? 0) - (b.centerDistance ?? 0) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))) {
     if (isProtected(candidate) || !accepted.some(pin => rectanglesCollide(pin.rect, candidate.rect, gap))) accepted.push(candidate)
   }
   return new Set(accepted.map(pin => pin.id))
