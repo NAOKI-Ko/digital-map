@@ -99,7 +99,7 @@ watch(selectedCategoryIds, () => {
 
 function selectSpot(spot: MapViewerSpot) {
   if (!selectedSpotId.value) mapViewerRef.value?.captureDetailContext()
-  spotTrigger = [...document.querySelectorAll<HTMLElement>('.map-viewer-marker[data-spot-id]')]
+  spotTrigger = [...document.querySelectorAll<HTMLElement>('.visitor-map-viewer .map-viewer-marker[data-spot-id]')]
     .find(element => element.dataset.spotId === spot.id) ?? null
   spotTriggerId = spot.id
   overlay.value = { type: 'spot', spotId: spot.id }
@@ -131,9 +131,9 @@ function closeSpot(source: 'pointer' | 'other' = 'other') {
   mapViewerRef.value?.restoreDetailContext()
   overlay.value = null
   const restoreFocus = () => {
-    const fallbackMarker = [...document.querySelectorAll<HTMLElement>('.map-viewer-marker[data-spot-id]')]
+    const fallbackMarker = [...document.querySelectorAll<HTMLElement>('.visitor-map-viewer .map-viewer-marker[data-spot-id]')]
       .find(element => element.dataset.spotId === closingSpotId)
-    const mapEntry = document.querySelector<HTMLElement>('.map-viewer-frame canvas[tabindex="0"]')
+    const mapEntry = document.querySelector<HTMLElement>('.visitor-map-viewer canvas[tabindex="0"]')
     const trigger = closingTrigger?.isConnected ? closingTrigger : fallbackMarker
     ;(trigger && !trigger.inert && getComputedStyle(trigger).visibility !== 'hidden' ? trigger : mapEntry)?.focus({ preventScroll: true })
     if (spotTriggerId === closingSpotId) {

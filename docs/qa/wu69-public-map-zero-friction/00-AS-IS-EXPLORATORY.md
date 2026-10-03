@@ -31,7 +31,7 @@ Detail拡大では約92%の高さを取り、内容末尾から画面下まで�
 
 - `as-is-initial-390.jpg` は初期表示。
 - `as-is-detail-drag.jpg` は拡大Detailの下ドラッグ後。
-- 正本の取得内容は `../wu69-asana-authority.json`。
+- 正本の取得内容は `ASANA-AUTHORITY.json`。
 - 初期カメラのbearing／pitch、collision priorityの実装、実行SHA、LIVE Preview parityは内部をまだ読んでおらず未確認。
 - 実際の屋外光、手持ち操作、touch pinch、Windowsは未検証。
 

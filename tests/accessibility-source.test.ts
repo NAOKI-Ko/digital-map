@@ -12,7 +12,7 @@ describe('WCAG implementation source contract', () => {
     expect(marker).toContain("image.alt = ''")
     expect(page).not.toContain('SpotAccessibleList')
     expect(page).toContain('trigger && !trigger.inert')
-    expect(page).toContain("querySelectorAll<HTMLElement>('.map-viewer-marker[data-spot-id]')")
+    expect(page).toContain("querySelectorAll<HTMLElement>('.visitor-map-viewer .map-viewer-marker[data-spot-id]')")
     expect(marker).toContain("element.setAttribute('data-spot-id', spot.id)")
     expect(dialog).toContain('<DialogRoot')
     expect(dialog).toContain('<DialogContent')
