@@ -8,12 +8,20 @@ const emit = defineEmits<{ close: [source?: 'pointer' | 'other'], expandedChange
 
 const sheetState = ref<BottomSheetState>('detail')
 const scrollBody = useTemplateRef<HTMLElement>('scrollBody')
+const bodyContent = useTemplateRef<HTMLElement>('bodyContent')
+const sheetHeader = useTemplateRef<HTMLElement>('sheetHeader')
+const contentHeight = ref(0)
+const photoStates = ref<Record<string, 'loaded' | 'error'>>({})
+let contentObserver: ResizeObserver | null = null
+let contentFrame: number | null = null
 const visibleHeight = ref(0)
 const visibleBottom = ref(0)
 
+const needsExpansion = computed(() => contentHeight.value > (visibleHeight.value || 800) * 0.55 + 1)
 const sheetHeight = computed(() => {
   const height = visibleHeight.value || (import.meta.client ? window.innerHeight : 800)
-  return Math.round(height * (sheetState.value === 'expanded' ? 0.92 : 0.6))
+  const maximum = Math.round(height * (sheetState.value === 'expanded' ? 0.92 : 0.55))
+  return contentHeight.value ? Math.min(maximum, contentHeight.value) : maximum
 })
 const viewportStyle = computed(() => ({
   '--spot-sheet-height': `${sheetHeight.value}px`,
@@ -40,7 +48,8 @@ function requestClose(source: 'pointer' | 'other' = 'other') {
 const gesture = useBottomSheetGesture({
   state: readonly(sheetState),
   onClose: () => requestClose('other'),
-  onExpand: () => setExpanded(true),
+  onExpand: () => { if (needsExpansion.value) setExpanded(true) },
+  onCollapse: () => setExpanded(false),
 })
 const sheetMotionStyle = gesture.style
 
@@ -72,19 +81,41 @@ function removeBodyTouchMoveListener() {
 }
 
 watch(() => props.spot.id, () => {
+  photoStates.value = {}
   sheetState.value = visibleHeight.value < 500 ? 'expanded' : 'detail'
   nextTick(() => scrollBody.value?.scrollTo({ top: 0 }))
 })
 watch(sheetState, state => emit('expandedChange', state === 'expanded'), { immediate: true })
 
+function measureContent() {
+  contentHeight.value = Math.ceil((sheetHeader.value?.getBoundingClientRect().height ?? 0) + (bodyContent.value?.getBoundingClientRect().height ?? 0))
+}
+function observeContent() {
+  contentObserver?.disconnect()
+  if (bodyContent.value) contentObserver?.observe(bodyContent.value)
+  if (sheetHeader.value) contentObserver?.observe(sheetHeader.value)
+  measureContent()
+}
+watch([bodyContent, sheetHeader], observeContent, { flush: 'post' })
+watch(scrollBody, (element, previous) => {
+  previous?.removeEventListener('touchmove', gesture.onBodyTouchMove)
+  element?.addEventListener('touchmove', gesture.onBodyTouchMove, { passive: false })
+}, { flush: 'post' })
 onMounted(() => {
   updateViewport()
+  contentObserver = new ResizeObserver(() => {
+    if (contentFrame !== null) cancelAnimationFrame(contentFrame)
+    contentFrame = requestAnimationFrame(() => { contentFrame = null; measureContent() })
+  })
+  observeContent()
   addBodyTouchMoveListener()
   window.addEventListener('resize', updateViewport)
   window.visualViewport?.addEventListener('resize', updateViewport)
   window.visualViewport?.addEventListener('scroll', updateViewport)
 })
 onBeforeUnmount(() => {
+  contentObserver?.disconnect()
+  if (contentFrame !== null) cancelAnimationFrame(contentFrame)
   removeBodyTouchMoveListener()
   window.removeEventListener('resize', updateViewport)
   window.visualViewport?.removeEventListener('resize', updateViewport)
@@ -106,6 +137,7 @@ onBeforeUnmount(() => {
         @pointer-down-outside="handlePointerDismiss"
       >
         <header
+          ref="sheetHeader"
           class="spot-detail-sheet__drag-region shrink-0 border-b border-stone-100 px-4"
           @pointerdown="gesture.onHeaderPointerDown"
           @pointermove="gesture.onHeaderPointerMove"
@@ -122,7 +154,7 @@ onBeforeUnmount(() => {
                 {{ spot.name }}
               </DialogTitle>
             </div>
-            <button type="button" class="grid size-11 shrink-0 place-items-center rounded-full text-lg text-stone-700 hover:bg-stone-100 md:hidden" :aria-label="sheetState === 'expanded' ? 'スポット詳細の高さを戻す' : 'スポット詳細を大きく表示'" @click="setExpanded(sheetState !== 'expanded')">
+            <button v-if="needsExpansion" type="button" class="grid size-11 shrink-0 place-items-center rounded-full text-lg text-stone-700 hover:bg-stone-100 md:hidden" :aria-label="sheetState === 'expanded' ? 'スポット詳細の高さを戻す' : 'スポット詳細を大きく表示'" @click="setExpanded(sheetState !== 'expanded')">
               <span aria-hidden="true">{{ sheetState === 'expanded' ? '⌄' : '⌃' }}</span>
             </button>
             <button type="button" class="grid size-11 shrink-0 place-items-center rounded-full bg-stone-100 text-xl leading-none text-stone-700 hover:bg-stone-200" aria-label="スポット詳細を閉じる" @click="requestClose('other')">×</button>
@@ -130,23 +162,29 @@ onBeforeUnmount(() => {
         </header>
 
         <div ref="scrollBody" class="spot-detail-sheet__body min-h-0 flex-1 overflow-y-auto overscroll-contain" @touchstart="gesture.onBodyTouchStart" @touchend="gesture.onBodyTouchEnd" @touchcancel="gesture.onBodyTouchCancel">
-          <div v-if="$slots.default" class="px-4 pt-4 md:px-6"><slot /></div>
-          <div v-if="spot.photos.length" class="flex snap-x snap-mandatory overflow-x-auto bg-stone-100" data-sheet-no-drag>
-            <img v-for="(photo, index) in spot.photos" :key="photo" :src="photo" :alt="`${spot.name}の写真${index + 1}`" class="h-52 w-full shrink-0 snap-center object-cover md:h-64">
-          </div>
-          <div class="px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-4 md:p-6">
-            <p v-if="spot.description" class="whitespace-pre-line text-sm leading-7 text-stone-700">{{ spot.description }}</p>
-            <p v-else class="text-sm text-stone-500">説明は登録されていません。</p>
-            <dl v-if="spot.informationFields.length" class="mt-6 divide-y divide-stone-200 border-y border-stone-200 text-sm">
-              <div v-for="field in spot.informationFields" :key="field.id" class="grid grid-cols-[5.5rem_1fr] gap-3 py-3">
-                <dt class="font-semibold text-stone-500">{{ field.label }}</dt>
-                <dd class="min-w-0 whitespace-pre-line text-stone-800">
-                  <a v-if="field.href" :href="field.href" class="break-words font-semibold text-terracotta-700 underline decoration-terracotta-300 underline-offset-4" :target="field.type === 'url' ? '_blank' : undefined" :rel="field.type === 'url' ? 'noopener noreferrer' : undefined">{{ field.value }}</a>
-                  <template v-else>{{ field.value }}</template>
-                </dd>
-              </div>
-            </dl>
-            <a v-if="spot.websiteAction" :href="spot.websiteAction.url" target="_blank" rel="noopener noreferrer" class="mt-5 inline-flex min-h-11 items-center rounded-lg bg-terracotta-600 px-4 py-2.5 text-sm font-semibold text-white">{{ spot.websiteAction.label }}を見る</a>
+          <div ref="bodyContent">
+            <div v-if="$slots.default" class="px-4 pt-4 md:px-6"><slot /></div>
+            <div v-if="spot.photos.length" class="flex snap-x snap-mandatory overflow-x-auto bg-stone-100" data-sheet-no-drag>
+              <figure v-for="(photo, index) in spot.photos" :key="photo" class="relative w-full shrink-0 snap-center">
+                <img v-if="photoStates[photo] !== 'error'" :src="photo" :alt="`${spot.name}の写真${index + 1}`" class="h-44 w-full object-cover md:h-56" @load="photoStates[photo] = 'loaded'" @error="photoStates[photo] = 'error'">
+                <p v-if="!photoStates[photo]" role="status" class="pointer-events-none absolute inset-0 grid place-items-center bg-stone-100 text-sm text-stone-600">写真を読み込み中</p>
+                <p v-else-if="photoStates[photo] === 'error'" class="px-4 py-4 text-sm text-stone-600">写真を表示できませんでした</p>
+              </figure>
+            </div>
+            <div class="px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-4 md:p-6">
+              <p v-if="spot.description" class="whitespace-pre-line text-sm leading-7 text-stone-700">{{ spot.description }}</p>
+              <p v-else class="text-sm text-stone-500">説明は登録されていません。</p>
+              <dl v-if="spot.informationFields.length" class="mt-6 divide-y divide-stone-200 border-y border-stone-200 text-sm">
+                <div v-for="field in spot.informationFields" :key="field.id" class="grid grid-cols-[5.5rem_1fr] gap-3 py-3">
+                  <dt class="font-semibold text-stone-500">{{ field.label }}</dt>
+                  <dd class="min-w-0 whitespace-pre-line text-stone-800">
+                    <a v-if="field.href" :href="field.href" class="break-words font-semibold text-terracotta-700 underline decoration-terracotta-300 underline-offset-4" :target="field.type === 'url' ? '_blank' : undefined" :rel="field.type === 'url' ? 'noopener noreferrer' : undefined">{{ field.value }}</a>
+                    <template v-else>{{ field.value }}</template>
+                  </dd>
+                </div>
+              </dl>
+              <a v-if="spot.websiteAction" :href="spot.websiteAction.url" target="_blank" rel="noopener noreferrer" class="mt-5 inline-flex min-h-11 items-center rounded-lg bg-terracotta-600 px-4 py-2.5 text-sm font-semibold text-white">{{ spot.websiteAction.label }}を見る</a>
+            </div>
           </div>
         </div>
       </DialogContent>
@@ -179,8 +217,8 @@ onBeforeUnmount(() => {
   .spot-detail-sheet {
     inset: 50% 1.25rem auto auto;
     width: min(32rem, calc(100vw - 2.5rem));
-    height: min(52rem, calc(100dvh - 2.5rem));
-    max-height: calc(100dvh - 2.5rem);
+    height: auto;
+    max-height: calc(100dvh - 7rem);
     transform: translate3d(0, -50%, 0) !important;
     border-radius: 1.5rem;
   }

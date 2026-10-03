@@ -2,7 +2,7 @@ import { computed, onBeforeUnmount, ref, type Ref } from 'vue'
 
 export type BottomSheetState = 'detail' | 'expanded'
 export type BottomSheetGestureSource = 'header' | 'body'
-export type BottomSheetGestureOutcome = 'close' | 'expand' | 'reset'
+export type BottomSheetGestureOutcome = 'close' | 'collapse' | 'expand' | 'reset'
 
 const DIRECTION_THRESHOLD_PX = 8
 const VERTICAL_RATIO = 1.25
@@ -28,8 +28,9 @@ export function getBottomSheetGestureOutcome(input: {
   velocityY: number
 }): BottomSheetGestureOutcome {
   if (!isVerticalSheetGesture(input.dx, input.dy)) return 'reset'
-  if (input.dy >= CLOSE_DISTANCE_PX) return 'close'
-  if (input.dy >= CLOSE_FLICK_DISTANCE_PX && input.velocityY >= CLOSE_FLICK_VELOCITY_PX_MS) return 'close'
+  if (input.dy >= CLOSE_DISTANCE_PX || (input.dy >= CLOSE_FLICK_DISTANCE_PX && input.velocityY >= CLOSE_FLICK_VELOCITY_PX_MS)) {
+    return input.state === 'expanded' ? 'collapse' : 'close'
+  }
   if (input.source === 'header' && input.state === 'detail' && -input.dy >= EXPAND_DISTANCE_PX) return 'expand'
   return 'reset'
 }
@@ -53,6 +54,7 @@ export function useBottomSheetGesture(options: {
   state: Readonly<Ref<BottomSheetState>>
   onClose: () => void
   onExpand: () => void
+  onCollapse: () => void
 }) {
   const translateY = ref(0)
   const dragging = ref(false)
@@ -154,6 +156,7 @@ export function useBottomSheetGesture(options: {
       return
     }
     if (outcome === 'expand') options.onExpand()
+    if (outcome === 'collapse') options.onCollapse()
     settling.value = true
     translateY.value = 0
     window.requestAnimationFrame(() => { settling.value = false })

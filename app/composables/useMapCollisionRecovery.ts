@@ -12,6 +12,7 @@ interface RecoveryOptions {
   spots: () => readonly MapViewerSpot[]
   position: (spot: MapViewerSpot) => { lng: number, lat: number } | null
   select: (spot: MapViewerSpot) => void
+  visitor?: () => boolean
   onStarted?: () => void
   refresh: () => void
 }
@@ -89,7 +90,7 @@ export function useMapCollisionRecovery(options: RecoveryOptions) {
       line.setAttribute('x1',String(layout.width/2)); line.setAttribute('y1',String(layout.contentHeight/2))
       line.setAttribute('x2',String(point.x)); line.setAttribute('y2',String(point.y)); line.setAttribute('stroke','#78716c')
       svg.append(line)
-      const pin = createSpotMarkerElement(spot, { mode:'view', selected:false, onSelected:() => { close(true); options.select(spot) } })
+      const pin = createSpotMarkerElement(spot, { mode:'view', visitor:options.visitor?.(), selected:false, onSelected:() => { close(true); options.select(spot) } })
       pin.classList.add('maplibregl-marker')
       pin.dataset.spiderfied = 'true'
       pin.style.left = `${point.x}px`; pin.style.top = `${point.y}px`

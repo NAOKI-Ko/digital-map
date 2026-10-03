@@ -70,7 +70,7 @@ describe('MapViewerのカメラ制約', () => {
   })
 
   it('比較実装の閲覧モードへ暫定pitch/bearing制約を渡す', () => {
-    const options = createMapViewerOptions('map', 'view')
+    const options = createMapViewerOptions('map', 'view', true)
 
     expect(options).toMatchObject({
       bearing: 0,
@@ -82,14 +82,14 @@ describe('MapViewerのカメラ制約', () => {
       pitchWithRotate: true,
       minZoom: 0,
       maxZoom: 24,
-      doubleClickZoom: false,
+      doubleClickZoom: true,
     })
     expect(VIEWER_CAMERA_CONSTRAINTS.view.maxPitch).toBe(70)
   })
 
-  it('double click zoomを無効化し、明示ボタンとtouch gestureを維持する', () => {
-    const options = createMapViewerOptions('map', 'view')
-    expect(options.doubleClickZoom).toBe(false)
+  it('Publicはdouble click zoomを有効にし、編集時の誤配置を防ぐ', () => {
+    const options = createMapViewerOptions('map', 'view', true)
+    expect(options.doubleClickZoom).toBe(true)
     expect(options.touchPitch).toBe(true)
     expect(createMapViewerOptions('map', 'edit').doubleClickZoom).toBe(false)
   })

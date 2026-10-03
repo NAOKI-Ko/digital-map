@@ -25,9 +25,9 @@ export function getVisitorContentBounds(floor: MapViewerFloor, spots: readonly M
   return [[Math.min(...lngs), Math.min(...lats)], [Math.max(...lngs), Math.max(...lats)]] as [[number, number], [number, number]]
 }
 
-export function clampVisitorInitialZoom(fitZoom: number, contentZoom: number) {
+export function clampVisitorInitialZoom(fitZoom: number, contentZoom: number, allowance = VISITOR_INITIAL_ZOOM_ALLOWANCE) {
   if (!Number.isFinite(contentZoom)) return fitZoom
-  return Math.min(fitZoom + VISITOR_INITIAL_ZOOM_ALLOWANCE, contentZoom)
+  return Math.min(fitZoom + allowance, contentZoom)
 }
 
 /** Broad content is a level whole-floor fallback rather than forced past its fitted zoom. */

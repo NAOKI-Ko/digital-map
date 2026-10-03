@@ -54,7 +54,7 @@ export function createMapViewerStyle(_mode: MapViewerMode): StyleSpecification {
   }
 }
 
-export function createMapViewerOptions(container: HTMLElement | string, mode: MapViewerMode): MapOptions {
+export function createMapViewerOptions(container: HTMLElement | string, mode: MapViewerMode, visitor = false): MapOptions {
   const camera = VIEWER_CAMERA_CONSTRAINTS[mode]
   return {
     container,
@@ -63,8 +63,13 @@ export function createMapViewerOptions(container: HTMLElement | string, mode: Ma
     zoom: 1,
     minZoom: ABSOLUTE_ZOOM_LIMITS.minZoom,
     maxZoom: ABSOLUTE_ZOOM_LIMITS.maxZoom,
-    // Disable conflicting double-click gestures; buttons and pinch/touch zoom remain native MapLibre controls.
-    doubleClickZoom: false,
+    // Visitor double-tap/double-click zoom stays native; editing keeps placement gestures unambiguous.
+    doubleClickZoom: mode === 'view' && visitor,
+    locale: visitor ? {
+      'GeolocateControl.FindMyLocation': '現在地を表示',
+      'GeolocateControl.LocationNotAvailable': '現在地を取得できません',
+      'AttributionControl.ToggleAttribution': '地図のクレジットを表示',
+    } : undefined,
     ...camera,
   }
 }
@@ -362,10 +367,11 @@ export function useMapCamera(
       const result = updateFloorZoomConstraints(corners)
       if (result) {
         const bounds = getVisitorContentBounds(options.floor.value, options.spots?.value ?? [])
-        const fittedContent = bounds ? instance.cameraForBounds(bounds, { padding: measureVisitorFitPadding(container.value!), bearing: 0, maxZoom: result.targetZoom + VISITOR_INITIAL_ZOOM_ALLOWANCE }) : null
+        const allowance = (container.value?.clientWidth ?? 1024) < 768 ? 1.3 : VISITOR_INITIAL_ZOOM_ALLOWANCE
+        const fittedContent = bounds ? instance.cameraForBounds(bounds, { padding: measureVisitorFitPadding(container.value!), bearing: 0, maxZoom: result.targetZoom + allowance }) : null
         const content = fittedContent && canUseVisitorContentCamera(result.targetZoom, fittedContent.zoom) ? fittedContent : null
-        homePitch = content ? VISITOR_INITIAL_PITCH : 0
-        const zoom = content ? clampVisitorInitialZoom(result.targetZoom, content.zoom ?? result.targetZoom) : result.targetZoom
+        homePitch = VISITOR_INITIAL_PITCH
+        const zoom = content ? clampVisitorInitialZoom(result.targetZoom, content.zoom ?? result.targetZoom, allowance) : result.targetZoom + (allowance > VISITOR_INITIAL_ZOOM_ALLOWANCE ? 1 : 0)
         instance.jumpTo({ center: content?.center ?? result.camera.center, zoom, bearing: 0, pitch: homePitch })
       }
       constraintLayoutKey = getConstraintLayoutKey()

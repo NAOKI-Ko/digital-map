@@ -7,6 +7,7 @@ import { createSpotMarkerElement } from '~/utils/marker-element'
 import { applyMarkerDensityPresentation, getMarkerDensityPresentation } from '~/utils/marker-density'
 import { applyPinVisibility, declutterPins, getCollisionGroup, measurePinRect } from '~/utils/marker-collision'
 import { getMinimalSpotPan, needsHeadingReset } from '~/utils/public-map-exploration'
+import { measureVisitorFitPadding } from '~/utils/visitor-floor-fit'
 import {
   createMapViewerOptions,
   createOneShotLocationCameraPolicy,
@@ -111,24 +112,40 @@ export class MapNavigationControl implements IControl {
   private map: MapLibreMap | null = null
   private container: HTMLElement | null = null
   private updateCompass: (() => void) | null = null
+  private requestedZoom: number | null = null
+  private finishZoom = () => { this.requestedZoom = null }
 
   constructor(
     private readonly homePitch: () => number = () => VIEWER_CAMERA_CONSTRAINTS.view.pitch,
     private readonly showWholeFloor?: () => void,
+    private readonly onInteraction: () => void = () => {},
+    private readonly visitor = false,
   ) {}
 
   onAdd(map: MapLibreMap) {
     this.map = map
     const container = document.createElement('div')
     container.className = 'map-viewer-navigation-control'
-    const zoomIn = createControlButton('拡大', '+', () => this.map?.zoomIn())
-    const zoomOut = createControlButton('縮小', '−', () => this.map?.zoomOut())
+    const zoom = (delta: number) => {
+      this.onInteraction()
+      if (!this.visitor) {
+        if (delta > 0) map.zoomIn()
+        else map.zoomOut()
+        return
+      }
+      const target = Math.max(map.getMinZoom(), Math.min(map.getMaxZoom(), (this.requestedZoom ?? map.getZoom()) + delta))
+      map.stop()
+      this.requestedZoom = target
+      map.easeTo({ zoom: target, duration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 140 })
+    }
+    const zoomIn = createControlButton('拡大', '+', () => zoom(1))
+    const zoomOut = createControlButton('縮小', '−', () => zoom(-1))
     zoomIn.className = 'map-viewer-zoom-control'
     zoomOut.className = 'map-viewer-zoom-control'
-    const compass = createControlButton('向きを戻す', 'N', () => this.map?.easeTo({ bearing: 0, pitch: this.homePitch(), duration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 250 }))
+    const compass = createControlButton('向きを戻す', 'N', () => { this.onInteraction(); this.map?.easeTo({ bearing: 0, pitch: this.homePitch(), duration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : this.visitor ? 180 : 250 }) })
     compass.className = 'map-viewer-compass'
     this.updateCompass = () => { compass.hidden = !needsHeadingReset(map.getBearing(), map.getPitch(), this.homePitch()) }
-    const overview = this.showWholeFloor ? createControlButton('地図全体を表示', '□', this.showWholeFloor) : null
+    const overview = this.showWholeFloor ? createControlButton('地図全体を表示', this.visitor ? '全体' : '□', () => { this.onInteraction(); this.showWholeFloor?.() }) : null
     if (overview) overview.className = 'map-viewer-overview-control'
     container.append(
       zoomIn,
@@ -138,12 +155,14 @@ export class MapNavigationControl implements IControl {
     )
     map.on('rotate', this.updateCompass)
     map.on('pitch', this.updateCompass)
+    map.on('moveend', this.finishZoom)
     this.updateCompass()
     this.container = container
     return container
   }
 
   onRemove(map: MapLibreMap) {
+    map.off('moveend', this.finishZoom)
     if (this.updateCompass) {
       map.off('rotate', this.updateCompass)
       map.off('pitch', this.updateCompass)
@@ -199,9 +218,27 @@ export function useMapViewer(
   let collisionFrame: number | null = null
   let collisionCandidates: import('~/utils/marker-collision').CollisionCandidate[] = []
   let previousWinners = new Set<string>()
+  let detailCamera: (MapViewerCameraState & { bearing: number, pitch: number }) | null = null
+  const discardDetailContext = () => { detailCamera = null }
+  function captureDetailContext() {
+    const instance = map.value
+    if (!instance || detailCamera) return
+    instance.stop()
+    detailCamera = { ...getMapViewerCameraState(instance), bearing: instance.getBearing(), pitch: instance.getPitch() }
+  }
+  function restoreDetailContext() {
+    const instance = map.value
+    const saved = detailCamera
+    detailCamera = null
+    if (!instance || !saved) return
+    instance.stop()
+    instance.jumpTo({ ...saved, center: [saved.center.lng, saved.center.lat] })
+    syncMarkerDensity()
+  }
   const recovery = useMapCollisionRecovery({
     map: () => map.value, frame: () => container.value, candidates: () => collisionCandidates,
     spots: () => options.spots.value, position: spot => imageToRenderCoordinates(options.floor.value, spot),
+    visitor: () => Boolean(options.visitorOverview?.value),
     onStarted: () => options.onCollisionStarted?.(),
     select: spot => options.onSpotSelected?.(spot), refresh: () => syncMarkerDensity(),
   })
@@ -227,9 +264,23 @@ export function useMapViewer(
     mode: options.mode,
     map,
     maplibre,
-    createBaseControls: () => [new MapNavigationControl(mapCamera.getHomePitch, options.mode === 'view' ? mapCamera.showWholeFloor : undefined)],
-    createControlGroup: controls => new HorizontalMapControlGroup(controls),
-    onExplicitRequest: () => locationCameraPolicy.beginRequest(),
+    createBaseControls: () => [new MapNavigationControl(mapCamera.getHomePitch, options.mode === 'view' ? () => {
+      if (options.visitorOverview?.value) options.onCollisionStarted?.()
+      mapCamera.showWholeFloor()
+    } : undefined, discardDetailContext, Boolean(options.visitorOverview?.value))],
+    createControlGroup: controls => {
+      const group = new HorizontalMapControlGroup(controls)
+      return {
+        onAdd(instance: MapLibreMap) {
+          const element = group.onAdd(instance)
+          if (options.visitorOverview?.value) element.dataset.mapFitEdge = 'bottom'
+          return element
+        },
+        onRemove: (instance: MapLibreMap) => group.onRemove(instance),
+        getElement: () => group.getElement(),
+      }
+    },
+    onExplicitRequest: () => { discardDetailContext(); locationCameraPolicy.beginRequest() },
     onOutsideResult: result => locationCameraPolicy.consumeOutsideResult(result.firstForRequest),
     onReset: () => locationCameraPolicy.reset(),
   })
@@ -245,10 +296,11 @@ export function useMapViewer(
         import('maplibre-gl/dist/maplibre-gl.css'),
       ])
       maplibre.value = maplibregl
-      const instance = new maplibregl.Map(createMapViewerOptions(container.value, options.mode))
+      const instance = new maplibregl.Map(createMapViewerOptions(container.value, options.mode, Boolean(options.visitorOverview?.value)))
       map.value = instance
       container.value.addEventListener('keydown', recovery.onKey, true)
       instance.on('movestart', recovery.onMotion)
+      instance.on('movestart', event => { if (event.originalEvent) discardDetailContext() })
       instance.on('click', () => recovery.close())
       container.value.addEventListener('focusin', syncMarkerDensity)
       container.value.addEventListener('focusout', syncMarkerDensity)
@@ -331,6 +383,7 @@ export function useMapViewer(
       const ghost = candidateKind === 'move' && selected
       const element = createSpotMarkerElement(spot, {
         mode: options.mode,
+        visitor: options.visitorOverview?.value,
         selected: selected && !ghost,
         ghost,
         dimmed: selectedIsPositioned && !selected,
@@ -399,7 +452,14 @@ export function useMapViewer(
         applyPinVisibility(element, recovery.isOpen() ? !recovery.hasMember(spot.id) && visible.has(spot.id) : visible.has(spot.id))
         element.dataset.collisionGroupSize = String(groupSizes.get(spot.id) ?? 1)
         const hasCollision = (groupSizes.get(spot.id) ?? 1) > 1
-        element.setAttribute('aria-label', hasCollision ? `${spot.name}の周辺ピンを表示` : `${spot.name}の詳細を表示`)
+        const badge = element.querySelector<HTMLElement>('.map-viewer-marker__collision-badge')
+        if (badge) {
+          badge.hidden = !hasCollision
+          const count = String(groupSizes.get(spot.id) ?? 1)
+          if (badge.textContent !== count) badge.textContent = count
+        }
+        const collisionCount = options.visitorOverview?.value ? `（${groupSizes.get(spot.id)}件）` : ''
+        element.setAttribute('aria-label', hasCollision ? `${spot.name}の周辺ピンを表示${collisionCount}` : `${spot.name}の詳細を表示`)
         if (hasCollision) element.setAttribute('aria-expanded', String(recovery.hasMember(spot.id)))
         else element.removeAttribute('aria-expanded')
       })
@@ -476,6 +536,8 @@ export function useMapViewer(
       point,
       { width: frameRect.width, height: frameRect.height },
       { left: panel.left - frameRect.left, top: panel.top - frameRect.top },
+      44,
+      options.visitorOverview?.value ? measureVisitorFitPadding(frame).top + 88 : 44,
     )
     if (Math.abs(dx) < 1 && Math.abs(dy) < 1) return false
     // MapLibre panBy moves the camera center; the projected PIN moves in the
@@ -620,6 +682,9 @@ export function useMapViewer(
     syncDraftMarker,
     focusSpot,
     ensureSpotVisible,
+    captureDetailContext,
+    restoreDetailContext,
+    discardDetailContext,
     compareCamera,
   }
 }

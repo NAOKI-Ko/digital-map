@@ -146,6 +146,11 @@ describe('Marker DOM生成', () => {
     expect(candidate.children[2]?.className).toBe('map-viewer-marker__shape')
   })
 
+  it('省略した表示状態は有効な通常PINとしてクリック可能なままにする', () => {
+    const pin = createSpotMarkerElement(baseSpot, { mode: 'view', selected: false }, fakeDocument as unknown as Pick<Document, 'createElement'>) as unknown as FakeElement
+    for (const state of ['ghost', 'dimmed', 'strongly-dimmed']) expect(pin.classList.contains(`map-viewer-marker--${state}`)).toBe(false)
+  })
+
   it('元位置ghostと非選択PINに視覚状態を付与する', () => {
     const ghost = createSpotMarkerElement(baseSpot, { mode: 'edit', selected: true, ghost: true }, fakeDocument as unknown as Pick<Document, 'createElement'>) as unknown as FakeElement
     const dimmed = createSpotMarkerElement(baseSpot, { mode: 'edit', selected: false, stronglyDimmed: true }, fakeDocument as unknown as Pick<Document, 'createElement'>) as unknown as FakeElement

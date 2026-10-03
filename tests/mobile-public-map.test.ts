@@ -45,7 +45,7 @@ describe('公開Mapのモバイル契約', () => {
 
   it('PINからsummaryを挟まずdetail/expandedの本文Dialogを直接開く', () => {
     expect(detail).toContain("const sheetState = ref<BottomSheetState>('detail')")
-    expect(detail).toContain("sheetState.value === 'expanded' ? 0.92 : 0.6")
+    expect(detail).toContain("sheetState.value === 'expanded' ? 0.92 : 0.55")
     expect(detail).toContain('<DialogContent')
     expect(detail).toContain('spot-detail-sheet__body min-h-0 flex-1 overflow-y-auto')
     expect(detail).not.toContain('詳細を見る')
@@ -68,7 +68,7 @@ describe('公開Mapのモバイル契約', () => {
     expect(publicPage).not.toContain('mobile-cover')
     expect(category).toContain('overflow-x-auto')
     expect(category).toContain('text-sm')
-    expect(category).toContain('h-8')
+    expect(category).toContain('カテゴリの絞り込みを解除')
     expect(category).toContain('min-h-11')
     expect(category).not.toContain('overflowCategories')
     expect(mapViewer).toContain(':style="{ height }"')
