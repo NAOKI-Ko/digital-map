@@ -5,7 +5,7 @@ import { getDecorationRenderCoordinates } from '~~/lib/decoration'
 import type { MapViewerCameraState, MapViewerDecoration, MapViewerFloor, MapViewerSpot } from '~~/shared/types/map-viewer'
 import { createSpotMarkerElement } from '~/utils/marker-element'
 import { applyMarkerDensityPresentation, getMarkerDensityPresentation } from '~/utils/marker-density'
-import { applyPinVisibility, declutterPins, getCollisionRepresentatives, measurePinRect } from '~/utils/marker-collision'
+import { applyPinVisibility, declutterPins, getCollisionRepresentatives, measurePinRect, measurePinVisualRect, VISITOR_PIN_COLLISION_GAP } from '~/utils/marker-collision'
 import { monitorFloorImage } from '~/utils/floor-image-state'
 import { getMinimalSpotPan, needsHeadingReset } from '~/utils/public-map-exploration'
 import { measureVisitorFitPadding } from '~/utils/visitor-floor-fit'
@@ -485,14 +485,15 @@ export function useMapViewer(
       // All scale writes precede all geometry reads; visibility writes happen last.
       const frame = container.value!.getBoundingClientRect()
       collisionCandidates = presentations.map(({ element, spot, presentation }) => {
-        const rect = measurePinRect(element)
+        const rect = options.visitorOverview?.value ? measurePinVisualRect(element) : measurePinRect(element)
         return { id: spot.id, priority: presentation.priority, protected: element.contains(element.ownerDocument.activeElement), rect,
           centerDistance: Math.hypot((rect.left+rect.right)/2-frame.left-frame.width/2,(rect.top+rect.bottom)/2-frame.top-frame.height/2) }
       })
       const eligible = new Set(presentations.filter(item => item.presentation.visible).map(item => item.spot.id))
-      const visible = declutterPins(collisionCandidates.filter(pin => eligible.has(pin.id)), undefined, previousWinners, frame)
+      const gap = options.visitorOverview?.value ? VISITOR_PIN_COLLISION_GAP : undefined
+      const visible = declutterPins(collisionCandidates.filter(pin => eligible.has(pin.id)), gap, previousWinners, frame)
       previousWinners = visible
-      const groupSizes = getCollisionRepresentatives(collisionCandidates, visible)
+      const groupSizes = getCollisionRepresentatives(collisionCandidates, visible, gap)
       presentations.forEach(({ element, spot }) => {
         // Spread clones are the visible, keyboard reachable representation while open.
         applyPinVisibility(element, recovery.isOpen() ? !recovery.hasMember(spot.id) && visible.has(spot.id) : visible.has(spot.id))

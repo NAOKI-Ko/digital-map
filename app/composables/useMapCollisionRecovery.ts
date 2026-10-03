@@ -1,7 +1,7 @@
 import type { Map as MapLibreMap } from 'maplibre-gl'
 import type { MapViewerSpot } from '~~/shared/types/map-viewer'
 import { createSpotMarkerElement } from '~/utils/marker-element'
-import { applyPinVisibility, getCollisionGroup, type CollisionCandidate } from '~/utils/marker-collision'
+import { applyPinVisibility, getCollisionGroup, type CollisionCandidate, VISITOR_PIN_COLLISION_GAP } from '~/utils/marker-collision'
 import { PIN_SIZE_SCALES } from '~/utils/marker-density'
 import { spiderfyLayout } from '~/utils/map-spiderfy'
 
@@ -35,7 +35,7 @@ export function useMapCollisionRecovery(options: RecoveryOptions) {
     // Wait for projected marker layout/collision geometry at the completed camera.
     window.requestAnimationFrame(() => window.requestAnimationFrame(() => {
       if (token === generation && id && options.map() && options.candidates().some(pin => pin.id === id)) {
-        const group = getCollisionGroup(id, options.candidates())
+        const group = getCollisionGroup(id, options.candidates(), options.visitor?.() ? VISITOR_PIN_COLLISION_GAP : undefined)
         if (group.length > 1 && options.map()!.getZoom() >= options.map()!.getMaxZoom() - .01) open(group)
       }
     }))
@@ -110,7 +110,7 @@ export function useMapCollisionRecovery(options: RecoveryOptions) {
     const map = options.map()
     if (!map) return
     close()
-    const group = getCollisionGroup(spot.id, options.candidates())
+    const group = getCollisionGroup(spot.id, options.candidates(), options.visitor?.() ? VISITOR_PIN_COLLISION_GAP : undefined)
     if (group.length < 2) { options.select(spot); return }
     options.onStarted?.()
     const members = options.spots().filter(item => group.some(pin => pin.id === item.id))

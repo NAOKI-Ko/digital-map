@@ -332,7 +332,8 @@ defineExpose({
   filter: drop-shadow(0 3px 3px rgb(37 48 58 / 38%));
 }
 
-.public-map-viewer .map-viewer-marker--featured::after {
+.public-map-viewer:not(.visitor-map-viewer) .map-viewer-marker--featured::after,
+.visitor-map-viewer .map-viewer-marker__featured {
   content: '';
   position: absolute;
   bottom: 2.3rem;

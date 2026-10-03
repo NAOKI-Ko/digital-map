@@ -1,0 +1,84 @@
+{
+  "wu": "WU-70 collision geometry & interaction hitbox",
+  "authority": "https://app.asana.com/1/1217082051589915/project/1217511165231924/task/1219131190131150",
+  "baseline": "99c416847099e107f5a5687c0e14f145abc0e66b",
+  "scope": "Public and Authenticated LIVE visitor renderer only",
+  "cause": "measurePinRect unions 60x60 button with transformed artwork; transparent target padding and rotated square corners caused early grouping",
+  "geometry": {
+    "presetAndCustom": "Axis-aligned bounds of existing -45 degree rounded teardrop. Trim transparent left/right/top corners using measured scale. Medium body width40px, height48.284px including tip. Small/medium/large and focus/selected CSS scales included.",
+    "illustration": "Measured image content bounds, natural aspect ratio and object-fit contain letterboxing accounted for. Selected outline uses wrapper bounds because that is where it is painted.",
+    "featured": "Existing dot changed from pseudo-element to measurable span only for visitor; same appearance and position.",
+    "selection": "Measured selected scale plus transformed 2px outline and2px offset.",
+    "excluded": "Transparent button padding, diffuse shadows, transient name label, and collision count badge. Badge must not feed back into geometry.",
+    "marginPx": 0,
+    "interaction": "60x60 native button preserved. Pointerdown resolves painted artwork and badges across overlapping targets in CSS z-index/reverse DOM order. Keyboard activation retains native button.",
+    "limitations": "Axis-aligned envelope rather than per-pixel alpha contour. Transparent padding authored within an image remains part of its image content bounds."
+  },
+  "comparison": {
+    "viewport": [
+      390,
+      844
+    ],
+    "fixture": "__qa_wu68;36 mixed-size PINs",
+    "camera": "Fresh390px load, then canvas + once. Per-PIN screen positions match exactly (max delta0).",
+    "currentHitboxGap6": {
+      "initialVisible": 4,
+      "denseVisible": 9,
+      "screenshot": "before-dense-390.jpg"
+    },
+    "visualGap0": {
+      "initialVisible": 6,
+      "denseVisible": 18,
+      "screenshot": "visual0-dense-390.jpg"
+    },
+    "visualGap2": {
+      "initialVisible": 6,
+      "denseVisible": 18,
+      "screenshot": "visual2-dense-390.jpg"
+    },
+    "decision": "0px preserves individual artwork until envelope overlap.2px provides no visible-count benefit in dense comparison. No separate enter/exit thresholds needed in observed short pans."
+  },
+  "regression": {
+    "priority": "selected/focused > activeCategory > featured > normal; existing center/stable winner and offscreen exclusion preserved",
+    "pan": "repeated +/-20px dense pan retains identical18 visible IDs and6 count badges; long edge pan hands representation to onscreen PINs",
+    "zoom": "staged representative tap separates; zoomout merges; near/coincident recover via spiderfy; Map-only",
+    "badge": "short pans retain count3; small zoomout/in changes2->3->2 only across overlap. Example merged body gap -4.932px; separated gap +5.324px.",
+    "pointer": "Reproduced neighbor target intercepting A artwork edge and A badge. After fixes correct A detail/recovery opens. Regression covers foreground artwork obscuring lower badge too.",
+    "selection": "normal/featured/small/medium/large/custom/wide+tall illustration selected and keyboard Enter/Escape verified",
+    "spiderfy": "near maxZoom, exact-coincident, individual normal/large selection, Escape and overview pass; existing presentation-only recovery unchanged",
+    "camera": "Public category->staged zoom->detail->Escape preserves all projected PIN positions exactly",
+    "parity": "Authenticated local disposable QA account. Public/LIVE initial and category/stagedZoom/detail-return geometry, visible flags and badge counts identical. Existing fixture DB reused, no canonical writes.",
+    "floor": "2F empty then return restores original floor; no orphan PINs"
+  },
+  "checks": {
+    "tests": {
+      "passed": 716,
+      "skipped": 18,
+      "failed": 0
+    },
+    "typecheck": "PASS",
+    "build": "PASS",
+    "diffCheck": "PASS",
+    "codexReview": "3rd local Codex review: no actionable regressions;58 targeted tests and typecheck passed. Two earlier P2 badge routing findings fixed and regression-tested.",
+    "verify": "pending push"
+  },
+  "finalBrowserSession": {
+    "started": "2026-10-03T16:30:38.234Z",
+    "elapsedSeconds": 305,
+    "verdict": "NO-near: no clear early-merge friction in final desktop-browser 390x844 session; physical touch/pinch remains Human QA"
+  },
+  "guardrails": {
+    "adminUXChanged": false,
+    "paperChanged": false,
+    "domainSchemaChanged": false,
+    "searchRoutingChanged": false,
+    "dependenciesChanged": false,
+    "productionTouched": false,
+    "devOrMainMerge": false
+  },
+  "unverified": [
+    "Physical one-hand touch/pinch and real mobile browser safe-area remain Human QA.",
+    "18 local optional/DB integration cases skipped; await GitHub Verify DB-backed run.",
+    "Human acceptance is pending; do not merge."
+  ]
+}
