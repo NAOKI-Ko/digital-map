@@ -1,0 +1,46 @@
+{
+  "advisories": {
+    "9999999": {
+      "findings": [
+        {
+          "version": "3.0.3",
+          "paths": [
+            ".>@nuxtjs/tailwindcss>tailwind-config-viewer>tailwindcss>chokidar>braces",
+            ".>@nuxtjs/tailwindcss>tailwind-config-viewer>tailwindcss>fast-glob>micromatch>braces",
+            ".>@nuxtjs/tailwindcss>tailwind-config-viewer>tailwindcss>micromatch>braces",
+            ".>@nuxtjs/tailwindcss>tailwindcss>chokidar>braces",
+            ".>@nuxtjs/tailwindcss>tailwindcss>fast-glob>micromatch>braces",
+            ".>@nuxtjs/tailwindcss>tailwindcss>micromatch>braces",
+            ".>nuxt>@nuxt/nitro-server>nitropack>globby>fast-glob>micromatch>braces",
+            ".>nuxt>@nuxt/nitro-server>nitropack>globby>micromatch>braces"
+          ],
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "id": 9999999,
+      "title": "SYNTHETIC SENTINEL: audit gate contract verification",
+      "module_name": "braces",
+      "vulnerable_versions": "<=3.0.3",
+      "patched_versions": ">=3.0.4",
+      "severity": "high",
+      "cwe": "CWE-674",
+      "github_advisory_id": "GHSA-2222-3333-4444",
+      "url": "https://github.com/advisories/GHSA-2222-3333-4444"
+    }
+  },
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 3,
+      "critical": 0
+    },
+    "dependencies": 810,
+    "devDependencies": 0,
+    "optionalDependencies": 235,
+    "totalDependencies": 1045
+  }
+}

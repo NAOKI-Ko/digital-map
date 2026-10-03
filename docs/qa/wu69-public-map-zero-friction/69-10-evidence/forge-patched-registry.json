@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "ERR_PNPM_PACKAGE_NOT_FOUND",
+    "message": "No matching version found for node-forge@1.4.1"
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "baselineHead": "ffb0460a658fd2baab8afbceada8cf68489e3aad",
+  "onlyAuditStepChanged": true,
+  "packageLockWorkspaceUnchanged": true,
+  "gateCases": [
+    {
+      "case": "live-both",
+      "pnpm": "11.9.0",
+      "ignores": [
+        "GHSA-86w9-cpqp-85rv",
+        "GHSA-vfj7-8cjw-p6xm"
+      ],
+      "registrationExit": 0,
+      "auditExit": 0,
+      "packageUnchanged": true,
+      "lockUnchanged": true
+    },
+    {
+      "case": "live-forge-only",
+      "pnpm": "11.9.0",
+      "ignores": [
+        "GHSA-86w9-cpqp-85rv"
+      ],
+      "registrationExit": 0,
+      "auditExit": 1,
+      "packageUnchanged": true,
+      "lockUnchanged": true
+    },
+    {
+      "case": "live-braces-only",
+      "pnpm": "11.9.0",
+      "ignores": [
+        "GHSA-vfj7-8cjw-p6xm"
+      ],
+      "registrationExit": 0,
+      "auditExit": 1,
+      "packageUnchanged": true,
+      "lockUnchanged": true
+    },
+    {
+      "case": "expected-only",
+      "pnpm": "11.9.0",
+      "ignores": [
+        "GHSA-86w9-cpqp-85rv",
+        "GHSA-vfj7-8cjw-p6xm"
+      ],
+      "registrationExit": 0,
+      "auditExit": 0,
+      "packageUnchanged": true,
+      "lockUnchanged": true
+    },
+    {
+      "case": "new-high",
+      "pnpm": "11.9.0",
+      "ignores": [
+        "GHSA-86w9-cpqp-85rv",
+        "GHSA-vfj7-8cjw-p6xm"
+      ],
+      "registrationExit": 0,
+      "auditExit": 1,
+      "packageUnchanged": true,
+      "lockUnchanged": true
+    },
+    {
+      "case": "new-critical",
+      "pnpm": "11.9.0",
+      "ignores": [
+        "GHSA-86w9-cpqp-85rv",
+        "GHSA-vfj7-8cjw-p6xm"
+      ],
+      "registrationExit": 0,
+      "auditExit": 1,
+      "packageUnchanged": true,
+      "lockUnchanged": true
+    }
+  ]
+}
