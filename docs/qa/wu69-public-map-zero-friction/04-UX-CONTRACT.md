@@ -41,3 +41,5 @@ Search、Routing、Current-location新規機能、Admin、Paper、domain、schem
 ## 反復QAからの追加契約
 
 optional PIN flagsが省略されたときはfalseとし、spiderfyの個別PINを必ずpointer/keyboardで選択可能にする。MapへのTab入口は1つとし、hidden PINからClose/Escapeで戻す先も操作可能なcanvasにする。selected PINと名前は表示中chromeより下に保ち、必要最小のPanのみ行う。resize observerの再計測を同一frame内でlayout更新のloopにしない。
+
+Floor切替に伴い、操作可能canvasのアクセシブル名も現在Floorへ更新する。視覚表示だけを更新して支援技術に旧Floorを残さない。

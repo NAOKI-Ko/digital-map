@@ -53,4 +53,8 @@ F15の定量再現、S8、S10、実touch pinchは追加検証が必要。未検�
 | F16 | FIXED | visitorの既存現在地/attribution名を日本語へ。新規機能なし。 |
 | F17〜F21 | FIXED | 上記個別証跡とregression tests。 |
 
-候補では20件のconfirmed Findingを回収し、F09を除外した。これはWindowsへの反映完了を意味しない。未変更baselineには初見で記録した摩擦が残る。実機touch pinch、safe area実値、片手5分、Authenticated LIVEの実ブラウザー比較は未検証として残す。
+候補では21件のconfirmed Findingを回収し、F09を除外した。これはWindowsへの反映完了を意味しない。未変更baselineには初見で記録した摩擦が残る。実機touch pinch、safe area実値、片手5分、Authenticated LIVEの実ブラウザー比較は未検証として残す。
+
+## F22 — Floor切替後のcanvas読み上げ名
+
+P2。keyboardでRecovery2Fへ切替後、外側regionとFloor buttonは2Fだが、Map canvas名は有松・桶狭間のまま。画面は正しいのに支援技術へ旧Floorを伝える。visitor canvas labelをprops.label変更へ追従させた。1F→2FをTab/Enterで実操作し、canvas名がRecovery2Fへ更新、Category保持、Floor focus復帰を確認。FIXED in candidate。

@@ -220,10 +220,11 @@
     "stageDelta": 1.0000000000000018
   },
   {
-    "check": "visitor-scoped-return-focus-final",
-    "code_sha": "4a0d80cd9eeeba13bbb1447bf78b78ffa6a54747",
-    "flow": "near spiderfy -> Enter Spot02 -> Detail -> Escape",
-    "focused_tag": "CANVAS",
-    "inside_visitor": true
+    "check": "floor-keyboard",
+    "flow": "Space Category -> Enter Floor -> Tab Tab Enter2F -> Enter group -> Tab Spot01 -> Enter Detail -> Escape",
+    "categoryPreserved": true,
+    "floorLabelUpdated": true,
+    "focusAfterDetail": "visible Spot01 PIN",
+    "code_sha": "6a4f9369e230057765f97a4963dfbfae0c221429"
   }
 ]

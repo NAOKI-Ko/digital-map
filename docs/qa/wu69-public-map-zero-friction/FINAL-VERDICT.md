@@ -4,7 +4,7 @@
 
 ## 実施したこと
 
-- 親WU本文・AC・Out of Scopeと69-01〜69-08を取得し、コード/内部仕様/Benchmarkの前に390×844で一般ユーザーとしてAS IS操作。16 Findingを固定。後続5 Findingを追加、F09は再現なしとして訂正。confirmed20件をcandidateで回収。
+- 親WU本文・AC・Out of Scopeと69-01〜69-08を取得し、コード/内部仕様/Benchmarkの前に390×844で一般ユーザーとしてAS IS操作。16 Findingを固定。後続6 Findingを追加、F09は再現なしとして訂正。confirmed21件をcandidateで回収。
 - Google Maps/Platinumapsの実画面比較、14軸の採用/不採用理由、UX Contract、モバイル反復、5幅/短高、keyboard/reduced motionの検証を保存。
 - WU68 priority・Map-only recovery・spiderfy・initial0/20・overview0/0・Public/LIVE共通rendererを維持。
 
@@ -45,7 +45,7 @@ Candidateはローカル修正を評価。Finalは、まだ旧SHAであるWindow
 | 14 | touch targetは原則44px以上 | PASS | PARTIAL | candidateの主要button44px、PIN60px。Windows final未了。 |
 | 15 | safe-area / browser chrome / short viewportで重要UIが欠けない | PARTIAL | PARTIAL | 390×400は画面内。safe-area実値/mobile browser chromeは未実測。 |
 | 16 | 390 / 768 / 1024 / 1440 / 1440x700で主要操作PASS | PASS | PARTIAL | 要求5幅で探索→Detail→Escape/camera復帰。Windows final未了。 |
-| 17 | keyboard/focus/Escapeの主要フローPASS | PASS | PARTIAL | Map、Category、PIN、Detail、Infoのkeyboard/focus/Escapeを実測。Floor完全keyboard/Windows未了。 |
+| 17 | keyboard/focus/Escapeの主要フローPASS | PASS | PARTIAL | Map、Category、PIN、Detail、Info、Floorのkeyboard/focus/Escapeを実測。Windows未了。 |
 | 18 | prefers-reduced-motionで操作可能 | PASS | PARTIAL | reduce=true、spiderfy/Enter/Detail0ms/Escapeを実測。Windows未了。 |
 | 19 | Public Release / Authenticated LIVE Preview parity維持 | PARTIAL | PARTIAL | 同一rendererに適用。Authenticated LIVE実操作との比較は未了。 |
 | 20 | Google Maps / PlatinumapsとのBenchmarkで、基本操作に明白な劣化UXがある場合は理由なく残さない | PASS | PARTIAL | 14軸比較と採用/不採用理由を記録。提供環境のrecheck未了。 |
@@ -61,8 +61,8 @@ Candidateはローカル修正を評価。Finalは、まだ旧SHAであるWindow
 | 69-02 Google benchmark | PASS、Chrome web版/表示制限の範囲を明記。 |
 | 69-03 Platinumaps benchmark | PASS、公式demo/physical touch未測定を明記。 |
 | 69-04 UX Contract | PASS |
-| 69-05 Mobile polish | PARTIAL。候補Finding回収、physical touch/提供環境未了。 |
-| 69-06 Responsive/a11y | PARTIAL。5幅と主要keyboard/reduce PASS、実safe-area/Floor keyboard/Windows未了。 |
+| 69-05 Mobile polish | PARTIAL。候補21 Finding回収、physical touch/提供環境未了。 |
+| 69-06 Responsive/a11y | PARTIAL。5幅と主要keyboard/reduce PASS、実safe-area/Windows未了。 |
 | 69-07 PR/Verify/Windows | FAIL。mandatory security gate不合格。merge/post-merge/Windows exact SHA未了。 |
 | 69-08 Black-box Final Acceptance | PARTIAL。Windowsのcandidate black-box S1〜S12と片手5分は未実施。 |
 
@@ -81,3 +81,7 @@ Candidateはローカル修正を評価。Finalは、まだ旧SHAであるWindow
 [Draft PR #28](https://github.com/NAOKI-Ko/digital-map/pull/28)、[Verify 37090800163](https://github.com/NAOKI-Ko/digital-map/actions/runs/37090800163)、exact HEAD `1df511c8e20195135f7bd419c43cd393bd97fde3` はaudit High2でFAIL。CIが提示したnode-forge1.4.1/braces3.0.4は公式registryに存在せず直接URLも404、公式tagも未公開。詳しい矛盾と根拠は `SECURITY-GATE.md`。dev保護の必須verify/enforce_adminsを確認し、merge以降は未実施。
 
 Windows SSHを再読取りしてdeployed SHAは `ad4f4bde269b16c5575b836add444b5e6fa88399` のまま。Production untouched。追加のCI証跡commitはcodeを変更しない。最新PR HEADに対する再実行結果はローカルoutput `delivery-status.json` に保存する。
+
+追加F22（Floor canvasの旧名）を回収し、Floor keyboard→PIN→Detail→Escapeも完遂。最終UI code SHA `6a4f9369e230057765f97a4963dfbfae0c221429`。
+
+最終UI code `6a4f9369e230057765f97a4963dfbfae0c221429` に対するlocal typecheck/build/full integration 702 PASS・1 SKIPを再確認。最後のlabel変更は依存・schema・Productionを変更しない。最新PR Verifyはこのcodeを含む証跡HEADで再確認する。

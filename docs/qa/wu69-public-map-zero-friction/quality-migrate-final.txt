@@ -1,7 +1,7 @@
 Loaded Prisma config from prisma.config.ts.
 
 Prisma schema loaded from prisma/schema.prisma.
-Datasource "db": PostgreSQL database "digital_map_test_wu65_wu69_final_20261003", schema "public" at "127.0.0.1:5432"
+Datasource "db": PostgreSQL database "digital_map_test_wu65_wu69_a11y_20261003", schema "public" at "127.0.0.1:5432"
 
 32 migrations found in prisma/migrations
 
