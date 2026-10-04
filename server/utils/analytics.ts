@@ -39,7 +39,7 @@ export class AnalyticsBuffer {
     const spotIds = [...new Set(batch.flatMap(item => item.event.type === 'SPOT_VIEW' ? [item.event.spotId] : []))]
     const [maps, spots] = await Promise.all([
       this.client.map.findMany({ where: { id: { in: mapIds }, currentReleaseId: { not: null }, isPublished: true }, select: { id: true, tenantId: true } }),
-      spotIds.length ? this.client.spot.findMany({ where: { id: { in: spotIds } }, select: { id: true, floor: { select: { mapId: true, map: { select: { tenantId: true } } } } } }) : [],
+      spotIds.length ? this.client.spot.findMany({ where: { id: { in: spotIds } }, select: { id: true, mapUsage: { select: { mapId: true } } } }) : [],
     ])
     const mapById = new Map(maps.map(map => [map.id, map]))
     const spotById = new Map(spots.map(spot => [spot.id, spot]))
@@ -54,7 +54,7 @@ export class AnalyticsBuffer {
       }))
       else {
         const spot = spotById.get(item.event.spotId)
-        if (!spot || spot.floor.mapId !== map.id) continue
+        if (!spot || spot.mapUsage?.mapId !== map.id) continue
         operations.push(this.client.spotDailyAnalytics.upsert({
           where: { spotId_date: { spotId: spot.id, date: item.date } },
           create: { tenantId: map.tenantId, mapId: map.id, spotId: spot.id, date: item.date, viewCount: item.count },

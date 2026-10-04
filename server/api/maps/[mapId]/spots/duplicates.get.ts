@@ -5,6 +5,6 @@ export default defineEventHandler(async (event): Promise<SpotDuplicateResponse> 
   const name = typeof query.name === 'string' ? query.name.trim() : ''
   const excludeId = typeof query.excludeId === 'string' ? query.excludeId : undefined
   if (!name) return { matches: [] }
-  const spots = await prisma.spot.findMany({ where: { name: { equals: name, mode: 'insensitive' }, floor: { mapId: map.id }, ...(excludeId ? { id: { not: excludeId } } : {}) }, select: { id: true, name: true, x: true, y: true, floor: { select: { name: true } }, spotCategories: { select: { category: { select: { name: true } } } } }, take: 10 })
-  return { matches: spots.map(spot => ({ id: spot.id, name: spot.name, floorName: spot.floor.name, categoryNames: spot.spotCategories.map(item => item.category.name), positioned: spot.x !== null && spot.y !== null })) }
+  const spots = await prisma.spot.findMany({ where: { name: { equals: name, mode: 'insensitive' }, mapUsage: { mapId: map.id }, ...(excludeId ? { id: { not: excludeId } } : {}) }, select: { id: true, name: true, x: true, y: true, floor: { select: { name: true } }, spotCategories: { select: { category: { select: { name: true } } } } }, take: 10 })
+  return { matches: spots.map(spot => ({ id: spot.id, name: spot.name, floorName: spot.floor?.name ?? 'フロア未設定', categoryNames: spot.spotCategories.map(item => item.category.name), positioned: spot.x !== null && spot.y !== null })) }
 })

@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
     const category = await tx.category.findFirst({ where: { id: categoryId, mapId: map.id, tenantId: map.tenantId } })
     if (!category) throw createError({ statusCode: 404, statusMessage: 'カテゴリーが見つかりません。' })
     const spots = await tx.spot.findMany({
-      where: { pinSourceCategoryId: category.id, pinSourceMode: 'category', tenantId: map.tenantId, floor: { mapId: map.id } },
+      where: { pinSourceCategoryId: category.id, pinSourceMode: 'category', tenantId: map.tenantId, mapUsage: { mapId: map.id } },
       select: { id: true, name: true, liveVersion: true, floor: { select: { id: true, name: true } } },
       orderBy: { name: 'asc' },
     })

@@ -1,4 +1,5 @@
 export default defineEventHandler(async (event) => {
+  await requireCategoryCanonicalWrite(event)
   const { map, session } = await requireOwnedMap(event)
   const category = await requireOwnedCategory(map.id, map.tenantId, getRouterParam(event, 'categoryId'))
   if (category._count.spotCategories > 0) {

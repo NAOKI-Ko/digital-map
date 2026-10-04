@@ -21,6 +21,7 @@ describe('Category icon API ownership', () => {
   beforeAll(async () => {
     vi.stubGlobal('defineEventHandler', (value: Handler) => value)
     vi.stubGlobal('requireOwnedMap', mocks.requireOwnedMap)
+    vi.stubGlobal('requireCategoryCanonicalWrite', vi.fn())
     vi.stubGlobal('requireOwnedCategory', mocks.requireOwnedCategory)
     vi.stubGlobal('readBody', mocks.readBody)
     vi.stubGlobal('getRouterParam', () => 'category-a')

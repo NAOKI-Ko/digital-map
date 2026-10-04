@@ -48,9 +48,9 @@ export default defineEventHandler(async (event): Promise<MapHomeSummaryResponse>
         _count: { select: { floors: true } },
       },
     }),
-    prisma.spot.count({ where: { floor: { mapId: accessibleMap.id } } }),
-    prisma.spot.count({ where: { floor: { mapId: accessibleMap.id }, OR: [{ x: null }, { y: null }] } }),
-    prisma.spotRevision.count({ where: { status: 'PENDING', spot: { floor: { mapId: accessibleMap.id } } } }),
+    prisma.spot.count({ where: { mapUsage: { mapId: accessibleMap.id } } }),
+    prisma.spot.count({ where: { mapUsage: { mapId: accessibleMap.id, placements: { none: { x: { not: null }, y: { not: null } } } } } }),
+    prisma.spotRevision.count({ where: { status: 'PENDING', spot: { mapUsage: { mapId: accessibleMap.id } } } }),
     prisma.mapDailyAnalytics.aggregate({
       where: { tenantId: accessibleMap.tenantId, mapId: accessibleMap.id, date: { gte: analyticsStart, lte: todayUtc } },
       _sum: { viewCount: true },

@@ -81,14 +81,14 @@ else {
     }
     await client.query('ROLLBACK')
 
-    const hardAnomalies = Object.values(anomalies)
+    const hardAnomalies = Object.entries(anomalies).filter(([name]) => name !== 'multiMapTenants').map(([, rows]) => rows)
       .reduce((sum, rows) => sum + rows.length, 0)
 
     console.log(JSON.stringify({
       counts,
       anomalies,
       policy: {
-        hardOneTenantOneMapClaimed: true,
+        hardOneTenantOneMapClaimed: false,
         multiMapTenantCount: anomalies.multiMapTenants.length,
       },
     }, null, 2))
@@ -98,7 +98,7 @@ else {
       process.exitCode = 1
     }
     else {
-      console.log('Tenant data foundation audit passed; hard one-Map-per-Tenant policy has zero blockers.')
+      console.log('Tenant data foundation audit passed; Workspace ownership integrity has zero blockers.')
     }
   }
   catch (error) {

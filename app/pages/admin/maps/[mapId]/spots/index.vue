@@ -188,9 +188,9 @@ function formatDate(value: string) {
                   <span v-for="category in spot.categories" :key="category.id" class="rounded-full bg-stone-100 px-2.5 py-1 text-xs text-stone-700">{{ category.name }}</span>
                   <span class="rounded-full px-2.5 py-1 text-xs font-semibold" :class="spot.isPublished ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'">{{ spot.isPublished ? '公開対象' : '公開対象外' }}</span>
                 </div>
-                <p v-if="spot.x !== null && spot.y !== null" class="mt-2 text-sm text-stone-600">{{ spot.floorName }} · 配置済み</p>
+                <p v-if="spot.hasPositionedPlacement ?? (spot.x !== null && spot.y !== null)" class="mt-2 text-sm text-stone-600">{{ spot.positionedFloorName ?? spot.floorName }} · 配置済み</p>
                 <p v-else class="mt-2 text-sm font-medium text-amber-700">{{ spot.floorName }} · 位置未設定</p>
-                <NuxtLink v-if="spot.x !== null && spot.y !== null" :to="{ path: `/admin/maps/${mapId}/editor`, query: { floorId: spot.floorId, placeSpotId: spot.id } }" class="mt-2 inline-flex text-xs font-semibold text-terracotta-700">地図上で識別</NuxtLink>
+                <NuxtLink v-if="spot.hasPositionedPlacement ?? (spot.x !== null && spot.y !== null)" :to="{ path: `/admin/maps/${mapId}/editor`, query: { floorId: spot.positionedFloorId ?? spot.floorId, placeSpotId: spot.positionedPlacementId ?? spot.id } }" class="mt-2 inline-flex text-xs font-semibold text-terracotta-700">地図上で識別</NuxtLink>
                 <button type="button" class="mt-2 min-h-11 text-xs text-stone-600 underline" @click="photoSpotId = spot.id">{{ spot.photoCount ? `写真 ${spot.photoCount}枚を編集` : '写真を追加（任意）' }}</button>
                 <PinAppearancePreview class="mt-2" compact :appearance="spot" :label="pinSourceLabel(spot.pinSourceMode, spot.pinSourceCategoryName, spot.pinSourceCategoryHasDefault)" />
                 <p class="mt-1 text-xs text-stone-500">最終更新 {{ formatDate(spot.updatedAt) }}</p>

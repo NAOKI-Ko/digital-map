@@ -1,3 +1,4 @@
+import { paperOccurrenceId } from '~~/shared/utils/paper-map-render'
 import sharp from 'sharp'
 import { getPinIconPreset } from '~~/shared/constants/spot'
 import type { SpotCategorySummary } from '~~/shared/types/category'
@@ -285,7 +286,7 @@ export function createEditorialRenderer(
       }
       for (const spot of page.floor.spots) {
         if (
-          !d.numbers.has(spot.id) ||
+          !d.numbers.has(paperOccurrenceId(spot)) ||
           spot.x < v.x ||
           spot.x > v.x + v.width ||
           spot.y < v.y ||
@@ -293,7 +294,7 @@ export function createEditorialRenderer(
         )
           continue
         const pt = viewportPoint(spot, v, r)
-        parts.push(marker(pt.x, pt.y, d.numbers.get(spot.id)!, 7.7))
+        parts.push(marker(pt.x, pt.y, d.numbers.get(paperOccurrenceId(spot))!, 7.7))
       }
       parts.push('</g>')
       for (const f of page.features) {

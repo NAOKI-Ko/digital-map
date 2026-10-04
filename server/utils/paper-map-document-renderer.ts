@@ -1,3 +1,4 @@
+import { paperOccurrenceId } from '~~/shared/utils/paper-map-render'
 import sharp from 'sharp'
 import QRCode from 'qrcode'
 import { PDFDocument } from 'pdf-lib'
@@ -69,11 +70,11 @@ export function createPaperPageRenderer(source: PaperMapSource, config: PaperMap
       }
       parts.push('</g><g clip-path="url(#map-clip)">')
       for (const spot of page.floor.spots) {
-        if (!document.numbers.has(spot.id) || !Number.isFinite(spot.x) || !Number.isFinite(spot.y)) continue
+        if (!document.numbers.has(paperOccurrenceId(spot)) || !Number.isFinite(spot.x) || !Number.isFinite(spot.y)) continue
         if (spot.x < viewport.x || spot.x > viewport.x + viewport.width || spot.y < viewport.y || spot.y > viewport.y + viewport.height) continue
         const point = viewportPoint(spot, viewport, rect)
         const color = /^#[0-9a-f]{6}$/i.test(spot.pinColor) ? spot.pinColor : p.accent
-        parts.push(`<circle cx="${point.x}" cy="${point.y}" r="8" fill="${color}" stroke="white" stroke-width="1.8"/><text x="${point.x}" y="${point.y + 3.1}" text-anchor="middle" font-size="8.5" font-weight="700" fill="white">${document.numbers.get(spot.id)}</text>`)
+        parts.push(`<circle cx="${point.x}" cy="${point.y}" r="8" fill="${color}" stroke="white" stroke-width="1.8"/><text x="${point.x}" y="${point.y + 3.1}" text-anchor="middle" font-size="8.5" font-weight="700" fill="white">${document.numbers.get(paperOccurrenceId(spot))}</text>`)
       }
       parts.push(`</g><rect x="${rect.x}" y="${rect.y}" width="${rect.width}" height="${rect.height}" fill="none" stroke="${p.rule}" stroke-width=".6"/>`)
     }

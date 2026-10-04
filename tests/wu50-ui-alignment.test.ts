@@ -9,11 +9,10 @@ const newSpot = readFileSync('app/pages/admin/maps/[mapId]/spots/new.vue', 'utf8
 const editSpot = readFileSync('app/pages/admin/maps/[mapId]/spots/[spotId]/index.vue', 'utf8')
 
 describe('WU-50 UI alignment contracts', () => {
-  it('one accessible map bypasses map-list selection and second-map CTA', () => {
-    expect(dashboard).toContain('maps.value.length === 1')
-    expect(dashboard).toContain('await navigateTo(`/admin/maps/${maps.value[0]!.id}`')
-    expect(dashboard).not.toContain('新しいマップ')
-    expect(dashboard).not.toContain('v-for="map in maps"')
+  it('offers explicit Map selection and Owner creation without a first-Map redirect', () => {
+    expect(dashboard).toContain('v-for="map in maps"')
+    expect(dashboard).toContain('v-if="canCreateMap"')
+    expect(dashboard).not.toContain('maps.value[0]')
   })
 
   it('workspace navigation replaces sidebar selectors and real map stays disabled', () => {

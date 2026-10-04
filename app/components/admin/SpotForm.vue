@@ -2,13 +2,14 @@
 import CategoryIcon from '~/components/CategoryIcon.vue'
 import UnsavedChangesGuard from '~/components/admin/UnsavedChangesGuard.vue'
 import { useForm } from 'vee-validate'
-import { spotFormSchema, type SpotFormInput } from '~~/shared/schemas/spot'
+import { spotFormSchema, spotContentFormSchema, type SpotFormInput } from '~~/shared/schemas/spot'
 import type { SpotCategorySummary } from '~~/shared/types/category'
 import type { SpotListFilterFloor } from '~~/shared/types/spot'
 import type { SpotFieldDefinitionItem } from '~~/shared/types/spot-field'
 
 const props = withDefaults(defineProps<{
   floors: SpotListFilterFloor[]
+  allowWithoutPlacement?: boolean
   categories: SpotCategorySummary[]
   fields?: SpotFieldDefinitionItem[]
   initialValue?: SpotFormInput
@@ -88,14 +89,14 @@ defineExpose({ acceptSaved })
 
 const submit = handleSubmit((values) => {
   const enabledCustomIds = new Set(enabledFields.value.filter(field => field.kind === 'custom').map(field => field.id))
-  const normalizeCoordinate = (value: unknown) => value === '' || value === undefined ? null : Number(value)
+  const normalizeCoordinate = (value: unknown) => value === '' || value === undefined || value === null ? null : Number(value)
   const submittedValues = {
     ...values,
     lat: normalizeCoordinate(values.lat),
     lng: normalizeCoordinate(values.lng),
     customValues: Object.fromEntries(Object.entries(values.customValues).filter(([fieldId]) => enabledCustomIds.has(fieldId))),
   }
-  const result = spotFormSchema.safeParse(submittedValues)
+  const result = (props.allowWithoutPlacement ? spotContentFormSchema : spotFormSchema).safeParse(submittedValues)
   if (!result.success) {
     const fieldErrors = result.error.flatten().fieldErrors
     setErrors(Object.fromEntries(
@@ -126,8 +127,8 @@ function cancel() {
         </div>
 
         <div>
-          <label for="spot-floor" class="text-sm font-semibold text-stone-800">フロア <span class="text-red-600">必須</span></label>
-          <UiSelect id="spot-floor" v-model="floorId" class="mt-2" label="フロア" :options="floors.map(floor => ({ value: floor.id, label: floor.name }))" />
+          <label for="spot-floor" class="text-sm font-semibold text-stone-800">フロア <span v-if="!allowWithoutPlacement" class="text-red-600">必須</span></label>
+          <UiSelect id="spot-floor" v-model="floorId" class="mt-2" label="フロア" :options="[...(allowWithoutPlacement ? [{ value: '', label: '配置なし（本文のみ編集）' }] : []), ...floors.map(floor => ({ value: floor.id, label: floor.name }))]" />
           <p v-if="errors.floorId" class="mt-1 text-sm text-red-600">{{ errors.floorId }}</p>
         </div>
         <div>

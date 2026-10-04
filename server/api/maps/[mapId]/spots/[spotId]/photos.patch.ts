@@ -1,3 +1,4 @@
+import { updateSpotWithUsage } from '~~/server/utils/spot-usage'
 import { pinConflict } from '~~/server/utils/pin-appearance'
 import { spotPhotosSchema } from '~~/shared/schemas/photo'
 import type { SpotPhotosResponse } from '~~/shared/types/spot'
@@ -26,7 +27,7 @@ export default defineEventHandler(async (event): Promise<SpotPhotosResponse> => 
 
   try {
     await prisma.$transaction(async (transaction) => {
-      await transaction.spot.update({ where: { id: spot.id, liveVersion: body.expectedVersion }, data: { photosJson: result.data.photos, liveVersion: { increment: 1 } } })
+      await updateSpotWithUsage(transaction, { where: { id: spot.id, liveVersion: body.expectedVersion }, data: { photosJson: result.data.photos, liveVersion: { increment: 1 } } })
       await transaction.spotPhoto.deleteMany({ where: { spotId: spot.id } })
       const managed = requestedIds.flatMap((assetId, order) => assetId ? [{ spotId: spot.id, assetId, order }] : [])
       if (managed.length) await transaction.spotPhoto.createMany({ data: managed })

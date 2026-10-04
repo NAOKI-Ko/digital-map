@@ -2,14 +2,13 @@ import { randomUUID } from 'node:crypto'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { prisma } from '../server/utils/prisma'
 import {
-  assertTenantCanCreateMap,
+  lockTenantMapCreation,
   floorBelongsToTenant,
   getTenantCategories,
   getTenantSpotById,
   getTenantSpots,
   mapBelongsToTenant,
   spotAndCategoryShareTenant,
-  TenantAlreadyHasMapError,
 } from '../server/utils/tenant-tourism-data'
 
 const databaseConfigured = Boolean(process.env.DATABASE_URL)
@@ -97,23 +96,21 @@ integration('PostgreSQL-backed tenant data foundation integrity', () => {
     await expect(prisma.$executeRaw`UPDATE "Map" SET "realMapEnabled" = false WHERE id = ${mapA}`).rejects.toThrow()
   })
 
-  it('enforces one Map per Tenant in PostgreSQL', async () => {
+  it('allows several Maps per Tenant in PostgreSQL', async () => {
     await expect(prisma.map.create({
       data: { tenantId: tenantA, name: 'Second Map A', slug: `wu49-second-map-${suffix}` },
-    })).rejects.toThrow()
-    expect(await prisma.map.count({ where: { tenantId: tenantA } })).toBe(1)
+    })).resolves.toMatchObject({ tenantId: tenantA })
+    expect(await prisma.map.count({ where: { tenantId: tenantA } })).toBe(2)
   })
 
-  it('serializes creation so exactly one first Map can be created', async () => {
+  it('serializes initialization while allowing both distinct Maps', async () => {
     const attempts = await Promise.allSettled([1, 2].map(index => prisma.$transaction(async (transaction) => {
-      await assertTenantCanCreateMap(transaction, tenantCreation)
+      await lockTenantMapCreation(transaction, tenantCreation)
       return transaction.map.create({
         data: { tenantId: tenantCreation, name: `Created ${index}`, slug: `wu49-created-${index}-${suffix}` },
       })
     })))
-    expect(attempts.filter(result => result.status === 'fulfilled')).toHaveLength(1)
-    const rejected = attempts.find(result => result.status === 'rejected')
-    expect(rejected).toMatchObject({ reason: expect.any(TenantAlreadyHasMapError) })
-    expect(await prisma.map.count({ where: { tenantId: tenantCreation } })).toBe(1)
+    expect(attempts.filter(result => result.status === 'fulfilled')).toHaveLength(2)
+    expect(await prisma.map.count({ where: { tenantId: tenantCreation } })).toBe(2)
   })
 })

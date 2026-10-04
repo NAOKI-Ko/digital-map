@@ -1,6 +1,7 @@
 import { nameTranslationSchema } from '~~/shared/schemas/translations'
 
 export default defineEventHandler(async (event) => {
+  await requireCategoryCanonicalWrite(event)
   const { map } = await requireMapAccess(event)
   const categoryId = getRouterParam(event, 'categoryId')
   const category = await prisma.category.findFirst({ where: { id: categoryId, mapId: map.id }, select: { id: true } })

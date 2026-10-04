@@ -38,7 +38,7 @@ describe('Category relation validation', () => {
     const { validateSpotCategories } = await import('../server/utils/category')
     const result = await validateSpotCategories({ category: { findMany } } as never, 'map-1', 'tenant-1', ['c1', 'c2', 'c1'])
     expect(findMany).toHaveBeenCalledOnce()
-    expect(findMany).toHaveBeenCalledWith(expect.objectContaining({ where: { id: { in: ['c1', 'c2'] }, mapId: 'map-1', tenantId: 'tenant-1' } }))
+    expect(findMany).toHaveBeenCalledWith(expect.objectContaining({ where: { id: { in: ['c1', 'c2'] }, mapUsages: { some: { mapId: 'map-1' } }, tenantId: 'tenant-1' } }))
     expect(result).toHaveLength(2)
   })
 

@@ -2,6 +2,7 @@ import { categoryPinDefaultSchema } from '~~/shared/schemas/pin-source'
 import { pinConflict, pinDependentsVersion } from '~~/server/utils/pin-appearance'
 import { resolveTenantMediaAsset } from '~~/server/utils/media'
 export default defineEventHandler(async (event) => {
+  await requireCategoryCanonicalWrite(event)
   const { map } = await requireOwnedMap(event)
   const categoryId = getRouterParam(event, 'categoryId')
   const parsed = categoryPinDefaultSchema.safeParse(await readBody(event))
@@ -15,7 +16,7 @@ export default defineEventHandler(async (event) => {
     await prisma.$transaction(async tx => {
       const category = await tx.category.findFirst({ where: { id: categoryId, mapId: map.id, tenantId: map.tenantId } })
       if (!category) throw createError({ statusCode: 404, statusMessage: 'カテゴリーが見つかりません。' })
-      const dependents = await tx.spot.findMany({ where: { pinSourceCategoryId: category.id, pinSourceMode: 'category' }, select: { id: true, liveVersion: true } })
+      const dependents = await tx.spot.findMany({ where: { pinSourceCategoryId: category.id, pinSourceMode: 'category', tenantId: map.tenantId, mapUsage: { mapId: map.id } }, select: { id: true, liveVersion: true } })
       if (category.pinDefaultRevision !== command.expectedRevision || pinDependentsVersion(dependents) !== command.dependentsVersion) throw pinConflict()
       await tx.category.update({ where: { id: category.id, pinDefaultRevision: command.expectedRevision }, data: {
         pinDefaultType: design?.pinIconType ?? null,

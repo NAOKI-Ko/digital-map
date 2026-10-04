@@ -33,7 +33,7 @@ describe('WU-45 PIN editor modes', () => {
   it('位置payloadには座標だけを含める', () => {
     expect(toPositionUpdatePayload({ x: 0.42, y: 0.61 })).toEqual({ x: 0.42, y: 0.61 })
     const savePosition = editorSource.slice(editorSource.indexOf('async function savePosition'), editorSource.indexOf('async function saveDesign'))
-    expect(savePosition).toContain('/position')
+    expect(savePosition).toContain('/placements/')
     expect(savePosition).not.toContain('/design')
     expect(savePosition).not.toContain('pinDesignEditorRef.value?.save')
   })

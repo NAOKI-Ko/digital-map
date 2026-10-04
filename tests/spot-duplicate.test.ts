@@ -32,7 +32,7 @@ describe('Spot duplicate warning', () => {
     expect(mocks.findMany).toHaveBeenCalledWith(expect.objectContaining({
       where: {
         name: { equals: 'Same name', mode: 'insensitive' },
-        floor: { mapId: 'map-a' },
+        mapUsage: { mapId: 'map-a' },
       },
       take: 10,
     }))

@@ -19,7 +19,11 @@ const props = defineProps<{ response: PublicMapResponse | null | undefined, stat
 const lastResponse = shallowRef(props.response)
 watch(() => props.response, response => { if (response?.map) lastResponse.value = response })
 // A locale refresh keeps the visitor's mounted map and exploration context.
-const data = computed(() => props.response ?? (props.status === 'pending' ? lastResponse.value : null))
+const data = computed(() => {
+  const response = props.response ?? (props.status === 'pending' ? lastResponse.value : null)
+  if (!response) return response
+  return { ...response, map: { ...response.map, floors: response.map.floors.map(floor => ({ ...floor, spots: floor.spots.map(spot => ({ ...spot, canonicalSpotId: spot.id, id: spot.placementId ?? `${floor.id}:${spot.id}` })) })) } }
+})
 const status = computed(() => props.status)
 const error = computed(() => props.error)
 const route = useRoute()
@@ -136,7 +140,7 @@ function selectSpot(spot: MapViewerSpot) {
   spotTriggerId = spot.id
   overlay.value = { type: 'spot', spotId: spot.id }
   void nextTick(() => ensureSelectedSpotVisible())
-  if (props.analyticsEnabled !== false && data.value?.map.id && mapSlug.value !== '__qa_arimatsu') sendPublicAnalytics({ type: 'SPOT_VIEW', mapId: data.value.map.id, spotId: spot.id })
+  if (props.analyticsEnabled !== false && data.value?.map.id && mapSlug.value !== '__qa_arimatsu') sendPublicAnalytics({ type: 'SPOT_VIEW', mapId: data.value.map.id, spotId: selectedFloor.value?.spots.find(item => item.id === spot.id)?.canonicalSpotId ?? spot.id })
 }
 
 function beginMapRecovery() {

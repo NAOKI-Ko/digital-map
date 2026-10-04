@@ -45,9 +45,9 @@ describe('イラストマップ作成セットアップ', () => {
     expect(mapCapabilitySchema.safeParse({ illustrationEnabled: true, realMapEnabled: false, defaultMapView: 'REAL' }).success).toBe(false)
   })
 
-  it('新しい2枚目Mapをtransaction内のTenant lockで拒否する', () => {
-    expect(createApiSource).toContain('assertTenantCanCreateMap')
-    expect(createApiSource).toContain("statusCode: 409")
+  it('複数Map作成でもtransaction内のWorkspace初期化lockを維持する', () => {
+    expect(createApiSource).toContain('lockTenantMapCreation')
+    expect(createApiSource).not.toContain('TenantAlreadyHasMapError')
     expect(tenantDataSource).toContain('where: { tenantId }')
     expect(tenantDataSource).toContain('pg_advisory_xact_lock')
   })

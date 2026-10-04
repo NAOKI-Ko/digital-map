@@ -56,13 +56,13 @@ function close() { if (!saving.value) { if (action.value) discard.value = true; 
 <template>
   <AppDialog open title="選択したスポットの一括操作" :description="`${spots.length}件を選択中。変更する操作を選び、内容を確認して適用します。`" max-width="lg" @close="close">
     <fieldset :disabled="saving" class="space-y-3">
-      <label class="block text-sm">操作<select v-model="action" class="mt-1 block w-full rounded border p-2"><option value="">変更しない</option><option value="addCategory">カテゴリーを追加</option><option value="removeCategory">カテゴリーを外す</option><option value="assignFloor">未配置スポットの配置先フロアを変更</option><option value="pinSource">PINの設定元を変更</option><option value="publish">公開対象にする</option><option value="unpublish">公開対象外にする</option><option value="delete">スポットを削除</option></select></label>
+      <label class="block text-sm">操作<select v-model="action" class="mt-1 block w-full rounded border p-2"><option value="">変更しない</option><option value="addCategory">カテゴリーを追加</option><option value="removeCategory">カテゴリーを外す</option><option value="assignFloor">未配置スポットの配置先フロアを変更</option><option value="pinSource">PINの設定元を変更</option><option value="publish">公開対象にする</option><option value="unpublish">公開対象外にする</option><option value="delete">このマップから外す</option></select></label>
       <label v-if="action === 'pinSource'" class="block text-sm">PINの設定元<select v-model="mode" class="mt-1 block w-full rounded border p-2"><option value="">変更しない</option><option value="soleCategory">各スポットの1つだけのカテゴリーを使う</option><option value="category">指定したカテゴリーを使う</option><option value="standard">標準ピンを使う</option><option value="individual">今の見た目を個別設定として保持（戻す先を解除）</option></select></label>
       <label v-if="action === 'addCategory' || action === 'removeCategory' || (action === 'pinSource' && mode === 'category')" class="block text-sm">カテゴリー<select v-model="categoryId" class="mt-1 block w-full rounded border p-2"><option value="">変更しない</option><option v-for="category in filters.categories" :key="category.id" :value="category.id">{{ category.name }}</option></select></label>
       <label v-if="action === 'assignFloor'" class="block text-sm">配置先フロア<select v-model="floorId" class="mt-1 block w-full rounded border p-2"><option value="">変更しない</option><option v-for="floor in filters.floors" :key="floor.id" :value="floor.id">{{ floor.name }}</option></select></label>
     </fieldset>
     <p class="my-3 text-sm text-stone-600">公開対象・PINの変更だけでは公開中の内容は変わりません。閲覧者プレビューで確認してから、マップを公開してください。</p>
-    <p v-if="action === 'delete'" class="my-3 font-semibold text-red-700">削除は元に戻せません。対象名を確認してください。</p>
+    <p v-if="action === 'delete'" class="my-3 font-semibold text-red-700">対象スポットをこのマップから外します。内容はワークスペースに残り、オーナーが管理できます。</p>
     <p v-if="action === 'pinSource'" class="my-3 text-sm">個別設定を変更する場合も含みます。カテゴリー既定は今後の変更を継承します。個別設定に戻しても以前の上書きデザインは復元されません。</p>
     <p v-if="loading" role="status">確認内容を読み込んでいます…</p>
     <template v-if="review">

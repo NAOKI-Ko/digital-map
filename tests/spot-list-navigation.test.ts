@@ -17,8 +17,8 @@ describe('Spot一覧ナビゲーション', () => {
   })
 
   it('同名Spotをフロア・配置・Categoryで識別し地図上のPINを選択できる', () => {
-    expect(listSource).toContain('{{ spot.floorName }} · 配置済み')
+    expect(listSource).toContain('{{ spot.positionedFloorName ?? spot.floorName }} · 配置済み')
     expect(listSource).toContain('v-for="category in spot.categories"')
-    expect(listSource).toContain('placeSpotId: spot.id')
+    expect(listSource).toContain('placeSpotId: spot.positionedPlacementId ?? spot.id')
   })
 })

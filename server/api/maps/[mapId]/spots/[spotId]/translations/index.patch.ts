@@ -1,3 +1,4 @@
+import { updateSpotWithUsage } from '~~/server/utils/spot-usage'
 import { spotTranslationSchema } from '~~/shared/schemas/translations'
 
 export default defineEventHandler(async (event) => {
@@ -26,7 +27,7 @@ export default defineEventHandler(async (event) => {
         update: { value },
       })
     }
-    await transaction.spot.update({ where: { id: spot.id }, data: { liveVersion: { increment: 1 } } })
+    await updateSpotWithUsage(transaction, { where: { id: spot.id }, data: { liveVersion: { increment: 1 }, contentVersion: { increment: 1 } } })
   })
   return { locale: 'en', translation: result.data }
 })

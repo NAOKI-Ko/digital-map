@@ -1,10 +1,11 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { planSpotBulk } from '../server/utils/spot-bulk'
 import type { SpotBulkInput } from '../shared/schemas/spot-bulk'
+vi.mock('../server/utils/spot-usage', () => ({ updateSpotWithUsage: (client: any, args: unknown) => client.spot.update(args) }))
 const map = { id: 'map-a', tenantId: 'tenant-a' }
 const category = { id: 'category-a', name: '展示', pinDefaultRevision: 0, pinDefaultType: null }
 const spot = () => ({ id: 'spot-a', name: 'A', floorId: 'floor-a', floor: { name: '1F' }, x: null, y: null, lat: null, lng: null, isPublished: false, liveVersion: 1, pinSourceMode: 'individual', pinSourceCategoryId: null, pinSourceCategory: null, spotCategories: [{ categoryId: category.id, category }], pinIconType: 'preset', pinIconId: null, pinIconImageUrl: null, pinIconAssetId: null, pinColor: '#C7401F', pinSize: 'medium' })
-const tx = { spot: { findMany: vi.fn(), update: vi.fn(), delete: vi.fn() }, spotCategory: { createMany: vi.fn(), deleteMany: vi.fn() }, category: { findMany: vi.fn() }, mapFloor: { findFirst: vi.fn() }, auditEvent: { create: vi.fn() } }
+const tx = { spot: { count: vi.fn().mockResolvedValue(0), findMany: vi.fn(), update: vi.fn(), delete: vi.fn() }, spotCategory: { createMany: vi.fn(), deleteMany: vi.fn() }, category: { findMany: vi.fn() }, mapFloor: { findFirst: vi.fn() }, auditEvent: { create: vi.fn() } }
 let input: unknown
 let handler: (event: unknown) => Promise<unknown>
 async function plan(command: SpotBulkInput) { return planSpotBulk(tx as never, map, command) }
@@ -31,7 +32,7 @@ describe('atomic reviewed Spot bulk API', () => {
     await expect(handler({})).rejects.toMatchObject({ statusCode: 409 })
     input = { action: 'unpublish', spotIds: ['spot-a', 'cross-map'], reviewToken: 'a'.repeat(64) }
     await expect(handler({})).rejects.toMatchObject({ statusCode: 404 })
-    expect(tx.spot.findMany).toHaveBeenCalledWith(expect.objectContaining({ where: { id: { in: ['cross-map', 'spot-a'] }, tenantId: map.tenantId, floor: { mapId: map.id } } }))
+    expect(tx.spot.findMany).toHaveBeenCalledWith(expect.objectContaining({ where: { id: { in: ['cross-map', 'spot-a'] }, tenantId: map.tenantId, mapUsage: { mapId: map.id } } }))
     expect(tx.spot.update).not.toHaveBeenCalled()
   })
   it('reports no-op membership adds without bumping versions or deleting other memberships', async () => {

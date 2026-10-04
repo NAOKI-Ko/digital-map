@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import SpotPlacements from '~/components/admin/SpotPlacements.vue'
 import PinSourceEditor from '~/components/admin/PinSourceEditor.vue'
 import SaveFeedback from '~/components/ui/SaveFeedback.vue'
 import SpotPhotoManager from '~/components/admin/SpotPhotoManager.vue'
@@ -161,7 +162,7 @@ async function saveEnglish() {
       <SaveFeedback class="mt-6" :state="isSubmitting ? 'saving' : submitError ? 'error' : successMessage ? 'success' : 'idle'" :message="submitError || successMessage" />
       <section class="mt-6 border-t border-stone-200 pt-5">
         <ClientOnly>
-          <SpotForm ref="spotForm" :floors="data.floors" :categories="data.categories" :fields="data.fields" :initial-value="initialValue" :is-submitting="isSubmitting" :guard-navigation="false" @dirty-change="spotFormDirty = $event" @submit="updateSpot" @cancel="cancelForm" />
+          <SpotForm :allow-without-placement="!data.spot.floorId" ref="spotForm" :floors="data.floors" :categories="data.categories" :fields="data.fields" :initial-value="initialValue" :is-submitting="isSubmitting" :guard-navigation="false" @dirty-change="spotFormDirty = $event" @submit="updateSpot" @cancel="cancelForm" />
           <template #fallback>
             <p class="text-sm text-stone-600">フォームを読み込んでいます…</p>
           </template>
@@ -200,6 +201,7 @@ async function saveEnglish() {
           @updated="Object.assign(data.spot, $event)"
         />
       </section>
+      <SpotPlacements :map-id="mapId" :spot-id="spotId" :floors="data.floors" @updated="refresh()" />
       <DuplicateSpotDialog :open="duplicateMatches.length > 0" :matches="duplicateMatches" @cancel="cancelDuplicateWarning" @continue="continueWithDuplicate" />
       <UnsavedChangesGuard :dirty="(spotFormDirty || englishDirty) && !isSubmitting && englishState !== 'saving'" />
     </template>

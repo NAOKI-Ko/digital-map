@@ -5,6 +5,7 @@ const mocks = vi.hoisted(() => ({
   readBody: vi.fn(),
   floorFindFirst: vi.fn(),
   spotUpdate: vi.fn(),
+  placementCount: vi.fn(),
 }))
 
 const baseBody = {
@@ -35,6 +36,7 @@ describe('PATCH /api/maps/:mapId/spots/:spotId', () => {
     vi.stubGlobal('prisma', {
       mapFloor: { findFirst: mocks.floorFindFirst },
       spot: { update: mocks.spotUpdate },
+      illustrationPlacement: { count: mocks.placementCount },
     })
     handler = (await import('../server/api/maps/[mapId]/spots/[spotId]/index.patch')).default as SpotUpdateHandler
   })
@@ -53,6 +55,7 @@ describe('PATCH /api/maps/:mapId/spots/:spotId', () => {
     mocks.readBody.mockReset()
     mocks.floorFindFirst.mockReset().mockResolvedValue({ id: 'floor-1' })
     mocks.spotUpdate.mockReset()
+    mocks.placementCount.mockReset().mockResolvedValue(0)
   })
 
   afterAll(() => vi.unstubAllGlobals())

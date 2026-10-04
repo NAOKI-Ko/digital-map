@@ -3,6 +3,13 @@ import type { SpotCategorySummary } from './category'
 import type { SpotFieldDefinitionItem } from './spot-field'
 
 export interface AdminSpotSummary {
+  hasPositionedPlacement?: boolean
+  positionedPlacementId?: string
+  positionedFloorId?: string
+  positionedFloorName?: string
+  canonicalSpotId?: string
+  placementId?: string
+  placementVersion?: number
   id: string
   floorId: string
   floorName: string

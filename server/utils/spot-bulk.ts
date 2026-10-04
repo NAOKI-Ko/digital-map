@@ -7,9 +7,9 @@ import { resolveEffectivePinAppearance, pinSourceLabel } from '~~/shared/utils/p
 /** One read/validation path for preview and transactional apply. No coordinates in planned writes. */
 export async function planSpotBulk(tx: Prisma.TransactionClient, map: { id: string, tenantId: string }, input: SpotBulkInput) {
   const spotIds = [...new Set(input.spotIds)].sort()
-  const spots = await tx.spot.findMany({ where: { id: { in: spotIds }, tenantId: map.tenantId, floor: { mapId: map.id } }, include: { floor: { select: { name: true } }, pinSourceCategory: pinSourceInclude, spotCategories: { include: { category: true } } }, orderBy: { id: 'asc' } })
+  const spots = await tx.spot.findMany({ where: { id: { in: spotIds }, tenantId: map.tenantId, mapUsage: { mapId: map.id } }, include: { mapUsage: { include: { placements: { select: { x: true, y: true } } } }, floor: { select: { name: true } }, pinSourceCategory: pinSourceInclude, spotCategories: { include: { category: true } } }, orderBy: { id: 'asc' } })
   if (spots.length !== spotIds.length) throw createError({ statusCode: 404, statusMessage: '選択したスポットが見つかりません。変更は保存されていません。' })
-  const categories = await tx.category.findMany({ where: { mapId: map.id, tenantId: map.tenantId } })
+  const categories = await tx.category.findMany({ where: { mapUsages: { some: { mapId: map.id } }, tenantId: map.tenantId } })
   const targetCategoryId = 'categoryId' in input ? input.categoryId : undefined
   const category = categories.find(item => item.id === targetCategoryId)
   if (targetCategoryId && !category) throw createError({ statusCode: 422, statusMessage: '選択したカテゴリーが見つかりません。' })
@@ -26,12 +26,12 @@ export async function planSpotBulk(tx: Prisma.TransactionClient, map: { id: stri
     const memberIds = spot.spotCategories.map(item => item.categoryId)
     if (input.action === 'assignFloor') {
       if ([spot.x, spot.y, spot.lat, spot.lng].some(value => value !== null) || spot.isPublished) error = '座標または公開対象設定があります。個別に配置を確認してください。'
-      description = `${spot.floor.name} → ${floor!.name}（座標は変更しません）`
+      description = `${spot.floor?.name ?? 'フロア未設定'} → ${floor!.name}（座標は変更しません）`
       changed = spot.floorId !== floor!.id; data = { floorId: floor!.id }
     }
     else if (input.action === 'publish' || input.action === 'unpublish') {
       const target = input.action === 'publish'
-      if (target && (spot.x === null || spot.y === null)) error = '未配置のため公開対象にできません。'
+      if (target && !(spot.mapUsage?.placements.some(p => p.x !== null && p.y !== null) ?? (spot.x !== null && spot.y !== null))) error = '未配置のため公開対象にできません。'
       description = `${spot.isPublished ? '公開対象' : '対象外'} → ${target ? '公開対象' : '対象外'}`
       changed = spot.isPublished !== target; data = { isPublished: target }
     }
@@ -50,8 +50,8 @@ export async function planSpotBulk(tx: Prisma.TransactionClient, map: { id: stri
       changed = spot.pinSourceMode !== mode || spot.pinSourceCategoryId !== sourceId
       description = `${pinSourceLabel(spot.pinSourceMode, spot.pinSourceCategory?.name)} → ${pinSourceLabel(mode, source?.name)}${mode === 'category' && !source?.pinDefaultType ? '（既定未設定：標準ピン）' : ''}`
     }
-    else { changed = true; description = 'スポットを削除（元に戻せません）' }
-    return { id: spot.id, name: spot.name, floorName: spot.floor.name, version: spot.liveVersion, error, description, changed, before, after, data, sourceId }
+    else { changed = true; description = 'このマップから外す（本文・写真・項目・承認待ちはワークスペースに保持）' }
+    return { id: spot.id, name: spot.name, floorName: spot.floor?.name ?? 'フロア未設定', version: spot.liveVersion, error, description, changed, before, after, data, sourceId }
   })
   const { reviewToken: _token, ...command } = spotBulkSchema.parse(input)
   const relevantCategoryIds = new Set(rows.map(row => row.sourceId).filter(Boolean))

@@ -115,3 +115,23 @@ describe('Paper template 2 document contract', () => {
     await expect(renderer.render(0)).rejects.toMatchObject({ statusCode: 422 })
   })
 })
+
+
+describe('WU72 paper occurrence compatibility', () => {
+  it('numbers repeated canonical content independently and keeps content overrides canonical', () => {
+    const input = source(1)
+    const first = input.map.floors[0]!.spots[0]!
+    first.placementId = 'placement-a'
+    input.map.floors[0]!.spots.push({ ...first, placementId: 'placement-b', x: .7 })
+    input.spotCount = 2
+    const config = defaultPaperMapConfig('spot-guide', 2, input.map.name)
+    config.spotOverrides = [{ spotId: first.id, summary: 'Shared override' }]
+    const doc = resolvePaperDocument(input, config)
+    const cards = doc.pages.flatMap(page => page.cards)
+    expect(cards.map(card => card.number)).toEqual([1, 2])
+    expect(new Set(cards.map(card => card.spot.id))).toEqual(new Set([first.id]))
+    expect(doc.numbers.get('placement-a')).toBe(1)
+    expect(doc.numbers.get('placement-b')).toBe(2)
+    expect(cards.every(card => card.summary.lines.join('').includes('Shared override'))).toBe(true)
+  })
+})

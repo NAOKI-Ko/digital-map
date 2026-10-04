@@ -1,15 +1,13 @@
 import { mapCreateSchema } from '~~/shared/schemas/map'
 import type { AdminMapResponse } from '~~/shared/types/map'
-import { assertTenantCanCreateMap, TenantAlreadyHasMapError } from '~~/server/utils/tenant-tourism-data'
+import { lockTenantMapCreation } from '~~/server/utils/tenant-tourism-data'
 import { ensureDefaultSpotFieldDefinitions } from '~~/server/utils/spot-field'
 
 export default defineEventHandler(async (event): Promise<AdminMapResponse> => {
   const { session } = await requireTenantOwner(event)
   const input = await readValidatedBody(event, mapCreateSchema.parse)
-  let map
-  try {
-    map = await prisma.$transaction(async (transaction) => {
-      await assertTenantCanCreateMap(transaction, session.user.tenantId)
+  const map = await prisma.$transaction(async (transaction) => {
+      await lockTenantMapCreation(transaction, session.user.tenantId)
       const created = await transaction.map.create({ data: {
         tenantId: session.user.tenantId,
         name: input.name,
@@ -34,14 +32,6 @@ export default defineEventHandler(async (event): Promise<AdminMapResponse> => {
       await transaction.tenant.update({ where: { id: session.user.tenantId }, data: { onboardingState: 'ACTIVE' } })
       return created
     })
-  }
-  catch (error) {
-    if (error instanceof TenantAlreadyHasMapError) {
-      throw createError({ statusCode: 409, statusMessage: 'この組織には既にマップがあります。' })
-    }
-    throw error
-  }
-
   setResponseStatus(event, 201)
 
   return {

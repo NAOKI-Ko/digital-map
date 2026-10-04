@@ -25,7 +25,7 @@ export async function validateSpotCategories(
   if (uniqueIds.length === 0) return []
 
   const categories = await client.category.findMany({
-    where: { id: { in: uniqueIds }, mapId, tenantId },
+    where: { id: { in: uniqueIds }, mapUsages: { some: { mapId } }, tenantId },
     select: { id: true, name: true, order: true, iconType: true, iconPresetId: true, iconImageUrl: true, iconAssetId: true },
     orderBy: categoryOrderBy,
   })
@@ -38,7 +38,7 @@ export async function validateSpotCategories(
 export async function requireOwnedCategory(mapId: string, tenantId: string, categoryId: string | undefined) {
   if (!categoryId) throw createError({ statusCode: 400, statusMessage: 'カテゴリーIDが必要です。' })
   const category = await prisma.category.findFirst({
-    where: { id: categoryId, mapId, tenantId },
+    where: { id: categoryId, mapUsages: { some: { mapId } }, tenantId },
     include: { _count: { select: { spotCategories: true } } },
   })
   if (!category) throw createError({ statusCode: 404, statusMessage: 'カテゴリーが見つかりません。' })
@@ -47,7 +47,7 @@ export async function requireOwnedCategory(mapId: string, tenantId: string, cate
 
 export function toCategorySummary(category: {
   id: string
-  mapId: string
+  mapId: string | null
   name: string
   order: number
   iconType: string | null
@@ -58,7 +58,7 @@ export function toCategorySummary(category: {
 }) {
   return {
     id: category.id,
-    mapId: category.mapId,
+    mapId: category.mapId ?? '',
     name: category.name,
     order: category.order,
     iconType: category.iconType === 'preset' || category.iconType === 'custom' ? category.iconType : null,
@@ -71,4 +71,14 @@ export function toCategorySummary(category: {
 
 export function isUniqueConstraintError(error: unknown) {
   return typeof error === 'object' && error !== null && 'code' in error && error.code === 'P2002'
+}
+
+/** Existing Map Editors retain canonical writes only while their Category is exclusive. */
+export async function requireCategoryCanonicalWrite(event: import('h3').H3Event) {
+  const access = await requireMapAccess(event)
+  const categoryId = getRouterParam(event, 'categoryId')
+  const category = await prisma.category.findFirst({ where: { id: categoryId, tenantId: access.map.tenantId, mapUsages: { some: { mapId: access.map.id } } }, include: { mapUsages: true } })
+  if (!category) throw createError({ statusCode: 404, statusMessage: 'カテゴリーが見つかりません。' })
+  if (!access.isOwner && (category.mapId !== access.map.id || category.mapUsages.some(usage => usage.mapId !== access.map.id))) throw createError({ statusCode: 403, statusMessage: 'このマップのカテゴリーではありません。' })
+  return category
 }

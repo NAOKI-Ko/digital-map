@@ -75,13 +75,13 @@ describe('release security: tenant / Map ownership boundary', () => {
     await requireOwnedFloor({} as never)
     await requireOwnedSpot({} as never)
     expect(mocks.floorFindFirst).toHaveBeenCalledWith(expect.objectContaining({ where: { id: 'floor-a', mapId: 'map-a' } }))
-    expect(mocks.spotFindFirst).toHaveBeenCalledWith(expect.objectContaining({ where: { id: 'spot-a', tenantId: 'tenant-a', floor: { mapId: 'map-a' } } }))
+    expect(mocks.spotFindFirst).toHaveBeenCalledWith(expect.objectContaining({ where: { id: 'spot-a', tenantId: 'tenant-a', mapUsage: { mapId: 'map-a' } } }))
   })
 
   it('Category IDだけを知っていても別Mapから取得できない', async () => {
     mocks.categoryFindFirst.mockResolvedValue(null)
     await expect(requireOwnedCategory('map-a', 'tenant-a', 'category-b')).rejects.toMatchObject({ statusCode: 404 })
-    expect(mocks.categoryFindFirst).toHaveBeenCalledWith(expect.objectContaining({ where: { id: 'category-b', mapId: 'map-a', tenantId: 'tenant-a' } }))
+    expect(mocks.categoryFindFirst).toHaveBeenCalledWith(expect.objectContaining({ where: { id: 'category-b', mapUsages: { some: { mapId: 'map-a' } }, tenantId: 'tenant-a' } }))
   })
 
   it('IMAGE spatial audit supports both legacy GEO and already-migrated schemas', async () => {

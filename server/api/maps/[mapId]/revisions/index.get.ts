@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
   const { map } = await requireMapAccess(event)
   const [revisions, fields] = await Promise.all([
     prisma.spotRevision.findMany({
-      where: { status: 'PENDING', spot: { floor: { mapId: map.id } } },
+      where: { status: 'PENDING', spot: { mapUsage: { mapId: map.id } } },
       include: {
         spot: {
           select: {

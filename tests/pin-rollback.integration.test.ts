@@ -6,7 +6,7 @@ const integration = process.env.DATABASE_URL ? describe : describe.skip
 integration('WU65 additive rollback rehearsal', () => {
   it('freezes inherited appearance into legacy columns before an old reader is used', async () => {
     const url = new URL(process.env.DATABASE_URL!)
-    if (!['localhost', '127.0.0.1'].includes(url.hostname) || !(url.pathname.startsWith('/digital_map_test_wu65') || url.pathname === '/digital_map_ci')) throw new Error('Disposable test database required')
+    if (!['localhost', '127.0.0.1'].includes(url.hostname) || !(url.pathname.startsWith('/digital_map_test_') || url.pathname === '/digital_map_ci')) throw new Error('Disposable test database required')
     const slug = `rollback-${randomUUID()}`
     const rollback = new Error('REHEARSAL_ROLLBACK')
     await expect(prisma.$transaction(async tx => {

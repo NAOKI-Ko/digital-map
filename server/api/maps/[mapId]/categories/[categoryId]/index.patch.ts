@@ -4,6 +4,7 @@ import { toCategoryIconData } from '~~/server/utils/category-icon'
 import { resolveTenantMediaAsset } from '~~/server/utils/media'
 
 export default defineEventHandler(async (event): Promise<CategoryResponse> => {
+  await requireCategoryCanonicalWrite(event)
   const { map, session } = await requireOwnedMap(event)
   const ownedCategory = await requireOwnedCategory(map.id, map.tenantId, getRouterParam(event, 'categoryId'))
   const result = categoryUpdateSchema.safeParse(await readBody(event))

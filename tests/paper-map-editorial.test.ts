@@ -300,3 +300,17 @@ describe('version 3 bounded editorial design', () => {
     ).rejects.toMatchObject({ statusCode: 422 })
   })
 })
+
+
+describe('WU72 editorial occurrence compatibility', () => {
+  it('keeps distinct numbering for repeated canonical Spot IDs', () => {
+    const input = fixture(1)
+    const first = input.map.floors[0]!.spots[0]!
+    first.placementId = 'placement-a'
+    input.map.floors[0]!.spots.push({ ...first, placementId: 'placement-b', x: .7 })
+    input.spotCount = 2
+    const doc = resolveEditorialDocument(input, paperDesignConfig('heritage-editorial', input))
+    expect(doc.numbers.get('placement-a')).toBe(1)
+    expect(doc.numbers.get('placement-b')).toBe(2)
+  })
+})

@@ -1,3 +1,4 @@
+import { paperOccurrenceId } from './paper-map-render'
 import type { PaperMapConfig, PaperSlotId } from '../schemas/paper-map'
 import type { PaperMapSource } from '../types/paper-map'
 import type { PublicFloor, PublicSpot } from '../types/public-map'
@@ -140,7 +141,7 @@ export function resolveEditorialDocument(
     height: height - margin * 2 - headerHeight - (expandedQr ? 80 : 68),
   }
   const selected = selectPaperMapSpotsFromSource(source, config),
-    numbers = new Map(selected.map((s, i) => [s.id, i + 1]))
+    numbers = new Map(selected.map((s, i) => [paperOccurrenceId(s), i + 1]))
   const categories = [
     ...new Map(
       selected.flatMap((s) => s.categories.map((c) => [c.id, c] as const)),
@@ -252,7 +253,7 @@ export function resolveEditorialDocument(
     )
     const features = featureSpots.map((spot, i) => ({
       spot,
-      number: numbers.get(spot.id)!,
+      number: numbers.get(paperOccurrenceId(spot))!,
       photo: photoOf(spot)!,
       rect: {
         x: featureFrame.x + i * (featureFrame.width / featureSpots.length),
@@ -346,7 +347,7 @@ export function resolveEditorialDocument(
         if (y + cardHeight > frame.y + frame.height) break
         page.cards.push({
           spot,
-          number: numbers.get(spot.id)!,
+          number: numbers.get(paperOccurrenceId(spot))!,
           name,
           category,
           summary,

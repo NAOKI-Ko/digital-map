@@ -15,6 +15,37 @@ function optimizedUrl(asset: { storageKey: string, variants?: Array<{ kind: stri
   return `/uploads/${variant?.storageKey ?? asset.storageKey}`
 }
 
+const publicSpotSelect = {
+              id: true,
+              floorId: true,
+              name: true,
+              translations: { select: { locale: true, name: true, description: true, address: true, hoursText: true, holidayText: true } },
+              importance: true,
+              description: true,
+              address: true,
+              website: true,
+              x: true,
+              y: true,
+              photosJson: true,
+              photos: { orderBy: { order: 'asc' }, select: { asset: { select: { storageKey: true, variants: true } } } },
+              hoursText: true,
+              holidayText: true,
+              phone: true,
+              fieldValues: { select: { fieldDefinitionId: true, valueJson: true } },
+              fieldValueTranslations: { select: { fieldDefinitionId: true, locale: true, value: true } },
+              pinSourceMode: true,
+              pinSourceCategoryId: true,
+              pinSourceCategory: pinSourceInclude,
+              pinIconType: true,
+              pinIconId: true,
+              pinIconImageUrl: true,
+              pinIconAsset: { select: { storageKey: true, variants: true } },
+              pinColor: true,
+              pinSize: true,
+              isPublished: true,
+              spotCategories: { select: spotCategorySelect },
+            } satisfies Prisma.SpotSelect
+
 export function buildPublicMapQuery(slug: string) {
   return {
     where: {
@@ -60,6 +91,11 @@ export function buildPublicMapQuery(slug: string) {
           refBImageY: true,
           refBLat: true,
           refBLng: true,
+          placements: {
+            where: { x: { not: null }, y: { not: null }, usage: { isPublished: true } },
+            orderBy: [{ createdAt: 'asc' as const }, { id: 'asc' as const }],
+            include: { usage: { include: { spot: { select: publicSpotSelect }, pinSourceCategory: pinSourceInclude, pinIconAsset: { select: { storageKey: true, variants: true } } } } },
+          },
           spots: {
             where: {
               isPublished: true,
@@ -67,36 +103,7 @@ export function buildPublicMapQuery(slug: string) {
               y: { not: null },
             },
             orderBy: [{ name: 'asc' as const }, { createdAt: 'asc' as const }],
-            select: {
-              id: true,
-              floorId: true,
-              name: true,
-              translations: { select: { locale: true, name: true, description: true, address: true, hoursText: true, holidayText: true } },
-              importance: true,
-              description: true,
-              address: true,
-              website: true,
-              x: true,
-              y: true,
-              photosJson: true,
-              photos: { orderBy: { order: 'asc' }, select: { asset: { select: { storageKey: true, variants: true } } } },
-              hoursText: true,
-              holidayText: true,
-              phone: true,
-              fieldValues: { select: { fieldDefinitionId: true, valueJson: true } },
-              fieldValueTranslations: { select: { fieldDefinitionId: true, locale: true, value: true } },
-              pinSourceMode: true,
-              pinSourceCategoryId: true,
-              pinSourceCategory: pinSourceInclude,
-              pinIconType: true,
-              pinIconId: true,
-              pinIconImageUrl: true,
-              pinIconAsset: { select: { storageKey: true, variants: true } },
-              pinColor: true,
-              pinSize: true,
-              isPublished: true,
-              spotCategories: { select: spotCategorySelect },
-            },
+            select: publicSpotSelect,
           },
           decorations: {
             orderBy: [{ order: 'asc' as const }, { createdAt: 'asc' as const }],
@@ -154,7 +161,11 @@ export function serializePublicMap(record: PublicMapRecord | null, requestedLoca
       refBImageY: floor.refBImageY,
       refBLat: floor.refBLat,
       refBLng: floor.refBLng,
-      spots: floor.spots.flatMap((spot) => {
+      spots: (floor.placements === undefined ? floor.spots : floor.placements.map(placement => ({
+        ...placement.usage.spot, ...placement.usage,
+        id: placement.usage.spot.id, floorId: placement.floorId, x: placement.x, y: placement.y,
+        placementId: placement.id,
+      }))).flatMap((spot) => {
         if (!spot.isPublished || spot.x === null || spot.y === null) return []
         const appearance = resolveEffectivePinAppearance(spot)
         const effectiveAsset = spot.pinSourceMode === 'category' ? spot.pinSourceCategory?.pinDefaultAsset : spot.pinSourceMode === 'standard' ? null : spot.pinIconAsset
@@ -204,7 +215,8 @@ export function serializePublicMap(record: PublicMapRecord | null, requestedLoca
 
         return [{
           id: spot.id,
-          floorId: spot.floorId,
+          floorId: floor.id,
+          ...('placementId' in spot ? { placementId: spot.placementId as string } : {}),
           name: spotName,
           categories: sortSpotCategories(spot.spotCategories.map((relation) => {
             const category = relation.category

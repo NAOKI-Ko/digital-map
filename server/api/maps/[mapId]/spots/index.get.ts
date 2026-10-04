@@ -15,8 +15,10 @@ export default defineEventHandler(async (event): Promise<AdminSpotListResponse> 
   const status = query.status === 'published' || query.status === 'draft' ? query.status : ''
   const position = query.position === 'positioned' || query.position === 'unpositioned' ? query.position : ''
   const sort = query.sort === 'name' || query.sort === 'created' ? query.sort : 'updated'
+  const positioned: Prisma.IllustrationPlacementWhereInput = { ...(floorId ? { floorId } : {}), x: { not: null }, y: { not: null } }
+  const occurrenceFilter: Prisma.IllustrationPlacementWhereInput = { ...(floorId ? { floorId } : {}), ...(position === 'positioned' ? { x: { not: null }, y: { not: null } } : position === 'unpositioned' ? { x: null, y: null } : {}) }
   const where: Prisma.SpotWhereInput = {
-    floor: { mapId: map.id },
+    mapUsage: { mapId: map.id, ...(query.view === 'placements' ? { placements: { some: occurrenceFilter } } : position === 'unpositioned' ? { placements: { none: positioned, ...(floorId ? { some: { floorId } } : {}) } } : (floorId || position) ? { placements: { some: occurrenceFilter } } : {}) },
     ...(['standard', 'category', 'individual'].includes(String(query.pinSource)) ? { pinSourceMode: String(query.pinSource) } : {}),
     ...(typeof query.pinSourceCategoryId === 'string' && query.pinSourceCategoryId ? { pinSourceCategoryId: query.pinSourceCategoryId } : {}),
     ...(keyword
@@ -29,9 +31,7 @@ export default defineEventHandler(async (event): Promise<AdminSpotListResponse> 
         }
       : {}),
     ...(categoryId === 'none' ? { spotCategories: { none: {} } } : categoryId ? { spotCategories: { some: { categoryId, category: { mapId: map.id } } } } : {}),
-    ...(floorId ? { floorId } : {}),
     ...(status ? { isPublished: status === 'published' } : {}),
-    ...(position === 'positioned' ? { x: { not: null }, y: { not: null } } : position === 'unpositioned' ? { OR: [{ x: null }, { y: null }] } : {}),
   }
 
   const [spots, floors, categories, unplaced, positionedTargetOff] = await Promise.all([
@@ -39,6 +39,7 @@ export default defineEventHandler(async (event): Promise<AdminSpotListResponse> 
       where,
       select: {
         id: true,
+        mapUsage: { include: { placements: { include: { floor: { select: { name: true } } } } } },
         floorId: true,
         name: true,
         address: true,
@@ -76,16 +77,16 @@ export default defineEventHandler(async (event): Promise<AdminSpotListResponse> 
       select: { id: true, name: true, order: true, iconType: true, iconPresetId: true, iconImageUrl: true, iconAssetId: true },
       orderBy: categoryOrderBy,
     }),
-    prisma.spot.count({ where: { floor: { mapId: map.id }, OR: [{ x: null }, { y: null }] } }),
-    prisma.spot.count({ where: { floor: { mapId: map.id }, x: { not: null }, y: { not: null }, isPublished: false } }),
+    prisma.spot.count({ where: { mapUsage: { mapId: map.id, placements: { none: { x: { not: null }, y: { not: null } } } } } }),
+    prisma.spot.count({ where: { mapUsage: { mapId: map.id, placements: { some: { x: { not: null }, y: { not: null } } } }, isPublished: false } }),
   ])
 
   return {
     taskCounts: { unplaced, positionedTargetOff },
     spots: spots.map(spot => ({
       id: spot.id,
-      floorId: spot.floorId,
-      floorName: spot.floor.name,
+      floorId: spot.floorId ?? '',
+      floorName: spot.floor?.name ?? 'フロア未設定',
       name: spot.name,
       address: spot.address,
       categories: sortSpotCategories(spot.spotCategories.map(relation => relation.category)),
@@ -95,6 +96,10 @@ export default defineEventHandler(async (event): Promise<AdminSpotListResponse> 
       lat: spot.lat,
       lng: spot.lng,
       isPublished: spot.isPublished,
+      hasPositionedPlacement: spot.mapUsage?.placements.some(item => item.x !== null && item.y !== null),
+      positionedPlacementId: spot.mapUsage?.placements.find(item => item.x !== null && item.y !== null && (!floorId || item.floorId === floorId))?.id,
+      positionedFloorId: spot.mapUsage?.placements.find(item => item.x !== null && item.y !== null && (!floorId || item.floorId === floorId))?.floorId,
+      positionedFloorName: spot.mapUsage?.placements.find(item => item.x !== null && item.y !== null && (!floorId || item.floorId === floorId))?.floor.name,
 
 
 
@@ -109,7 +114,7 @@ export default defineEventHandler(async (event): Promise<AdminSpotListResponse> 
       updatedAt: spot.updatedAt.toISOString(),
       liveVersion: spot.liveVersion,
       photoCount: spotPhotoCount(spot.photosJson, spot._count.photos),
-    })).filter(spot => query.photo !== 'none' || spot.photoCount === 0),
+    })).flatMap((spot, index) => query.view !== 'placements' ? [spot] : (spots[index]!.mapUsage?.placements ?? []).filter(item => (!floorId || item.floorId === floorId) && (!position || (position === 'positioned' ? item.x !== null && item.y !== null : item.x === null && item.y === null))).map(placement => ({ ...spot, id: placement.id, canonicalSpotId: spot.id, placementId: placement.id, placementVersion: placement.version, floorId: placement.floorId, floorName: placement.floor.name, x: placement.x, y: placement.y }))).filter(spot => query.photo !== 'none' || spot.photoCount === 0),
     filters: {
       categories,
       floors,
