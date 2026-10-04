@@ -29,7 +29,7 @@ export default defineEventHandler(async (event): Promise<CategoryResponse> => {
     return { category: toCategorySummary(category) }
   }
   catch (error) {
-    if (isUniqueConstraintError(error)) throw createError({ statusCode: 409, statusMessage: '同じ名前のカテゴリーが既にあります。' })
+    if (isUniqueConstraintError(error)) throw createError({ statusCode: 409, statusMessage: 'このワークスペースで同じカテゴリー名は使用済みです。別マップとの共有は現在できません。' })
     throw error
   }
 })

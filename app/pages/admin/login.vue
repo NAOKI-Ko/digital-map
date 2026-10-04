@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { authReturnPath } from '~~/shared/utils/auth-return'
 import { useForm } from 'vee-validate'
 import { loginSchema } from '~~/shared/schemas/auth'
 
@@ -21,20 +22,7 @@ const { defineField, errors, handleSubmit, setErrors } = useForm({
 const [email, emailAttrs] = defineField('email')
 const [password, passwordAttrs] = defineField('password')
 
-const redirectTarget = computed(() => {
-  const redirect = route.query.redirect
-
-  if (
-    typeof redirect === 'string'
-    && redirect.startsWith('/admin/')
-    && !redirect.startsWith('//')
-    && redirect !== '/admin/login'
-  ) {
-    return redirect
-  }
-
-  return '/admin/dashboard'
-})
+const redirectTarget = computed(() => authReturnPath(route.query.redirect))
 
 if (loggedIn.value) {
   await navigateTo(redirectTarget.value)

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import WorkspaceContext from '~/components/admin/WorkspaceContext.vue'
 const route = useRoute()
 const isNavigationOpen = ref(false)
 const sidebarExpanded = useState('admin-sidebar-expanded', () => false)
@@ -90,7 +91,7 @@ onBeforeUnmount(() => {
     </Transition>
 
     <main class="min-h-screen transition-[padding] duration-200 motion-reduce:transition-none" :class="sidebarExpanded ? 'lg:pl-64' : 'lg:pl-[4.5rem]'" :inert="isNavigationOpen || undefined" @transitionend="signalMapResize">
-      <div class="mx-auto w-full max-w-[90rem] px-4 py-6 sm:px-6 lg:px-8 lg:py-8"><slot /></div>
+      <div class="mx-auto w-full max-w-[90rem] px-4 py-6 sm:px-6 lg:px-8 lg:py-8"><WorkspaceContext /><slot /></div>
     </main>
   </div>
 </template>

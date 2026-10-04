@@ -1,10 +1,13 @@
 <script setup lang="ts">
+import JourneyStatus from '~/components/admin/JourneyStatus.vue'
+import UnsavedChangesGuard from '~/components/admin/UnsavedChangesGuard.vue'
 import SaveFeedback from '~/components/ui/SaveFeedback.vue'
 import type { AdminMapResponse } from '~~/shared/types/map'
 import type { MapFloorListResponse } from '~~/shared/types/floor'
 import type { CategoryListResponse } from '~~/shared/types/category'
 
 definePageMeta({ layout: 'admin', middleware: 'auth' })
+useHead({ title: 'マップの準備 | デジタルマップ' })
 const route = useRoute()
 const mapId = route.params.mapId as string
 const [{ data: mapData }, { data: floors }, { data: categories, refresh: refreshCategories }] = await Promise.all([
@@ -19,6 +22,7 @@ const message = ref('')
 const categorySaveState = ref<'idle' | 'saving' | 'success' | 'error'>('idle')
 
 async function addCategories() {
+  if (categorySaveState.value === 'saving') return
   const names = [...new Set([...selectedTemplates.value, customCategory.value.trim()].filter(Boolean))]
     .filter(name => !categories.value?.categories.some(category => category.name === name))
   try {
@@ -35,8 +39,9 @@ async function addCategories() {
     message.value = `${names.length}件のカテゴリーを追加しました。`
     categorySaveState.value = 'success'
   }
-  catch {
-    message.value = 'カテゴリーを追加できませんでした。'
+  catch (error: any) {
+    await refreshCategories()
+    message.value = error?.data?.statusMessage ?? 'カテゴリーを追加できませんでした。追加済みの項目は保持しています。'
     categorySaveState.value = 'error'
   }
 }
@@ -49,19 +54,20 @@ async function addCategories() {
     <p class="mt-2 text-sm text-stone-600">マップの位置合わせは任意です。イラストと項目を登録すれば、設定とスポット登録を進められます。</p>
     <SaveFeedback v-if="route.query.saved === 'map-created'" class="mt-5" state="success" message="マップを作成しました。セットアップを続けてください。" />
 
+    <JourneyStatus :map-id="mapId" />
     <ol class="mt-8 grid gap-4 sm:grid-cols-2">
       <li class="rounded-2xl border bg-white p-5"><b>1. イラストを登録</b><p class="mt-2 text-sm text-stone-600">{{ floors?.floors.length ? `${floors.floors.length}フロア登録済み` : '未登録' }}</p><NuxtLink :to="`/admin/maps/${mapId}/floors`" class="mt-4 inline-flex text-sm font-semibold text-terracotta-700">フロアとイラストを設定 →</NuxtLink></li>
       <li class="rounded-2xl border bg-white p-5"><b>2. カテゴリーを設定</b><p class="mt-2 text-sm text-stone-600">{{ categories?.categories.length ?? 0 }}件登録済み</p></li>
-      <li class="rounded-2xl border bg-white p-5"><b>3. スポット情報項目を確認</b><p class="mt-2 text-sm text-stone-600">標準の項目を作成済みです。</p><NuxtLink :to="`/admin/maps/${mapId}/fields`" class="mt-4 inline-flex text-sm font-semibold text-terracotta-700">項目を確認 →</NuxtLink></li>
+      <li class="rounded-2xl border bg-white p-5"><b>3. スポット情報項目を確認</b><p class="mt-2 text-sm text-stone-600">作成時に標準項目を準備します。有効な項目・必須設定は項目画面で確認できます。</p><NuxtLink :to="`/admin/maps/${mapId}/fields`" class="mt-4 inline-flex text-sm font-semibold text-terracotta-700">項目を確認 →</NuxtLink></li>
       <li class="rounded-2xl border bg-white p-5"><b>4. スポットを登録</b><p class="mt-2 text-sm text-stone-600">イラスト登録後に配置できます。</p><NuxtLink :to="`/admin/maps/${mapId}/spots`" class="mt-4 inline-flex text-sm font-semibold text-terracotta-700">スポット管理へ →</NuxtLink></li>
     </ol>
 
     <section class="mt-6 rounded-2xl border bg-white p-6">
       <h2 class="font-bold">観光向けカテゴリー候補（任意）</h2>
-      <p class="mt-1 text-sm text-stone-600">必要なものだけ選んで追加します。自動追加はされません。</p>
+      <p class="mt-1 text-sm text-stone-600">必要なものだけ選んで追加します。自動追加はされません。同じワークスペースでカテゴリー名は重複できず、別マップとの共有は現在できません。別名で区別する場合は管理の負担が増えます。</p>
       <div class="mt-4 flex flex-wrap gap-3"><label v-for="name in tourismTemplates" :key="name" class="flex items-center gap-2 rounded-lg border px-3 py-2 text-sm"><input v-model="selectedTemplates" type="checkbox" :value="name">{{ name }}</label></div>
       <label class="mt-5 block text-sm font-semibold">独自カテゴリー<input v-model="customCategory" maxlength="50" class="mt-2 w-full max-w-sm rounded-lg border border-stone-300 px-3 py-2"></label>
-      <button type="button" :disabled="!selectedTemplates.length && !customCategory.trim()" class="mt-4 rounded-lg bg-stone-900 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-40" @click="addCategories">選択したカテゴリーを追加</button>
+      <button type="button" :disabled="categorySaveState === 'saving' || (!selectedTemplates.length && !customCategory.trim())" class="mt-4 rounded-lg bg-stone-900 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-40" @click="addCategories">選択したカテゴリーを追加</button>
       <SaveFeedback class="mt-3" :state="categorySaveState" :message="message" />
     </section>
 
@@ -70,5 +76,6 @@ async function addCategories() {
       <p class="mt-2 text-sm text-stone-600">マップの位置合わせ、ワークスペース情報・ロゴ、装飾は必要に応じて追加できます。</p>
       <NuxtLink :to="`/admin/maps/${mapId}/settings`" class="mt-4 inline-flex rounded-lg border border-stone-300 px-4 py-2.5 text-sm font-semibold">マップ設定を開く</NuxtLink>
     </section>
+    <UnsavedChangesGuard :dirty="(selectedTemplates.length > 0 || Boolean(customCategory.trim())) && categorySaveState !== 'saving'" />
   </div>
 </template>

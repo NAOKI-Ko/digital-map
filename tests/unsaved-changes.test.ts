@@ -6,7 +6,7 @@ const spotForm = readFileSync(new URL('../app/components/admin/SpotForm.vue', im
 
 describe('未保存変更ガード', () => {
   it('cleanなら通過し、dirtyな内部遷移だけを保留する', () => {
-    expect(guard).toContain('if (!props.dirty || bypassNextNavigation) return true')
+    expect(guard).toContain('if (!props.dirty) return true')
     expect(guard).toContain('return false')
   })
   it('編集継続は入力を破棄せず、明示破棄だけが保留先へ移動する', () => {

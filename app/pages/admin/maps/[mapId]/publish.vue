@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import JourneyStatus from '~/components/admin/JourneyStatus.vue'
 import PublicSharePanel from '~/components/admin/PublicSharePanel.vue'
 import ConfirmDialog from '~/components/ui/ConfirmDialog.vue'
 import { buildPublicMapUrl } from '~~/shared/utils/public-url'
@@ -132,6 +133,7 @@ async function rollbackRelease(releaseId: string) {
         <p class="mt-2 text-sm leading-6 text-stone-600">マップの見え方と、閲覧者に表示する内容を管理します。編集中の変更は、公開するまで閲覧者には反映されません。</p>
       </header>
 
+      <JourneyStatus :map-id="mapId" />
       <section class="mt-6 border-y border-stone-200 py-5">
         <div class="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div>

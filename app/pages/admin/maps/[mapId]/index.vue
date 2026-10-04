@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import JourneyStatus from '~/components/admin/JourneyStatus.vue'
 import type { MapHomeSummaryResponse } from '~~/shared/types/map-home'
 import { mapVisibilityLabel } from '~/utils/admin-publication-copy'
 import { visitorPreviewPath } from '~~/shared/utils/visitor-preview'
@@ -46,6 +47,7 @@ function formatDateTime(value: string) {
       </div>
       <p v-if="data.map.isPublished" class="mt-2 text-xs text-stone-600">編集中の変更は、次に「編集中の内容を公開する」まで閲覧者の表示に反映されません。</p>
 
+      <JourneyStatus :map-id="mapId" />
       <section class="mt-6 grid grid-cols-2 divide-x divide-stone-200 border-y border-stone-200 py-2 lg:grid-cols-4" aria-label="マップの概要">
         <AdminMetricCard label="スポット" :value="data.metrics.spotCount" hint="登録済み" />
         <AdminMetricCard label="未配置" :value="data.metrics.unpositionedSpotCount" :hint="data.metrics.unpositionedSpotCount ? '位置設定が必要' : 'すべて配置済み'" :tone="data.metrics.unpositionedSpotCount ? 'warning' : 'neutral'" />
