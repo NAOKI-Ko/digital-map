@@ -568,3 +568,28 @@ defineExpose({
   }
 }
 </style>
+
+<style>
+/* Paint-copy handoff must be immediate, never a second opacity fade. */
+.visitor-map-viewer .map-viewer-marker__shape { transition-property: box-shadow; }
+.visitor-map-viewer .map-viewer-marker__illustration { transition-property: filter; }
+.visitor-map-viewer .map-viewer-marker__ground-shadow { transition: none; }
+/* Only paint copies animate. The original artwork, button and MapLibre anchor
+   remain measurable at their final size throughout the entrance. */
+.visitor-map-viewer .map-viewer-marker--awaiting > *,
+.visitor-map-viewer .map-viewer-marker--entering > :not(.map-viewer-marker__entrance) { opacity: 0 !important; }
+.visitor-map-viewer .map-viewer-marker__entrance {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  transform-origin: bottom center;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .visitor-map-viewer .map-viewer-marker__entrance { display: none; }
+  .visitor-map-viewer .map-viewer-marker--awaiting > *,
+  .visitor-map-viewer .map-viewer-marker--entering > :not(.map-viewer-marker__entrance) { opacity: 1 !important; }
+}
+</style>

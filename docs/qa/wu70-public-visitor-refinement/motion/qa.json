@@ -1,0 +1,136 @@
+{
+  "baselineSha": "7120240006355a36e2be471ef77e7b2917d916db",
+  "scope": "Public Map / Authenticated LIVE / visitor renderer only; no Admin, Paper, Domain, Billing, Search, Routing feature or Production changes",
+  "animation": {
+    "durationMs": 200,
+    "opacity": [
+      0,
+      1
+    ],
+    "scale": [
+      0.7,
+      1.06,
+      1
+    ],
+    "translateY": [
+      5,
+      0
+    ],
+    "delayMs": 24,
+    "maxDelayMs": 240,
+    "maxTotalMs": 440,
+    "order": "viewport-center outward; at most 11 waves, priority within each wave; focused PIN immediate",
+    "triggers": [
+      "initial map with image ready and camera stationary",
+      "floor ID change including returning to a floor"
+    ],
+    "neverReplay": [
+      "pan",
+      "zoom",
+      "collision split",
+      "representative change",
+      "Category filter rebuild"
+    ],
+    "geometry": "inert aria-hidden paint copies animate; original artwork remains at final measurable dimensions; 60px button and MapLibre anchor untouched",
+    "interruption": "pointerdown/key input ends entrance immediately",
+    "reducedMotion": "no paint copies; immediate display; CSS also removes pop when preference changes"
+  },
+  "layout": {
+    "compared": [
+      "existing horizontal chips",
+      "240px one-column floating palette",
+      "400px two-column grid"
+    ],
+    "decision": "240px vertical; grid wrapped tourist labels excessively and covered more illustration",
+    "maxHeight": "50dvh",
+    "breakpoint": "existing Tailwind lg=1024px; md=768px remains horizontal",
+    "content": "icon/label/check/spot count; always visible all/clear and selected-category count; internal vertical scrolling",
+    "camera": "same existing bottom fit band; full-width Map unchanged"
+  },
+  "viewportComparison": [
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "maxAnchorDelta": 0,
+      "beforeVisible": 7,
+      "afterVisible": 7,
+      "sameStates": true
+    },
+    {
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "maxAnchorDelta": 0,
+      "beforeVisible": 15,
+      "afterVisible": 15,
+      "sameStates": true
+    },
+    {
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "maxAnchorDelta": 0,
+      "beforeVisible": 10,
+      "afterVisible": 10,
+      "sameStates": true
+    },
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "maxAnchorDelta": 0,
+      "beforeVisible": 18,
+      "afterVisible": 18,
+      "sameStates": true
+    },
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 700
+      },
+      "maxAnchorDelta": 0,
+      "beforeVisible": 8,
+      "afterVisible": 8,
+      "sameStates": true
+    }
+  ],
+  "regression": {
+    "motionGeometryMaxDeltaPx": 0,
+    "motionVisibilityBadgeStates": 1,
+    "handoffOpacityFailures": 0,
+    "publicLiveParity": "390x844 and1440x700: anchor/artwork positions, visible IDs and badges match exactly",
+    "detailCameraAnchorMaxDeltaPx": 0,
+    "pan": "18 dense visible IDs and badge counts unchanged for20px pan; no entrance copies",
+    "zoom": "staged zoom split, zoom-out regroup; no replay",
+    "spiderfy": "coincident and near/maxZoom group recover; keyboard selection/Escape/overview pass",
+    "types": "existing preset/custom/illustration, selected/featured, small/medium/large geometry tests retained",
+    "category": "18 categories with long Japanese and unbroken English labels; multi-select, Enter, clear and scroll pass; no horizontal overflow in desktop list",
+    "mobile": "native horizontal chips and fixed clear remain;390x650 additional short-height check fits",
+    "reducedMotion": "unit test plus temporary forced dev branch and CSS in actual browser: zero paint copies; source restored afterwards"
+  },
+  "checks": {
+    "tests": {
+      "pass": 722,
+      "skip": 18,
+      "fail": 0
+    },
+    "typecheck": "PASS",
+    "build": "PASS",
+    "diffCheck": "PASS",
+    "review": "P2 opacity handoff fixed; final Codex review no actionable defects; reviewer had no browser, primary agent completed actual browser QA"
+  },
+  "verdict": {
+    "mobileDesktop": "Mobile remains natural; Desktop clearly improves category scanning and multiselect",
+    "motion": "A brief map startup cue rather than an extended effect;200ms/1.06 preferred over220ms/1.08; no clear remaining friction in browser QA"
+  },
+  "unverified": [
+    "physical mobile touch/pinch/browser chrome and nonzero safe-area insets",
+    "native OS reduced-motion preference toggle (reduced branch and CSS were forced in dev for browser QA)",
+    "Human acceptance; no merge"
+  ]
+}

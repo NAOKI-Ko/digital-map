@@ -38,7 +38,7 @@ watch(categoryDock, (element, _previous, onCleanup) => {
   if (!element) return
   let frame: number | null = null
   const measure = () => {
-    const height = Math.ceil(element.getBoundingClientRect().height)
+    const height = Number.parseFloat(getComputedStyle(element).getPropertyValue('--category-fit-height')) || Math.ceil(element.getBoundingClientRect().height)
     if (height > 0 || !categories.value.length) categoryDockHeight.value = height
   }
   const observer = new ResizeObserver(() => {
@@ -87,6 +87,13 @@ const displayedDecorations = computed(() => (
 const categories = computed(() => (
   collectSpotCategories(selectedFloor.value?.spots ?? [])
 ))
+const categoryCounts = computed(() => {
+  const counts: Record<string, number> = {}
+  for (const spot of selectedFloor.value?.spots ?? []) {
+    for (const category of spot.categories) counts[category.id] = (counts[category.id] ?? 0) + 1
+  }
+  return counts
+})
 const visibleSpots = computed(() => filterSpotsByCategoryIds(selectedFloor.value?.spots ?? [], selectedCategoryIds.value))
 const selectedCategoryNames = computed(() => categories.value.filter(category => selectedCategoryIds.value.includes(category.id)).map(category => category.name).join('・'))
 const showFloorSelector = computed(() => shouldShowFloorSelector(data.value?.map.floors.length ?? 0))
@@ -304,18 +311,20 @@ onBeforeUnmount(clearPendingSpotClose)
 
         <div
           ref="categoryDock"
-          data-map-fit-edge="bottom"
           v-show="!appModalOpen && !selectedSpot"
-          class="pointer-events-none absolute bottom-[calc(env(safe-area-inset-bottom)+2rem)] left-[calc(env(safe-area-inset-left)+0.75rem)] right-[calc(env(safe-area-inset-right)+0.75rem)] z-20 md:left-1/2 md:right-auto md:w-[min(50vw,44rem)] md:-translate-x-1/2"
+          class="pointer-events-none absolute bottom-[calc(env(safe-area-inset-bottom)+2rem)] left-[calc(env(safe-area-inset-left)+0.75rem)] right-[calc(env(safe-area-inset-right)+0.75rem)] z-20 md:left-1/2 md:right-auto md:w-[min(50vw,44rem)] md:-translate-x-1/2 lg:bottom-auto lg:left-5 lg:right-auto lg:top-20 lg:w-60 lg:translate-x-0 lg:[--category-fit-height:52px]"
+          :class="{ 'lg:!top-5': !showFloorSelector }"
         >
           <div class="pointer-events-auto">
-            <CategoryFilter v-model="selectedCategoryIds" :categories="categories" />
-            <p v-if="selectedCategoryIds.length" role="status" class="mt-1 flex max-w-full items-start gap-2 rounded-xl bg-white/95 px-3 py-1 text-xs font-semibold leading-5 text-stone-800">
+            <CategoryFilter v-model="selectedCategoryIds" :categories="categories" :counts="categoryCounts" />
+            <p v-if="selectedCategoryIds.length" role="status" class="mt-1 flex max-w-full items-start lg:hidden gap-2 rounded-xl bg-white/95 px-3 py-1 text-xs font-semibold leading-5 text-stone-800">
               <span class="min-w-0 flex-1 break-words">{{ selectedCategoryNames }}</span>
               <span class="shrink-0">{{ selectedCategoryIds.length }}カテゴリ · {{ visibleSpots.length }}件</span>
             </p>
           </div>
         </div>
+
+        <div v-show="!appModalOpen && !selectedSpot && categories.length" data-map-fit-edge="bottom" aria-hidden="true" class="pointer-events-none absolute bottom-[calc(env(safe-area-inset-bottom)+2rem)] left-3 right-3 lg:!h-[52px]" :style="{ height: `${categoryDockHeight}px` }" />
 
         <ClientOnly>
           <LazyMapViewer

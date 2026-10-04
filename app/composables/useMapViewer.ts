@@ -1,3 +1,4 @@
+import { createPinEntrance } from '~/utils/marker-entrance'
 import { onBeforeUnmount, onMounted, readonly, ref, shallowRef, watch, type Ref } from 'vue'
 import type { IControl, ImageSource, Map as MapLibreMap, Marker, MarkerOptions } from 'maplibre-gl'
 import { getFloorCorners, imageToRenderCoordinates, isValidImagePosition, renderToImageCoordinates, toImageCoordinates, type ImagePosition, type LatLng } from '~~/lib/geo'
@@ -245,6 +246,7 @@ export function useMapViewer(
   let collisionFrame: number | null = null
   let collisionCandidates: import('~/utils/marker-collision').CollisionCandidate[] = []
   let previousWinners = new Set<string>()
+  const pinEntrance = createPinEntrance()
   let localeObserver: MutationObserver | null = null
   function syncVisitorControlLabels() {
     if (!options.visitorOverview?.value) return
@@ -345,7 +347,10 @@ export function useMapViewer(
         localeObserver.observe(controls, { subtree: true, childList: true, attributes: true, attributeFilter: ['aria-label', 'title'] })
       }
       container.value.addEventListener('keydown', recovery.onKey, true)
+      container.value.addEventListener('pointerdown', pinEntrance.finish, true)
+      container.value.addEventListener('keydown', pinEntrance.finish, true)
       instance.on('movestart', recovery.onMotion)
+      instance.on('movestart', event => { if (event.originalEvent) pinEntrance.finish() })
       instance.on('movestart', event => { if (event.originalEvent) discardDetailContext() })
       instance.on('click', () => recovery.close())
       container.value.addEventListener('focusin', syncMarkerDensity)
@@ -389,10 +394,13 @@ export function useMapViewer(
   }
 
   function destroy() {
+    pinEntrance.finish()
     localeObserver?.disconnect()
     localeObserver = null
     recovery.close()
     container.value?.removeEventListener('keydown', recovery.onKey, true)
+    container.value?.removeEventListener('pointerdown', pinEntrance.finish, true)
+    container.value?.removeEventListener('keydown', pinEntrance.finish, true)
     container.value?.removeEventListener('focusin', syncMarkerDensity)
     container.value?.removeEventListener('focusout', syncMarkerDensity)
     if (collisionFrame !== null) window.cancelAnimationFrame(collisionFrame)
@@ -450,6 +458,9 @@ export function useMapViewer(
 
       return marker
     })
+    if (options.mode === 'view' && options.visitorOverview?.value) {
+      pinEntrance.prepare(options.floor.value.id, spotMarkerElements.map(item => item.element))
+    }
     syncMarkerDensity()
   }
 
@@ -510,6 +521,12 @@ export function useMapViewer(
         if (hasCollision) element.setAttribute('aria-expanded', String(recovery.hasMember(spot.id)))
         else element.removeAttribute('aria-expanded')
       })
+      if (options.visitorOverview?.value && floorImageState.value !== 'loading' && !instance.isMoving()) {
+        const candidates = new Map(collisionCandidates.map(pin => [pin.id, pin]))
+        pinEntrance.play(spotMarkerElements.filter(({ element }) => element.dataset.pinVisible === 'true').map(({ element, spot }) => ({
+          element, id: spot.id, priority: candidates.get(spot.id)!.priority, centerDistance: candidates.get(spot.id)!.centerDistance ?? 0,
+        })), window.matchMedia('(prefers-reduced-motion: reduce)').matches || floorImageState.value === 'error')
+      }
     })
   }
 
@@ -699,6 +716,7 @@ export function useMapViewer(
     destroy()
   })
 
+  watch(floorImageState, syncMarkerDensity)
   watch(() => options.spots.value, syncSpotMarkers, { deep: true })
   if (options.locale) watch(options.locale, syncVisitorControlLabels)
   watch(() => options.decorations.value, syncDecorations, { deep: true })
