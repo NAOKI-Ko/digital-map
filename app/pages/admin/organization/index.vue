@@ -110,7 +110,7 @@ async function run(action: () => Promise<void>) {
 
     <section v-if="organizationError" class="mt-6 rounded-xl border border-red-200 bg-red-50 p-5 text-sm text-red-800">ワークスペース設定とメンバー管理は、ワークスペースのオーナーだけが利用できます。</section>
 
-    <section v-if="organization" id="settings" class="mt-6 scroll-mt-6 border-t border-stone-200 pt-5">
+    <section v-if="organization" id="settings" class="mt-6 scroll-mt-24 border-t border-stone-200 pt-5 lg:scroll-mt-6">
       <h2 class="text-lg font-bold">ワークスペース設定</h2>
       <form class="mt-5 grid gap-4" @submit.prevent="saveOrganization">
         <label class="text-sm font-semibold">ワークスペース名<input v-model="form.name" required maxlength="100" class="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2.5"></label>
@@ -127,7 +127,7 @@ async function run(action: () => Promise<void>) {
       </form>
     </section>
 
-    <section v-if="organization" id="members" class="mt-6 scroll-mt-6 border-t border-stone-200 pt-5">
+    <section v-if="organization" id="members" class="mt-6 scroll-mt-24 border-t border-stone-200 pt-5 lg:scroll-mt-6">
       <h2 class="text-lg font-bold">ワークスペースへメンバーを招待</h2>
       <p class="mt-1 text-sm text-stone-600">招待を承認するまでメンバーには追加されません。招待リンクは発行時だけ表示されます。</p>
       <form class="mt-5 flex gap-3" @submit.prevent="addMember">
