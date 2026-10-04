@@ -1,3 +1,4 @@
+import { bindVisitorMarkerInteraction } from './marker-interaction'
 import { getPinIconPreset } from '~~/shared/constants/spot'
 import type { MapViewerSpot } from '~~/shared/types/map-viewer'
 import { getPinColorVariants } from '~~/shared/utils/pin-style'
@@ -118,6 +119,12 @@ export function createSpotMarkerElement(
   }
 
   if (options.mode === 'view' && options.visitor) {
+    if (spot.importance === 'featured') {
+      const decoration = ownerDocument.createElement('span')
+      decoration.className = 'map-viewer-marker__featured'
+      decoration.setAttribute('aria-hidden', 'true')
+      element.append(decoration)
+    }
     const badge = ownerDocument.createElement('span')
     badge.className = 'map-viewer-marker__collision-badge'
     badge.hidden = true
@@ -130,7 +137,8 @@ export function createSpotMarkerElement(
     element.append(name)
   }
 
-  element.addEventListener('click', (event) => {
+  if (options.mode === 'view' && options.visitor) bindVisitorMarkerInteraction(element, () => options.onSelected?.())
+  else element.addEventListener('click', (event) => {
     event.stopPropagation()
     options.onSelected?.()
   })

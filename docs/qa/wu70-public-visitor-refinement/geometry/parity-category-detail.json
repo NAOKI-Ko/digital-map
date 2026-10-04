@@ -1,0 +1,42 @@
+{
+  "public": [
+    {
+      "badge": "1",
+      "height": 60,
+      "id": "cmubo9ymg000968vahxbrk9sz",
+      "visible": "true",
+      "width": 60,
+      "x": 202.45306396484375,
+      "y": 376.83648681640625
+    },
+    {
+      "badge": "1",
+      "height": 60,
+      "id": "cmubo9yme000868vaj6v3h6s7",
+      "visible": "true",
+      "width": 60,
+      "x": 127.9518585205078,
+      "y": 347.32391357421875
+    }
+  ],
+  "live": [
+    {
+      "badge": "1",
+      "height": 60,
+      "id": "cmubo9ymg000968vahxbrk9sz",
+      "visible": "true",
+      "width": 60,
+      "x": 202.45306396484375,
+      "y": 376.83648681640625
+    },
+    {
+      "badge": "1",
+      "height": 60,
+      "id": "cmubo9yme000868vaj6v3h6s7",
+      "visible": "true",
+      "width": 60,
+      "x": 127.9518585205078,
+      "y": 347.32391357421875
+    }
+  ]
+}

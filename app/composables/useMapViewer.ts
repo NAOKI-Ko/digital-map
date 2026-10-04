@@ -1,11 +1,13 @@
+import { createPinEntrance } from '~/utils/marker-entrance'
 import { onBeforeUnmount, onMounted, readonly, ref, shallowRef, watch, type Ref } from 'vue'
-import type { IControl, Map as MapLibreMap, Marker, MarkerOptions } from 'maplibre-gl'
+import type { IControl, ImageSource, Map as MapLibreMap, Marker, MarkerOptions } from 'maplibre-gl'
 import { getFloorCorners, imageToRenderCoordinates, isValidImagePosition, renderToImageCoordinates, toImageCoordinates, type ImagePosition, type LatLng } from '~~/lib/geo'
 import { getDecorationRenderCoordinates } from '~~/lib/decoration'
 import type { MapViewerCameraState, MapViewerDecoration, MapViewerFloor, MapViewerSpot } from '~~/shared/types/map-viewer'
 import { createSpotMarkerElement } from '~/utils/marker-element'
 import { applyMarkerDensityPresentation, getMarkerDensityPresentation } from '~/utils/marker-density'
-import { applyPinVisibility, declutterPins, getCollisionRepresentatives, measurePinRect } from '~/utils/marker-collision'
+import { applyPinVisibility, declutterPins, getCollisionRepresentatives, measurePinRect, measurePinVisualRect, VISITOR_PIN_COLLISION_GAP } from '~/utils/marker-collision'
+import { monitorFloorImage } from '~/utils/floor-image-state'
 import { getMinimalSpotPan, needsHeadingReset } from '~/utils/public-map-exploration'
 import { measureVisitorFitPadding } from '~/utils/visitor-floor-fit'
 import {
@@ -231,6 +233,7 @@ export function useMapViewer(
   const maplibre = shallowRef<typeof import('maplibre-gl') | null>(null)
   const mapError = ref('')
   const floorError = ref('')
+  const floorImageState = ref<'idle' | 'loading' | 'loaded' | 'error'>('idle')
   const isReady = ref(false)
   let draftMarker: Marker | null = null
   let spotMarkers: Marker[] = []
@@ -243,6 +246,7 @@ export function useMapViewer(
   let collisionFrame: number | null = null
   let collisionCandidates: import('~/utils/marker-collision').CollisionCandidate[] = []
   let previousWinners = new Set<string>()
+  const pinEntrance = createPinEntrance()
   let localeObserver: MutationObserver | null = null
   function syncVisitorControlLabels() {
     if (!options.visitorOverview?.value) return
@@ -343,7 +347,10 @@ export function useMapViewer(
         localeObserver.observe(controls, { subtree: true, childList: true, attributes: true, attributeFilter: ['aria-label', 'title'] })
       }
       container.value.addEventListener('keydown', recovery.onKey, true)
+      container.value.addEventListener('pointerdown', pinEntrance.finish, true)
+      container.value.addEventListener('keydown', pinEntrance.finish, true)
       instance.on('movestart', recovery.onMotion)
+      instance.on('movestart', event => { if (event.originalEvent) pinEntrance.finish() })
       instance.on('movestart', event => { if (event.originalEvent) discardDetailContext() })
       instance.on('click', () => recovery.close())
       container.value.addEventListener('focusin', syncMarkerDensity)
@@ -387,10 +394,13 @@ export function useMapViewer(
   }
 
   function destroy() {
+    pinEntrance.finish()
     localeObserver?.disconnect()
     localeObserver = null
     recovery.close()
     container.value?.removeEventListener('keydown', recovery.onKey, true)
+    container.value?.removeEventListener('pointerdown', pinEntrance.finish, true)
+    container.value?.removeEventListener('keydown', pinEntrance.finish, true)
     container.value?.removeEventListener('focusin', syncMarkerDensity)
     container.value?.removeEventListener('focusout', syncMarkerDensity)
     if (collisionFrame !== null) window.cancelAnimationFrame(collisionFrame)
@@ -448,6 +458,9 @@ export function useMapViewer(
 
       return marker
     })
+    if (options.mode === 'view' && options.visitorOverview?.value) {
+      pinEntrance.prepare(options.floor.value.id, spotMarkerElements.map(item => item.element))
+    }
     syncMarkerDensity()
   }
 
@@ -469,7 +482,7 @@ export function useMapViewer(
       const instance = map.value
       if (!instance) return
       const presentations = spotMarkerElements.map(({ element, spot }) => {
-        const presentation = getMarkerDensityPresentation(spot.importance, spot.pinSize ?? 'medium', instance.getZoom(), instance.getMinZoom(), options.mode === 'edit' || spot.id === options.selectedSpotId.value, options.prioritizeVisibleSpots?.value ?? false)
+        const presentation = getMarkerDensityPresentation(spot.importance, spot.pinSize ?? 'medium', instance.getZoom(), instance.getMinZoom(), options.mode === 'edit' || spot.id === options.selectedSpotId.value, options.prioritizeVisibleSpots?.value ?? false, options.visitorOverview?.value ?? false)
         if (element.contains(element.ownerDocument.activeElement)) presentation.visible = true
         if (options.mode === 'edit') applyMarkerDensityPresentation(element, presentation)
         else {
@@ -483,18 +496,15 @@ export function useMapViewer(
       // All scale writes precede all geometry reads; visibility writes happen last.
       const frame = container.value!.getBoundingClientRect()
       collisionCandidates = presentations.map(({ element, spot, presentation }) => {
-        const rect = measurePinRect(element)
+        const rect = options.visitorOverview?.value ? measurePinVisualRect(element) : measurePinRect(element)
         return { id: spot.id, priority: presentation.priority, protected: element.contains(element.ownerDocument.activeElement), rect,
           centerDistance: Math.hypot((rect.left+rect.right)/2-frame.left-frame.width/2,(rect.top+rect.bottom)/2-frame.top-frame.height/2) }
       })
       const eligible = new Set(presentations.filter(item => item.presentation.visible).map(item => item.spot.id))
-      const visible = declutterPins(collisionCandidates.filter(pin => eligible.has(pin.id)), undefined, previousWinners)
+      const gap = options.visitorOverview?.value ? VISITOR_PIN_COLLISION_GAP : undefined
+      const visible = declutterPins(collisionCandidates.filter(pin => eligible.has(pin.id)), gap, previousWinners, frame)
       previousWinners = visible
-      const onscreenVisible = new Set([...visible].filter(id => {
-        const rect = collisionCandidates.find(pin => pin.id === id)!.rect
-        return rect.right > frame.left && rect.left < frame.right && rect.bottom > frame.top && rect.top < frame.bottom
-      }))
-      const groupSizes = getCollisionRepresentatives(collisionCandidates, onscreenVisible)
+      const groupSizes = getCollisionRepresentatives(collisionCandidates, visible, gap)
       presentations.forEach(({ element, spot }) => {
         // Spread clones are the visible, keyboard reachable representation while open.
         applyPinVisibility(element, recovery.isOpen() ? !recovery.hasMember(spot.id) && visible.has(spot.id) : visible.has(spot.id))
@@ -511,6 +521,12 @@ export function useMapViewer(
         if (hasCollision) element.setAttribute('aria-expanded', String(recovery.hasMember(spot.id)))
         else element.removeAttribute('aria-expanded')
       })
+      if (options.visitorOverview?.value && floorImageState.value !== 'loading' && !instance.isMoving()) {
+        const candidates = new Map(collisionCandidates.map(pin => [pin.id, pin]))
+        pinEntrance.play(spotMarkerElements.filter(({ element }) => element.dataset.pinVisible === 'true').map(({ element, spot }) => ({
+          element, id: spot.id, priority: candidates.get(spot.id)!.priority, centerDistance: candidates.get(spot.id)!.centerDistance ?? 0,
+        })), window.matchMedia('(prefers-reduced-motion: reduce)').matches || floorImageState.value === 'error')
+      }
     })
   }
 
@@ -616,6 +632,7 @@ export function useMapViewer(
     }
     activeLayerId = null
     activeSourceId = null
+    floorImageState.value = 'idle'
   }
 
   function syncDecorations() {
@@ -671,6 +688,11 @@ export function useMapViewer(
     })
     activeSourceId = sourceId
     activeLayerId = layerId
+    if (options.visitorOverview?.value) {
+      const source = instance.getSource<ImageSource>(sourceId)!
+      monitorFloorImage(source, () => map.value === instance && activeSourceId === sourceId && instance.getSource(sourceId) === source,
+        state => { floorImageState.value = state })
+    }
     syncDecorations()
 
     if (refit) mapCamera.fitFloorBounds(corners, animate)
@@ -694,6 +716,7 @@ export function useMapViewer(
     destroy()
   })
 
+  watch(floorImageState, syncMarkerDensity)
   watch(() => options.spots.value, syncSpotMarkers, { deep: true })
   if (options.locale) watch(options.locale, syncVisitorControlLabels)
   watch(() => options.decorations.value, syncDecorations, { deep: true })
@@ -719,6 +742,7 @@ export function useMapViewer(
     map: readonly(map),
     mapError: readonly(mapError),
     floorError: readonly(floorError),
+    floorImageState: readonly(floorImageState),
     isReady: readonly(isReady),
     geolocationAvailable: geolocation.geolocationAvailable,
     geolocationAreaMessage: geolocation.geolocationAreaMessage,

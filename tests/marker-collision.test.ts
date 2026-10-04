@@ -35,16 +35,48 @@ describe('screen-space decluttering', () => {
     expect(getCollisionGroup('missing',candidates)).toEqual([])
   })
   it('ties use stable IDs; touching safety gap is allowed; zoom spacing reveals then suppresses', () => {
-    expect([...declutterPins([pin('b',2,69),pin('a',2)])]).toEqual(['a'])
-    expect([...declutterPins([pin('b',2,70),pin('a',2)])]).toEqual(['a','b'])
+    expect([...declutterPins([pin('b',2,65),pin('a',2)])]).toEqual(['a'])
+    expect([...declutterPins([pin('b',2,66),pin('a',2)])]).toEqual(['a','b'])
     expect([...declutterPins([pin('b',2,35),pin('a',2)])]).toEqual(['a'])
   })
-  it('prefers viewport center in equal priorities, with an eight-pixel winner retention band', () => {
+  it('prefers viewport center initially and retains equal-priority winners during pan', () => {
     const a={...pin('a',2),centerDistance:50}, b={...pin('b',2),centerDistance:20}
     expect([...declutterPins([a,b])]).toEqual(['b'])
     expect([...declutterPins([{...a,centerDistance:25},b],10,new Set(['a']))]).toEqual(['a'])
-    expect([...declutterPins([{...a,centerDistance:30},b],10,new Set(['a']))]).toEqual(['b'])
+    expect([...declutterPins([{...a,centerDistance:30},b],6,new Set(['a']))]).toEqual(['a'])
     expect([...declutterPins([a,{...b,priority:1}])]).toEqual(['a'])
+  })
+  it('retains representative order across pan but never outranks selection or category priority', () => {
+    const candidates = [pin('a',2,0),pin('bridge',1,60),pin('b',2,120)]
+    const previous = new Set(['a','b'])
+    const panned = candidates.map(p => ({...p, centerDistance:p.id === 'b' ? 0 : 250}))
+    const visible = declutterPins(panned,6,previous)
+    expect([...visible]).toEqual(['a','b'])
+    expect([...getCollisionRepresentatives(panned,visible)]).toEqual([['a',3]])
+    expect([...declutterPins([pin('a',2),pin('category',3)],6,previous)]).toEqual(['category'])
+    expect([...declutterPins([pin('a',2),pin('selected',4)],6,previous)]).toEqual(['selected'])
+  })
+  it('admits separated hit targets six pixels apart, never actually overlapping targets', () => {
+    expect([...declutterPins([pin('a',2),pin('b',1,66)])]).toEqual(['a','b'])
+    expect([...declutterPins([pin('a',2),pin('b',1,66)],10)]).toEqual(['a'])
+    for (const x of [0,40,59.9,60,65.9]) expect([...declutterPins([pin('a',2),pin('b',1,x)])]).toEqual(['a'])
+  })
+  it('hands recovery to an onscreen neighbor when a retained winner pans beyond any viewport edge', () => {
+    const viewport = { left: 0, top: 0, right: 390, bottom: 844 }
+    for (const [outside, inside] of [
+      [pin('a',2,-65),pin('b',2,0)],
+      [pin('a',2,395),pin('b',2,330)],
+      [{...pin('a',2),rect:{left:100,right:160,top:-65,bottom:-5}}, {...pin('b',2),rect:{left:100,right:160,top:0,bottom:60}}],
+      [{...pin('a',2),rect:{left:100,right:160,top:849,bottom:909}}, {...pin('b',2),rect:{left:100,right:160,top:784,bottom:844}}],
+    ]) {
+      const candidates = [outside!,inside!]
+      const visible = declutterPins(candidates,6,new Set(['a']),viewport)
+      expect([...visible]).toEqual(['b'])
+      expect([...getCollisionRepresentatives(candidates,visible)]).toEqual([['b',2]])
+    }
+    // A partly visible winner stays stable; a target exactly outside is excluded.
+    expect([...declutterPins([pin('a',2,-59),pin('b',2,6)],6,new Set(['a']),viewport)]).toEqual(['a'])
+    expect([...declutterPins([pin('a',4,-60),pin('b',1,5)],6,new Set(['a']),viewport)]).toEqual(['b'])
   })
   it('larger actual artwork suppresses more neighbors without mutating canonical candidates', () => {
     const pins=[pin('a',2,0,80),pin('b',1,75)]

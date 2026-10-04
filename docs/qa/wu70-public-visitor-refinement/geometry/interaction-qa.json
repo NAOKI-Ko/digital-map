@@ -1,0 +1,757 @@
+{
+  "started": "2026-10-03T16:30:38.234Z",
+  "elapsedSeconds": 305,
+  "events": [
+    {
+      "label": "final QA start: geometry 0px",
+      "time": "2026-10-03T16:20:43.274Z",
+      "visible": [
+        "pair-a",
+        "pair-b",
+        "small",
+        "medium",
+        "large",
+        "wide",
+        "tall"
+      ],
+      "badges": []
+    },
+    {
+      "label": "dense +1 before pan",
+      "time": "2026-10-03T16:21:54.683Z",
+      "visible": [
+        "wu68-00",
+        "wu68-01",
+        "wu68-02",
+        "wu68-03",
+        "wu68-05",
+        "wu68-10",
+        "wu68-12",
+        "wu68-15",
+        "wu68-17",
+        "wu68-19",
+        "wu68-20",
+        "wu68-22",
+        "wu68-30",
+        "wu68-31",
+        "wu68-32",
+        "wu68-33",
+        "wu68-34",
+        "wu68-35"
+      ],
+      "badges": [
+        [
+          "wu68-30",
+          "6"
+        ],
+        [
+          "wu68-31",
+          "6"
+        ],
+        [
+          "wu68-32",
+          "6"
+        ],
+        [
+          "wu68-33",
+          "6"
+        ],
+        [
+          "wu68-34",
+          "6"
+        ],
+        [
+          "wu68-35",
+          "6"
+        ]
+      ]
+    },
+    {
+      "label": "pan right20",
+      "time": "2026-10-03T16:22:04.129Z",
+      "visible": [
+        "wu68-00",
+        "wu68-01",
+        "wu68-02",
+        "wu68-03",
+        "wu68-05",
+        "wu68-10",
+        "wu68-12",
+        "wu68-15",
+        "wu68-17",
+        "wu68-19",
+        "wu68-20",
+        "wu68-22",
+        "wu68-30",
+        "wu68-31",
+        "wu68-32",
+        "wu68-33",
+        "wu68-34",
+        "wu68-35"
+      ],
+      "badges": [
+        [
+          "wu68-30",
+          "6"
+        ],
+        [
+          "wu68-31",
+          "6"
+        ],
+        [
+          "wu68-32",
+          "6"
+        ],
+        [
+          "wu68-33",
+          "6"
+        ],
+        [
+          "wu68-34",
+          "6"
+        ],
+        [
+          "wu68-35",
+          "6"
+        ]
+      ]
+    },
+    {
+      "label": "pan left20",
+      "time": "2026-10-03T16:22:04.655Z",
+      "visible": [
+        "wu68-00",
+        "wu68-01",
+        "wu68-02",
+        "wu68-03",
+        "wu68-05",
+        "wu68-10",
+        "wu68-12",
+        "wu68-15",
+        "wu68-17",
+        "wu68-19",
+        "wu68-20",
+        "wu68-22",
+        "wu68-30",
+        "wu68-31",
+        "wu68-32",
+        "wu68-33",
+        "wu68-34",
+        "wu68-35"
+      ],
+      "badges": [
+        [
+          "wu68-30",
+          "6"
+        ],
+        [
+          "wu68-31",
+          "6"
+        ],
+        [
+          "wu68-32",
+          "6"
+        ],
+        [
+          "wu68-33",
+          "6"
+        ],
+        [
+          "wu68-34",
+          "6"
+        ],
+        [
+          "wu68-35",
+          "6"
+        ]
+      ]
+    },
+    {
+      "label": "repeat pan right20",
+      "time": "2026-10-03T16:22:05.048Z",
+      "visible": [
+        "wu68-00",
+        "wu68-01",
+        "wu68-02",
+        "wu68-03",
+        "wu68-05",
+        "wu68-10",
+        "wu68-12",
+        "wu68-15",
+        "wu68-17",
+        "wu68-19",
+        "wu68-20",
+        "wu68-22",
+        "wu68-30",
+        "wu68-31",
+        "wu68-32",
+        "wu68-33",
+        "wu68-34",
+        "wu68-35"
+      ],
+      "badges": [
+        [
+          "wu68-30",
+          "6"
+        ],
+        [
+          "wu68-31",
+          "6"
+        ],
+        [
+          "wu68-32",
+          "6"
+        ],
+        [
+          "wu68-33",
+          "6"
+        ],
+        [
+          "wu68-34",
+          "6"
+        ],
+        [
+          "wu68-35",
+          "6"
+        ]
+      ]
+    },
+    {
+      "label": "left edge long pan",
+      "time": "2026-10-03T16:22:13.701Z",
+      "visible": [
+        "wu68-03",
+        "wu68-05",
+        "wu68-10",
+        "wu68-15",
+        "wu68-17",
+        "wu68-22",
+        "wu68-33",
+        "wu68-34",
+        "wu68-35"
+      ],
+      "badges": [
+        [
+          "wu68-33",
+          "6"
+        ],
+        [
+          "wu68-34",
+          "6"
+        ],
+        [
+          "wu68-35",
+          "6"
+        ]
+      ]
+    },
+    {
+      "label": "representative tap separates at next stage",
+      "time": "2026-10-03T16:22:34.567Z",
+      "visible": [
+        "wu68-02",
+        "wu68-03",
+        "wu68-04",
+        "wu68-08",
+        "wu68-09",
+        "wu68-10",
+        "wu68-14",
+        "wu68-15",
+        "wu68-16",
+        "wu68-20",
+        "wu68-21",
+        "wu68-22",
+        "wu68-26",
+        "wu68-27",
+        "wu68-28",
+        "wu68-32",
+        "wu68-33",
+        "wu68-34"
+      ],
+      "badges": []
+    },
+    {
+      "label": "zoom-out merged",
+      "time": "2026-10-03T16:22:43.509Z",
+      "visible": [
+        "wu68-00",
+        "wu68-01",
+        "wu68-03",
+        "wu68-08",
+        "wu68-10",
+        "wu68-11",
+        "wu68-13",
+        "wu68-15",
+        "wu68-18",
+        "wu68-20",
+        "wu68-22",
+        "wu68-23",
+        "wu68-25",
+        "wu68-30",
+        "wu68-32",
+        "wu68-33",
+        "wu68-34",
+        "wu68-35"
+      ],
+      "badges": [
+        [
+          "wu68-00",
+          "6"
+        ],
+        [
+          "wu68-08",
+          "6"
+        ],
+        [
+          "wu68-13",
+          "6"
+        ],
+        [
+          "wu68-23",
+          "6"
+        ],
+        [
+          "wu68-33",
+          "6"
+        ],
+        [
+          "wu68-34",
+          "6"
+        ]
+      ]
+    },
+    {
+      "label": "active category",
+      "time": "2026-10-03T16:23:02.260Z",
+      "visible": [
+        "wu68-06",
+        "wu68-07",
+        "wu68-08",
+        "wu68-09",
+        "wu68-10",
+        "wu68-11",
+        "wu68-18",
+        "wu68-19",
+        "wu68-20",
+        "wu68-21",
+        "wu68-22",
+        "wu68-23",
+        "wu68-30",
+        "wu68-31",
+        "wu68-32",
+        "wu68-33",
+        "wu68-34",
+        "wu68-35"
+      ],
+      "badges": [
+        [
+          "wu68-18",
+          "6"
+        ],
+        [
+          "wu68-19",
+          "6"
+        ],
+        [
+          "wu68-20",
+          "6"
+        ],
+        [
+          "wu68-21",
+          "6"
+        ],
+        [
+          "wu68-22",
+          "6"
+        ],
+        [
+          "wu68-23",
+          "6"
+        ]
+      ]
+    },
+    {
+      "label": "overview after active category",
+      "time": "2026-10-03T16:23:11.551Z",
+      "visible": [
+        "wu68-19",
+        "wu68-21"
+      ],
+      "badges": [
+        [
+          "wu68-21",
+          "36"
+        ]
+      ]
+    },
+    {
+      "label": "near fixture reset by HMR; recovery needs replay",
+      "time": "2026-10-03T16:24:17.017Z",
+      "visible": [
+        "wu68-00"
+      ],
+      "badges": [
+        [
+          "wu68-00",
+          "3"
+        ]
+      ]
+    },
+    {
+      "label": "near maxZoom spiderfy verified",
+      "time": "2026-10-03T16:24:29.838Z",
+      "visible": [
+        "wu68-00",
+        "wu68-01",
+        "wu68-02"
+      ],
+      "badges": []
+    },
+    {
+      "label": "coincident direct spiderfy",
+      "time": "2026-10-03T16:26:42.461Z",
+      "visible": [
+        "wu68-00",
+        "wu68-01",
+        "wu68-02"
+      ],
+      "badges": []
+    },
+    {
+      "label": "neighbor intercepted badge correctly opens A coincident group",
+      "time": "2026-10-03T16:27:36.345Z",
+      "visible": [
+        "pair-b",
+        "small",
+        "medium",
+        "large",
+        "wide",
+        "tall",
+        "pair-a",
+        "pair-a2"
+      ],
+      "badges": []
+    },
+    {
+      "label": "FINAL uninterrupted QA start after source fixes and build",
+      "time": "2026-10-03T16:30:38.234Z"
+    },
+    {
+      "label": "Public category staged zoom reveals both",
+      "time": "2026-10-03T16:31:02.648Z",
+      "visible": [
+        "cmubo9ymg000968vahxbrk9sz",
+        "cmubo9yme000868vaj6v3h6s7"
+      ],
+      "badges": []
+    },
+    {
+      "label": "Public individual discovery after pan zoom",
+      "time": "2026-10-03T16:31:54.892Z",
+      "visible": [
+        "cmubo9ynb000p68va2uwteos9",
+        "cmubo9yn7000o68vageam0wb0",
+        "cmubo9ymk000b68vauoaplx2y",
+        "cmubo9ymg000968vahxbrk9sz",
+        "cmubo9ymi000a68vap6he7f1r"
+      ],
+      "badges": []
+    },
+    {
+      "label": "2F empty keeps Map recovery",
+      "time": "2026-10-03T16:32:07.507Z",
+      "visible": [],
+      "badges": []
+    },
+    {
+      "label": "geometry group2 and separate Normal B",
+      "time": "2026-10-03T16:32:40.294Z",
+      "visible": [
+        "pair-a",
+        "pair-b",
+        "small",
+        "medium",
+        "large",
+        "wide",
+        "tall"
+      ],
+      "badges": [
+        [
+          "pair-a",
+          "2"
+        ]
+      ]
+    },
+    {
+      "label": "zoom-out merged groups5/2",
+      "time": "2026-10-03T16:32:51.184Z",
+      "visible": [
+        "small",
+        "medium",
+        "wide",
+        "tall"
+      ],
+      "badges": [
+        [
+          "small",
+          "5"
+        ],
+        [
+          "tall",
+          "2"
+        ]
+      ]
+    },
+    {
+      "label": "merged groups5/2 pan right",
+      "time": "2026-10-03T16:32:51.789Z",
+      "visible": [
+        "small",
+        "medium",
+        "wide",
+        "tall"
+      ],
+      "badges": [
+        [
+          "small",
+          "5"
+        ],
+        [
+          "tall",
+          "2"
+        ]
+      ]
+    },
+    {
+      "label": "merged groups5/2 pan left",
+      "time": "2026-10-03T16:32:52.185Z",
+      "visible": [
+        "small",
+        "medium",
+        "wide",
+        "tall"
+      ],
+      "badges": [
+        [
+          "small",
+          "5"
+        ],
+        [
+          "tall",
+          "2"
+        ]
+      ]
+    },
+    {
+      "label": "zoom-in restores separated pair with count2",
+      "time": "2026-10-03T16:33:37.651Z",
+      "visible": [
+        "pair-a",
+        "pair-b",
+        "small",
+        "medium",
+        "large",
+        "wide",
+        "tall"
+      ],
+      "badges": [
+        [
+          "pair-a",
+          "2"
+        ]
+      ]
+    },
+    {
+      "label": "small zoom-out",
+      "time": "2026-10-03T16:33:46.497Z",
+      "visible": [
+        "pair-a",
+        "small",
+        "medium",
+        "large",
+        "wide",
+        "tall"
+      ],
+      "badges": [
+        [
+          "pair-a",
+          "3"
+        ]
+      ]
+    },
+    {
+      "label": "count3 short pan1",
+      "time": "2026-10-03T16:34:05.858Z",
+      "visible": [
+        "pair-a",
+        "small",
+        "medium",
+        "large",
+        "wide",
+        "tall"
+      ],
+      "badges": [
+        [
+          "pair-a",
+          "3"
+        ]
+      ]
+    },
+    {
+      "label": "count3 short pan2",
+      "time": "2026-10-03T16:34:06.371Z",
+      "visible": [
+        "pair-a",
+        "small",
+        "medium",
+        "large",
+        "wide",
+        "tall"
+      ],
+      "badges": [
+        [
+          "pair-a",
+          "3"
+        ]
+      ]
+    },
+    {
+      "label": "reverse small zoom restores count2",
+      "time": "2026-10-03T16:34:27.879Z",
+      "visible": [
+        "pair-a",
+        "pair-b",
+        "small",
+        "medium",
+        "large",
+        "wide",
+        "tall"
+      ],
+      "badges": [
+        [
+          "pair-a",
+          "2"
+        ]
+      ]
+    },
+    {
+      "label": "artwork overview recovery",
+      "time": "2026-10-03T16:35:02.635Z",
+      "visible": [
+        "pair-b",
+        "small",
+        "medium",
+        "large",
+        "wide",
+        "tall"
+      ],
+      "badges": [
+        [
+          "pair-b",
+          "3"
+        ]
+      ]
+    },
+    {
+      "label": "final dense view settled",
+      "time": "2026-10-03T16:35:42.643Z",
+      "visible": [
+        "wu68-00",
+        "wu68-01",
+        "wu68-02",
+        "wu68-03",
+        "wu68-05",
+        "wu68-10",
+        "wu68-12",
+        "wu68-13",
+        "wu68-15",
+        "wu68-17",
+        "wu68-20",
+        "wu68-22",
+        "wu68-25",
+        "wu68-30",
+        "wu68-32",
+        "wu68-33",
+        "wu68-34",
+        "wu68-35"
+      ],
+      "badges": [
+        [
+          "wu68-25",
+          "6"
+        ],
+        [
+          "wu68-30",
+          "6"
+        ],
+        [
+          "wu68-32",
+          "6"
+        ],
+        [
+          "wu68-33",
+          "6"
+        ],
+        [
+          "wu68-34",
+          "6"
+        ],
+        [
+          "wu68-35",
+          "6"
+        ]
+      ]
+    },
+    {
+      "label": "final dense small pan",
+      "time": "2026-10-03T16:35:43.163Z",
+      "visible": [
+        "wu68-00",
+        "wu68-01",
+        "wu68-02",
+        "wu68-03",
+        "wu68-05",
+        "wu68-10",
+        "wu68-12",
+        "wu68-13",
+        "wu68-15",
+        "wu68-17",
+        "wu68-20",
+        "wu68-22",
+        "wu68-25",
+        "wu68-30",
+        "wu68-32",
+        "wu68-33",
+        "wu68-34",
+        "wu68-35"
+      ],
+      "badges": [
+        [
+          "wu68-25",
+          "6"
+        ],
+        [
+          "wu68-30",
+          "6"
+        ],
+        [
+          "wu68-32",
+          "6"
+        ],
+        [
+          "wu68-33",
+          "6"
+        ],
+        [
+          "wu68-34",
+          "6"
+        ],
+        [
+          "wu68-35",
+          "6"
+        ]
+      ]
+    }
+  ],
+  "verdict": "NO-near: no clear early-merge friction in final desktop-browser 390x844 session; physical touch/pinch remains Human QA"
+}

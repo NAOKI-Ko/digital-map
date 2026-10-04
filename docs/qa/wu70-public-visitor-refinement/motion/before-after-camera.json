@@ -1,0 +1,796 @@
+{
+  "comparison": [
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "maxAnchorDelta": 0,
+      "beforeVisible": 7,
+      "afterVisible": 7,
+      "sameStates": true
+    },
+    {
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "maxAnchorDelta": 0,
+      "beforeVisible": 15,
+      "afterVisible": 15,
+      "sameStates": true
+    },
+    {
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "maxAnchorDelta": 0,
+      "beforeVisible": 10,
+      "afterVisible": 10,
+      "sameStates": true
+    },
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "maxAnchorDelta": 0,
+      "beforeVisible": 18,
+      "afterVisible": 18,
+      "sameStates": true
+    },
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 700
+      },
+      "maxAnchorDelta": 0,
+      "beforeVisible": 8,
+      "afterVisible": 8,
+      "sameStates": true
+    }
+  ],
+  "after": [
+    {
+      "size": {
+        "width": 390,
+        "height": 844
+      },
+      "pins": [
+        {
+          "badge": "1",
+          "id": "cmubo9yn4000n68valy3vyx5d",
+          "visible": "false",
+          "x": 67.38487243652344,
+          "y": 266.1379699707031
+        },
+        {
+          "badge": "19",
+          "id": "cmubo9ynb000p68va2uwteos9",
+          "visible": "true",
+          "x": 164.85887145996094,
+          "y": 311.4158020019531
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9yn1000m68va7aoj69bu",
+          "visible": "false",
+          "x": 37.64991760253906,
+          "y": 245.8436584472656
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9yn7000o68vageam0wb0",
+          "visible": "false",
+          "x": 128.64907836914062,
+          "y": 290.3836364746094
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymo000e68vadn9u81lx",
+          "visible": "true",
+          "x": 243.15164184570312,
+          "y": 298.0088806152344
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymn000d68va4kbvlqmf",
+          "visible": "false",
+          "x": 211.74459838867188,
+          "y": 284.0474853515625
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymk000b68vauoaplx2y",
+          "visible": "false",
+          "x": 149.86553955078125,
+          "y": 259.9173889160156
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymy000l68varduh2xli",
+          "visible": "true",
+          "x": 354.6795959472656,
+          "y": 418.02044677734375
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymg000968vahxbrk9sz",
+          "visible": "true",
+          "x": 84.01913452148438,
+          "y": 236.1932678222656
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymp000f68va8omzrtjf",
+          "visible": "true",
+          "x": 195.89779663085935,
+          "y": 204.28982543945312
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymd000768vabymdxfaz",
+          "visible": "true",
+          "x": 14.748783111572266,
+          "y": 206.40036010742188
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9yms000h68va2jrt8ge2",
+          "visible": "false",
+          "x": 301.8567199707031,
+          "y": 329.88421630859375
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ylp000668va9gy61rqi",
+          "visible": "false",
+          "x": -22.85044288635254,
+          "y": 174.31869506835938
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymi000a68vap6he7f1r",
+          "visible": "false",
+          "x": 119.3057098388672,
+          "y": 249.68316650390625
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymt000i68vamoceccw3",
+          "visible": "true",
+          "x": 340.6263427734375,
+          "y": 362.3963623046875
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymw000k68vaebgyccjg",
+          "visible": "false",
+          "x": 385.7540893554687,
+          "y": 395.7417907714844
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymr000g68va0o5is7rj",
+          "visible": "false",
+          "x": 274.89300537109375,
+          "y": 312.118896484375
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9yme000868vaj6v3h6s7",
+          "visible": "false",
+          "x": 49.096473693847656,
+          "y": 222.84243774414065
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9yml000c68vazvjujz92",
+          "visible": "false",
+          "x": 180.65907287597656,
+          "y": 273.623779296875
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymu000j68vai8fvxp6i",
+          "visible": "false",
+          "x": 363.1712646484375,
+          "y": 380.8053894042969
+        }
+      ]
+    },
+    {
+      "size": {
+        "width": 768,
+        "height": 1024
+      },
+      "pins": [
+        {
+          "badge": "1",
+          "id": "cmubo9yn4000n68valy3vyx5d",
+          "visible": "false",
+          "x": 203.00665283203125,
+          "y": 389.7107238769531
+        },
+        {
+          "badge": "2",
+          "id": "cmubo9ynb000p68va2uwteos9",
+          "visible": "true",
+          "x": 353.7803649902344,
+          "y": 460.6324462890625
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9yn1000m68va7aoj69bu",
+          "visible": "true",
+          "x": 157.54696655273438,
+          "y": 358.2013854980469
+        },
+        {
+          "badge": "2",
+          "id": "cmubo9yn7000o68vageam0wb0",
+          "visible": "true",
+          "x": 297.5880126953125,
+          "y": 427.580810546875
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymo000e68vadn9u81lx",
+          "visible": "true",
+          "x": 475.406005859375,
+          "y": 439.5420837402344
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymn000d68va4kbvlqmf",
+          "visible": "true",
+          "x": 426.4798278808594,
+          "y": 417.6603393554687
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymk000b68vauoaplx2y",
+          "visible": "false",
+          "x": 330.60919189453125,
+          "y": 380.0343017578125
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymy000l68varduh2xli",
+          "visible": "true",
+          "x": 653.5053100585938,
+          "y": 631.0885620117188
+        },
+        {
+          "badge": "4",
+          "id": "cmubo9ymg000968vahxbrk9sz",
+          "visible": "true",
+          "x": 229.23828125,
+          "y": 343.2779541015625
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymp000f68va8omzrtjf",
+          "visible": "true",
+          "x": 401.4000244140625,
+          "y": 294.2151184082031
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymd000768vabymdxfaz",
+          "visible": "true",
+          "x": 123.43624877929688,
+          "y": 297.4479675292969
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9yms000h68va2jrt8ge2",
+          "visible": "true",
+          "x": 567.5196533203125,
+          "y": 489.8103332519531
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ylp000668va9gy61rqi",
+          "visible": "true",
+          "x": 66.96533966064453,
+          "y": 248.50193786621097
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymi000a68vap6he7f1r",
+          "visible": "true",
+          "x": 283.4747314453125,
+          "y": 364.1495666503906
+        },
+        {
+          "badge": "3",
+          "id": "cmubo9ymt000i68vamoceccw3",
+          "visible": "true",
+          "x": 629.218017578125,
+          "y": 541.5316772460938
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymw000k68vaebgyccjg",
+          "visible": "true",
+          "x": 701.5115356445312,
+          "y": 595.0557250976562
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymr000g68va0o5is7rj",
+          "visible": "true",
+          "x": 525.0404663085938,
+          "y": 461.7405700683594
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9yme000868vaj6v3h6s7",
+          "visible": "false",
+          "x": 175.75335693359375,
+          "y": 322.6955261230469
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9yml000c68vazvjujz92",
+          "visible": "false",
+          "x": 378.24615478515625,
+          "y": 401.3767395019531
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymu000j68vai8fvxp6i",
+          "visible": "false",
+          "x": 665.3265380859375,
+          "y": 571.0205688476562
+        }
+      ]
+    },
+    {
+      "size": {
+        "width": 1024,
+        "height": 768
+      },
+      "pins": [
+        {
+          "badge": "1",
+          "id": "cmubo9yn4000n68valy3vyx5d",
+          "visible": "false",
+          "x": 352.06268310546875,
+          "y": 268.24859619140625
+        },
+        {
+          "badge": "4",
+          "id": "cmubo9ynb000p68va2uwteos9",
+          "visible": "true",
+          "x": 481.8102416992187,
+          "y": 329.0458068847656
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9yn1000m68va7aoj69bu",
+          "visible": "false",
+          "x": 313.243408203125,
+          "y": 241.39376831054688
+        },
+        {
+          "badge": "2",
+          "id": "cmubo9yn7000o68vageam0wb0",
+          "visible": "true",
+          "x": 433.350341796875,
+          "y": 300.651611328125
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymo000e68vadn9u81lx",
+          "visible": "false",
+          "x": 586.7715454101562,
+          "y": 310.9150695800781
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymn000d68va4kbvlqmf",
+          "visible": "true",
+          "x": 544.4713745117188,
+          "y": 292.14984130859375
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymk000b68vauoaplx2y",
+          "visible": "false",
+          "x": 461.8820495605469,
+          "y": 259.9913635253906
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymy000l68varduh2xli",
+          "visible": "true",
+          "x": 743.3106689453125,
+          "y": 477.1930847167969
+        },
+        {
+          "badge": "7",
+          "id": "cmubo9ymg000968vahxbrk9sz",
+          "visible": "true",
+          "x": 374.9178161621094,
+          "y": 228.70814514160156
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymp000f68va8omzrtjf",
+          "visible": "true",
+          "x": 522.5707397460938,
+          "y": 187.1527557373047
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymd000768vabymdxfaz",
+          "visible": "true",
+          "x": 284.6194763183594,
+          "y": 189.88385009765625
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9yms000h68va2jrt8ge2",
+          "visible": "false",
+          "x": 666.791748046875,
+          "y": 354.2009582519531
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ylp000668va9gy61rqi",
+          "visible": "false",
+          "x": 236.9515686035156,
+          "y": 148.64059448242188
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymi000a68vap6he7f1r",
+          "visible": "false",
+          "x": 421.3971862792969,
+          "y": 246.4559631347656
+        },
+        {
+          "badge": "3",
+          "id": "cmubo9ymt000i68vamoceccw3",
+          "visible": "true",
+          "x": 720.8924560546875,
+          "y": 398.9975280761719
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymw000k68vaebgyccjg",
+          "visible": "true",
+          "x": 784.5690307617188,
+          "y": 445.6349487304687
+        },
+        {
+          "badge": "2",
+          "id": "cmubo9ymr000g68va0o5is7rj",
+          "visible": "true",
+          "x": 629.7916259765625,
+          "y": 329.9996337890625
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9yme000868vaj6v3h6s7",
+          "visible": "false",
+          "x": 329.1896667480469,
+          "y": 211.24717712402344
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9yml000c68vazvjujz92",
+          "visible": "false",
+          "x": 502.87884521484375,
+          "y": 278.2156066894531
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymu000j68vai8fvxp6i",
+          "visible": "false",
+          "x": 752.6910400390625,
+          "y": 424.6569213867187
+        }
+      ]
+    },
+    {
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "pins": [
+        {
+          "badge": "3",
+          "id": "cmubo9yn4000n68valy3vyx5d",
+          "visible": "true",
+          "x": 523.193603515625,
+          "y": 323.3506164550781
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ynb000p68va2uwteos9",
+          "visible": "true",
+          "x": 689.7557983398438,
+          "y": 401.7171630859375
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9yn1000m68va7aoj69bu",
+          "visible": "false",
+          "x": 473.5775146484375,
+          "y": 288.8489074707031
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9yn7000o68vageam0wb0",
+          "visible": "true",
+          "x": 627.4702758789062,
+          "y": 365.0730285644531
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymo000e68vadn9u81lx",
+          "visible": "true",
+          "x": 824.7154541015625,
+          "y": 378.30950927734375
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymn000d68va4kbvlqmf",
+          "visible": "true",
+          "x": 770.2692260742188,
+          "y": 354.1162414550781
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymk000b68vauoaplx2y",
+          "visible": "true",
+          "x": 664.1817016601562,
+          "y": 312.7347717285156
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymy000l68varduh2xli",
+          "visible": "true",
+          "x": 1028.10498046875,
+          "y": 594.1842041015625
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymg000968vahxbrk9sz",
+          "visible": "true",
+          "x": 552.7373046875,
+          "y": 272.5751647949219
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymp000f68va8omzrtjf",
+          "visible": "true",
+          "x": 741.924560546875,
+          "y": 219.37400817871097
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymd000768vabymdxfaz",
+          "visible": "true",
+          "x": 437.3561096191406,
+          "y": 222.8654022216797
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9yms000h68va2jrt8ge2",
+          "visible": "true",
+          "x": 927.992431640625,
+          "y": 434.24652099609375
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ylp000668va9gy61rqi",
+          "visible": "true",
+          "x": 376.8248291015625,
+          "y": 170.2162628173828
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymi000a68vap6he7f1r",
+          "visible": "true",
+          "x": 612.2650146484375,
+          "y": 295.34722900390625
+        },
+        {
+          "badge": "2",
+          "id": "cmubo9ymt000i68vamoceccw3",
+          "visible": "true",
+          "x": 998.187744140625,
+          "y": 492.327880859375
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymw000k68vaebgyccjg",
+          "visible": "true",
+          "x": 1081.0220947265625,
+          "y": 553.0046997070312
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymr000g68va0o5is7rj",
+          "visible": "true",
+          "x": 880.1670532226562,
+          "y": 402.9494934082031
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9yme000868vaj6v3h6s7",
+          "visible": "true",
+          "x": 494.2489013671875,
+          "y": 250.20066833496097
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9yml000c68vazvjujz92",
+          "visible": "true",
+          "x": 716.8131103515625,
+          "y": 336.1734619140625
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymu000j68vai8fvxp6i",
+          "visible": "false",
+          "x": 1039.548095703125,
+          "y": 525.6851806640625
+        }
+      ]
+    },
+    {
+      "size": {
+        "width": 1440,
+        "height": 700
+      },
+      "pins": [
+        {
+          "badge": "1",
+          "id": "cmubo9yn4000n68valy3vyx5d",
+          "visible": "false",
+          "x": 579.0361938476562,
+          "y": 239.869873046875
+        },
+        {
+          "badge": "15",
+          "id": "cmubo9ynb000p68va2uwteos9",
+          "visible": "true",
+          "x": 689.8381958007812,
+          "y": 291.6473083496094
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9yn1000m68va7aoj69bu",
+          "visible": "false",
+          "x": 545.7875366210938,
+          "y": 216.94854736328125
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9yn7000o68vageam0wb0",
+          "visible": "false",
+          "x": 648.4881591796875,
+          "y": 267.48541259765625
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymo000e68vadn9u81lx",
+          "visible": "false",
+          "x": 779.3764038085938,
+          "y": 276.2230224609375
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymn000d68va4kbvlqmf",
+          "visible": "true",
+          "x": 743.3170776367188,
+          "y": 260.2441101074219
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymk000b68vauoaplx2y",
+          "visible": "false",
+          "x": 672.8161010742188,
+          "y": 232.82540893554688
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymy000l68varduh2xli",
+          "visible": "true",
+          "x": 911.982421875,
+          "y": 417.1533203125
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymg000968vahxbrk9sz",
+          "visible": "true",
+          "x": 598.462646484375,
+          "y": 206.1101837158203
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymp000f68va8omzrtjf",
+          "visible": "true",
+          "x": 724.7176513671875,
+          "y": 170.55731201171875
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymd000768vabymdxfaz",
+          "visible": "true",
+          "x": 521.1068725585938,
+          "y": 172.89620971679688
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9yms000h68va2jrt8ge2",
+          "visible": "false",
+          "x": 847.4664306640625,
+          "y": 313.0240783691406
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ylp000668va9gy61rqi",
+          "visible": "false",
+          "x": 480.09967041015625,
+          "y": 137.54124450683594
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymi000a68vap6he7f1r",
+          "visible": "false",
+          "x": 638.2179565429688,
+          "y": 221.2716522216797
+        },
+        {
+          "badge": "4",
+          "id": "cmubo9ymt000i68vamoceccw3",
+          "visible": "true",
+          "x": 893.3377075195312,
+          "y": 351.0249938964844
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymw000k68vaebgyccjg",
+          "visible": "false",
+          "x": 947.2351684570312,
+          "y": 390.49658203125
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymr000g68va0o5is7rj",
+          "visible": "true",
+          "x": 816.0144653320312,
+          "y": 292.4583740234375
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9yme000868vaj6v3h6s7",
+          "visible": "false",
+          "x": 559.3150024414062,
+          "y": 191.1804962158203
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9yml000c68vazvjujz92",
+          "visible": "false",
+          "x": 707.8256225585938,
+          "y": 248.36911010742188
+        },
+        {
+          "badge": "1",
+          "id": "cmubo9ymu000j68vai8fvxp6i",
+          "visible": "false",
+          "x": 920.2549438476562,
+          "y": 372.7532653808594
+        }
+      ]
+    }
+  ]
+}

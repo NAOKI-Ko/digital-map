@@ -99,7 +99,7 @@ const viewer = useMapViewer(container, {
   onSpotSelected: spot => emit('spotSelected', spot),
   onCollisionStarted: () => emit('collisionStarted'),
 })
-const { floorError, geolocationAreaMessage, isReady, mapError } = viewer
+const { floorError, floorImageState, geolocationAreaMessage, isReady, mapError } = viewer
 
 defineExpose({
   focusSpot: viewer.focusSpot,
@@ -114,7 +114,7 @@ defineExpose({
 
 <template>
   <div :class="{ 'public-map-viewer h-full': mode === 'view', 'visitor-map-viewer': visitorOverview }">
-    <div class="map-viewer-frame relative overflow-hidden rounded-xl border border-stone-300 bg-stone-100" :style="{ height }" :aria-busy="!isReady">
+    <div class="map-viewer-frame relative overflow-hidden rounded-xl border border-stone-300 bg-stone-100" :style="{ height }" :aria-busy="!isReady || floorImageState === 'loading'">
       <div
         ref="container"
         class="h-full w-full transition-opacity duration-150"
@@ -124,6 +124,13 @@ defineExpose({
         :tabindex="visitorOverview ? -1 : 0"
       />
       <div v-if="!isReady && !mapError" class="pointer-events-none absolute inset-0 animate-pulse bg-stone-200" aria-hidden="true" />
+      <p v-if="visitorOverview && (!isReady || floorImageState === 'loading') && !mapError" role="status" class="pointer-events-none absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 rounded-xl bg-white/95 px-4 py-3 text-sm text-stone-700 shadow">
+        {{ locale === 'en' ? 'Loading map…' : '地図を読み込み中…' }}
+      </p>
+      <div v-if="visitorOverview && floorImageState === 'error'" role="alert" class="absolute inset-x-4 top-1/2 z-10 mx-auto max-w-sm -translate-y-1/2 rounded-xl bg-white/95 p-4 text-center text-sm text-stone-700 shadow">
+        <p>{{ locale === 'en' ? 'The map image could not be loaded.' : '地図画像を読み込めませんでした。' }}</p>
+        <button type="button" class="mt-3 min-h-11 rounded-lg bg-stone-800 px-4 font-semibold text-white" @click="viewer.showFloor(floor, false, false)">{{ locale === 'en' ? 'Try again' : '再読み込み' }}</button>
+      </div>
       <div
         v-if="mode === 'edit' && placementEnabled"
         class="pointer-events-none absolute left-3 top-3 rounded-lg bg-white/95 px-4 py-3 text-sm font-semibold text-stone-800 shadow"
@@ -325,7 +332,8 @@ defineExpose({
   filter: drop-shadow(0 3px 3px rgb(37 48 58 / 38%));
 }
 
-.public-map-viewer .map-viewer-marker--featured::after {
+.public-map-viewer:not(.visitor-map-viewer) .map-viewer-marker--featured::after,
+.visitor-map-viewer .map-viewer-marker__featured {
   content: '';
   position: absolute;
   bottom: 2.3rem;
@@ -558,5 +566,30 @@ defineExpose({
   .visitor-map-viewer [role="region"] {
     transition: none;
   }
+}
+</style>
+
+<style>
+/* Paint-copy handoff must be immediate, never a second opacity fade. */
+.visitor-map-viewer .map-viewer-marker__shape { transition-property: box-shadow; }
+.visitor-map-viewer .map-viewer-marker__illustration { transition-property: filter; }
+.visitor-map-viewer .map-viewer-marker__ground-shadow { transition: none; }
+/* Only paint copies animate. The original artwork, button and MapLibre anchor
+   remain measurable at their final size throughout the entrance. */
+.visitor-map-viewer .map-viewer-marker--awaiting > *,
+.visitor-map-viewer .map-viewer-marker--entering > :not(.map-viewer-marker__entrance) { opacity: 0 !important; }
+.visitor-map-viewer .map-viewer-marker__entrance {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  transform-origin: bottom center;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .visitor-map-viewer .map-viewer-marker__entrance { display: none; }
+  .visitor-map-viewer .map-viewer-marker--awaiting > *,
+  .visitor-map-viewer .map-viewer-marker--entering > :not(.map-viewer-marker__entrance) { opacity: 1 !important; }
 }
 </style>

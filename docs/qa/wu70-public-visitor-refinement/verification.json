@@ -1,0 +1,113 @@
+{
+  "wu": "WU-70",
+  "baseline": "2021446c822f4f331cf83f8886a6c96e1552893e",
+  "windowsReadiness": 200,
+  "baselinePublicUrl": "https://reaches-see-permissions-comparable.trycloudflare.com/arimatsu-fon",
+  "scope": "visitor-facing renderer; no admin UX/domain/dependency/security exception changes",
+  "candidateGapPx": 6,
+  "comparison": {
+    "viewport": [
+      390,
+      844
+    ],
+    "fixture": "__qa_wu68",
+    "zoom": 16.25970764639831,
+    "visiblePins": {
+      "gap10": 8,
+      "gap6": 9,
+      "gap2": 10
+    },
+    "decision": "6px balances earlier individual visibility and remaining hit-target clearance; 2px gains only one additional target in dense comparison.",
+    "separateEnterExitThresholds": false,
+    "stability": "retain previous equal-priority winner order; prioritize selection/focus and priority before retention"
+  },
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "P2",
+      "finding": "Early merging and normal PIN zoom cliff",
+      "fix": "10px to6px actual hit/artwork gap; visitor normals remain collision eligible at low zoom without priority inflation",
+      "result": "First collision tap on same Windows map data now exposes Cafe detail instead of requiring another recovery tap"
+    },
+    {
+      "id": "F02",
+      "severity": "P2",
+      "finding": "Pan causes center-distance winner/badge switching",
+      "fix": "Retain equal-priority winner order; new candidates still use center distance",
+      "result": "Repeated short forward/reverse pans keep traceable PINs and same group representative. Actual groups can still split/merge geometrically."
+    },
+    {
+      "id": "F03",
+      "severity": "P3",
+      "finding": "Detail title receives a distracting rectangular focus ring",
+      "fix": "Suppress outline on announcement-only heading; buttons retain focus-visible",
+      "result": "Pointer opening clean; keyboard Space/Enter/Escape and focus return verified"
+    },
+    {
+      "id": "F04",
+      "severity": "P2",
+      "finding": "Floor image loading/failure leaves unexplained blank map behind pins",
+      "fix": "Visitor loading status and image-specific retry; stale floor/source events ignored",
+      "result": "Real image load error shown; retry available with exact camera preserved; normal image hides status"
+    },
+    {
+      "id": "R01",
+      "severity": "P2",
+      "finding": "Retained offscreen winner can hide an onscreen neighbor during pan",
+      "fix": "Exclude fully offscreen candidates before decluttering; keep all candidates in recovery groups",
+      "result": "Reproduced in 390x844 dense fixture; visible neighbor and recovery badge return after edge pan. Four-edge and partial-target regression tests pass."
+    }
+  ],
+  "verification": {
+    "tests": {
+      "pass": 703,
+      "skip": 18,
+      "fail": 0,
+      "note": "Full local Vitest run; DB-dependent/optional skipped cases not claimed passed"
+    },
+    "typecheck": "PASS",
+    "build": "PASS",
+    "diffCheck": "PASS",
+    "screens": [
+      [
+        390,
+        844
+      ],
+      [
+        768,
+        1024
+      ],
+      [
+        1440,
+        700
+      ]
+    ],
+    "cameraCloseExactEquality": true,
+    "imageRetryCameraExactEquality": true,
+    "hitTargetOverlapsObserved": 0,
+    "maxZoomSpiderfy": "PASS,3 near PINs; selected normal accessible",
+    "coincidentSpiderfy": "PASS",
+    "floorSwitch": "PASS, old spiderfy count0",
+    "empty": "PASS, no orphan category dock or spinner; map remains explorable",
+    "category": "PASS, native horizontal scroll, fixed clear, OR selection, scroll position retention",
+    "keyboard": "PASS, Space category, Enter PIN, Escape close + focus restore",
+    "initialCameraSafety": "unchanged; existing tests pass",
+    "overview": "bearing0 pitch0, whole floor restored",
+    "finalSessionSeconds": 305,
+    "verdict": "NO-near: no additional clear actionable friction observed in tested390px browser interactions",
+    "limitations": [
+      "Physical one-hand touch/pinch, real mobile browser chrome and safe-area hardware not exercised",
+      "No candidate deployment to Windows; candidate visual QA runs local renderer over read-only Windows public JSON with byte-identical local floor raster and Windows photos",
+      "Synthetic high-density/Floor/Spiderfy cases use existing dev-only public fixture routes"
+    ],
+    "reviewFixQA": "390x844 edge-pan before/after, recovery badge, detail, category clear, overview and maxZoom Spiderfy repeated after R01 fix"
+  },
+  "guardrails": {
+    "productionTouched": false,
+    "mainChanged": false,
+    "windowsUpdated": false,
+    "securityExceptionChanged": false,
+    "dependenciesChanged": false,
+    "dbWritten": false
+  }
+}
