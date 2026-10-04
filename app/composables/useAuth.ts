@@ -18,6 +18,7 @@ export function useAuth() {
     }
     await $fetch('/api/auth/logout', { method: 'POST' })
     await session.fetch()
+    if (import.meta.client && skipGuard) window.dispatchEvent(new CustomEvent('admin-confirmed-logout'))
     return navigateTo('/admin/login')
   }
 

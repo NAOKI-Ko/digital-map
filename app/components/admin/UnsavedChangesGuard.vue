@@ -12,6 +12,7 @@ function beforeLogout(event: Event) {
   open.value = true
 }
 let bypassNextNavigation = false
+function confirmedLogout() { bypassNextNavigation = true }
 
 function beforeUnload(event: BeforeUnloadEvent) {
   if (!props.dirty) return
@@ -19,8 +20,8 @@ function beforeUnload(event: BeforeUnloadEvent) {
   event.returnValue = ''
 }
 
-onMounted(() => { window.addEventListener('beforeunload', beforeUnload); window.addEventListener('admin-before-logout', beforeLogout) })
-onBeforeUnmount(() => { window.removeEventListener('beforeunload', beforeUnload); window.removeEventListener('admin-before-logout', beforeLogout) })
+onMounted(() => { window.addEventListener('beforeunload', beforeUnload); window.addEventListener('admin-before-logout', beforeLogout); window.addEventListener('admin-confirmed-logout', confirmedLogout) })
+onBeforeUnmount(() => { window.removeEventListener('beforeunload', beforeUnload); window.removeEventListener('admin-before-logout', beforeLogout); window.removeEventListener('admin-confirmed-logout', confirmedLogout) })
 
 onBeforeRouteLeave((to) => {
   if (!props.dirty || bypassNextNavigation) return true
@@ -40,9 +41,8 @@ async function discard() {
   const destination = pendingDestination.value
   open.value = false
   pendingDestination.value = ''
-  bypassNextNavigation = true
   if (pendingLogout.value) { pendingLogout.value = false; await useAuth().logout(true) }
-  else await navigateTo(destination)
+  else { bypassNextNavigation = true; await navigateTo(destination) }
 }
 </script>
 
