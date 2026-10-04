@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import SignupResend from '~/components/admin/SignupResend.vue'
 import { signupSchema } from '~~/shared/schemas/signup'
 
 definePageMeta({ layout: false })
@@ -9,6 +10,7 @@ const error = ref('')
 const submitted = ref(false)
 const devUrl = ref('')
 async function submit() {
+  if (busy.value) return
   const parsed = signupSchema.safeParse(form)
   if (!parsed.success) { error.value = parsed.error.issues[0]?.message ?? '入力内容を確認してください。'; return }
   busy.value = true; error.value = ''
@@ -25,7 +27,9 @@ async function submit() {
   <main class="min-h-screen bg-stone-100 px-5 py-12"><section class="mx-auto max-w-lg rounded-2xl bg-white p-8 shadow-sm">
     <p class="text-sm font-semibold tracking-widest text-terracotta-700">DIGITAL MAP</p><h1 class="mt-3 text-2xl font-bold">ワークスペースを作成</h1>
     <div v-if="submitted" role="status" class="mt-6 rounded-xl bg-emerald-50 p-5 text-sm leading-6 text-emerald-900">確認メールを送信しました。メール内のリンクから登録を完了してください。<a v-if="devUrl" :href="devUrl" class="mt-3 block font-semibold underline">開発環境: 確認リンクを開く</a></div>
-    <form v-else class="mt-7 space-y-5" @submit.prevent="submit">
+    <SignupResend v-if="submitted" />
+    <p class="mt-3 text-sm leading-6 text-stone-600">新しいワークスペースを作る方の登録です。既存の所属先を使う方はログイン、招待された方は招待メールのリンクから進んでください。</p>
+    <form v-if="!submitted" class="mt-7 space-y-5" @submit.prevent="submit">
       <label class="block text-sm font-semibold">メールアドレス<input v-model="form.email" type="email" autocomplete="email" required class="mt-2 w-full rounded-lg border p-3"></label>
       <label class="block text-sm font-semibold">パスワード（12文字以上）<input v-model="form.password" type="password" autocomplete="new-password" minlength="12" required class="mt-2 w-full rounded-lg border p-3"></label>
       <label class="block text-sm font-semibold">ワークスペース名<input v-model="form.organizationName" required maxlength="100" class="mt-2 w-full rounded-lg border p-3"></label>

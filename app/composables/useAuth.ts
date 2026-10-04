@@ -11,7 +11,11 @@ export function useAuth() {
     await session.fetch()
   }
 
-  async function logout() {
+  async function logout(skipGuard = false) {
+    if (import.meta.client && !skipGuard) {
+      const request = new CustomEvent('admin-before-logout', { cancelable: true })
+      if (!window.dispatchEvent(request)) return
+    }
     await $fetch('/api/auth/logout', { method: 'POST' })
     await session.fetch()
     return navigateTo('/admin/login')

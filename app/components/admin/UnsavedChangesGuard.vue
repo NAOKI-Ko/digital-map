@@ -4,6 +4,13 @@ import ConfirmDialog from '~/components/ui/ConfirmDialog.vue'
 const props = defineProps<{ dirty: boolean }>()
 const open = ref(false)
 const pendingDestination = ref('')
+const pendingLogout = ref(false)
+function beforeLogout(event: Event) {
+  if (!props.dirty || event.defaultPrevented) return
+  event.preventDefault()
+  pendingLogout.value = true
+  open.value = true
+}
 let bypassNextNavigation = false
 
 function beforeUnload(event: BeforeUnloadEvent) {
@@ -12,17 +19,19 @@ function beforeUnload(event: BeforeUnloadEvent) {
   event.returnValue = ''
 }
 
-onMounted(() => window.addEventListener('beforeunload', beforeUnload))
-onBeforeUnmount(() => window.removeEventListener('beforeunload', beforeUnload))
+onMounted(() => { window.addEventListener('beforeunload', beforeUnload); window.addEventListener('admin-before-logout', beforeLogout) })
+onBeforeUnmount(() => { window.removeEventListener('beforeunload', beforeUnload); window.removeEventListener('admin-before-logout', beforeLogout) })
 
 onBeforeRouteLeave((to) => {
   if (!props.dirty || bypassNextNavigation) return true
+  pendingLogout.value = false
   pendingDestination.value = to.fullPath
   open.value = true
   return false
 })
 
 function stay() {
+  pendingLogout.value = false
   open.value = false
   pendingDestination.value = ''
 }
@@ -32,7 +41,8 @@ async function discard() {
   open.value = false
   pendingDestination.value = ''
   bypassNextNavigation = true
-  await navigateTo(destination)
+  if (pendingLogout.value) { pendingLogout.value = false; await useAuth().logout(true) }
+  else await navigateTo(destination)
 }
 </script>
 

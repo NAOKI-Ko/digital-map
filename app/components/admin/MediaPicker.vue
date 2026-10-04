@@ -13,7 +13,7 @@ const props = withDefaults(defineProps<{
   selectedUrl?: string | null
   disabled?: boolean
 }>(), { label: '画像', usage: 'photo' })
-const emit = defineEmits<{ selected: [image: UploadedImage], busy: [value: boolean], cleared: [] }>()
+const emit = defineEmits<{ selected: [image: UploadedImage], busy: [value: boolean], cleared: [], dirty: [value: boolean] }>()
 const { data, refresh } = await useFetch<MediaAssetListResponse>('/api/media')
 const scope = ref<Scope>('recent')
 const usageFilter = ref<UsageFilter>(props.usage)
@@ -94,7 +94,7 @@ function changeSelection() {
     <div v-else class="grid gap-5 lg:grid-cols-2">
       <section>
         <h3 class="text-sm font-bold text-stone-900">新規アップロード</h3>
-        <ImageUploader :label="label" @uploaded="useUpload" @busy="emit('busy', $event)" />
+        <ImageUploader :label="label" @uploaded="useUpload" @busy="emit('busy', $event)" @dirty="emit('dirty', $event)" />
       </section>
       <section>
         <h3 class="text-sm font-bold text-stone-900">登録済み画像から選ぶ</h3>

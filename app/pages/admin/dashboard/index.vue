@@ -16,7 +16,7 @@ const activeOrganization = computed(() => organizationData.value?.organizations.
 
 <template>
   <div class="mx-auto max-w-4xl">
-    <AdminPageHeader eyebrow="ワークスペース" :title="activeOrganization?.name ?? 'ホーム'" description="このワークスペースのDigital Mapを管理します。" />
+    <AdminPageHeader eyebrow="ワークスペース" :title="activeOrganization?.name ?? 'ホーム'" description="ワークスペースは所属先、マップは制作・公開する案内です。この所属先のマップを選びます。" />
 
     <section v-if="status === 'pending'" class="mt-7" aria-live="polite">
       <div class="h-48 animate-pulse rounded-xl bg-stone-200 motion-reduce:animate-none" />
@@ -31,7 +31,7 @@ const activeOrganization = computed(() => organizationData.value?.organizations.
     <section v-else-if="maps.length === 0" class="mt-5 rounded-xl border border-dashed border-stone-300 bg-white p-8 text-center">
       <div class="mx-auto grid size-11 place-items-center rounded-xl bg-terracotta-50 text-xl text-terracotta-700" aria-hidden="true">◇</div>
       <h2 class="mt-4 text-lg font-bold text-stone-950">{{ canCreateMap ? 'ワークスペースのマップを作成しましょう' : 'アクセスできるマップはありません' }}</h2>
-      <p class="mx-auto mt-2 max-w-lg text-sm leading-6 text-stone-600">{{ canCreateMap ? '1つのマップで、イラスト表示と今後のリアル表示を管理します。まずマップ名と公開パスを設定してください。' : 'ワークスペースのオーナーに、マップまたは担当スポットへのアクセスを依頼してください。' }}</p>
+      <p class="mx-auto mt-2 max-w-lg text-sm leading-6 text-stone-600">{{ canCreateMap ? 'まずマップ名と公開パスを設定してください。1つのワークスペースで複数のマップを管理できます。Plan Mockの操作は不要です。' : 'ワークスペースのオーナーに、マップまたは担当スポットへのアクセスを依頼してください。' }}</p>
       <NuxtLink v-if="canCreateMap" to="/admin/maps/new" class="mt-5 inline-flex min-h-11 items-center rounded-lg bg-terracotta-600 px-4 text-sm font-semibold text-white hover:bg-terracotta-700">マップを作成</NuxtLink>
     </section>
 

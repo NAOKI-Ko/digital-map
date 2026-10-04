@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import UnsavedChangesGuard from '~/components/admin/UnsavedChangesGuard.vue'
 import SaveFeedback from '~/components/ui/SaveFeedback.vue'
 import MediaPicker from '~/components/admin/MediaPicker.vue'
 import ConfirmDialog from '~/components/ui/ConfirmDialog.vue'
@@ -31,12 +32,19 @@ const busyFloorId = ref('')
 const operationError = ref('')
 const saveMessage = ref('')
 const saveState = ref<'idle' | 'saving' | 'success' | 'error'>('idle')
+const pendingImage = ref(false)
+const savedFloorNames = reactive<Record<string, string>>({})
+watch(() => data.value?.floors, floors => {
+  for (const floor of floors ?? []) if (!(floor.id in savedFloorNames)) savedFloorNames[floor.id] = floor.name
+}, { immediate: true })
+const floorDirty = computed(() => Boolean(createInput.name || createInput.illustrationUrl || pendingImage.value)
+  || Boolean(data.value?.floors.some(floor => floor.name !== savedFloorNames[floor.id])))
 const deleteTarget = ref<MapFloorItem | null>(null)
 const deleteMessage = computed(() => {
   const floor = deleteTarget.value
   if (!floor) return ''
   return floor.spotCount > 0
-    ? `「${floor.name}」と登録済みスポット${floor.spotCount}件を削除します。関連する写真やカテゴリー設定も登録から外れ、元に戻せません。`
+    ? `「${floor.name}」とこのフロア上の配置を削除します。スポット本文・写真・カテゴリーと他フロアの配置は保持します。このフロアへの配置は元に戻せません。`
     : `「${floor.name}」を削除します。元に戻せません。`
 })
 
@@ -67,6 +75,7 @@ async function replaceFloorImage(floor: MapFloorItem, image: UploadedImage) {
       body: { name: floor.name, illustrationUrl: image.url, illustrationAssetId: image.assetId, imageWidth: image.width, imageHeight: image.height },
     })
     if (data.value) data.value = { floors: data.value.floors.map(item => item.id === floor.id ? response.floor : item) }
+    savedFloorNames[floor.id] = response.floor.name
     saveMessage.value = 'フロア画像を差し替えました。'
     saveState.value = 'success'
   }
@@ -104,6 +113,7 @@ async function createFloor() {
       imageHeight: 0,
       illustrationAssetId: undefined,
     })
+    pendingImage.value = false
     createPickerRevision.value += 1
     saveMessage.value = 'フロアを追加しました。'
     saveState.value = 'success'
@@ -140,6 +150,7 @@ async function updateFloor(floor: MapFloorItem) {
         floors: data.value.floors.map(item => item.id === floor.id ? response.floor : item),
       }
     }
+    savedFloorNames[floor.id] = response.floor.name
     saveMessage.value = 'フロア名を保存しました。'
     saveState.value = 'success'
   }
@@ -239,7 +250,7 @@ async function confirmDeleteFloor() {
     <details class="mt-6 border-y border-stone-200 py-4" :open="!data?.floors.length">
       <summary class="w-fit cursor-pointer text-sm font-semibold text-terracotta-700">＋ フロアを追加</summary>
       <div class="mt-6 grid gap-6 lg:grid-cols-2">
-        <MediaPicker :key="createPickerRevision" :map-id="mapId" label="フロアイラスト" usage="floor" @selected="useUploadedImage" />
+        <MediaPicker :key="createPickerRevision" :map-id="mapId" label="フロアイラスト" usage="floor" @selected="useUploadedImage" @dirty="pendingImage = $event" @cleared="Object.assign(createInput, { illustrationUrl: '', illustrationAssetId: undefined, imageWidth: 0, imageHeight: 0 })" />
         <form class="space-y-5" @submit.prevent="createFloor">
           <div>
             <label for="new-floor-name" class="text-sm font-semibold text-stone-800">フロア名</label>
@@ -307,5 +318,6 @@ async function confirmDeleteFloor() {
       </ol>
     </section>
     <ConfirmDialog :open="deleteTarget !== null" title="フロアを削除" :message="deleteMessage" confirm-label="削除する" destructive :busy="Boolean(busyFloorId)" @cancel="deleteTarget = null" @confirm="confirmDeleteFloor" />
+    <UnsavedChangesGuard :dirty="floorDirty && !isCreating && !busyFloorId" />
   </div>
 </template>
