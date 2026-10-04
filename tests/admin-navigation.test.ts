@@ -24,8 +24,8 @@ describe('WU-50 single-map workspace navigation model', () => {
 
   it('Spot EditorだけならMap管理を表示せず、assignmentがある場合だけ担当Spotを表示する', () => {
     const assigned = buildAdminNavigation({ mapId: null, isOwner: false, hasAssignedSpots: true })
-    expect(assigned.map(item => item.id)).toEqual(['workspace-home', 'assigned-spots'])
-    expect(buildAdminNavigation({ mapId: null, isOwner: false, hasAssignedSpots: false }).map(item => item.id)).toEqual(['workspace-home'])
+    expect(assigned.map(item => item.id)).toEqual(['workspace-home', 'assigned-spots', 'plan-billing'])
+    expect(buildAdminNavigation({ mapId: null, isOwner: false, hasAssignedSpots: false }).map(item => item.id)).toEqual(['workspace-home', 'plan-billing'])
   })
 
   it('Map編集の子routeとOrganization hashを正しくactiveにする', () => {

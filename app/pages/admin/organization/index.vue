@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import WorkspaceSpotManager from '~/components/admin/WorkspaceSpotManager.vue'
+import SettingsNavigation from '~/components/admin/SettingsNavigation.vue'
 import ConfirmDialog from '~/components/ui/ConfirmDialog.vue'
 import ImageUploader from '~/components/admin/ImageUploader.vue'
 import SaveFeedback from '~/components/ui/SaveFeedback.vue'
@@ -99,6 +100,7 @@ async function run(action: () => Promise<void>) {
 
 <template>
   <div class="max-w-5xl">
+    <SettingsNavigation :is-owner="Boolean(organization)" />
     <header>
       <p class="text-sm font-medium text-terracotta-700">ワークスペース</p>
       <h1 class="mt-1 text-3xl font-bold text-stone-900">ワークスペース設定・メンバー</h1>

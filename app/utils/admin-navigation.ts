@@ -150,6 +150,11 @@ export function buildAdminNavigation(context: AdminNavigationContext): AdminNavi
     )
   }
 
+  items.push({
+    id: 'plan-billing', label: 'Plan & Billing', shortLabel: 'Plan & Billing', icon: 'settings',
+    to: '/admin/organization/billing', group: 'management', rail: true,
+    activePaths: ['/admin/organization/billing'],
+  })
   return items
 }
 
