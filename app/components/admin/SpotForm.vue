@@ -89,7 +89,7 @@ defineExpose({ acceptSaved })
 
 const submit = handleSubmit((values) => {
   const enabledCustomIds = new Set(enabledFields.value.filter(field => field.kind === 'custom').map(field => field.id))
-  const normalizeCoordinate = (value: unknown) => value === '' || value === undefined ? null : Number(value)
+  const normalizeCoordinate = (value: unknown) => value === '' || value === undefined || value === null ? null : Number(value)
   const submittedValues = {
     ...values,
     lat: normalizeCoordinate(values.lat),

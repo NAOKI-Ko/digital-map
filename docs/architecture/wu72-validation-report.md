@@ -18,9 +18,9 @@ All DB mutations/tests/migrations used localhost disposable `digital_map_test_*`
 
 - Prisma validate and generate: PASS.
 - Typecheck and production build: PASS.
-- Full database-enabled tests: 757 PASS, 1 skipped. The existing WU-65 before/after external-DB equivalence test requires separate URLs; its skip is explicit. WU-72 historical upgrade and live domain integration tests ran.
+- Full database-enabled tests: 763 PASS, 1 skipped. The existing WU-65 before/after external-DB equivalence test requires separate URLs; its skip is explicit. WU-72 historical upgrade and live domain integration tests ran.
 - Domain/tenant/image/paper audits: PASS, no blocking anomalies. Multi-Map tenants are now informational, consistent with the approved scope.
-- Codex independent review: successive findings fixed and covered by regression; final review status is recorded in the Draft PR.
+- Codex independent review: full implementation reviewed in successive passes; findings on publication, list/media membership, concurrent conflicts, CSV without occurrences, paper numbering, Category dependents, placement-free edits and HTTP(S) validation were fixed. A final incremental review checks the last URL/null-coordinate corrections; its result is recorded in the Draft PR.
 - Browser QA on local built output: 0 Map onboarding, 2 Map explicit selection, canonical detail with two Floors, secondary detail, primary deletion promoting remaining occurrence, adding and explicitly saving an independent occurrence. Mobile/reduced-motion dense recovery reached distinct PINs and canonical detail; desktop Floor switching and public release publication succeeded. An explicit bundled MapLibre worker URL was added after the built-output QA exposed missing relative worker assets.
 
 Raw logs, screenshots and the read-only backup are retained outside Git in the task's `evidence/` directory. They are not production data or candidate deployment evidence. Final commit and Verify run SHA/URLs are recorded on the Draft PR so the evidence can be tied to its exact head without changing that SHA.

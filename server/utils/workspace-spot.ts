@@ -3,6 +3,7 @@ import { z } from 'zod'
 import type { Prisma } from '~~/prisma/generated/client'
 import { appendAuditEvent } from './audit'
 import { validateSpotFieldSubmission } from './spot-field'
+import { spotFormSchema } from '~~/shared/schemas/spot'
 
 export async function requireWorkspaceSpot(event: H3Event) {
   const { session } = await requireTenantOwner(event)
@@ -13,10 +14,10 @@ export async function requireWorkspaceSpot(event: H3Event) {
 
 export const workspaceContentInput = z.object({
   expectedContentVersion: z.number().int().positive(),
-  name: z.string().trim().min(1).max(200),
-  description: z.string().max(10000).nullable(), address: z.string().max(500).nullable(),
-  phone: z.string().max(100).nullable(), website: z.string().url().max(2000).nullable(),
-  hoursText: z.string().max(2000).nullable(), holidayText: z.string().max(2000).nullable(),
+  name: spotFormSchema.shape.name,
+  description: spotFormSchema.shape.description.nullable(), address: spotFormSchema.shape.address.nullable(),
+  phone: spotFormSchema.shape.phone.nullable(), website: spotFormSchema.shape.website.nullable(),
+  hoursText: spotFormSchema.shape.hoursText.nullable(), holidayText: spotFormSchema.shape.holidayText.nullable(),
   customValues: z.record(z.string(), z.union([z.string(), z.number().finite(), z.boolean(), z.null()])).default({}),
 }).strict()
 
