@@ -40,7 +40,7 @@ onBeforeUnmount(() => {
 
 <template>
   <Teleport to="body">
-    <div aria-label="通知" class="pointer-events-none fixed inset-x-4 top-4 z-[100] flex flex-col items-end gap-2 sm:left-auto sm:w-96">
+    <div role="region" aria-label="通知" class="pointer-events-none fixed inset-x-4 top-4 z-[100] flex flex-col items-end gap-2 sm:left-auto sm:w-96">
       <TransitionGroup name="toast">
         <div
           v-for="toast in toasts"
