@@ -108,7 +108,7 @@ function formatDate(value: string) {
     </header>
 
     <p v-if="data?.taskCounts" class="mt-4 text-sm" role="status">このマップ：未配置 {{ data.taskCounts.unplaced }}件 / 配置済み・公開対象外 {{ data.taskCounts.positionedTargetOff }}件</p>
-    <div class="mt-4 flex flex-wrap gap-3 text-sm" aria-label="スポット準備の作業">
+    <div class="mt-4 flex flex-wrap gap-3 text-sm" role="group" aria-label="スポット準備の作業">
       <button type="button" class="min-h-11 underline" @click="Object.assign(form, { position: 'unpositioned', status: '', photo: '' })">未配置を確認</button>
       <button type="button" class="min-h-11 underline" @click="Object.assign(form, { position: 'positioned', status: 'draft', photo: '' })">配置済み・公開対象外を確認</button>
       <button type="button" class="min-h-11 underline" @click="Object.assign(form, { photo: 'none', position: '', status: '' })">写真なしを確認（任意）</button>
