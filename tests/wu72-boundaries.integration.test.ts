@@ -6,7 +6,7 @@ import { createSpotWithUsage, detachSpotUsage } from '../server/utils/spot-usage
 import { updateWorkspaceContent } from '../server/utils/workspace-spot'
 import { approveSpotRevision } from '../server/utils/spot-revision'
 import { loadSpotCsvContext, createSpotCsvExport, previewSpotCsv } from '../server/utils/spot-csv'
-import { AnalyticsBuffer } from '../server/utils/analytics'
+let AnalyticsBuffer: typeof import('../server/utils/analytics').AnalyticsBuffer
 const integration = process.env.DATABASE_URL ? describe : describe.skip
 integration('WU72 multi-Map authorization, retention and compatibility', () => {
   const id = randomUUID(), tenantId = `t-${id}`, a = `a-${id}`, b = `b-${id}`, f = `f-${id}`, f2 = `f2-${id}`, fb = `fb-${id}`, s = `s-${id}`, owner = `o-${id}`, editor = `e-${id}`
@@ -24,6 +24,7 @@ integration('WU72 multi-Map authorization, retention and compatibility', () => {
     await prisma.spotFieldDefinition.create({ data: { id: field, mapId: a, kind: 'custom', label: 'Code', type: 'single_line_text' } })
     await prisma.$transaction(tx => createSpotWithUsage(tx, { data: { id: s, tenantId, floorId: f, name: 'Canonical', description: 'body', x: .2, y: .3, liveVersion: 7, contentVersion: 7, spotCategories: { create: { categoryId: category } }, fieldValues: { create: { fieldDefinitionId: field, valueJson: 'original' } } } }))
     vi.stubGlobal('prisma', prisma)
+    ;({ AnalyticsBuffer } = await import('../server/utils/analytics'))
     vi.stubGlobal('requireUser', async () => ({ user: { id: userId, tenantId } }))
     vi.stubGlobal('getRouterParam', (_: unknown, key: string) => key === 'mapId' ? routeMap : s)
     vi.stubGlobal('createError', (value: object) => Object.assign(new Error(), value))

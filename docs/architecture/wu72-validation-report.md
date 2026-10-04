@@ -25,8 +25,30 @@ All DB mutations/tests/migrations used localhost disposable `digital_map_test_*`
 
 Raw logs, screenshots and the read-only backup are retained outside Git in the task's `evidence/` directory. They are not production data or candidate deployment evidence. Final commit and Verify run SHA/URLs are recorded on the Draft PR so the evidence can be tied to its exact head without changing that SHA.
 
-## Windows / Production status
+## Windows candidate evidence
 
-Windows candidate has not been deployed or migrated. The prior Windows inventory in the plan is historical and cannot authorize a migration. Before candidate deployment, refresh its exact deployed SHA/data inventory, verify DB/Media/Public backups and restoration, confirm all head checks (tests/typecheck/build/Prisma/Verify/Codex review), then perform Windows QA on that exact candidate SHA. Public-LIVE parity, same-Floor repeat placements, Floor/delete/archive retention and publication rollback remain explicit Windows QA cases.
+The user authorized PR #30 through Windows candidate QA, dev merge, exact merge-SHA redeployment and Asana completion, subject to all blocking acceptance gates passing. Production remains excluded.
 
-Production is untouched. No merge, Production promotion, main update, destructive migration or backup restore over active data is authorized by this PR. Rollback retains new domain records/schema, uses compatible application writes and immutable release pointers, and never deletes new content/placements to recreate a singleton model.
+Fresh Windows QA started at `2d12122fdf016e77b477ed6296a4c44ae7b6cfd6`. A frozen custom-format DB backup and Media/Public backups were restored into an isolated DB and isolated directories, then compared with every original table/column and file SHA256. Restore PASS. The rollback anchor retains the old application, verified backups and original immutable releases; rollback does not reverse migrations or overwrite active data.
+
+Candidate `3e52bb8672ab6a9c867f5e7a3623a3430bab9926` passed Windows frozen install, Prisma validate/generate, all five migrations, domain/tenant/image/paper audits, typecheck and build. A second frozen backup preceded active QA migration and cutover. Readiness and exact candidate SHA passed.
+
+| Preserved boundary | Before / after migration |
+| --- | --- |
+| Workspace / Map / Floor | 9 / 9 / 9, unchanged |
+| canonical Spot / Category | 90 / 20, same IDs and all original columns |
+| Usage / Placement / Category Usage | 90 / 90 / 20 added; missing mapping, duplicate and wrong-Map mapping: 0 |
+| unpositioned / unpublished | 32 / 32 included in backfill |
+| PublicRelease | 19, unchanged; existing slugs/current pointers unchanged |
+| MediaAsset / SpotPhoto | 56 / 24, unchanged |
+| field definitions / values / translated values | 31 / 0 / 0, unchanged |
+| pending revision / assignment | 0 / 0, unchanged |
+| original Media / Public files | 124 / 160, byte hashes unchanged |
+
+Because the existing Windows fixture has no pending revisions, assignments or custom values, the historical upgrade regression now adds those before migration, together with CSV-origin field identity, translations, analytics references and a READY Release/current pointer. All original records and pending baseVersion survive backfill unchanged. Independent Codex review found no actionable defects. A Windows-only test initialization issue was fixed by importing AnalyticsBuffer after its Prisma global is installed; production behavior is unchanged.
+
+Windows black-box HTTP QA exercised 16 groups: login/zero Map; 1 Map dashboard; second Map creation/list/ACL; managed Media/Floors; Category unique name/translation/default; Spot custom content/photo/translation; same-Floor and multi-Floor occurrences; direct-ID/nested-payload denials; DB sole consumer/steward/field invariants; CSV round-trip; assignment/revision approval after placement addition; authenticated LIVE/READY activation/public occurrences; immutable release/draft isolation/unpublish/rollback; referenced Category deletion refusal; Placement/Floor deletion retention; second Map publication/archive; analytics and existing Aquarium/Arimatsu Public URLs. API groups PASS. Public Aquarium retains 5 snapshot Floors/37 occurrences; Arimatsu URLs remain accessible. Four legacy `publication-*` synthetic missing-manifest fixtures already existed in the frozen baseline and remain fail-closed; WU63's existing empty public snapshot validly has zero Floors.
+
+Browser and exact final-head Windows revalidation are required before Ready/merge. Their final results, CI URLs, deployment SHA, all acceptance judgments and post-merge evidence are recorded on PR #30 and Asana against the final SHA rather than rewriting this document after merge. Raw logs and screenshots stay in the task evidence directory.
+
+Production is untouched. No main update or Production deployment is authorized. Legacy compatibility columns remain intentionally; cross-Map Spot/Category reuse and transfer remain deferred. App rollback retains new domain records/schema and immutable release pointers, without deleting content or placements to recreate a singleton model.
