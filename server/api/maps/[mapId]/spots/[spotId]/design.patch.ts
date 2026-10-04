@@ -1,3 +1,4 @@
+import { updateLegacySpot } from '~~/server/utils/spot-usage'
 import { pinConflict } from '~~/server/utils/pin-appearance'
 import { pinDesignSchema } from '~~/shared/schemas/pin-design'
 import { normalizePinIconType, normalizePinSize, normalizeSpotImportance } from '~~/shared/constants/spot'
@@ -18,7 +19,7 @@ export default defineEventHandler(async (event): Promise<SpotPinDesignResponse> 
   }
 
   const asset = await resolveTenantMediaAsset(session.user.tenantId, result.data.pinIconAssetId, 'icon')
-  const updatedSpot = await prisma.spot.update({
+  const updatedSpot = await updateLegacySpot({
     where: { id: spot.id, liveVersion: body.expectedVersion },
     data: {
       liveVersion: { increment: 1 },

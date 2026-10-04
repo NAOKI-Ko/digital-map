@@ -24,6 +24,8 @@ describe('WU-24 Spot Editor revision', () => {
       spotFieldValue: { deleteMany: mocks.fieldDeleteMany, create: mocks.fieldCreate },
       spotPhoto: { deleteMany: mocks.photoDeleteMany, createMany: mocks.photoCreateMany },
       auditEvent: { create: mocks.auditCreate },
+      spotFieldDefinition: { findMany: vi.fn().mockResolvedValue([{ id: 'field-1', type: 'single_line_text' }]) },
+      mediaAsset: { count: mocks.assetCount },
     }
     vi.stubGlobal('createError', testError)
     vi.stubGlobal('requireUser', mocks.requireUser)
@@ -41,7 +43,7 @@ describe('WU-24 Spot Editor revision', () => {
     mocks.requireUser.mockResolvedValue({ user: { id: 'editor-1', tenantId: 'tenant-a' } })
     mocks.requireMapAccess.mockResolvedValue({ session: { user: { id: 'reviewer-1' } }, map: { id: 'map-a', tenantId: 'tenant-a' } })
     mocks.spotFindUnique.mockResolvedValue({
-      id: 'spot-1', tenantId: 'tenant-a', liveVersion: 3, floor: { map: { id: 'map-a', tenantId: 'tenant-a' } }, editorAssignment: { userId: 'editor-1' },
+      id: 'spot-1', tenantId: 'tenant-a', liveVersion: 9, contentVersion: 3, stewardMapId: 'map-a', mapUsage: { mapId: 'map-a', map: { id: 'map-a', tenantId: 'tenant-a', archivedAt: null } }, editorAssignment: { userId: 'editor-1' },
     })
     mocks.membershipFindUnique.mockResolvedValue({ role: 'MEMBER' })
     mocks.fieldCount.mockResolvedValue(1)
@@ -86,13 +88,13 @@ describe('WU-24 Spot Editor revision', () => {
   })
 
   it('detects a stale live version and never overwrites it', async () => {
-    mocks.revisionFindFirst.mockResolvedValue({ id: 'revision-1', spotId: 'spot-1', baseVersion: 2, payload, spot: { liveVersion: 3 }, photos: [] })
+    mocks.revisionFindFirst.mockResolvedValue({ id: 'revision-1', spotId: 'spot-1', baseVersion: 2, payload, spot: { liveVersion: 9, contentVersion: 3 }, photos: [] })
     await expect(approveSpotRevision({} as never, 'revision-1')).rejects.toMatchObject({ statusCode: 409 })
     expect(mocks.spotUpdate).not.toHaveBeenCalled()
   })
 
   it('applies only allowed fields, custom values, and ordered photos atomically', async () => {
-    mocks.revisionFindFirst.mockResolvedValue({ id: 'revision-1', spotId: 'spot-1', baseVersion: 3, payload, spot: { liveVersion: 3 }, photos: [{ assetId: 'asset-1', order: 0 }] })
+    mocks.revisionFindFirst.mockResolvedValue({ id: 'revision-1', spotId: 'spot-1', baseVersion: 3, payload, spot: { liveVersion: 9, contentVersion: 3 }, photos: [{ assetId: 'asset-1', order: 0 }] })
     await approveSpotRevision({} as never, 'revision-1')
     const data = mocks.spotUpdate.mock.calls[0]![0].data
     expect(data).toMatchObject({ name: payload.name, liveVersion: { increment: 1 } })

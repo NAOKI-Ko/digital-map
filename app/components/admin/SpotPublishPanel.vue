@@ -24,7 +24,7 @@ const isPreviewOpen = ref(false)
 const errorMessage = ref('')
 const { success } = useToast()
 const pinPreset = computed(() => getPinIconPreset(props.spot.pinIconId))
-const hasCoordinates = computed(() => props.spot.x !== null && props.spot.y !== null)
+const hasCoordinates = computed(() => props.spot.hasPositionedPlacement ?? (props.spot.x !== null && props.spot.y !== null))
 const pinStyle = computed(() => {
   const colors = getPinColorVariants(props.spot.pinColor)
   return {

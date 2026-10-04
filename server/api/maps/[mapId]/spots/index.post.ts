@@ -1,3 +1,4 @@
+import { createSpotWithUsage } from '~~/server/utils/spot-usage'
 import { spotFormSchema } from '~~/shared/schemas/spot'
 import type { AdminSpotResponse } from '~~/shared/types/spot'
 
@@ -26,7 +27,7 @@ export default defineEventHandler(async (event): Promise<AdminSpotResponse> => {
     const { categoryIds: _categoryIds, customValues, ...spotData } = result.data
     const fieldValues = Object.entries(customValues).flatMap(([fieldDefinitionId, value]) =>
       value === null || value === '' ? [] : [{ fieldDefinitionId, valueJson: value }])
-    return transaction.spot.create({
+    return createSpotWithUsage(transaction, {
       data: {
         tenantId: map.tenantId,
         pinSourceMode: 'standard',

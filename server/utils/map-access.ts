@@ -10,10 +10,10 @@ export async function requireMapAccess(event: H3Event) {
 
   const map = await prisma.map.findUnique({
     where: { id: mapId },
-    select: { id: true, name: true, tenantId: true },
+    select: { id: true, name: true, tenantId: true, archivedAt: true },
   })
 
-  if (!map) {
+  if (!map || map.archivedAt) {
     throw createError({ statusCode: 404, statusMessage: 'マップが見つかりません。' })
   }
 
@@ -72,7 +72,8 @@ export async function requireOwnedSpot(event: H3Event) {
     where: {
       id: spotId,
       tenantId: map.tenantId,
-      floor: { mapId: map.id },
+      mapUsage: { mapId: map.id },
+      ...(isOwner ? {} : { stewardMapId: map.id }),
     },
     select: { id: true, floorId: true, x: true, y: true, isPublished: true, liveVersion: true, pinSourceCategoryId: true, pinSourceMode: true },
   })

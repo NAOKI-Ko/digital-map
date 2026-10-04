@@ -1,12 +1,13 @@
+import { updateSpotWithUsage } from '~~/server/utils/spot-usage'
 import { assertPinSourceMembership, pinConflict } from '~~/server/utils/pin-appearance'
-import { spotFormSchema } from '~~/shared/schemas/spot'
+import { spotFormSchema, spotContentFormSchema } from '~~/shared/schemas/spot'
 import type { AdminSpotResponse } from '~~/shared/types/spot'
 
 export default defineEventHandler(async (event): Promise<AdminSpotResponse> => {
   const { map, spot: ownedSpot } = await requireOwnedSpot(event)
   const body = await readBody(event)
   if (body.expectedVersion !== ownedSpot.liveVersion) throw pinConflict()
-  const result = spotFormSchema.safeParse(body)
+  const result = (ownedSpot.floorId === null ? spotContentFormSchema : spotFormSchema).safeParse(body)
 
   if (!result.success) {
     throw createError({
@@ -15,15 +16,16 @@ export default defineEventHandler(async (event): Promise<AdminSpotResponse> => {
     })
   }
 
-  const floor = await prisma.mapFloor.findFirst({
+  const floor = result.data.floorId ? await prisma.mapFloor.findFirst({
     where: { id: result.data.floorId, mapId: map.id },
     select: { id: true },
-  })
-  if (!floor) {
+  }) : null
+  if (result.data.floorId && !floor) {
     throw createError({ statusCode: 422, statusMessage: '選択したフロアが見つかりません。' })
   }
+  if (!result.data.floorId && (result.data.x !== null || result.data.y !== null)) throw createError({ statusCode: 422, statusMessage: '位置を設定するには配置先のフロアを選択してください。' })
 
-  if (ownedSpot.isPublished && (result.data.x === null || result.data.y === null)) {
+  if (ownedSpot.isPublished && (result.data.x === null || result.data.y === null) && !await prisma.illustrationPlacement.count({ where: { usage: { spotId: ownedSpot.id }, isPrimary: false, x: { not: null }, y: { not: null } } })) {
     throw createError({
       statusCode: 422,
       statusMessage: '公開中のスポットから位置を削除できません。先に下書きへ戻してください。',
@@ -37,12 +39,13 @@ export default defineEventHandler(async (event): Promise<AdminSpotResponse> => {
     if (categories) assertPinSourceMembership(ownedSpot, categories.map(category => category.id))
     await validateSpotFieldSubmission(transaction, map.id, result.data, result.data.customValues, ownedSpot.id)
     const { categoryIds: _categoryIds, customValues, ...spotData } = result.data
-    const updated = await transaction.spot.update({
+    const updated = await updateSpotWithUsage(transaction, {
       where: { id: ownedSpot.id, liveVersion: ownedSpot.liveVersion },
       data: {
         tenantId: map.tenantId,
         liveVersion: { increment: 1 },
         ...spotData,
+        floorId: spotData.floorId || null,
         description: spotData.description || null,
         address: spotData.address || null,
         website: spotData.website || null,

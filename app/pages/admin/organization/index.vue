@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import WorkspaceSpotManager from '~/components/admin/WorkspaceSpotManager.vue'
 import ConfirmDialog from '~/components/ui/ConfirmDialog.vue'
 import ImageUploader from '~/components/admin/ImageUploader.vue'
 import SaveFeedback from '~/components/ui/SaveFeedback.vue'
@@ -157,6 +158,7 @@ async function run(action: () => Promise<void>) {
         </article>
       </div>
     </section>
+    <WorkspaceSpotManager v-if="organization" />
     <ConfirmDialog :open="removeTarget !== null" title="ワークスペースから削除" :message="removeTarget ? `「${removeTarget.label}」をワークスペースから削除します。ユーザーアカウントは削除されません。` : ''" confirm-label="ワークスペースから削除" destructive :busy="saving" @cancel="removeTarget = null" @confirm="removeTarget && removeMember(removeTarget.userId)" />
     <UnsavedChangesGuard :dirty="(profileDirty || Boolean(email.trim())) && !saving" />
   </div>

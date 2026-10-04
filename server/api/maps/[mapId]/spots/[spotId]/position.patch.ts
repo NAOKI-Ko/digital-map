@@ -1,3 +1,4 @@
+import { updateLegacySpot } from '~~/server/utils/spot-usage'
 import { spotPositionSchema } from '~~/shared/schemas/position'
 import { pinConflict } from '~~/server/utils/pin-appearance'
 export default defineEventHandler(async event => {
@@ -9,7 +10,7 @@ export default defineEventHandler(async event => {
   if (!floorDate || !Number.isFinite(floorDate.getTime())) throw pinConflict()
   if (body.expectedVersion !== spot.liveVersion || body.expectedFloorId !== spot.floorId) throw pinConflict()
   try {
-    const updated = await prisma.spot.update({
+    const updated = await updateLegacySpot({
       where: { id: spot.id, liveVersion: body.expectedVersion, floorId: body.expectedFloorId, floor: { updatedAt: floorDate } },
       data: { ...result.data, liveVersion: { increment: 1 } }, select: { liveVersion: true },
     })

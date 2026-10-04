@@ -51,7 +51,7 @@ else {
       const partialSpots = (await client.query(`SELECT "id", "floorId", "name", "x", "y" FROM "Spot" WHERE ("x" IS NULL) <> ("y" IS NULL) ORDER BY "floorId", "id"`)).rows
       const outsideSpots = (await client.query(`SELECT "id", "floorId", "name", "x", "y" FROM "Spot" WHERE "x" < 0 OR "x" > 1 OR "y" < 0 OR "y" > 1 ORDER BY "floorId", "id"`)).rows
       const invalidReferences = (await client.query(`SELECT "id", "mapId", "refAImageX", "refAImageY", "refBImageX", "refBImageY" FROM "MapFloor" WHERE ("refAImageX" IS NOT NULL AND ("refAImageX" < 0 OR "refAImageX" > 1)) OR ("refAImageY" IS NOT NULL AND ("refAImageY" < 0 OR "refAImageY" > 1)) OR ("refBImageX" IS NOT NULL AND ("refBImageX" < 0 OR "refBImageX" > 1)) OR ("refBImageY" IS NOT NULL AND ("refBImageY" < 0 OR "refBImageY" > 1)) ORDER BY "mapId", "id"`)).rows
-      const publishedUnpositionedSpots = (await client.query(`SELECT "id", "floorId", "name" FROM "Spot" WHERE "isPublished" AND ("x" IS NULL OR "y" IS NULL) ORDER BY "floorId", "id"`)).rows
+      const publishedUnpositionedSpots = (await client.query(`SELECT "id", "floorId", "name" FROM "Spot" s WHERE "isPublished" AND NOT EXISTS (SELECT 1 FROM "IllustrationPlacement" p JOIN "MapSpotUsage" u ON u.id=p."usageId" WHERE u."spotId"=s.id AND p.x IS NOT NULL AND p.y IS NOT NULL) ORDER BY "floorId", "id"`)).rows
       console.log(JSON.stringify({ schema: 'IMAGE', invalidFloors, invalidReferences, partialSpots, outsideSpots, publishedUnpositionedSpots }, null, 2))
       exceptionCount = invalidFloors.length + invalidReferences.length + partialSpots.length + outsideSpots.length
     }

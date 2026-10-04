@@ -6,6 +6,9 @@ const mocks = vi.hoisted(() => ({
   update: vi.fn(),
 }))
 
+// The route keeps its legacy wire contract; PostgreSQL adapter coverage is in WU72 integration tests.
+vi.mock('../server/utils/spot-usage', () => ({ updateLegacySpot: (args: unknown) => mocks.update(args) }))
+
 type Handler = (event: unknown) => Promise<unknown>
 let handler: Handler
 let removeHandler: Handler
@@ -20,7 +23,7 @@ describe('PATCH Spot IMAGE position', () => {
     vi.stubGlobal('requireOwnedSpot', mocks.requireOwnedSpot)
     vi.stubGlobal('readBody', mocks.readBody)
     vi.stubGlobal('createError', testError)
-    vi.stubGlobal('prisma', { spot: { update: mocks.update } })
+    vi.stubGlobal('prisma', { spot: { update: mocks.update }, illustrationPlacement: { count: vi.fn().mockResolvedValue(0) } })
     handler = (await import('../server/api/maps/[mapId]/spots/[spotId]/position.patch')).default as Handler
     removeHandler = (await import('../server/api/maps/[mapId]/spots/[spotId]/position.delete')).default as Handler
   })

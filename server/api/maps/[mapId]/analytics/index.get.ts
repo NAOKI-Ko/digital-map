@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
     prisma.mapDailyAnalytics.findMany({ where: { tenantId: map.tenantId, mapId: map.id, date: { gte: start, lte: end } }, orderBy: { date: 'asc' } }),
     prisma.spotDailyAnalytics.groupBy({ by: ['spotId'], where: { tenantId: map.tenantId, mapId: map.id, date: { gte: start, lte: end } }, _sum: { viewCount: true }, orderBy: { _sum: { viewCount: 'desc' } }, take: 20 }),
   ])
-  const spotNames = await prisma.spot.findMany({ where: { id: { in: spots.map(spot => spot.spotId) }, floor: { mapId: map.id } }, select: { id: true, name: true } })
+  const spotNames = await prisma.spot.findMany({ where: { id: { in: spots.map(spot => spot.spotId) }, mapUsage: { mapId: map.id } }, select: { id: true, name: true } })
   const names = new Map(spotNames.map(spot => [spot.id, spot.name]))
   return {
     timezone: 'UTC', displayTimezone: 'Asia/Tokyo',

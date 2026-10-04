@@ -1,4 +1,5 @@
 import 'dotenv/config'
+import { synchronizeLegacySpot } from '../server/utils/spot-usage'
 import { copyFile, mkdir } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -243,6 +244,7 @@ async function syncSeedSpotCategories(tenantId: string, mapId: string, spots: re
       select: { id: true, name: true },
     })
   )))
+  await prisma.mapCategoryUsage.createMany({ data: categories.map(category => ({ mapId, categoryId: category.id })), skipDuplicates: true })
   const categoryIdByName = new Map(categories.map(category => [category.name, category.id]))
 
   await prisma.$transaction(spots.map((spot) => {
@@ -326,6 +328,7 @@ async function seedArimatsuDemo(tenantId: string) {
     })
   }))
 
+  await prisma.$transaction(async tx => { for (const spot of arimatsuDemoSpots) await synchronizeLegacySpot(tx, spot.id) })
   await syncSeedSpotCategories(tenantId, map.id, arimatsuDemoSpots)
 
   console.info(`有松チーム内デモを作成しました: ${arimatsuDemoSpots.length}スポット（すべて下書き）`)

@@ -32,7 +32,7 @@ const saveState = ref<'idle' | 'saving' | 'success' | 'error'>('idle')
 const saveMessage = ref('')
 watch(data, (value) => { if (!value) return; name.value = value.paperMap.name; draft.value = structuredClone(value.paperMap.config); savedSnapshot.value = JSON.stringify({ name: name.value, config: draft.value }) }, { immediate: true })
 const dirty = computed(() => draft.value ? JSON.stringify({ name: name.value, config: draft.value }) !== savedSnapshot.value : false)
-const spots = computed(() => data.value?.source.map.floors.flatMap(floor => floor.spots) ?? [])
+const spots = computed(() => [...new Map((data.value?.source.map.floors.flatMap(floor => floor.spots) ?? []).map(spot => [spot.id, spot])).values()])
 watch(spots, (value) => {
   if (!value.some(spot => spot.id === selectedSpotId.value)) selectedSpotId.value = value[0]?.id ?? ''
 }, { immediate: true })
@@ -44,7 +44,7 @@ const currentOverride = computed({ get: () => draft.value?.spotOverrides.find(it
 function toggleId(values: string[], id: string, checked: boolean) { const index = values.indexOf(id); if (checked && index < 0) values.push(id); if (!checked && index >= 0) values.splice(index, 1) }
 function selectSlot(slot: PaperSlotId | 'title') { selectedSlot.value = slot }
 function changeDesign(value: PaperDesignId) { if(draft.value && data.value)draft.value=switchPaperDesign(draft.value,value,data.value.source);designPickerOpen.value=false }
-const orderedSpots = computed(() => draft.value && data.value ? selectPaperMapSpotsFromSource(data.value.source,draft.value) : [])
+const orderedSpots = computed(() => draft.value && data.value ? [...new Map(selectPaperMapSpotsFromSource(data.value.source,draft.value).map(spot => [spot.id, spot])).values()] : [])
 function moveSpot(id:string,delta:number) { if(!draft.value)return;const ids=orderedSpots.value.map(s=>s.id),i=ids.indexOf(id);if(i+delta<0||i+delta>=ids.length)return;[ids[i],ids[i+delta]]=[ids[i+delta]!,ids[i]!];draft.value.ordering={mode:'manual',spotIds:ids} }
 function choosePhoto(url:string) { if(!draft.value||!selectedSpot.value)return;draft.value.photoChoices=(draft.value.photoChoices??[]).filter(c=>c.spotId!==selectedSpot.value!.id);if(url)draft.value.photoChoices.push({spotId:selectedSpot.value.id,url}) }
 function changeTemplate(value: string) { if (draft.value) draft.value = switchPaperTemplate(draft.value, value as PaperTemplateId) }

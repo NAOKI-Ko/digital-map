@@ -1,3 +1,4 @@
+import { createSpotWithUsage, updateSpotWithUsage } from '~~/server/utils/spot-usage'
 import { assertPinSourceMembership } from '~~/server/utils/pin-appearance'
 import type { Prisma } from '~~/prisma/generated/client'
 import type { SpotCsvImportResponse } from '~~/shared/types/spot-csv'
@@ -56,7 +57,7 @@ async function writeCustomValues(transaction: Prisma.TransactionClient, spotId: 
 }
 
 export default defineEventHandler(async (event): Promise<SpotCsvImportResponse> => {
-  const { map, session } = await requireOwnedMap(event)
+  const { map, session, isOwner } = await requireOwnedMap(event)
   const body = await readBody<{ csv?: string }>(event)
   if (typeof body.csv !== 'string') throw createError({ statusCode: 422, statusMessage: 'CSVを指定してください。' })
 
@@ -72,7 +73,7 @@ export default defineEventHandler(async (event): Promise<SpotCsvImportResponse> 
       if (row.status === 'UNCHANGED') continue
       if (row.status === 'NEW') {
         if (!row.floorId) throw createError({ statusCode: 422, statusMessage: `行${row.rowNumber}のフロアを特定できません。` })
-        const spot = await transaction.spot.create({
+        const spot = await createSpotWithUsage(transaction, {
           data: {
             tenantId: map.tenantId,
             floorId: row.floorId,
@@ -90,9 +91,10 @@ export default defineEventHandler(async (event): Promise<SpotCsvImportResponse> 
         changedSpotIds.push(spot.id)
       }
       else if (row.status === 'UPDATE' && row.spotId) {
-        const current = await transaction.spot.findUniqueOrThrow({ where: { id: row.spotId } })
+        const current = await transaction.spot.findFirst({ where: { id: row.spotId, tenantId: map.tenantId, mapUsage: { mapId: map.id }, ...(isOwner ? {} : { stewardMapId: map.id }) } })
+        if (!current) throw createError({ statusCode: 403, statusMessage: 'このスポットの本文はオーナーのみ編集できます。' })
         assertPinSourceMembership(current, row.categoryIds)
-        await transaction.spot.update({
+        await updateSpotWithUsage(transaction, {
           where: { id: row.spotId },
           data: {
             name: row.name,

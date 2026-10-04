@@ -35,7 +35,7 @@ describe('ピン管理workspace', () => {
 
   it('ピン配置解除には確認ダイアログがある', () => {
     expect(editorSource).toContain('title="ピン配置を解除"')
-    expect(editorSource).toContain("method: 'DELETE'")
+    expect(editorSource).toContain("method: 'PATCH', body: { x: null, y: null, expectedVersion: spot.placementVersion")
   })
 
   it('既存PINを地図から直接選択し、旧一覧とraw座標を表示しない', () => {

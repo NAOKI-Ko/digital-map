@@ -12,6 +12,8 @@
 
 ## 技術スタックのルール
 
+WU-72 Phase 1 / WU-71 Accepted Decision Dは以下の旧MVP記述より優先する。Workspaceは複数Mapを持てる。Spotはcanonical Contentでありconsumer Mapは0..1、同一Map内の複数Floor/同一FloorへのIllustrationPlacementを許可する。位置と公開対象・PIN外観はUsage/Placementに分離し、legacy Spot位置はprimary配置の互換投影として残す。CategoryもWorkspace所有・consumer Map 0..1で、跨Map共有/移管は未解放。詳細と順序は`docs/architecture/wu72-phase1-migration-plan.md`を参照する。
+
 - フレームワーク: Nuxt 4 (Vue 3, Composition API, `<script setup lang="ts">`)。Options APIは使わない。フロント資産は`app/`配下に置く(Nuxt 4のデフォルト構成)
 - DB: PostgreSQL + Prisma。生SQLは特別な理由がない限り書かない。Prismaクライアントは`server/utils/prisma.ts`等に集約し、各APIハンドラで使い回す
 - API: `server/api/`配下のNitroサーバールートとして実装する(Express等の別サーバーは立てない)

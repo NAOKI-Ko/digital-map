@@ -84,6 +84,7 @@ export function buildAdminNavigation(context: AdminNavigationContext): AdminNavi
 
   if (context.mapId) {
     items.push(
+      { id: 'map-picker', label: 'マップを選ぶ', shortLabel: 'マップを選ぶ', icon: 'maps', to: '/admin/dashboard', group: 'organization', rail: false, activePaths: ['/admin/dashboard'], exact: true },
       {
         id: 'illustration-map', label: 'イラストマップ', shortLabel: 'イラストマップ', icon: 'edit', to: mapPath(context.mapId, '/editor'),
         group: 'map', rail: true,

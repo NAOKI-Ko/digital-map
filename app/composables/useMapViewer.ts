@@ -334,10 +334,12 @@ export function useMapViewer(
     if (!container.value || map.value) return
 
     try {
-      const [maplibregl] = await Promise.all([
+      const [maplibregl, , worker] = await Promise.all([
         import('maplibre-gl'),
         import('maplibre-gl/dist/maplibre-gl.css'),
+        import('maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'),
       ])
+      maplibregl.setWorkerUrl(worker.default)
       maplibre.value = maplibregl
       const instance = new maplibregl.Map(createMapViewerOptions(container.value, options.mode, Boolean(options.visitorOverview?.value), options.locale?.value))
       map.value = instance

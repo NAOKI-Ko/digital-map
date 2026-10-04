@@ -30,7 +30,7 @@ const settingSections = computed(() => [
   { id: 'language', label: '言語・翻訳' },
   { id: 'seo', label: '検索・シェア表示' },
   ...(data.value?.map.permissions?.canManageEditors ? [{ id: 'team', label: '編集者' }] : []),
-  ...(data.value?.map.permissions?.canDelete ? [{ id: 'danger', label: 'マップの削除' }] : []),
+  ...(data.value?.map.permissions?.canDelete ? [{ id: 'danger', label: 'マップをアーカイブ' }] : []),
 ])
 const activeSection = computed(() => settingSections.value.some(item => `#${item.id}` === route.hash) ? route.hash.slice(1) : 'basic')
 const { data, error, status } = await useFetch<AdminMapResponse>(`/api/maps/${mapId}`)
@@ -183,7 +183,7 @@ async function deleteMap() {
     await refreshNuxtData(ADMIN_MAP_LIST_KEY)
     await navigateTo('/admin/dashboard')
   }
-  catch (error: any) { deleteError.value = error?.data?.statusMessage ?? 'マップを削除できませんでした。' }
+  catch (error: any) { deleteError.value = error?.data?.statusMessage ?? 'マップをアーカイブできませんでした。' }
   finally { isDeleting.value = false }
 }
 
@@ -397,12 +397,12 @@ async function saveSeo() {
       </section>
 
       <section v-if="data.map.permissions?.canDelete" id="danger" v-show="activeSection === 'danger'" class="settings-section rounded-lg border border-red-200 p-5">
-        <h2 class="text-lg font-bold text-red-900">マップの削除</h2>
-        <p class="mt-2 text-sm text-stone-600">マップと配下のデータを削除します。編集者はこの操作を実行できません。</p>
+        <h2 class="text-lg font-bold text-red-900">マップをアーカイブ</h2>
+        <p class="mt-2 text-sm text-stone-600">公開を停止し、一覧から非表示にします。スポットの内容と公開履歴は保持されます。オーナーのみ操作できます。</p>
         <p v-if="deleteError" class="mt-3 text-sm text-red-700">{{ deleteError }}</p>
-        <button :disabled="isDeleting" class="mt-5 rounded-lg border border-red-300 px-4 py-2.5 text-sm font-semibold text-red-700 disabled:opacity-50" @click="deleteDialogOpen = true">マップを削除</button>
+        <button :disabled="isDeleting" class="mt-5 rounded-lg border border-red-300 px-4 py-2.5 text-sm font-semibold text-red-700 disabled:opacity-50" @click="deleteDialogOpen = true">マップをアーカイブ</button>
       </section>
-      <ConfirmDialog :open="deleteDialogOpen" title="マップを削除" message="このマップと配下のデータを削除します。この操作は取り消せません。" confirm-label="削除する" destructive :busy="isDeleting" @cancel="deleteDialogOpen = false" @confirm="deleteMap" />
+      <ConfirmDialog :open="deleteDialogOpen" title="マップをアーカイブ" message="公開を停止し、このマップを一覧から非表示にします。スポットの内容・項目・公開履歴は保持します。" confirm-label="アーカイブする" destructive :busy="isDeleting" @cancel="deleteDialogOpen = false" @confirm="deleteMap" />
       <ConfirmDialog :open="sectionDiscardOpen" title="未保存の設定があります" message="保存していない設定を破棄して別の設定項目へ移動しますか？" confirm-label="破棄して移動" cancel-label="編集を続ける" destructive @cancel="sectionDiscardOpen = false; pendingSectionPath = ''" @confirm="discardSectionDrafts" />
       <UnsavedChangesGuard :dirty="pageDirty && !isSubmitting && !isBrandingSaving && translationState !== 'saving' && seoState !== 'saving'" />
 

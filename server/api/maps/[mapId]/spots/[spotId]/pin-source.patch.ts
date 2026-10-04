@@ -1,3 +1,4 @@
+import { updateSpotWithUsage } from '~~/server/utils/spot-usage'
 import { pinSourceSchema } from '~~/shared/schemas/pin-source'
 import { resolveEffectivePinAppearance } from '~~/shared/utils/pin-appearance'
 import { pinConflict } from '~~/server/utils/pin-appearance'
@@ -9,7 +10,7 @@ export default defineEventHandler(async (event) => {
   const command = parsed.data
   try {
     const spot = await prisma.$transaction(async tx => {
-      const current = await tx.spot.findFirst({ where: { id: ownedSpot.id, tenantId: map.tenantId, floor: { mapId: map.id } }, include: adminSpotInclude })
+      const current = await tx.spot.findFirst({ where: { id: ownedSpot.id, tenantId: map.tenantId, mapUsage: { mapId: map.id } }, include: adminSpotInclude })
       if (!current || current.liveVersion !== command.expectedVersion) throw pinConflict()
       if (command.categoryId && !current.spotCategories.some(item => item.category.id === command.categoryId)) {
         throw createError({ statusCode: 422, statusMessage: '所属カテゴリーからPIN用カテゴリーを選択してください。' })
@@ -18,7 +19,7 @@ export default defineEventHandler(async (event) => {
         const source = await tx.category.findFirst({ where: { id: command.categoryId!, mapId: map.id, tenantId: map.tenantId } })
         if (!source || source.pinDefaultRevision !== command.expectedCategoryRevision) throw pinConflict()
       }
-      return tx.spot.update({
+      return updateSpotWithUsage(tx, {
         where: { id: current.id, liveVersion: command.expectedVersion },
         data: {
           ...(command.mode === 'individual' ? resolveEffectivePinAppearance(current) : {}),

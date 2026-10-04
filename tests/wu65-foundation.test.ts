@@ -51,9 +51,8 @@ describe('WU-65 list scope', () => {
     const handler = (await import('../server/api/maps/[mapId]/spots/index.get')).default
     await handler({} as never)
     expect(findMany.mock.calls[0]![0].where).toMatchObject({
-      floor: { mapId: 'map-a' }, floorId: 'floor-0',
+      mapUsage: { mapId: 'map-a', placements: { some: { floorId: 'floor-0' }, none: { floorId: 'floor-0', x: { not: null }, y: { not: null } } } },
       AND: [{ OR: expect.arrayContaining([{ name: { contains: '展示', mode: 'insensitive' } }]) }],
-      OR: [{ x: null }, { y: null }],
     })
   })
   it('reports Map-wide work counts independently of row filters and supports no Category', async () => {
@@ -68,7 +67,7 @@ describe('WU-65 list scope', () => {
     expect(result.taskCounts).toEqual({ unplaced: 37, positionedTargetOff: 4 })
     expect(findMany.mock.calls[0]![0].where.spotCategories).toEqual({ none: {} })
     for (const call of count.mock.calls) {
-      expect(call[0].where).toHaveProperty('floor.mapId', 'map-a')
+      expect(call[0].where).toHaveProperty('mapUsage.mapId', 'map-a')
       expect(call[0].where).not.toHaveProperty('floorId')
       expect(call[0].where).not.toHaveProperty('name')
     }

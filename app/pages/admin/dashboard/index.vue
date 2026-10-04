@@ -12,9 +12,6 @@ const [{ data, error, refresh, status }, { data: organizationData }] = await Pro
 const maps = computed(() => data.value?.maps ?? [])
 const canCreateMap = computed(() => data.value?.permissions.canCreateMap ?? false)
 const activeOrganization = computed(() => organizationData.value?.organizations.find(item => item.id === organizationData.value?.activeOrganizationId))
-if (maps.value.length === 1) {
-  await navigateTo(`/admin/maps/${maps.value[0]!.id}`, { replace: true })
-}
 </script>
 
 <template>
@@ -38,9 +35,9 @@ if (maps.value.length === 1) {
       <NuxtLink v-if="canCreateMap" to="/admin/maps/new" class="mt-5 inline-flex min-h-11 items-center rounded-lg bg-terracotta-600 px-4 text-sm font-semibold text-white hover:bg-terracotta-700">マップを作成</NuxtLink>
     </section>
 
-    <section v-else-if="maps.length > 1" class="mt-7 rounded-xl border border-amber-300 bg-amber-50 p-6" role="alert">
-      <h2 class="font-bold text-amber-950">マップ構成を確認してください</h2>
-      <p class="mt-2 text-sm leading-6 text-amber-900">このワークスペースに複数のアクセス可能なマップが返されました。WU-49の単一マップ契約と一致しないため、自動選択せず安全に停止しています。</p>
+    <section v-else class="mt-7">
+      <div class="mb-4 flex items-center justify-between gap-3"><h2 class="font-bold">マップを選ぶ</h2><NuxtLink v-if="canCreateMap" to="/admin/maps/new" class="inline-flex min-h-11 items-center rounded-lg bg-terracotta-600 px-4 text-sm font-semibold text-white">マップを作成</NuxtLink></div>
+      <ul class="grid gap-4 sm:grid-cols-2"><li v-for="map in maps" :key="map.id"><NuxtLink :to="`/admin/maps/${map.id}`" class="block rounded-xl border border-stone-200 bg-white p-5 hover:border-terracotta-400"><h3 class="font-bold">{{ map.name }}</h3><p class="mt-2 text-sm text-stone-600">{{ map.isPublished ? '公開中' : '下書き' }} · {{ map.floorCount }}フロア</p></NuxtLink></li></ul>
     </section>
   </div>
 </template>

@@ -33,7 +33,7 @@ function updateDraft(value: PinAppearance) {
     <template v-if="data">
       <p class="my-2 text-sm">変更対象：{{ data.spots.length }}件。標準ピン・個別設定には影響しません。公開中の表示は次の公開時に更新されます。</p>
       <NuxtLink v-if="data.spots.length" :to="{ path: `/admin/maps/${mapId}/spots`, query: { pinSource: 'category', pinSourceCategoryId: categoryId } }" class="text-sm underline">この既定を使うスポットを一覧で確認</NuxtLink>
-      <details v-if="data.spots.length" class="my-3 text-sm"><summary>対象スポットとフロアを確認</summary><ul><li v-for="spot in data.spots" :key="spot.id">{{ spot.floor.name }} — {{ spot.name }}</li></ul></details>
+      <details v-if="data.spots.length" class="my-3 text-sm"><summary>対象スポットとフロアを確認</summary><ul><li v-for="spot in data.spots" :key="spot.id">{{ (spot.floor?.name ?? 'フロア未設定') }} — {{ spot.name }}</li></ul></details>
       <div class="my-3 flex gap-3"><PinAppearancePreview :appearance="data.design ?? standardPinAppearance" label="現在" /><PinAppearancePreview :appearance="enabled ? draft : standardPinAppearance" label="保存後" /></div>
       <label class="block text-sm"><input v-model="enabled" type="checkbox" :disabled="saving"> PIN既定を設定する（解除すると継承中のピンは標準ピンになります）</label>
       <fieldset :disabled="saving"><PinDesignEditor v-if="enabled" :key="data.revision" :map-id="mapId" spot-id="" :initial-value="data.design ?? standardPinAppearance" :show-save="false" :show-importance="false" :guard-navigation="false" @changed="updateDraft" /></fieldset>

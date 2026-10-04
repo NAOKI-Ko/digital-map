@@ -239,7 +239,7 @@ model MapMember {
 
 model Map {
   id                   String                @id @default(cuid())
-  tenantId             String                @unique
+  tenantId             String
   tenant               Tenant                @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   name                 String
   slug                 String                @unique
@@ -265,6 +265,11 @@ model Map {
   currentRelease       PublicRelease?        @relation("MapCurrentRelease", fields: [currentReleaseId], references: [id], onDelete: SetNull)
   dailyAnalytics       MapDailyAnalytics[]
   spotDailyAnalytics   SpotDailyAnalytics[]
+  archivedAt           DateTime?
+  spotUsages           MapSpotUsage[]
+  schemaSpots          Spot[]                @relation("SpotSchemaMap")
+  stewardedSpots       Spot[]                @relation("SpotStewardMap")
+  categoryUsages       MapCategoryUsage[]
   floors               MapFloor[]
   categories           Category[]
   spotFieldDefinitions SpotFieldDefinition[]
@@ -274,6 +279,7 @@ model Map {
   createdAt            DateTime              @default(now())
   updatedAt            DateTime              @updatedAt
 
+  @@index([tenantId])
   @@index([seoImageAssetId])
 }
 
@@ -378,31 +384,33 @@ model MapTranslation {
 }
 
 model Category {
-  id             String                @id @default(cuid())
-  tenantId       String
-  tenant         Tenant                @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  mapId          String
-  map            Map                   @relation(fields: [mapId], references: [id], onDelete: Cascade)
-  name           String
-  order          Int                   @default(0)
-  iconType       String?
-  iconPresetId   String?
-  iconImageUrl   String?
-  iconAssetId    String?
-  iconAsset      MediaAsset?           @relation("CategoryIconAsset", fields: [iconAssetId], references: [id], onDelete: SetNull)
+  pinSourceUsages    MapSpotUsage[]
+  id                 String                @id @default(cuid())
+  tenantId           String
+  tenant             Tenant                @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  mapId              String?
+  map                Map?                  @relation(fields: [mapId], references: [id], onDelete: SetNull)
+  name               String
+  order              Int                   @default(0)
+  iconType           String?
+  iconPresetId       String?
+  iconImageUrl       String?
+  iconAssetId        String?
+  iconAsset          MediaAsset?           @relation("CategoryIconAsset", fields: [iconAssetId], references: [id], onDelete: SetNull)
   pinDefaultType     String?
   pinDefaultIconId   String?
   pinDefaultImageUrl String?
   pinDefaultAssetId  String?
-  pinDefaultAsset    MediaAsset? @relation("CategoryPinDefaultAsset", fields: [pinDefaultAssetId], references: [id], onDelete: Restrict)
+  pinDefaultAsset    MediaAsset?           @relation("CategoryPinDefaultAsset", fields: [pinDefaultAssetId], references: [id], onDelete: Restrict)
   pinDefaultColor    String?
   pinDefaultSize     String?
-  pinDefaultRevision Int @default(0)
-  pinSourceSpots     Spot[] @relation("SpotPinSource")
-  spotCategories SpotCategory[]
-  translations   CategoryTranslation[]
-  createdAt      DateTime              @default(now())
-  updatedAt      DateTime              @updatedAt
+  pinDefaultRevision Int                   @default(0)
+  pinSourceSpots     Spot[]                @relation("SpotPinSource")
+  mapUsages          MapCategoryUsage[]
+  spotCategories     SpotCategory[]
+  translations       CategoryTranslation[]
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
 
   @@unique([tenantId, name])
   @@index([tenantId, order])
@@ -423,16 +431,16 @@ model CategoryTranslation {
 }
 
 model MapFloor {
-  id                  String            @id @default(cuid())
+  id                  String                  @id @default(cuid())
   mapId               String
-  map                 Map               @relation(fields: [mapId], references: [id], onDelete: Cascade)
+  map                 Map                     @relation(fields: [mapId], references: [id], onDelete: Cascade)
   name                String
   illustrationUrl     String
   illustrationAssetId String?
-  illustrationAsset   MediaAsset?       @relation("FloorIllustrationAsset", fields: [illustrationAssetId], references: [id], onDelete: SetNull)
+  illustrationAsset   MediaAsset?             @relation("FloorIllustrationAsset", fields: [illustrationAssetId], references: [id], onDelete: SetNull)
   imageWidth          Int
   imageHeight         Int
-  order               Int               @default(0)
+  order               Int                     @default(0)
   refAImageX          Float?
   refAImageY          Float?
   refALat             Float?
@@ -441,10 +449,11 @@ model MapFloor {
   refBImageY          Float?
   refBLat             Float?
   refBLng             Float?
+  placements          IllustrationPlacement[]
   spots               Spot[]
   decorations         FloorDecoration[]
-  createdAt           DateTime          @default(now())
-  updatedAt           DateTime          @updatedAt
+  createdAt           DateTime                @default(now())
+  updatedAt           DateTime                @updatedAt
 
   @@index([mapId, order])
 }
@@ -453,8 +462,13 @@ model Spot {
   id                     String                      @id @default(cuid())
   tenantId               String
   tenant                 Tenant                      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  floorId                String
-  floor                  MapFloor                    @relation(fields: [floorId], references: [id], onDelete: Cascade)
+  floorId                String?
+  floor                  MapFloor?                   @relation(fields: [floorId], references: [id], onDelete: SetNull)
+  schemaMapId            String?
+  schemaMap              Map?                        @relation("SpotSchemaMap", fields: [schemaMapId], references: [id], onDelete: Restrict)
+  stewardMapId           String?
+  stewardMap             Map?                        @relation("SpotStewardMap", fields: [stewardMapId], references: [id], onDelete: Restrict)
+  mapUsage               MapSpotUsage?
   name                   String
   spotCategories         SpotCategory[]
   description            String?
@@ -468,9 +482,9 @@ model Spot {
   hoursText              String?
   holidayText            String?
   phone                  String?
-  pinSourceMode          String @default("individual")
+  pinSourceMode          String                      @default("individual")
   pinSourceCategoryId    String?
-  pinSourceCategory      Category? @relation("SpotPinSource", fields: [pinSourceCategoryId], references: [id], onDelete: Restrict)
+  pinSourceCategory      Category?                   @relation("SpotPinSource", fields: [pinSourceCategoryId], references: [id], onDelete: Restrict)
   pinIconType            String                      @default("preset")
   pinIconId              String?
   pinIconImageUrl        String?
@@ -484,6 +498,7 @@ model Spot {
   fieldValueTranslations SpotFieldValueTranslation[]
   dailyAnalytics         SpotDailyAnalytics[]
   targetedInvitations    OrganizationInvitation[]
+  contentVersion         Int                         @default(1)
   liveVersion            Int                         @default(1)
   pinColor               String                      @default("#C7401F")
   pinSize                String                      @default("medium")
@@ -651,31 +666,32 @@ model SpotFieldValueTranslation {
 }
 
 model MediaAsset {
-  id                 String              @id @default(cuid())
-  tenantId           String
-  tenant             Tenant              @relation("TenantMediaAssets", fields: [tenantId], references: [id], onDelete: Cascade)
-  storageKey         String              @unique
-  originalFilename   String
-  mimeType           String
-  width              Int
-  height             Int
-  fileSize           Int
-  sha256             String?
-  mapLogos           Map[]               @relation("MapLogoAsset")
-  mapSeoImages       Map[]               @relation("MapSeoImageAsset")
-  floorIllustrations MapFloor[]          @relation("FloorIllustrationAsset")
-  categoryIcons      Category[]          @relation("CategoryIconAsset")
-  categoryPinDefaults Category[] @relation("CategoryPinDefaultAsset")
-  spotPins           Spot[]              @relation("SpotPinAsset")
-  spotPhotos         SpotPhoto[]
-  revisionPhotos     SpotRevisionPhoto[]
-  decorations        FloorDecoration[]
-  tenantLogos        Tenant[]            @relation("TenantLogoAsset")
-  variants           MediaVariant[]
-  processingStatus   String              @default("PENDING")
-  processingError    String?
-  createdAt          DateTime            @default(now())
-  updatedAt          DateTime            @updatedAt
+  usagePins           MapSpotUsage[]
+  id                  String              @id @default(cuid())
+  tenantId            String
+  tenant              Tenant              @relation("TenantMediaAssets", fields: [tenantId], references: [id], onDelete: Cascade)
+  storageKey          String              @unique
+  originalFilename    String
+  mimeType            String
+  width               Int
+  height              Int
+  fileSize            Int
+  sha256              String?
+  mapLogos            Map[]               @relation("MapLogoAsset")
+  mapSeoImages        Map[]               @relation("MapSeoImageAsset")
+  floorIllustrations  MapFloor[]          @relation("FloorIllustrationAsset")
+  categoryIcons       Category[]          @relation("CategoryIconAsset")
+  categoryPinDefaults Category[]          @relation("CategoryPinDefaultAsset")
+  spotPins            Spot[]              @relation("SpotPinAsset")
+  spotPhotos          SpotPhoto[]
+  revisionPhotos      SpotRevisionPhoto[]
+  decorations         FloorDecoration[]
+  tenantLogos         Tenant[]            @relation("TenantLogoAsset")
+  variants            MediaVariant[]
+  processingStatus    String              @default("PENDING")
+  processingError     String?
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
 
   @@index([tenantId, createdAt])
   @@index([tenantId, sha256])
@@ -718,5 +734,61 @@ model SpotCategory {
   category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   @@id([spotId, categoryId])
+  @@index([categoryId])
+}
+
+// Phase 1: one consumer Map per canonical Spot. Styling and publication belong here.
+model MapSpotUsage {
+  id                  String                  @id @default(cuid())
+  spotId              String                  @unique
+  spot                Spot                    @relation(fields: [spotId], references: [id], onDelete: Cascade)
+  mapId               String
+  map                 Map                     @relation(fields: [mapId], references: [id], onDelete: Restrict)
+  version             Int                     @default(1)
+  isPublished         Boolean                 @default(false)
+  importance          String                  @default("normal")
+  pinSourceMode       String                  @default("individual")
+  pinSourceCategoryId String?
+  pinSourceCategory   Category?               @relation(fields: [pinSourceCategoryId], references: [id], onDelete: Restrict)
+  pinIconType         String                  @default("preset")
+  pinIconId           String?
+  pinIconImageUrl     String?
+  pinIconAssetId      String?
+  pinIconAsset        MediaAsset?             @relation(fields: [pinIconAssetId], references: [id], onDelete: SetNull)
+  pinColor            String                  @default("#C7401F")
+  pinSize             String                  @default("medium")
+  placements          IllustrationPlacement[]
+  createdAt           DateTime                @default(now())
+  updatedAt           DateTime                @updatedAt
+
+  @@index([mapId])
+}
+
+// An occurrence, never a copy of canonical content. Same-floor repeats are valid.
+model IllustrationPlacement {
+  id        String       @id @default(cuid())
+  usageId   String
+  usage     MapSpotUsage @relation(fields: [usageId], references: [id], onDelete: Cascade)
+  floorId   String
+  floor     MapFloor     @relation(fields: [floorId], references: [id], onDelete: Cascade)
+  x         Float?
+  y         Float?
+  version   Int          @default(1)
+  isPrimary Boolean      @default(false)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  @@index([usageId])
+  @@index([floorId])
+}
+
+// Category is Workspace-owned; adoption is a separate Map boundary.
+model MapCategoryUsage {
+  mapId      String
+  map        Map      @relation(fields: [mapId], references: [id], onDelete: Cascade)
+  categoryId String   @unique
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([mapId, categoryId])
   @@index([categoryId])
 }

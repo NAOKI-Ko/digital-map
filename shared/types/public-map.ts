@@ -11,6 +11,8 @@ export interface PublicSpotInformationField {
 }
 
 export interface PublicSpot {
+  placementId?: string
+  canonicalSpotId?: string
   id: string
   floorId: string
   name: string

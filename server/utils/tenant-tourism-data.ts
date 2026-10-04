@@ -3,23 +3,9 @@ import { prisma } from './prisma'
 
 type TenantDataClient = Prisma.TransactionClient | PrismaClient
 
-export class TenantAlreadyHasMapError extends Error {
-  constructor() {
-    super('TENANT_ALREADY_HAS_MAP')
-    this.name = 'TenantAlreadyHasMapError'
-  }
-}
-
-export async function assertTenantCanCreateMap(
-  client: TenantDataClient,
-  tenantId: string,
-) {
+/** Serialize Workspace creation/initialization without imposing a Map quota. */
+export async function lockTenantMapCreation(client: TenantDataClient, tenantId: string) {
   await client.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${tenantId}, 0))`
-  const existingMap = await client.map.findFirst({
-    where: { tenantId },
-    select: { id: true },
-  })
-  if (existingMap) throw new TenantAlreadyHasMapError()
 }
 
 export function getTenantSpots(tenantId: string, client: TenantDataClient = prisma) {

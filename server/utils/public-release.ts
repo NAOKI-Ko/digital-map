@@ -88,7 +88,7 @@ export function validatePublicSnapshot(snapshot: unknown) {
 }
 
 export async function buildPublicRelease(mapId: string, actorUserId: string, uploadDirectory: string, storage = getPublicStorage()) {
-  const mapRecord = await prisma.map.findUnique({ where: { id: mapId }, select: { id: true, slug: true, enabledLocales: true } })
+  const mapRecord = await prisma.map.findUnique({ where: { id: mapId, archivedAt: null }, select: { id: true, slug: true, enabledLocales: true } })
   if (!mapRecord) throw createError({ statusCode: 404, statusMessage: 'マップが見つかりません。' })
   const release = await prisma.publicRelease.create({ data: { mapId, createdBy: actorUserId, status: 'BUILDING' } })
   const root = releaseRoot(mapRecord.slug, release.id)
@@ -97,7 +97,7 @@ export async function buildPublicRelease(mapId: string, actorUserId: string, upl
       const ja = await getLivePublicMapById(mapId, 'ja', transaction)
       if (!ja) throw new Error('SNAPSHOT_SOURCE_NOT_FOUND')
       const result: ReleaseLocales = { ja }
-      for (const locale of mapLocales.filter(item => item !== 'ja' && mapRecord.enabledLocales.includes(item))) {
+      for (const locale of mapLocales.filter(item => item !== 'ja' && new Set<string>(ja.enabledLocales).has(item))) {
         result[locale] = (await getLivePublicMapById(mapId, locale, transaction)) ?? ja
       }
       return result
@@ -162,7 +162,7 @@ export async function activatePublicRelease(mapId: string, releaseId: string, te
       // intentionally held across the bounded pointer write so successful DB and
       // pointer states cannot be reordered by another application process.
       await transaction.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${`public-map:${mapId}`}, 0))`
-      const release = await transaction.publicRelease.findFirst({ where: { id: releaseId, mapId, status: 'READY' }, include: { map: { select: { slug: true, currentReleaseId: true } } } })
+      const release = await transaction.publicRelease.findFirst({ where: { id: releaseId, mapId, status: 'READY', map: { archivedAt: null } }, include: { map: { select: { slug: true, currentReleaseId: true } } } })
       if (!release?.manifestKey) throw createError({ statusCode: 404, statusMessage: '公開可能なリリースが見つかりません。' })
       transition.pointerSlug = release.map.slug
       transition.pointerWrite = await putPointer(storage, transition.pointerSlug, { releaseId, manifestKey: release.manifestKey, published: true, updatedAt: new Date().toISOString() })
@@ -182,7 +182,7 @@ export async function activatePublicRelease(mapId: string, releaseId: string, te
   }
 }
 
-export async function unpublishCurrentMap(mapId: string, tenantId: string, actorUserId: string, storage = getPublicStorage()) {
+export async function unpublishCurrentMap(mapId: string, tenantId: string, actorUserId: string, storage = getPublicStorage(), archive = false) {
   const transition: { pointerWrite?: Awaited<ReturnType<typeof putPointer>>, pointerSlug?: string } = {}
   try {
     await prisma.$transaction(async (transaction) => {
@@ -191,8 +191,8 @@ export async function unpublishCurrentMap(mapId: string, tenantId: string, actor
       if (!map) throw createError({ statusCode: 404, statusMessage: 'マップが見つかりません。' })
       transition.pointerSlug = map.slug
       transition.pointerWrite = await putPointer(storage, transition.pointerSlug, { releaseId: map.currentReleaseId, manifestKey: null, published: false, updatedAt: new Date().toISOString() })
-      await transaction.map.update({ where: { id: mapId }, data: { isPublished: false } })
-      await appendAuditEvent(transaction, { tenantId, actorUserId, action: 'MAP_UNPUBLISHED', targetType: 'Map', targetId: mapId, mapId, metadata: { isPublished: false } })
+      await transaction.map.update({ where: { id: mapId }, data: { isPublished: false, ...(archive ? { archivedAt: new Date() } : {}) } })
+      await appendAuditEvent(transaction, { tenantId, actorUserId, action: archive ? 'MAP_ARCHIVED' : 'MAP_UNPUBLISHED', targetType: 'Map', targetId: mapId, mapId, metadata: { isPublished: false, ...(archive ? { archivedAt: new Date() } : {}) } })
     }, publicationTransactionOptions)
   }
   catch (error) {

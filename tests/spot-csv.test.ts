@@ -199,7 +199,7 @@ describe('Spot CSV', () => {
   it('import handlerは全行検証後に単一transactionで未配置・非公開Spotを作る', () => {
     const source = readFileSync(new URL('../server/api/maps/[mapId]/spots/import/index.post.ts', import.meta.url), 'utf8')
     expect(source).toContain('await prisma.$transaction')
-    expect(source.indexOf('result.preview.errors > 0')).toBeLessThan(source.indexOf('transaction.spot.create'))
+    expect(source.indexOf('result.preview.errors > 0')).toBeLessThan(source.indexOf('createSpotWithUsage(transaction,'))
     expect(source).toContain('x: null')
     expect(source).toContain('y: null')
     expect(source).toContain('isPublished: false')

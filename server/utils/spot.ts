@@ -6,6 +6,7 @@ import { normalizePinIconType, normalizePinSize, normalizeSpotImportance } from 
 import { sortSpotCategories, spotCategorySelect } from './category'
 
 export const adminSpotInclude = {
+  mapUsage: { include: { placements: { select: { x: true, y: true } } } },
   pinSourceCategory: pinSourceInclude,
   floor: { select: { name: true } },
   spotCategories: { select: spotCategorySelect },
@@ -32,8 +33,8 @@ export function toAdminSpotDetail(spot: SpotWithFloor) {
 
   return {
     id: spot.id,
-    floorId: spot.floorId,
-    floorName: spot.floor.name,
+    floorId: spot.floorId ?? '',
+    floorName: spot.floor?.name ?? 'フロア未設定',
     name: spot.name,
     englishTranslation: spot.translations[0]
       ? {
@@ -75,6 +76,7 @@ export function toAdminSpotDetail(spot: SpotWithFloor) {
     pinSourceCategoryHasDefault: Boolean(spot.pinSourceCategory?.pinDefaultType),
     liveVersion: spot.liveVersion,
     isPublished: spot.isPublished,
+    hasPositionedPlacement: spot.mapUsage?.placements.some(item => item.x !== null && item.y !== null) ?? false,
     createdAt: spot.createdAt.toISOString(),
     updatedAt: spot.updatedAt.toISOString(),
   }
@@ -90,7 +92,7 @@ export async function getMapFloorOptions(mapId: string) {
 
 export async function getMapCategoryOptions(mapId: string) {
   return prisma.category.findMany({
-    where: { mapId },
+    where: { mapUsages: { some: { mapId } } },
     select: { id: true, name: true, order: true, iconType: true, iconPresetId: true, iconImageUrl: true, iconAssetId: true },
     orderBy: [{ order: 'asc' }, { name: 'asc' }],
   })

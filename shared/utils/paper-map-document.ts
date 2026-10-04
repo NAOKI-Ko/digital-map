@@ -1,3 +1,4 @@
+import { paperOccurrenceId } from './paper-map-render'
 import type { PaperMapConfig } from '../schemas/paper-map'
 import type { PaperMapSource } from '../types/paper-map'
 import type { PublicFloor, PublicSpot } from '../types/public-map'
@@ -41,7 +42,7 @@ export function resolvePaperDocument(source: PaperMapSource, config: PaperMapCon
   const top = margin + title.lines.length * 29 + subtitle.lines.length * 14 + (intro.lines.length ? intro.lines.length * 14 + 8 : 0) + 18
   const content: PaperRect = { x: margin, y: top, width: contentWidth, height: height - top - margin - 62 }
   const selected = selectPaperMapSpotsFromSource(source, config)
-  const numbers = new Map(selected.map((spot, index) => [spot.id, index + 1]))
+  const numbers = new Map(selected.map((spot, index) => [paperOccurrenceId(spot), index + 1]))
   const photoIds = new Set(selected.filter(spot => spot.photos.length).slice(0, config.presentation.photoMode === 'featured' ? 4 : undefined).map(spot => spot.id))
   const overrides = new Map(config.spotOverrides.map(item => [item.spotId, item.summary]))
   const pages: PaperDocumentPage[] = []
@@ -83,7 +84,7 @@ export function resolvePaperDocument(source: PaperMapSource, config: PaperMapCon
           const summary = paperText(config.presentation.informationDensity === 'detail' ? overrides.get(spot.id) || spot.description || '' : '', textWidth, 9.5, 3)
           const category = paperText(slotVisible(config, 'categoryLegend') && config.presentation.informationDensity !== 'names' ? spot.categories.map(item => item.name).join(' / ') : '', textWidth, 9, 1)
           const textHeight = name.lines.length * 14 + category.lines.length * 13 + summary.lines.length * 12 + 12
-          return { spot, number: numbers.get(spot.id)!, name, summary, category, photo, height: Math.max(photo ? 72 : 27, textHeight) }
+          return { spot, number: numbers.get(paperOccurrenceId(spot))!, name, summary, category, photo, height: Math.max(photo ? 72 : 27, textHeight) }
         })
         const rowHeight = Math.max(...row.map(card => card.height))
         if (y + rowHeight > frame.y + frame.height) break

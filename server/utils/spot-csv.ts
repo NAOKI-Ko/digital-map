@@ -455,7 +455,7 @@ export function previewSpotCsv(
         if (existing) {
           resolvedFloorId = existing.floorId
           const canonicalFloor = floorById.get(existing.floorId)
-          if (suppliedFloorId !== existing.floorId || floorName !== canonicalFloor?.name) messages.push({ level: 'error', message: '既存スポットのフロア変更はCSVではできません。マップ上で変更してください。' })
+          if (suppliedFloorId !== existing.floorId || floorName !== (canonicalFloor?.name ?? '')) messages.push({ level: 'error', message: '既存スポットのフロア変更はCSVではできません。マップ上で変更してください。' })
         } else {
           const matches = floorsByName.get(floorName) ?? []
           if (!floorName) messages.push({ level: 'error', message: '新規スポットのフロアは必須です。' })
@@ -531,9 +531,9 @@ export async function loadSpotCsvContext(client: Prisma.TransactionClient | type
     client.map.findUnique({ where: { id: mapId }, select: { enabledLocales: true } }),
     client.mapFloor.findMany({ where: { mapId }, select: { id: true, name: true, order: true }, orderBy: [{ order: 'asc' }, { id: 'asc' }] }),
     client.spotFieldDefinition.findMany({ where: { mapId }, orderBy: [{ order: 'asc' }, { createdAt: 'asc' }] }),
-    client.category.findMany({ where: { mapId }, select: { id: true, name: true } }),
+    client.category.findMany({ where: { mapUsages: { some: { mapId } } }, select: { id: true, name: true } }),
     client.spot.findMany({
-      where: { floor: { mapId } },
+      where: { mapUsage: { mapId } },
       select: {
         id: true, floorId: true, name: true, description: true, address: true, website: true, hoursText: true, holidayText: true, phone: true,
         spotCategories: { select: { categoryId: true } },
@@ -551,7 +551,7 @@ export async function loadSpotCsvContext(client: Prisma.TransactionClient | type
     categories,
     existingNames: spots.map(spot => spot.name),
     enabledLocales: map.enabledLocales,
-    spots,
+    spots: spots.map(spot => ({ ...spot, floorId: spot.floorId ?? '' })),
     schemaVersion: computeSpotCsvSchemaVersion(fields, map.enabledLocales, floor ? undefined : floors),
   }
 }

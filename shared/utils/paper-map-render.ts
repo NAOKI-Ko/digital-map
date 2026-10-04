@@ -4,6 +4,9 @@ import type { PublicSpot } from '../types/public-map'
 import { containRect, paperPageSize, resolveViewport, viewportPoint, type PaperRect } from './paper-map-layout'
 import { resolvePaperTemplate, slotVisible } from './paper-map-templates'
 
+/** Render/number each occurrence, while selection and content overrides stay canonical. */
+export function paperOccurrenceId(spot: Pick<PublicSpot, 'id' | 'placementId'>): string { return spot.placementId ?? spot.id }
+
 export interface PaperRenderSpot extends PublicSpot { number: number, summary: string, point?: { x: number, y: number } }
 export interface PaperRenderModel { size: ReturnType<typeof paperPageSize>, template: ReturnType<typeof resolvePaperTemplate>, title: string, subtitle: string, intro: string, footer: string, qrLabel: string, mapFrame: PaperRect, infoFrame: PaperRect, imageRect: PaperRect, floor: PaperMapSource['map']['floors'][number] | undefined, spots: PaperRenderSpot[], categories: string[], photos: PaperRenderSpot[], visible: (slot: Parameters<typeof slotVisible>[1]) => boolean, viewport: ReturnType<typeof resolveViewport>, warnings: string[] }
 

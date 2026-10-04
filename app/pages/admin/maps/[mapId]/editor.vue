@@ -32,7 +32,7 @@ const pinDesignEditorRef = useTemplateRef<{
 const route = useRoute()
 const mapId = route.params.mapId as string
 const { data, error, status, refresh: refreshFloors } = await useFetch<MapFloorListResponse>(`/api/maps/${mapId}/floors`)
-const { data: spotData, refresh: refreshSpots, error: spotsError } = await useFetch<AdminSpotListResponse>(`/api/maps/${mapId}/spots`)
+const { data: spotData, refresh: refreshSpots, error: spotsError } = await useFetch<AdminSpotListResponse>(`/api/maps/${mapId}/spots`, { query: { view: 'placements' } })
 const requestedFloorId = typeof route.query.floorId === 'string' ? route.query.floorId : ''
 const requestedPlacementSpotId = typeof route.query.placeSpotId === 'string' ? route.query.placeSpotId : ''
 const returnContext = resolveMapEditorReturnContext(
@@ -56,7 +56,7 @@ const queueTargetRef = useTemplateRef<HTMLElement>('queueTarget')
 const placementConflict = ref(false)
 const skippedSpotIds = ref<string[]>([])
 const queueItems = computed(() => placementQueue(spotData.value?.spots ?? [], selectedFloorId.value, skippedSpotIds.value))
-const placementSpotId = ref(requestedPlacementSpotId)
+const placementSpotId = ref(spotData.value?.spots.find(spot => spot.id === requestedPlacementSpotId || (spot.canonicalSpotId === requestedPlacementSpotId && (!requestedFloorId || spot.floorId === requestedFloorId)))?.id ?? '')
 const placementSpot = computed(() => selectedFloorSpots.value.find(spot => spot.id === placementSpotId.value) ?? null)
 const placementSpotIsPositioned = computed(() => Boolean(placementSpot.value && hasPosition(placementSpot.value)))
 const placementMode = ref<PinEditorMode>('idle')
@@ -237,9 +237,9 @@ async function savePosition(advance = false) {
   saveMessage.value = ''
   moveStatus.value = '位置を保存しています…'
   try {
-    await $fetch<SpotPositionResponse>(`/api/maps/${mapId}/spots/${placementSpot.value.id}/position`, {
+    await $fetch<SpotPositionResponse>(`/api/maps/${mapId}/spots/${placementSpot.value.canonicalSpotId ?? placementSpot.value.id}/placements/${placementSpot.value.placementId}`, {
       method: 'PATCH',
-      body: { ...toPositionUpdatePayload(position.value), expectedVersion: placementSpot.value.liveVersion, expectedFloorId: selectedFloorId.value, expectedFloorUpdatedAt: selectedFloor.value?.updatedAt },
+      body: { ...toPositionUpdatePayload(position.value), expectedVersion: placementSpot.value.placementVersion, expectedFloorId: selectedFloorId.value, expectedFloorUpdatedAt: selectedFloor.value?.updatedAt },
     })
     await finishSuccessfulSave('', operation, advance)
     saveState.value = 'success'
@@ -324,9 +324,9 @@ async function unplaceSpot() {
   unplacing.value = true
   moveStatus.value = 'ピン配置を解除しています…'
   try {
-    await $fetch<SpotPositionResponse>(`/api/maps/${mapId}/spots/${spot.id}/position`, { method: 'DELETE' })
+    await $fetch<SpotPositionResponse>(`/api/maps/${mapId}/spots/${spot.canonicalSpotId ?? spot.id}/placements/${spot.placementId}`, { method: 'PATCH', body: { x: null, y: null, expectedVersion: spot.placementVersion, expectedFloorUpdatedAt: selectedFloor.value?.updatedAt } })
     if (operationGate.isCurrent(operation)) unplaceConfirmOpen.value = false
-    await finishSuccessfulSave('ピン配置を解除しました。公開対象だった場合は公開対象外にしました。', operation)
+    await finishSuccessfulSave('ピン配置を解除しました。配置済みのピンがなくなった場合は公開対象外になりました。', operation)
   }
   catch {
     if (operationGate.isCurrent(operation)) moveStatus.value = 'ピン配置を解除できませんでした。'
@@ -584,7 +584,7 @@ onBeforeUnmount(() => {
                 <span class="rounded-full bg-stone-100 px-2.5 py-1 text-stone-700">{{ placementSpot.importance === 'featured' ? '注目ピン' : '通常ピン' }}</span>
               </div>
               <template v-if="placementMode === 'idle'">
-                <NuxtLink :to="`/admin/maps/${mapId}/spots/${placementSpot.id}`" class="mt-3 inline-flex text-sm font-semibold text-terracotta-700">スポット詳細を開く</NuxtLink>
+                <NuxtLink :to="`/admin/maps/${mapId}/spots/${placementSpot.canonicalSpotId ?? placementSpot.id}`" class="mt-3 inline-flex text-sm font-semibold text-terracotta-700">スポット詳細を開く</NuxtLink>
                 <div class="mt-4 grid gap-2 sm:grid-cols-2">
                   <button type="button" class="rounded-lg bg-stone-900 px-4 py-2.5 text-sm font-semibold text-white" @click="placementSpotIsPositioned ? startMoving() : startPlacement()">{{ placementSpotIsPositioned ? '位置を移動' : '位置を設定' }}</button>
                   <button type="button" class="rounded-lg border border-stone-300 px-4 py-2.5 text-sm font-semibold text-stone-800 hover:bg-stone-50" @click="startDesignEditing">デザインを編集</button>
@@ -597,7 +597,7 @@ onBeforeUnmount(() => {
                   ref="pinDesignEditor"
                   :key="placementSpot.id"
                   :map-id="mapId"
-                  :spot-id="placementSpot.id"
+                  :spot-id="placementSpot.canonicalSpotId ?? placementSpot.id"
                   :expected-version="placementSpot.liveVersion"
                   :initial-value="placementSpot"
                   compact

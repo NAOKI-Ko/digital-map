@@ -55,5 +55,8 @@ export const spotPublishSchema = z.object({
   isPublished: z.boolean(),
 })
 
+/** Editing adopted content with no occurrences must not require creating one. */
+export const spotContentFormSchema = spotFormSchema.safeExtend({ floorId: z.string() })
+
 export type SpotFormInput = z.infer<typeof spotFormSchema>
 export type SpotPublishInput = z.infer<typeof spotPublishSchema>
