@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import ConfirmDialog from '~/components/ui/ConfirmDialog.vue'
 
-const props = defineProps<{ dirty: boolean }>()
+const props = defineProps<{ dirty: boolean, guardUpdates?: boolean }>()
+const emit = defineEmits<{ discard: [] }>()
 const open = ref(false)
 const pendingDestination = ref('')
 const pendingLogout = ref(false)
@@ -11,8 +12,12 @@ function beforeLogout(event: Event) {
   pendingLogout.value = true
   open.value = true
 }
-let bypassNextNavigation = false
-function confirmedLogout() { bypassNextNavigation = true }
+let approvedDestination = ''
+function confirmedLogout() { approvedDestination = '/admin/login' }
+const removeNavigationObserver = useRouter().afterEach((_to, _from, failure) => {
+  if (!failure) approvedDestination = ''
+})
+onBeforeUnmount(removeNavigationObserver)
 
 function beforeUnload(event: BeforeUnloadEvent) {
   if (!props.dirty) return
@@ -23,18 +28,22 @@ function beforeUnload(event: BeforeUnloadEvent) {
 onMounted(() => { window.addEventListener('beforeunload', beforeUnload); window.addEventListener('admin-before-logout', beforeLogout); window.addEventListener('admin-confirmed-logout', confirmedLogout) })
 onBeforeUnmount(() => { window.removeEventListener('beforeunload', beforeUnload); window.removeEventListener('admin-before-logout', beforeLogout); window.removeEventListener('admin-confirmed-logout', confirmedLogout) })
 
-onBeforeRouteLeave((to) => {
-  if (!props.dirty || bypassNextNavigation) return true
+function guardNavigation(to: { fullPath: string }) {
+  if (to.fullPath === approvedDestination) return true
+  if (!props.dirty) return true
   pendingLogout.value = false
   pendingDestination.value = to.fullPath
   open.value = true
   return false
-})
+}
+onBeforeRouteLeave(guardNavigation)
+onBeforeRouteUpdate(to => props.guardUpdates ? guardNavigation(to) : true)
 
 function stay() {
   pendingLogout.value = false
   open.value = false
   pendingDestination.value = ''
+  approvedDestination = ''
 }
 
 async function discard() {
@@ -42,7 +51,7 @@ async function discard() {
   open.value = false
   pendingDestination.value = ''
   if (pendingLogout.value) { pendingLogout.value = false; await useAuth().logout(true) }
-  else { bypassNextNavigation = true; await navigateTo(destination) }
+  else { approvedDestination = destination; emit('discard'); await navigateTo(destination) }
 }
 </script>
 

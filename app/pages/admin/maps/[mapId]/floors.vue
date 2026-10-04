@@ -18,7 +18,7 @@ definePageMeta({
 const route = useRoute()
 const mapId = route.params.mapId as string
 const { data: mapData } = await useFetch<AdminMapResponse>(`/api/maps/${mapId}`)
-const { data, error, status } = await useFetch<MapFloorListResponse>(`/api/maps/${mapId}/floors`)
+const { data, error, status } = await useFetch<MapFloorListResponse>(`/api/maps/${mapId}/floors`, { deep: true, key: `editable-floors:${mapId}` })
 const createInput = reactive<FloorCreateInput>({
   name: '',
   illustrationUrl: '',
@@ -47,6 +47,14 @@ const deleteMessage = computed(() => {
     ? `「${floor.name}」とこのフロア上の配置を削除します。スポット本文・写真・カテゴリーと他フロアの配置は保持します。このフロアへの配置は元に戻せません。`
     : `「${floor.name}」を削除します。元に戻せません。`
 })
+
+function discardFloorDrafts() {
+  Object.assign(createInput, { name: '', illustrationUrl: '', imageWidth: 0, imageHeight: 0, illustrationAssetId: undefined })
+  pendingImage.value = false
+  createPickerRevision.value += 1
+  createError.value = ''
+  for (const floor of data.value?.floors ?? []) floor.name = savedFloorNames[floor.id] ?? floor.name
+}
 
 function isFloorGeoreferenced(floor: MapFloorItem) {
   return isGeoReferenced(floor)
@@ -318,6 +326,6 @@ async function confirmDeleteFloor() {
       </ol>
     </section>
     <ConfirmDialog :open="deleteTarget !== null" title="フロアを削除" :message="deleteMessage" confirm-label="削除する" destructive :busy="Boolean(busyFloorId)" @cancel="deleteTarget = null" @confirm="confirmDeleteFloor" />
-    <UnsavedChangesGuard :dirty="floorDirty && !isCreating && !busyFloorId" />
+    <UnsavedChangesGuard :dirty="floorDirty && !isCreating && !busyFloorId" guard-updates @discard="discardFloorDrafts" />
   </div>
 </template>
