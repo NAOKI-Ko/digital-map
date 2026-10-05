@@ -576,6 +576,10 @@ defineExpose({
   display: none;
 }
 
+/* Keep marker priorities inside the map canvas, below the native controls. */
+.visitor-map-viewer .maplibregl-canvas-container {
+  isolation: isolate;
+}
 .visitor-map-viewer .maplibregl-ctrl-top-right {
   top: auto;
   bottom: calc(env(safe-area-inset-bottom) + 2rem + var(--visitor-category-height, 52px) + 1.5rem);
