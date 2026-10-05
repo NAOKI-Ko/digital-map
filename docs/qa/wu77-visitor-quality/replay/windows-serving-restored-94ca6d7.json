@@ -1,0 +1,147 @@
+{
+  "candidateSha": "94ca6d75f30a6f5960d1e6df5d0dccab81547c0b",
+  "source": {
+    "sourceFiles": 1364,
+    "servingSourceVerified": true,
+    "fixtureSha256": "36e5ea87d9a3297a99821c6e4ad6d2860f9763b611070a0ff3f299090ccf3ffd",
+    "verifiedUTC": "2026-10-05T16:03:19.9890699+00:00",
+    "source": "94ca6d75f30a6f5960d1e6df5d0dccab81547c0b"
+  },
+  "candidateRuntime": {
+    "canonicalSha": "9403d32fff4f5d0a84f3ba2c1212391ddf6c1f9d",
+    "oldCandidatePreserved": true,
+    "ownedPids": [
+      13208,
+      18652,
+      23320,
+      25328,
+      7580,
+      17952,
+      27620
+    ],
+    "canonicalDtoSha256": "8b4df738764bb4ddd2949c1403fd2f41e65f6c15c8d469714e511282404b2b35",
+    "servedPngSha256": "dd51f2177020810b69e2b5298c3cb4d3278013863fd50fbe6f869af8c058b2c9",
+    "floorCounts": [
+      24,
+      12
+    ],
+    "runtime": {
+      "port": 3016,
+      "host": "127.0.0.1",
+      "source": "94ca6d75f30a6f5960d1e6df5d0dccab81547c0b",
+      "ownerPid": 13208,
+      "lifetime": "owned SSH foreground up to4h",
+      "mode": "dev-synthetic-noDB",
+      "root": "C:\\DigitalMap\\incoming\\wu77-fix-20261005",
+      "startedUTC": "2026-10-05T15:16:03.2218296+00:00"
+    },
+    "source": "94ca6d75f30a6f5960d1e6df5d0dccab81547c0b",
+    "servedPngBytes": 52956,
+    "canonicalPid": 19992,
+    "runtimeVerified": true,
+    "listenerPid": 25328,
+    "verifiedUTC": "2026-10-05T15:52:43.1360886+00:00"
+  },
+  "legacyRuntime": {
+    "source": "d35f39eaa17f8412684bf5c00e8444c0d1fdd2cb",
+    "mutation": false,
+    "floorCounts": [
+      24,
+      12
+    ],
+    "servedPngSha256": "dd51f2177020810b69e2b5298c3cb4d3278013863fd50fbe6f869af8c058b2c9",
+    "sourceVerified": true,
+    "root": "C:\\DigitalMap\\incoming\\wu77-baseline-20261005",
+    "sourceFiles": 1322,
+    "servedPngBytes": 52956,
+    "listenerPid": 27172,
+    "runtime": {
+      "port": 3015,
+      "host": "127.0.0.1",
+      "source": "d35f39eaa17f8412684bf5c00e8444c0d1fdd2cb",
+      "lifetime": "owned SSH foreground up to4h",
+      "ownerPid": 26580,
+      "mode": "dev-synthetic-noDB",
+      "startedUTC": "2026-10-05T13:22:36.9695939Z"
+    },
+    "ownedPids": [
+      26580,
+      24892,
+      692,
+      27172,
+      28388,
+      15820,
+      29192
+    ],
+    "verifiedUTC": "2026-10-05T15:59:09.6957850+00:00"
+  },
+  "loopbackApiAndPng": [
+    {
+      "mode": "candidate",
+      "url": "http://127.0.0.1:58123/__qa_wu77_visitor",
+      "apiStatus": 200,
+      "floorCounts": [
+        24,
+        12
+      ],
+      "pngSha256": "dd51f2177020810b69e2b5298c3cb4d3278013863fd50fbe6f869af8c058b2c9",
+      "pngBytes": 52956,
+      "verifiedUTC": "2026-10-05T16:05:16.375033+00:00"
+    },
+    {
+      "mode": "legacy",
+      "url": "http://127.0.0.1:3015/__qa_wu77_visitor_baseline",
+      "apiStatus": 200,
+      "floorCounts": [
+        24,
+        12
+      ],
+      "pngSha256": "dd51f2177020810b69e2b5298c3cb4d3278013863fd50fbe6f869af8c058b2c9",
+      "pngBytes": 52956,
+      "verifiedUTC": "2026-10-05T16:05:16.427533+00:00"
+    }
+  ],
+  "candidateForward": {
+    "mode": "candidate",
+    "pid": 77791,
+    "localHost": "127.0.0.1",
+    "localPort": 58123,
+    "remotePort": 3016,
+    "startedUTC": "2026-10-05T15:58:53.360047+00:00",
+    "untilUTC": "2026-10-05T19:14:00+00:00",
+    "runtimeRestarted": false,
+    "bindAvailabilityChecked": true
+  },
+  "legacyForward": {
+    "mode": "legacy",
+    "pid": 78187,
+    "localHost": "127.0.0.1",
+    "localPort": 3015,
+    "remotePort": 3015,
+    "startedUTC": "2026-10-05T16:02:00.646052+00:00",
+    "untilUTC": "2026-10-05T17:20:00+00:00",
+    "runtimeRestarted": false,
+    "bindAvailabilityChecked": true
+  },
+  "htmlResponses": [
+    {
+      "url": "http://127.0.0.1:58123/__qa_wu77_visitor",
+      "status": 200,
+      "contentType": "text/html;charset=utf-8",
+      "bytes": 35520,
+      "sha256": "0a89fc01e570dc6c1ac15877dfe4a83956e6e49e1689c2cbbe92abfe6ffd4aff",
+      "verifiedUTC": "2026-10-05T16:13:39.307982+00:00"
+    },
+    {
+      "url": "http://127.0.0.1:3015/__qa_wu77_visitor_baseline",
+      "status": 200,
+      "contentType": "text/html;charset=utf-8",
+      "bytes": 33756,
+      "sha256": "b6b2ad0a48e18d352d433bd5c89e2c227633b57789aea7c150b28da04c63845d",
+      "verifiedUTC": "2026-10-05T16:13:39.341907+00:00"
+    }
+  ],
+  "windowsRuntimeRestarted": false,
+  "qualityAcceptance": false,
+  "scope": "Owned connection restored after executor transport loss; source, listener, API/PNG and HTML reachability only. Independent browser retest is pending."
+}

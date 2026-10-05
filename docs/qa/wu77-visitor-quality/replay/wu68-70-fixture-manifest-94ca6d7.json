@@ -1,0 +1,238 @@
+{
+  "candidateSha": "94ca6d75f30a6f5960d1e6df5d0dccab81547c0b",
+  "devOnly": true,
+  "databaseAccess": false,
+  "publicationWrites": false,
+  "sourceFactory": {
+    "path": "server/api/public/__qa_wu68/index.get.ts",
+    "sha256": "e3b17e4513134f7da9ecaca6a3a3c01f3dc75292e436f6d0f65e76d8b2699b3f"
+  },
+  "sourceFixture": {
+    "path": "server/fixtures/arimatsu-public.json",
+    "sha256": "9611b4b5720d3b374704190f32bc24af4f10e6ac58a0460a79e5c0ef279faafe"
+  },
+  "routes": [
+    {
+      "slug": "__qa_wu68",
+      "url": "http://127.0.0.1:58123/__qa_wu68",
+      "apiUrl": "http://127.0.0.1:58123/api/public/__qa_wu68",
+      "source": "server/api/public/__qa_wu68/index.get.ts",
+      "sourceSha256": "e3b17e4513134f7da9ecaca6a3a3c01f3dc75292e436f6d0f65e76d8b2699b3f",
+      "factoryMode": "dense",
+      "declaredShape": "6x6 grid; featured every third; small/medium/large cycle",
+      "expectedFloorSpotCounts": [
+        36
+      ],
+      "observedApiStatus": 200,
+      "observedFloorSpotCounts": [
+        36
+      ],
+      "observedDtoSha256": "f2c4897a0a497e8c0d1ac1e6ca42d90d26fc3ceeb4464d92c65d6c7f166d66be",
+      "observedUTC": "2026-10-05T16:13:38.254014+00:00"
+    },
+    {
+      "slug": "__qa_wu68_coincident",
+      "url": "http://127.0.0.1:58123/__qa_wu68_coincident",
+      "apiUrl": "http://127.0.0.1:58123/api/public/__qa_wu68_coincident",
+      "source": "server/api/public/__qa_wu68_coincident/index.get.ts",
+      "sourceSha256": "51c804846ebc30cfb49b229a7b18c41b270a95b78ebc79d44d821bf6f95646dc",
+      "factoryMode": "coincident",
+      "declaredShape": "Spot00 featured, Spot01/02 normal; identical(.5,.5); small/medium/large; categories empty",
+      "expectedFloorSpotCounts": [
+        3
+      ],
+      "observedApiStatus": 200,
+      "observedFloorSpotCounts": [
+        3
+      ],
+      "observedDtoSha256": "cc4bd16a8c03f84915793716b5cba4c46e164c2f70a7ff73f962ab769042ee80",
+      "observedUTC": "2026-10-05T16:13:38.328526+00:00"
+    },
+    {
+      "slug": "__qa_wu68_near",
+      "url": "http://127.0.0.1:58123/__qa_wu68_near",
+      "apiUrl": "http://127.0.0.1:58123/api/public/__qa_wu68_near",
+      "source": "server/api/public/__qa_wu68_near/index.get.ts",
+      "sourceSha256": "1742d4f06b95ebecc083c0bb8cfc1261a8240eb1ff365c2d4df9c87eb8248ebc",
+      "factoryMode": "near",
+      "declaredShape": "x=.5+index*.000001,y=.5; categories empty",
+      "expectedFloorSpotCounts": [
+        3
+      ],
+      "observedApiStatus": 200,
+      "observedFloorSpotCounts": [
+        3
+      ],
+      "observedDtoSha256": "fc2be8e5b882e236bee798a7297a9da27742204e73543e39cb0f34dbb38ba266",
+      "observedUTC": "2026-10-05T16:13:38.399363+00:00"
+    },
+    {
+      "slug": "__qa_wu68_priority",
+      "url": "http://127.0.0.1:58123/__qa_wu68_priority",
+      "apiUrl": "http://127.0.0.1:58123/api/public/__qa_wu68_priority",
+      "source": "server/api/public/__qa_wu68_priority/index.get.ts",
+      "sourceSha256": "2bc6221076ee076db0e4cb798ed9871afaa7830b39070a832a710ec906372eb2",
+      "factoryMode": "priority",
+      "declaredShape": "x=[.506,.5,.512],y=.5; Spot00 normal,01/02 featured; all medium",
+      "expectedFloorSpotCounts": [
+        3
+      ],
+      "observedApiStatus": 200,
+      "observedFloorSpotCounts": [
+        3
+      ],
+      "observedDtoSha256": "f0bbeb3e8256dabcb2624c449aea0e09b0260801dc54eb39d828fe391afdd2c0",
+      "observedUTC": "2026-10-05T16:13:38.496373+00:00"
+    },
+    {
+      "slug": "__qa_wu68_recovery_floors",
+      "url": "http://127.0.0.1:58123/__qa_wu68_recovery_floors",
+      "apiUrl": "http://127.0.0.1:58123/api/public/__qa_wu68_recovery_floors",
+      "source": "server/api/public/__qa_wu68_recovery_floors/index.get.ts",
+      "sourceSha256": "b375d0f80839b8bc4ecb6bc33b03030924e2435f0edfeb72eef7d2103476e651",
+      "factoryMode": "recovery-floors",
+      "declaredShape": "two floors, identical(.5,.5) groups; second-floor IDs suffixed -2F",
+      "expectedFloorSpotCounts": [
+        3,
+        3
+      ],
+      "observedApiStatus": 200,
+      "observedFloorSpotCounts": [
+        3,
+        3
+      ],
+      "observedDtoSha256": "2bfd1956d48ab4e345cd0ca7e6df065a866c52abfd3a6a5cb559440b3f09d1bf",
+      "observedUTC": "2026-10-05T16:13:38.613381+00:00"
+    },
+    {
+      "slug": "__qa_wu68_groups",
+      "url": "http://127.0.0.1:58123/__qa_wu68_groups",
+      "apiUrl": "http://127.0.0.1:58123/api/public/__qa_wu68_groups",
+      "source": "server/api/public/__qa_wu68_groups/index.get.ts",
+      "sourceSha256": "5bc0b249b49aa40779615204b5e7d93517d206f54e0a6628b0fde82ce93e0f26",
+      "factoryMode": "groups",
+      "declaredShape": "two groups of3 at x=.2/.8,y=.5; all medium",
+      "expectedFloorSpotCounts": [
+        6
+      ],
+      "observedApiStatus": 200,
+      "observedFloorSpotCounts": [
+        6
+      ],
+      "observedDtoSha256": "967a2e5dba94d675be056a5414a5c7f61dfb995ac9d8df69024f56b0cff96663",
+      "observedUTC": "2026-10-05T16:13:38.687605+00:00"
+    },
+    {
+      "slug": "__qa_wu68_broad",
+      "url": "http://127.0.0.1:58123/__qa_wu68_broad",
+      "apiUrl": "http://127.0.0.1:58123/api/public/__qa_wu68_broad",
+      "source": "server/api/public/__qa_wu68_broad/index.get.ts",
+      "sourceSha256": "800c01ee0eaf68833f5c64c8fc39618ece95c825d392555c4622db6919083522",
+      "factoryMode": "broad",
+      "declaredShape": "(.1,.1) and(.9,.9); second featured",
+      "expectedFloorSpotCounts": [
+        2
+      ],
+      "observedApiStatus": 200,
+      "observedFloorSpotCounts": [
+        2
+      ],
+      "observedDtoSha256": "7aeab78f634f0895373175471a71fea8459b204a4c01e8446d701a6b51c3abb9",
+      "observedUTC": "2026-10-05T16:13:38.766940+00:00"
+    },
+    {
+      "slug": "__qa_wu68_dateline",
+      "url": "http://127.0.0.1:58123/__qa_wu68_dateline",
+      "apiUrl": "http://127.0.0.1:58123/api/public/__qa_wu68_dateline",
+      "source": "server/api/public/__qa_wu68_dateline/index.get.ts",
+      "sourceSha256": "898025fca9161372e5ec5110c2877ac65a2ba92a533dd0e4588e2de84f628b5c",
+      "factoryMode": "dateline",
+      "declaredShape": "reference longitudes179.99/179.995; grid unchanged",
+      "expectedFloorSpotCounts": [
+        36
+      ],
+      "observedApiStatus": 200,
+      "observedFloorSpotCounts": [
+        36
+      ],
+      "observedDtoSha256": "b3c1696734c12b4fc2220c0d2ce0b797e179963f7e19a523b9908d8468bc630d",
+      "observedUTC": "2026-10-05T16:13:38.847352+00:00"
+    },
+    {
+      "slug": "__qa_wu68_empty",
+      "url": "http://127.0.0.1:58123/__qa_wu68_empty",
+      "apiUrl": "http://127.0.0.1:58123/api/public/__qa_wu68_empty",
+      "source": "server/api/public/__qa_wu68_empty/index.get.ts",
+      "sourceSha256": "7d6754205862f1ea141789f97306d009634a44b4eaf33d08bec3adc8ba96e0e8",
+      "factoryMode": "empty",
+      "declaredShape": "no placements",
+      "expectedFloorSpotCounts": [
+        0
+      ],
+      "observedApiStatus": 200,
+      "observedFloorSpotCounts": [
+        0
+      ],
+      "observedDtoSha256": "ab27fbd382a97e44de04a1877cb9082b9cc4b20459bab00fed2fd01e9b81ab23",
+      "observedUTC": "2026-10-05T16:13:38.925167+00:00"
+    },
+    {
+      "slug": "__qa_wu68_invalid",
+      "url": "http://127.0.0.1:58123/__qa_wu68_invalid",
+      "apiUrl": "http://127.0.0.1:58123/api/public/__qa_wu68_invalid",
+      "source": "server/api/public/__qa_wu68_invalid/index.get.ts",
+      "sourceSha256": "809ae8be75c04e5e322d490b7c9302f70de45b9252bd41e371b486f362c4e848",
+      "factoryMode": "invalid",
+      "declaredShape": "intentional invalid x=2; application error/recovery must be tested",
+      "expectedFloorSpotCounts": [
+        1
+      ],
+      "observedApiStatus": 200,
+      "observedFloorSpotCounts": [
+        1
+      ],
+      "observedDtoSha256": "f549ef3e1024fbd04f10594c0c94fdc6ee8ba0e191a8add3074a03f6b072d83d",
+      "observedUTC": "2026-10-05T16:13:39.002758+00:00"
+    },
+    {
+      "slug": "__qa_wu70_geometry",
+      "url": "http://127.0.0.1:58123/__qa_wu70_geometry",
+      "apiUrl": "http://127.0.0.1:58123/api/public/__qa_wu70_geometry",
+      "source": "server/api/public/__qa_wu70_geometry/index.get.ts",
+      "sourceSha256": "1200385ec91aaaa0e1801c736c149b0069b97b84cb17e9b597c1151108a9c618",
+      "factoryMode": "geometry",
+      "declaredShape": "coincident pair; preset/custom/illustration; small/medium/large; wide240x40/tall30x90 SVG artwork",
+      "expectedFloorSpotCounts": [
+        8
+      ],
+      "observedApiStatus": 200,
+      "observedFloorSpotCounts": [
+        8
+      ],
+      "observedDtoSha256": "7750c4cd39fae90d88dac5acedf9681458d917a79dfe0f62963ac865f32c64ae",
+      "observedUTC": "2026-10-05T16:13:39.082628+00:00"
+    },
+    {
+      "slug": "__qa_wu70_motion",
+      "url": "http://127.0.0.1:58123/__qa_wu70_motion",
+      "apiUrl": "http://127.0.0.1:58123/api/public/__qa_wu70_motion",
+      "source": "server/api/public/__qa_wu70_motion/index.get.ts",
+      "sourceSha256": "1adb743e19cde2b3f09267d1869c4c03334027699b102718875cc51f85b7a703",
+      "factoryMode": "motion",
+      "declaredShape": "two floors;18 Japanese/long English categories; shared dense grid",
+      "expectedFloorSpotCounts": [
+        36,
+        36
+      ],
+      "observedApiStatus": 200,
+      "observedFloorSpotCounts": [
+        36,
+        36
+      ],
+      "observedDtoSha256": "318d1144598223872eb54aedb593a7e2744ceec97a7ec55ff6db273ea0834019",
+      "observedUTC": "2026-10-05T16:13:39.166259+00:00"
+    }
+  ],
+  "qualityAcceptance": false,
+  "scope": "Declaration plus actual API reachability/shape; no browser, motion, collision, accessibility or full maxZoom PASS. Intentional data shape never waives a user-facing Finding."
+}

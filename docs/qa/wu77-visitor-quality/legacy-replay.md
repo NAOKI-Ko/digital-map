@@ -3,9 +3,9 @@
 2026-10-05. This records a replay entrypoint for independent QA, not Quality Acceptance.
 
 - Legacy source: `d35f39eaa17f8412684bf5c00e8444c0d1fdd2cb`. This is the existing9403d32 product UI plus fixed synthetic fixture/harnessf8615de and same-artwork PNG repaird35f39e, before the facility/visitor featuref27a16a.
-- Old UI: `http://127.0.0.1:3015/__qa_wu77_visitor_baseline`; API `/api/public/__qa_wu77_visitor_baseline`.
-- Feature candidate: `http://127.0.0.1:3013/__qa_wu77_visitor`, source `9d2a1ec196a9bec33d78aaaf1e418b786cb7b21c`. The `_baseline` helper on3013 shares the new shell and cannot establish the old product's whole-UI before state.
-- Windows legacy root: `C:\DigitalMap\incoming\wu77-baseline-20261005`. Started2026-10-05T13:22:36.9695939Z, ownerPowerShell26580, listenerNode27172, owned SSH foreground lifetime up to4h (approximately17:22UTC). Dedicated Mac loopback SSHforward is session9068. Recheck freshness before QA.
+- Old UI: `http://127.0.0.1:3015/__qa_wu77_visitor_baseline` on both Windows and the restored Mac forward; API `/api/public/__qa_wu77_visitor_baseline`.
+- Current feature candidate: `http://127.0.0.1:58123/__qa_wu77_visitor`, physically served Windows3016 source `94ca6d75f30a6f5960d1e6df5d0dccab81547c0b`. Original9d2/3013 is historical. Candidate `_baseline` helpers share the new shell and cannot establish the old product's whole-UI before state.
+- Windows legacy root: `C:\DigitalMap\incoming\wu77-baseline-20261005`. Started2026-10-05T13:22:36.9695939Z, ownerPowerShell26580, listenerNode27172, owned SSH foreground lifetime up to4h (approximately17:22UTC). Executor transport loss disconnected the original Mac forward. The restored owned SSHforward has PID78187/session45034, starts16:02UTC and expires17:20UTC. [Fresh source/serving observation](replay/windows-serving-restored-94ca6d7.json) confirms all1322 source hashes, owned process,24+12, PNG and Mac API/HTML reachability without restarting Windows. Recheck freshness before QA.
 
 The [full source manifest](replay/legacy-source-manifest.json) records1322 old source paths/hashes. The old tree was reconstructed in a new owned root from the already verified9d2 archive, replacing21 modified files with their exact old bytes and removing24 candidate-only paths. Delta archive64,846bytes SHA256 `becae1234fa253a02c34b7af3e272dc3730e6be8d4a76eb3444dabd5e3d03619`. Full1322 hashes matched before and after frozen install/start. Install reused972 packages, downloaded0, finished54.6s. No source mismatch occurred.
 
