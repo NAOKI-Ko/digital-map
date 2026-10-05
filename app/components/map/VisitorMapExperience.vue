@@ -8,6 +8,7 @@ import SpotDetailCard from '~/components/map/SpotDetailCard.vue'
 import { collectSpotCategories, filterSpotsByCategoryIds } from '~/utils/category-filter'
 import { closeFilteredSpot, createFloorSwitchState, selectedSpotIdFromOverlay, shouldShowFloorSelector, type PublicOverlay } from '~/utils/public-map-ui'
 import { isFacilityPinIcon } from '~~/shared/constants/spot'
+import { getExclusiveFacilityCategoryId, showOverviewAfterDockUpdate } from '~/utils/visitor-overview-assistance'
 import { restorePinFocus } from '~/utils/marker-collision'
 import type { MapViewerSpot } from '~~/shared/types/map-viewer'
 import type { PublicMapResponse } from '~~/shared/types/public-map'
@@ -38,27 +39,31 @@ const selectedSpotId = computed(() => selectedSpotIdFromOverlay(overlay.value))
 const selectedCategoryIds = ref<string[]>([])
 const categoryDock = useTemplateRef<HTMLElement>('categoryDock')
 const categoryDockHeight = ref(52)
+const visitorReady = ref(false)
+const overviewSuggested = ref(false)
+function measureCategoryDock() {
+  const element = categoryDock.value
+  if (!element) return
+  const height = Number.parseFloat(getComputedStyle(element).getPropertyValue('--category-fit-height')) || Math.ceil(element.getBoundingClientRect().height)
+  if (height > 0 || !categories.value.length) categoryDockHeight.value = height
+}
 // Selection names may wrap. Keep Map controls above the actual Category dock,
 // without refitting or moving the user's camera when this UI changes height.
 watch(categoryDock, (element, _previous, onCleanup) => {
   if (!element) return
   let frame: number | null = null
-  const measure = () => {
-    const height = Number.parseFloat(getComputedStyle(element).getPropertyValue('--category-fit-height')) || Math.ceil(element.getBoundingClientRect().height)
-    if (height > 0 || !categories.value.length) categoryDockHeight.value = height
-  }
   const observer = new ResizeObserver(() => {
     if (frame !== null) cancelAnimationFrame(frame)
-    frame = requestAnimationFrame(() => { frame = null; measure() })
+    frame = requestAnimationFrame(() => { frame = null; measureCategoryDock() })
   })
-  measure()
+  measureCategoryDock()
   observer.observe(element)
   onCleanup(() => {
     observer.disconnect()
     if (frame !== null) cancelAnimationFrame(frame)
   })
 }, { flush: 'post' })
-const mapViewerRef = ref<{ ensureSpotVisible: (spotId: string, panel: DOMRect | null) => boolean, compareCamera: (pitch: 0 | 20 | 25 | 45, fit: boolean) => void, captureDetailContext: () => void, restoreDetailContext: () => void, discardDetailContext: () => void } | null>(null)
+const mapViewerRef = ref<{ showWholeFloor: () => void, ensureSpotVisible: (spotId: string, panel: DOMRect | null) => boolean, compareCamera: (pitch: 0 | 20 | 25 | 45, fit: boolean) => void, captureDetailContext: () => void, restoreDetailContext: () => void, discardDetailContext: () => void } | null>(null)
 const cameraComparisonEnabled = computed(() => import.meta.dev && route.query.cameraCompare === '1')
 const cameraComparisonMode = ref<'same' | 'fit'>('same')
 const floorSelectorOpen = computed(() => overlay.value?.type === 'floor')
@@ -102,6 +107,23 @@ const categoryCounts = computed(() => {
   return counts
 })
 const visibleSpots = computed(() => filterSpotsByCategoryIds(selectedFloor.value?.spots ?? [], selectedCategoryIds.value))
+const facilityCategoryId = computed(() => getExclusiveFacilityCategoryId(selectedFloor.value?.spots ?? []))
+const facilityOverviewAvailable = computed(() => Boolean(visitorReady.value && facilityCategoryId.value && !selectedCategoryIds.value.includes(facilityCategoryId.value)))
+async function showFacilitiesOverview() {
+  const categoryId = facilityCategoryId.value
+  const floorId = selectedFloor.value?.id
+  if (!visitorReady.value || !categoryId || selectedSpot.value || appModalOpen.value) return
+  clearPendingSpotClose()
+  if (!selectedCategoryIds.value.includes(categoryId)) selectedCategoryIds.value = [...selectedCategoryIds.value, categoryId]
+  await showOverviewAfterDockUpdate({
+    nextRender: () => nextTick(),
+    nextFrame: () => new Promise<void>(resolve => requestAnimationFrame(() => resolve())),
+    measureDock: measureCategoryDock,
+    isCurrent: () => selectedFloor.value?.id === floorId && facilityCategoryId.value === categoryId
+      && selectedCategoryIds.value.includes(categoryId) && !selectedSpot.value && !appModalOpen.value && visitorReady.value,
+    showWholeFloor: () => mapViewerRef.value?.showWholeFloor(),
+  })
+}
 const selectedCategoryNames = computed(() => categories.value.filter(category => selectedCategoryIds.value.includes(category.id)).map(category => category.name).join('・'))
 const showFloorSelector = computed(() => shouldShowFloorSelector(data.value?.map.floors.length ?? 0))
 const appModalOpen = computed(() => overlay.value?.type === 'floor' || overlay.value?.type === 'info')
@@ -334,7 +356,7 @@ onBeforeUnmount(clearPendingSpotClose)
           class="pointer-events-none absolute bottom-[calc(env(safe-area-inset-bottom)+2rem)] left-[calc(env(safe-area-inset-left)+0.75rem)] right-[calc(env(safe-area-inset-right)+0.75rem)] z-20 md:left-1/2 md:right-auto md:w-[min(50vw,44rem)] md:-translate-x-1/2 lg:[--category-fit-height:52px]"
         >
           <div class="pointer-events-auto">
-            <CategoryFilter v-model="selectedCategoryIds" :categories="categories" :counts="categoryCounts" />
+            <CategoryFilter v-model="selectedCategoryIds" :categories="categories" :counts="categoryCounts" :facility-overview-available="facilityOverviewAvailable" @facility-overview="showFacilitiesOverview" />
             <p v-if="selectedCategoryIds.length" role="status" class="visitor-surface mt-1 flex max-w-full items-start lg:hidden gap-2 rounded-xl bg-white/95 px-3 py-1 text-xs font-semibold leading-5 text-stone-800">
               <span class="min-w-0 flex-1 truncate" :title="selectedCategoryNames">{{ selectedCategoryNames }}</span>
               <span class="shrink-0">{{ selectedCategoryIds.length }}カテゴリ · {{ visibleSpots.length }}件</span>
@@ -357,10 +379,13 @@ onBeforeUnmount(clearPendingSpotClose)
             :selected-spot-id="selectedSpotId"
             :prioritize-visible-spots="selectedCategoryIds.length > 0"
             visitor-overview
+            :overview-assistance-blocked="appModalOpen"
             height="100%"
             :label="`${data.map.name} ${selectedFloor.name}`"
             @spot-selected="selectSpot"
             @collision-started="beginMapRecovery"
+            @overview-suggested="overviewSuggested = $event"
+            @ready-change="visitorReady = $event"
           />
           <template #fallback>
             <div role="status" class="grid h-full place-items-center bg-stone-100 text-sm text-stone-600">{{ t.loading }}</div>
@@ -377,7 +402,7 @@ onBeforeUnmount(clearPendingSpotClose)
         </div>
 
         <ClientOnly>
-          <MapOperationHint :storage-key="`digital-map:operation-hint:${data.map.slug}`" :suppressed="appModalOpen || Boolean(selectedSpot)" />
+          <MapOperationHint :storage-key="`digital-map:operation-hint:${data.map.slug}`" :suppressed="appModalOpen || Boolean(selectedSpot)" :overview-suggested="overviewSuggested" />
         </ClientOnly>
       </section>
 

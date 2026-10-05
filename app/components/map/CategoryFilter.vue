@@ -2,8 +2,8 @@
 import type { SpotCategorySummary } from '~~/shared/types/category'
 import { nextCategoryScrollLeft } from '~/utils/category-scroll'
 
-const props = defineProps<{ categories: readonly SpotCategorySummary[], modelValue: string[], counts?: Readonly<Record<string, number>> }>()
-const emit = defineEmits<{ 'update:modelValue': [categoryIds: string[]] }>()
+const props = defineProps<{ categories: readonly SpotCategorySummary[], modelValue: string[], counts?: Readonly<Record<string, number>>, facilityOverviewAvailable?: boolean }>()
+const emit = defineEmits<{ 'update:modelValue': [categoryIds: string[]], facilityOverview: [] }>()
 const scroller = useTemplateRef<HTMLElement>('scroller')
 const canBack = ref(false)
 const canForward = ref(false)
@@ -59,6 +59,7 @@ watch(() => props.categories, () => nextTick(() => {
         <span class="mt-0.5">{{ modelValue.length ? `クリア (${modelValue.length})` : 'すべて' }}</span>
       </span>
     </button>
+    <button v-if="facilityOverviewAvailable" type="button" class="visitor-control flex h-11 shrink-0 flex-col items-center justify-center rounded-full border border-white/70 bg-white/95 px-3 text-xs font-semibold leading-tight text-stone-800 shadow-sm md:hidden" aria-label="設備を全体で見る" @click="emit('facilityOverview')"><span>設備を</span><span>全体で見る</span></button>
     <div class="category-list-frame relative min-w-0 flex-1">
       <div ref="scroller" class="category-chip-scroller flex min-w-0 gap-2 overflow-x-auto overscroll-x-contain py-1" @scroll="measure" @focusin="reveal">
         <button v-for="category in categories" :key="category.id" type="button" class="category-item visitor-control flex min-h-11 min-w-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-white/70 px-3 text-sm font-semibold shadow-sm backdrop-blur" :class="modelValue.includes(category.id) ? 'bg-terracotta-600 text-white' : 'bg-white/95 text-stone-700 hover:bg-white'" :aria-pressed="modelValue.includes(category.id)" :title="category.name" @click="toggleCategory(category.id)">
