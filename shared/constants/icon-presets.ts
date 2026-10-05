@@ -30,6 +30,20 @@ export const materialSymbolPresets = [
 
 export type MaterialSymbolPresetId = typeof materialSymbolPresets[number]['id']
 
+// Facility grammar is explicitly authored; legacy material:wc/info remain destinations.
+export const facilityIconPresets = [
+  { id: 'facility:wc', name: 'wc', imageUrl: '/icons/facilities/wc.svg', label: 'トイレ', text: null },
+  { id: 'facility:accessible-wc', name: 'accessible', imageUrl: '/icons/facilities/accessible.svg', label: '多目的トイレ', text: null },
+  { id: 'facility:elevator', name: 'elevator', imageUrl: '/icons/facilities/elevator.svg', label: 'エレベーター', text: null },
+  { id: 'facility:stairs', name: 'stairs', imageUrl: '/icons/facilities/stairs.svg', label: '階段', text: null },
+  { id: 'facility:escalator', name: 'escalator', imageUrl: '/icons/facilities/escalator.svg', label: 'エスカレーター', text: null },
+  { id: 'facility:nursing', name: 'breastfeeding', imageUrl: '/icons/facilities/breastfeeding.svg', label: '授乳室', text: null },
+  { id: 'facility:aed', name: 'monitor_heart', imageUrl: '/icons/facilities/monitor_heart.svg', label: 'AED', text: 'AED' },
+  { id: 'facility:information', name: 'info', imageUrl: '/icons/facilities/info.svg', label: '案内所', text: null },
+] as const
+
+export type FacilityIconPresetId = typeof facilityIconPresets[number]['id']
+
 export function isMaterialSymbolPresetId(value: string): value is MaterialSymbolPresetId {
   return materialSymbolPresets.some(preset => preset.id === value)
 }

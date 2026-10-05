@@ -104,6 +104,22 @@ function createElement(overrides: Partial<MapViewerSpot> = {}) {
 }
 
 describe('Marker DOM生成', () => {
+  it('明示facilityだけが角丸バッジと設備読み上げを持ち、AED文字はglyphから独立する', () => {
+    const marker = createElement({ name: '救護室前', pinIconId: 'facility:aed', importance: 'featured' })
+    expect(marker.classList.contains('map-viewer-marker--facility')).toBe(true)
+    expect(marker.classList.contains('map-viewer-marker--featured')).toBe(true)
+    expect(marker.attributes.get('aria-label')).toBe('救護室前（設備・AED）の詳細を表示')
+    const shape = marker.children[1]
+    expect(shape?.children[0]).toMatchObject({ tagName: 'IMG', src: '/icons/facilities/monitor_heart.svg', alt: '' })
+    expect(shape?.children[0]?.attributes.get('aria-hidden')).toBe('true')
+    expect(shape?.children[0]?.classList.contains('material-symbols-outlined')).toBe(false)
+    expect(shape?.children[1]).toMatchObject({ className: 'map-viewer-marker__facility-text', textContent: 'AED' })
+    expect(marker.style.properties.has('transform')).toBe(false)
+    for (const id of ['material:wc', 'material:info', 'kanji:i']) {
+      expect(createElement({ pinIconId: id }).classList.contains('map-viewer-marker--facility')).toBe(false)
+    }
+  })
+
   it.each([
     ['normal', 'preset', null, 'map-viewer-marker__shape'],
     ['normal', 'custom', '/uploads/custom.png', 'map-viewer-marker__shape'],

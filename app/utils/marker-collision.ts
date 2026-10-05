@@ -52,7 +52,9 @@ export function measurePinVisualRect(element: HTMLElement): ScreenRect {
   const artwork = shape ?? illustration
   if (!artwork) return element.getBoundingClientRect()
   const measured = artwork.getBoundingClientRect()
-  let rect: ScreenRect = shape ? pinArtworkBounds(measured) : measured
+  const facility = element.classList.contains('map-viewer-marker--facility')
+  let rect: ScreenRect = shape && !facility ? pinArtworkBounds(measured)
+    : { left: measured.left, top: measured.top, right: measured.right, bottom: measured.bottom }
   const image = illustration?.querySelector<HTMLImageElement>('img')
   // object-fit:contain can letterbox a very wide image inside the capped image box.
   if (image?.naturalWidth && image.naturalHeight) {
@@ -62,9 +64,9 @@ export function measurePinVisualRect(element: HTMLElement): ScreenRect {
     rect = { left: box.left + (box.width-width)/2, right: box.right - (box.width-width)/2,
       top: box.top + (box.height-height)/2, bottom: box.bottom - (box.height-height)/2 }
   }
-  if (element.classList.contains('map-viewer-marker--selected')) {
+  if (element.classList.contains('map-viewer-marker--selected') || (facility && element.matches(':focus-visible'))) {
     // Public selection outline: 2px + 2px offset, transformed with the artwork.
-    const scale = shape ? measured.width / (artwork.offsetWidth * Math.SQRT2) : measured.width / artwork.offsetWidth
+    const scale = measured.width / (artwork.offsetWidth * (shape && !facility ? Math.SQRT2 : 1))
     const ring = 4 * (Number.isFinite(scale) ? scale : 1)
     const base = illustration ? measured : rect
     rect = { left: base.left-ring, right: base.right+ring, top: base.top-ring, bottom: base.bottom+ring }
@@ -87,6 +89,17 @@ export function applyPinVisibility(element: HTMLElement, visible: boolean) {
     element.closest<HTMLElement>('[role="region"]')?.focus({ preventScroll: true })
     element.blur()
   }
+}
+
+/** Detail dismissal returns to its own PIN even if deselection already suppressed it.
+ * Reveal and focus in one task so the viewer's focusin refresh protects that PIN.
+ * Ordinary hidden PINs remain inert; callers must identify the closing Detail's PIN.
+ */
+export function restorePinFocus(element: HTMLElement | null | undefined) {
+  if (!element?.isConnected) return false
+  applyPinVisibility(element, true)
+  element.focus({ preventScroll: true })
+  return element.ownerDocument.activeElement === element
 }
 
 /** Connected screen-space overlaps, including density-hidden members; no canonical writes. */

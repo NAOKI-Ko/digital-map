@@ -1,0 +1,1357 @@
+{
+  "map": {
+    "id": "wu77-map",
+    "name": "海のミュージアム（品質比較用）",
+    "slug": "__qa_arimatsu",
+    "locale": "ja",
+    "defaultLocale": "ja",
+    "enabledLocales": [
+      "ja"
+    ],
+    "seo": {
+      "title": "品質比較用館内図",
+      "description": "架空の固定比較fixture",
+      "imageUrl": null
+    },
+    "organizationName": "WU-77 比較fixture",
+    "logoUrl": null,
+    "websiteUrl": null,
+    "snsUrl": null,
+    "floors": [
+      {
+        "id": "wu77-floor-0",
+        "name": "2F",
+        "illustrationUrl": "/__qa__/wu77/aquarium.svg",
+        "imageWidth": 1200,
+        "imageHeight": 800,
+        "order": 0,
+        "spots": [
+          {
+            "id": "wu77-0-00",
+            "floorId": "wu77-floor-0",
+            "name": "海の展示A",
+            "categories": [
+              {
+                "id": "wu77-cat-0",
+                "name": "展示",
+                "order": 0,
+                "iconType": "preset",
+                "iconPresetId": "material:museum",
+                "iconImageUrl": null,
+                "iconAssetId": null
+              }
+            ],
+            "importance": "featured",
+            "description": "2Fの海の展示Aです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+            "x": 0.14,
+            "y": 0.22,
+            "photos": [],
+            "informationFields": [
+              {
+                "id": "wu77-hours",
+                "label": "利用時間",
+                "type": "single_line_text",
+                "value": "9:30–17:00（比較用）",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "material:museum",
+            "pinIconImageUrl": null,
+            "pinColor": "#315B83",
+            "pinSize": "small"
+          },
+          {
+            "id": "wu77-0-01",
+            "floorId": "wu77-floor-0",
+            "name": "カフェA",
+            "categories": [
+              {
+                "id": "wu77-cat-1",
+                "name": "飲食",
+                "order": 1,
+                "iconType": "preset",
+                "iconPresetId": "material:restaurant",
+                "iconImageUrl": null,
+                "iconAssetId": null
+              }
+            ],
+            "importance": "normal",
+            "description": "2FのカフェAです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+            "x": 0.32,
+            "y": 0.22,
+            "photos": [],
+            "informationFields": [
+              {
+                "id": "wu77-hours",
+                "label": "利用時間",
+                "type": "single_line_text",
+                "value": "9:30–17:00（比較用）",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "material:local_cafe",
+            "pinIconImageUrl": null,
+            "pinColor": "#A84B2B",
+            "pinSize": "medium"
+          },
+          {
+            "id": "wu77-0-02",
+            "floorId": "wu77-floor-0",
+            "name": "ショップA",
+            "categories": [
+              {
+                "id": "wu77-cat-2",
+                "name": "ショップ",
+                "order": 2,
+                "iconType": "preset",
+                "iconPresetId": "material:storefront",
+                "iconImageUrl": null,
+                "iconAssetId": null
+              }
+            ],
+            "importance": "normal",
+            "description": "2FのショップAです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+            "x": 0.5,
+            "y": 0.22,
+            "photos": [],
+            "informationFields": [
+              {
+                "id": "wu77-hours",
+                "label": "利用時間",
+                "type": "single_line_text",
+                "value": "9:30–17:00（比較用）",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "kanji:買",
+            "pinIconImageUrl": null,
+            "pinColor": "#674D83",
+            "pinSize": "large"
+          },
+          {
+            "id": "wu77-0-03",
+            "floorId": "wu77-floor-0",
+            "name": "海の展示B",
+            "categories": [
+              {
+                "id": "wu77-cat-0",
+                "name": "展示",
+                "order": 0,
+                "iconType": "preset",
+                "iconPresetId": "material:museum",
+                "iconImageUrl": null,
+                "iconAssetId": null
+              }
+            ],
+            "importance": "normal",
+            "description": "2Fの海の展示Bです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+            "x": 0.68,
+            "y": 0.22,
+            "photos": [],
+            "informationFields": [
+              {
+                "id": "wu77-hours",
+                "label": "利用時間",
+                "type": "single_line_text",
+                "value": "9:30–17:00（比較用）",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "material:museum",
+            "pinIconImageUrl": null,
+            "pinColor": "#315B83",
+            "pinSize": "small"
+          },
+          {
+            "id": "wu77-0-04",
+            "floorId": "wu77-floor-0",
+            "name": "カフェB",
+            "categories": [
+              {
+                "id": "wu77-cat-1",
+                "name": "飲食",
+                "order": 1,
+                "iconType": "preset",
+                "iconPresetId": "material:restaurant",
+                "iconImageUrl": null,
+                "iconAssetId": null
+              }
+            ],
+            "importance": "normal",
+            "description": "2FのカフェBです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+            "x": 0.86,
+            "y": 0.22,
+            "photos": [],
+            "informationFields": [
+              {
+                "id": "wu77-hours",
+                "label": "利用時間",
+                "type": "single_line_text",
+                "value": "9:30–17:00（比較用）",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "custom",
+            "pinIconId": "material:local_cafe",
+            "pinIconImageUrl": "/__qa__/wu77/cafe.svg",
+            "pinColor": "#A84B2B",
+            "pinSize": "medium"
+          },
+          {
+            "id": "wu77-0-05",
+            "floorId": "wu77-floor-0",
+            "name": "ショップB",
+            "categories": [
+              {
+                "id": "wu77-cat-2",
+                "name": "ショップ",
+                "order": 2,
+                "iconType": "preset",
+                "iconPresetId": "material:storefront",
+                "iconImageUrl": null,
+                "iconAssetId": null
+              }
+            ],
+            "importance": "normal",
+            "description": "2FのショップBです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+            "x": 0.25,
+            "y": 0.22,
+            "photos": [],
+            "informationFields": [
+              {
+                "id": "wu77-hours",
+                "label": "利用時間",
+                "type": "single_line_text",
+                "value": "9:30–17:00（比較用）",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "illustration",
+            "pinIconId": "kanji:買",
+            "pinIconImageUrl": "/__qa__/wu77/fish.svg",
+            "pinColor": "#674D83",
+            "pinSize": "large"
+          },
+          {
+            "id": "wu77-0-06",
+            "floorId": "wu77-floor-0",
+            "name": "海の展示C",
+            "categories": [
+              {
+                "id": "wu77-cat-0",
+                "name": "展示",
+                "order": 0,
+                "iconType": "preset",
+                "iconPresetId": "material:museum",
+                "iconImageUrl": null,
+                "iconAssetId": null
+              }
+            ],
+            "importance": "featured",
+            "description": "2Fの海の展示Cです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+            "x": 0.14,
+            "y": 0.39,
+            "photos": [],
+            "informationFields": [
+              {
+                "id": "wu77-hours",
+                "label": "利用時間",
+                "type": "single_line_text",
+                "value": "9:30–17:00（比較用）",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "material:museum",
+            "pinIconImageUrl": null,
+            "pinColor": "#315B83",
+            "pinSize": "small"
+          },
+          {
+            "id": "wu77-0-07",
+            "floorId": "wu77-floor-0",
+            "name": "カフェC",
+            "categories": [
+              {
+                "id": "wu77-cat-1",
+                "name": "飲食",
+                "order": 1,
+                "iconType": "preset",
+                "iconPresetId": "material:restaurant",
+                "iconImageUrl": null,
+                "iconAssetId": null
+              }
+            ],
+            "importance": "normal",
+            "description": "2FのカフェCです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+            "x": 0.5,
+            "y": 0.4,
+            "photos": [],
+            "informationFields": [
+              {
+                "id": "wu77-hours",
+                "label": "利用時間",
+                "type": "single_line_text",
+                "value": "9:30–17:00（比較用）",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "material:local_cafe",
+            "pinIconImageUrl": null,
+            "pinColor": "#A84B2B",
+            "pinSize": "medium"
+          },
+          {
+            "id": "wu77-0-08",
+            "floorId": "wu77-floor-0",
+            "name": "ショップC",
+            "categories": [
+              {
+                "id": "wu77-cat-2",
+                "name": "ショップ",
+                "order": 2,
+                "iconType": "preset",
+                "iconPresetId": "material:storefront",
+                "iconImageUrl": null,
+                "iconAssetId": null
+              }
+            ],
+            "importance": "normal",
+            "description": "2FのショップCです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+            "x": 0.5,
+            "y": 0.4,
+            "photos": [],
+            "informationFields": [
+              {
+                "id": "wu77-hours",
+                "label": "利用時間",
+                "type": "single_line_text",
+                "value": "9:30–17:00（比較用）",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "kanji:買",
+            "pinIconImageUrl": null,
+            "pinColor": "#674D83",
+            "pinSize": "large"
+          },
+          {
+            "id": "wu77-0-09",
+            "floorId": "wu77-floor-0",
+            "name": "海の展示D",
+            "categories": [
+              {
+                "id": "wu77-cat-0",
+                "name": "展示",
+                "order": 0,
+                "iconType": "preset",
+                "iconPresetId": "material:museum",
+                "iconImageUrl": null,
+                "iconAssetId": null
+              }
+            ],
+            "importance": "normal",
+            "description": "2Fの海の展示Dです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+            "x": 0.5,
+            "y": 0.4,
+            "photos": [],
+            "informationFields": [
+              {
+                "id": "wu77-hours",
+                "label": "利用時間",
+                "type": "single_line_text",
+                "value": "9:30–17:00（比較用）",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "material:museum",
+            "pinIconImageUrl": null,
+            "pinColor": "#315B83",
+            "pinSize": "small"
+          },
+          {
+            "id": "wu77-0-10",
+            "floorId": "wu77-floor-0",
+            "name": "カフェD",
+            "categories": [
+              {
+                "id": "wu77-cat-1",
+                "name": "飲食",
+                "order": 1,
+                "iconType": "preset",
+                "iconPresetId": "material:restaurant",
+                "iconImageUrl": null,
+                "iconAssetId": null
+              }
+            ],
+            "importance": "normal",
+            "description": "2FのカフェDです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+            "x": 0.86,
+            "y": 0.39,
+            "photos": [],
+            "informationFields": [
+              {
+                "id": "wu77-hours",
+                "label": "利用時間",
+                "type": "single_line_text",
+                "value": "9:30–17:00（比較用）",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "material:wc",
+            "pinIconImageUrl": null,
+            "pinColor": "#A84B2B",
+            "pinSize": "medium"
+          },
+          {
+            "id": "wu77-0-11",
+            "floorId": "wu77-floor-0",
+            "name": "ショップD",
+            "categories": [
+              {
+                "id": "wu77-cat-2",
+                "name": "ショップ",
+                "order": 2,
+                "iconType": "preset",
+                "iconPresetId": "material:storefront",
+                "iconImageUrl": null,
+                "iconAssetId": null
+              }
+            ],
+            "importance": "normal",
+            "description": "2FのショップDです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+            "x": 0.25,
+            "y": 0.39,
+            "photos": [],
+            "informationFields": [
+              {
+                "id": "wu77-hours",
+                "label": "利用時間",
+                "type": "single_line_text",
+                "value": "9:30–17:00（比較用）",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "kanji:i",
+            "pinIconImageUrl": null,
+            "pinColor": "#674D83",
+            "pinSize": "large"
+          },
+          {
+            "id": "wu77-0-12",
+            "floorId": "wu77-floor-0",
+            "name": "北側トイレ",
+            "categories": [
+              {
+                "id": "wu77-cat-3",
+                "name": "設備",
+                "order": 3,
+                "iconType": "preset",
+                "iconPresetId": "material:info",
+                "iconImageUrl": null,
+                "iconAssetId": null
+              }
+            ],
+            "importance": "featured",
+            "description": "2Fの北側トイレです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+            "x": 0.14,
+            "y": 0.56,
+            "photos": [],
+            "informationFields": [
+              {
+                "id": "wu77-hours",
+                "label": "利用時間",
+                "type": "single_line_text",
+                "value": "9:30–17:00（比較用）",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "facility:wc",
+            "pinIconImageUrl": null,
+            "pinColor": "#2C5F78",
+            "pinSize": "small"
+          },
+          {
+            "id": "wu77-0-13",
+            "floorId": "wu77-floor-0",
+            "name": "多目的トイレ",
+            "categories": [
+              {
+                "id": "wu77-cat-3",
+                "name": "設備",
+                "order": 3,
+                "iconType": "preset",
+                "iconPresetId": "material:info",
+                "iconImageUrl": null,
+                "iconAssetId": null
+              }
+            ],
+            "importance": "normal",
+            "description": "2Fの多目的トイレです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+            "x": 0.32,
+            "y": 0.56,
+            "photos": [],
+            "informationFields": [
+              {
+                "id": "wu77-hours",
+                "label": "利用時間",
+                "type": "single_line_text",
+                "value": "9:30–17:00（比較用）",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "facility:accessible-wc",
+            "pinIconImageUrl": null,
+            "pinColor": "#2C5F78",
+            "pinSize": "medium"
+          },
+          {
+            "id": "wu77-0-14",
+            "floorId": "wu77-floor-0",
+            "name": "エレベーター",
+            "categories": [
+              {
+                "id": "wu77-cat-3",
+                "name": "設備",
+                "order": 3,
+                "iconType": "preset",
+                "iconPresetId": "material:info",
+                "iconImageUrl": null,
+                "iconAssetId": null
+              }
+            ],
+            "importance": "normal",
+            "description": "2Fのエレベーターです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+            "x": 0.5,
+            "y": 0.56,
+            "photos": [],
+            "informationFields": [
+              {
+                "id": "wu77-hours",
+                "label": "利用時間",
+                "type": "single_line_text",
+                "value": "9:30–17:00（比較用）",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "facility:elevator",
+            "pinIconImageUrl": null,
+            "pinColor": "#2C5F78",
+            "pinSize": "large"
+          },
+          {
+            "id": "wu77-0-15",
+            "floorId": "wu77-floor-0",
+            "name": "階段",
+            "categories": [
+              {
+                "id": "wu77-cat-3",
+                "name": "設備",
+                "order": 3,
+                "iconType": "preset",
+                "iconPresetId": "material:info",
+                "iconImageUrl": null,
+                "iconAssetId": null
+              }
+            ],
+            "importance": "normal",
+            "description": "2Fの階段です。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+            "x": 0.73,
+            "y": 0.61,
+            "photos": [],
+            "informationFields": [
+              {
+                "id": "wu77-hours",
+                "label": "利用時間",
+                "type": "single_line_text",
+                "value": "9:30–17:00（比較用）",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "facility:stairs",
+            "pinIconImageUrl": null,
+            "pinColor": "#2C5F78",
+            "pinSize": "small"
+          },
+          {
+            "id": "wu77-0-16",
+            "floorId": "wu77-floor-0",
+            "name": "エスカレーター",
+            "categories": [
+              {
+                "id": "wu77-cat-3",
+                "name": "設備",
+                "order": 3,
+                "iconType": "preset",
+                "iconPresetId": "material:info",
+                "iconImageUrl": null,
+                "iconAssetId": null
+              }
+            ],
+            "importance": "normal",
+            "description": "2Fのエスカレーターです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+            "x": 0.73,
+            "y": 0.61,
+            "photos": [],
+            "informationFields": [
+              {
+                "id": "wu77-hours",
+                "label": "利用時間",
+                "type": "single_line_text",
+                "value": "9:30–17:00（比較用）",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "facility:escalator",
+            "pinIconImageUrl": null,
+            "pinColor": "#2C5F78",
+            "pinSize": "medium"
+          },
+          {
+            "id": "wu77-0-17",
+            "floorId": "wu77-floor-0",
+            "name": "授乳室",
+            "categories": [
+              {
+                "id": "wu77-cat-3",
+                "name": "設備",
+                "order": 3,
+                "iconType": "preset",
+                "iconPresetId": "material:info",
+                "iconImageUrl": null,
+                "iconAssetId": null
+              }
+            ],
+            "importance": "normal",
+            "description": "2Fの授乳室です。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+            "x": 0.73,
+            "y": 0.61,
+            "photos": [],
+            "informationFields": [
+              {
+                "id": "wu77-hours",
+                "label": "利用時間",
+                "type": "single_line_text",
+                "value": "9:30–17:00（比較用）",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "facility:nursing",
+            "pinIconImageUrl": null,
+            "pinColor": "#2C5F78",
+            "pinSize": "large"
+          },
+          {
+            "id": "wu77-0-18",
+            "floorId": "wu77-floor-0",
+            "name": "AED",
+            "categories": [
+              {
+                "id": "wu77-cat-3",
+                "name": "設備",
+                "order": 3,
+                "iconType": "preset",
+                "iconPresetId": "material:info",
+                "iconImageUrl": null,
+                "iconAssetId": null
+              }
+            ],
+            "importance": "normal",
+            "description": "2FのAEDです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+            "x": 0.14,
+            "y": 0.73,
+            "photos": [],
+            "informationFields": [
+              {
+                "id": "wu77-hours",
+                "label": "利用時間",
+                "type": "single_line_text",
+                "value": "9:30–17:00（比較用）",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "facility:aed",
+            "pinIconImageUrl": null,
+            "pinColor": "#2C5F78",
+            "pinSize": "small"
+          },
+          {
+            "id": "wu77-0-19",
+            "floorId": "wu77-floor-0",
+            "name": "案内所",
+            "categories": [
+              {
+                "id": "wu77-cat-3",
+                "name": "設備",
+                "order": 3,
+                "iconType": "preset",
+                "iconPresetId": "material:info",
+                "iconImageUrl": null,
+                "iconAssetId": null
+              }
+            ],
+            "importance": "normal",
+            "description": "2Fの案内所です。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+            "x": 0.32,
+            "y": 0.73,
+            "photos": [],
+            "informationFields": [
+              {
+                "id": "wu77-hours",
+                "label": "利用時間",
+                "type": "single_line_text",
+                "value": "9:30–17:00（比較用）",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "facility:information",
+            "pinIconImageUrl": null,
+            "pinColor": "#2C5F78",
+            "pinSize": "medium"
+          },
+          {
+            "id": "wu77-0-20",
+            "floorId": "wu77-floor-0",
+            "name": "トイレ 2",
+            "categories": [
+              {
+                "id": "wu77-cat-3",
+                "name": "設備",
+                "order": 3,
+                "iconType": "preset",
+                "iconPresetId": "material:info",
+                "iconImageUrl": null,
+                "iconAssetId": null
+              }
+            ],
+            "importance": "normal",
+            "description": "2Fのトイレ 2です。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+            "x": 0.5,
+            "y": 0.73,
+            "photos": [],
+            "informationFields": [
+              {
+                "id": "wu77-hours",
+                "label": "利用時間",
+                "type": "single_line_text",
+                "value": "9:30–17:00（比較用）",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "facility:wc",
+            "pinIconImageUrl": null,
+            "pinColor": "#2C5F78",
+            "pinSize": "large"
+          },
+          {
+            "id": "wu77-0-21",
+            "floorId": "wu77-floor-0",
+            "name": "多目的トイレ 2",
+            "categories": [
+              {
+                "id": "wu77-cat-3",
+                "name": "設備",
+                "order": 3,
+                "iconType": "preset",
+                "iconPresetId": "material:info",
+                "iconImageUrl": null,
+                "iconAssetId": null
+              }
+            ],
+            "importance": "normal",
+            "description": "2Fの多目的トイレ 2です。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+            "x": 0.68,
+            "y": 0.73,
+            "photos": [],
+            "informationFields": [
+              {
+                "id": "wu77-hours",
+                "label": "利用時間",
+                "type": "single_line_text",
+                "value": "9:30–17:00（比較用）",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "facility:accessible-wc",
+            "pinIconImageUrl": null,
+            "pinColor": "#2C5F78",
+            "pinSize": "small"
+          },
+          {
+            "id": "wu77-0-22",
+            "floorId": "wu77-floor-0",
+            "name": "エレベーター 2",
+            "categories": [
+              {
+                "id": "wu77-cat-3",
+                "name": "設備",
+                "order": 3,
+                "iconType": "preset",
+                "iconPresetId": "material:info",
+                "iconImageUrl": null,
+                "iconAssetId": null
+              }
+            ],
+            "importance": "normal",
+            "description": "2Fのエレベーター 2です。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+            "x": 0.86,
+            "y": 0.73,
+            "photos": [],
+            "informationFields": [
+              {
+                "id": "wu77-hours",
+                "label": "利用時間",
+                "type": "single_line_text",
+                "value": "9:30–17:00（比較用）",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "facility:elevator",
+            "pinIconImageUrl": null,
+            "pinColor": "#2C5F78",
+            "pinSize": "medium"
+          },
+          {
+            "id": "wu77-0-23",
+            "floorId": "wu77-floor-0",
+            "name": "階段 2",
+            "categories": [
+              {
+                "id": "wu77-cat-3",
+                "name": "設備",
+                "order": 3,
+                "iconType": "preset",
+                "iconPresetId": "material:info",
+                "iconImageUrl": null,
+                "iconAssetId": null
+              }
+            ],
+            "importance": "normal",
+            "description": "2Fの階段 2です。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+            "x": 0.25,
+            "y": 0.73,
+            "photos": [],
+            "informationFields": [
+              {
+                "id": "wu77-hours",
+                "label": "利用時間",
+                "type": "single_line_text",
+                "value": "9:30–17:00（比較用）",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "facility:stairs",
+            "pinIconImageUrl": null,
+            "pinColor": "#2C5F78",
+            "pinSize": "large"
+          }
+        ],
+        "decorations": [],
+        "refAImageX": null,
+        "refAImageY": null,
+        "refALat": null,
+        "refALng": null,
+        "refBImageX": null,
+        "refBImageY": null,
+        "refBLat": null,
+        "refBLng": null
+      },
+      {
+        "id": "wu77-floor-1",
+        "name": "3F",
+        "illustrationUrl": "/__qa__/wu77/aquarium.svg",
+        "imageWidth": 1200,
+        "imageHeight": 800,
+        "order": 1,
+        "spots": [
+          {
+            "id": "wu77-1-00",
+            "floorId": "wu77-floor-1",
+            "name": "海の展示A",
+            "categories": [
+              {
+                "id": "wu77-cat-0",
+                "name": "展示",
+                "order": 0,
+                "iconType": "preset",
+                "iconPresetId": "material:museum",
+                "iconImageUrl": null,
+                "iconAssetId": null
+              }
+            ],
+            "importance": "featured",
+            "description": "3Fの海の展示Aです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+            "x": 0.14,
+            "y": 0.22,
+            "photos": [],
+            "informationFields": [
+              {
+                "id": "wu77-hours",
+                "label": "利用時間",
+                "type": "single_line_text",
+                "value": "9:30–17:00（比較用）",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "material:museum",
+            "pinIconImageUrl": null,
+            "pinColor": "#315B83",
+            "pinSize": "small"
+          },
+          {
+            "id": "wu77-1-01",
+            "floorId": "wu77-floor-1",
+            "name": "カフェA",
+            "categories": [
+              {
+                "id": "wu77-cat-1",
+                "name": "飲食",
+                "order": 1,
+                "iconType": "preset",
+                "iconPresetId": "material:restaurant",
+                "iconImageUrl": null,
+                "iconAssetId": null
+              }
+            ],
+            "importance": "normal",
+            "description": "3FのカフェAです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+            "x": 0.32,
+            "y": 0.22,
+            "photos": [],
+            "informationFields": [
+              {
+                "id": "wu77-hours",
+                "label": "利用時間",
+                "type": "single_line_text",
+                "value": "9:30–17:00（比較用）",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "material:local_cafe",
+            "pinIconImageUrl": null,
+            "pinColor": "#A84B2B",
+            "pinSize": "medium"
+          },
+          {
+            "id": "wu77-1-02",
+            "floorId": "wu77-floor-1",
+            "name": "ショップA",
+            "categories": [
+              {
+                "id": "wu77-cat-2",
+                "name": "ショップ",
+                "order": 2,
+                "iconType": "preset",
+                "iconPresetId": "material:storefront",
+                "iconImageUrl": null,
+                "iconAssetId": null
+              }
+            ],
+            "importance": "normal",
+            "description": "3FのショップAです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+            "x": 0.5,
+            "y": 0.22,
+            "photos": [],
+            "informationFields": [
+              {
+                "id": "wu77-hours",
+                "label": "利用時間",
+                "type": "single_line_text",
+                "value": "9:30–17:00（比較用）",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "kanji:買",
+            "pinIconImageUrl": null,
+            "pinColor": "#674D83",
+            "pinSize": "large"
+          },
+          {
+            "id": "wu77-1-03",
+            "floorId": "wu77-floor-1",
+            "name": "海の展示B",
+            "categories": [
+              {
+                "id": "wu77-cat-0",
+                "name": "展示",
+                "order": 0,
+                "iconType": "preset",
+                "iconPresetId": "material:museum",
+                "iconImageUrl": null,
+                "iconAssetId": null
+              }
+            ],
+            "importance": "normal",
+            "description": "3Fの海の展示Bです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+            "x": 0.68,
+            "y": 0.22,
+            "photos": [],
+            "informationFields": [
+              {
+                "id": "wu77-hours",
+                "label": "利用時間",
+                "type": "single_line_text",
+                "value": "9:30–17:00（比較用）",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "material:museum",
+            "pinIconImageUrl": null,
+            "pinColor": "#315B83",
+            "pinSize": "small"
+          },
+          {
+            "id": "wu77-1-04",
+            "floorId": "wu77-floor-1",
+            "name": "カフェB",
+            "categories": [
+              {
+                "id": "wu77-cat-1",
+                "name": "飲食",
+                "order": 1,
+                "iconType": "preset",
+                "iconPresetId": "material:restaurant",
+                "iconImageUrl": null,
+                "iconAssetId": null
+              }
+            ],
+            "importance": "normal",
+            "description": "3FのカフェBです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+            "x": 0.86,
+            "y": 0.22,
+            "photos": [],
+            "informationFields": [
+              {
+                "id": "wu77-hours",
+                "label": "利用時間",
+                "type": "single_line_text",
+                "value": "9:30–17:00（比較用）",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "custom",
+            "pinIconId": "material:local_cafe",
+            "pinIconImageUrl": "/__qa__/wu77/cafe.svg",
+            "pinColor": "#A84B2B",
+            "pinSize": "medium"
+          },
+          {
+            "id": "wu77-1-05",
+            "floorId": "wu77-floor-1",
+            "name": "ショップB",
+            "categories": [
+              {
+                "id": "wu77-cat-2",
+                "name": "ショップ",
+                "order": 2,
+                "iconType": "preset",
+                "iconPresetId": "material:storefront",
+                "iconImageUrl": null,
+                "iconAssetId": null
+              }
+            ],
+            "importance": "normal",
+            "description": "3FのショップBです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+            "x": 0.25,
+            "y": 0.22,
+            "photos": [],
+            "informationFields": [
+              {
+                "id": "wu77-hours",
+                "label": "利用時間",
+                "type": "single_line_text",
+                "value": "9:30–17:00（比較用）",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "illustration",
+            "pinIconId": "kanji:買",
+            "pinIconImageUrl": "/__qa__/wu77/fish.svg",
+            "pinColor": "#674D83",
+            "pinSize": "large"
+          },
+          {
+            "id": "wu77-1-06",
+            "floorId": "wu77-floor-1",
+            "name": "北側トイレ",
+            "categories": [
+              {
+                "id": "wu77-cat-3",
+                "name": "設備",
+                "order": 3,
+                "iconType": "preset",
+                "iconPresetId": "material:info",
+                "iconImageUrl": null,
+                "iconAssetId": null
+              }
+            ],
+            "importance": "featured",
+            "description": "3Fの北側トイレです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+            "x": 0.14,
+            "y": 0.39,
+            "photos": [],
+            "informationFields": [
+              {
+                "id": "wu77-hours",
+                "label": "利用時間",
+                "type": "single_line_text",
+                "value": "9:30–17:00（比較用）",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "facility:wc",
+            "pinIconImageUrl": null,
+            "pinColor": "#2C5F78",
+            "pinSize": "small"
+          },
+          {
+            "id": "wu77-1-07",
+            "floorId": "wu77-floor-1",
+            "name": "多目的トイレ",
+            "categories": [
+              {
+                "id": "wu77-cat-3",
+                "name": "設備",
+                "order": 3,
+                "iconType": "preset",
+                "iconPresetId": "material:info",
+                "iconImageUrl": null,
+                "iconAssetId": null
+              }
+            ],
+            "importance": "normal",
+            "description": "3Fの多目的トイレです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+            "x": 0.32,
+            "y": 0.39,
+            "photos": [],
+            "informationFields": [
+              {
+                "id": "wu77-hours",
+                "label": "利用時間",
+                "type": "single_line_text",
+                "value": "9:30–17:00（比較用）",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "facility:accessible-wc",
+            "pinIconImageUrl": null,
+            "pinColor": "#2C5F78",
+            "pinSize": "medium"
+          },
+          {
+            "id": "wu77-1-08",
+            "floorId": "wu77-floor-1",
+            "name": "エレベーター",
+            "categories": [
+              {
+                "id": "wu77-cat-3",
+                "name": "設備",
+                "order": 3,
+                "iconType": "preset",
+                "iconPresetId": "material:info",
+                "iconImageUrl": null,
+                "iconAssetId": null
+              }
+            ],
+            "importance": "normal",
+            "description": "3Fのエレベーターです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+            "x": 0.5,
+            "y": 0.39,
+            "photos": [],
+            "informationFields": [
+              {
+                "id": "wu77-hours",
+                "label": "利用時間",
+                "type": "single_line_text",
+                "value": "9:30–17:00（比較用）",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "facility:elevator",
+            "pinIconImageUrl": null,
+            "pinColor": "#2C5F78",
+            "pinSize": "large"
+          },
+          {
+            "id": "wu77-1-09",
+            "floorId": "wu77-floor-1",
+            "name": "階段",
+            "categories": [
+              {
+                "id": "wu77-cat-3",
+                "name": "設備",
+                "order": 3,
+                "iconType": "preset",
+                "iconPresetId": "material:info",
+                "iconImageUrl": null,
+                "iconAssetId": null
+              }
+            ],
+            "importance": "normal",
+            "description": "3Fの階段です。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+            "x": 0.68,
+            "y": 0.39,
+            "photos": [],
+            "informationFields": [
+              {
+                "id": "wu77-hours",
+                "label": "利用時間",
+                "type": "single_line_text",
+                "value": "9:30–17:00（比較用）",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "facility:stairs",
+            "pinIconImageUrl": null,
+            "pinColor": "#2C5F78",
+            "pinSize": "small"
+          },
+          {
+            "id": "wu77-1-10",
+            "floorId": "wu77-floor-1",
+            "name": "エスカレーター",
+            "categories": [
+              {
+                "id": "wu77-cat-3",
+                "name": "設備",
+                "order": 3,
+                "iconType": "preset",
+                "iconPresetId": "material:info",
+                "iconImageUrl": null,
+                "iconAssetId": null
+              }
+            ],
+            "importance": "normal",
+            "description": "3Fのエスカレーターです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+            "x": 0.86,
+            "y": 0.39,
+            "photos": [],
+            "informationFields": [
+              {
+                "id": "wu77-hours",
+                "label": "利用時間",
+                "type": "single_line_text",
+                "value": "9:30–17:00（比較用）",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "facility:escalator",
+            "pinIconImageUrl": null,
+            "pinColor": "#2C5F78",
+            "pinSize": "medium"
+          },
+          {
+            "id": "wu77-1-11",
+            "floorId": "wu77-floor-1",
+            "name": "授乳室",
+            "categories": [
+              {
+                "id": "wu77-cat-3",
+                "name": "設備",
+                "order": 3,
+                "iconType": "preset",
+                "iconPresetId": "material:info",
+                "iconImageUrl": null,
+                "iconAssetId": null
+              }
+            ],
+            "importance": "normal",
+            "description": "3Fの授乳室です。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+            "x": 0.25,
+            "y": 0.39,
+            "photos": [],
+            "informationFields": [
+              {
+                "id": "wu77-hours",
+                "label": "利用時間",
+                "type": "single_line_text",
+                "value": "9:30–17:00（比較用）",
+                "href": null
+              }
+            ],
+            "websiteAction": null,
+            "pinIconType": "preset",
+            "pinIconId": "facility:nursing",
+            "pinIconImageUrl": null,
+            "pinColor": "#2C5F78",
+            "pinSize": "large"
+          }
+        ],
+        "decorations": [],
+        "refAImageX": null,
+        "refAImageY": null,
+        "refALat": null,
+        "refALng": null,
+        "refBImageX": null,
+        "refBImageY": null,
+        "refBLat": null,
+        "refBLng": null
+      }
+    ]
+  }
+}

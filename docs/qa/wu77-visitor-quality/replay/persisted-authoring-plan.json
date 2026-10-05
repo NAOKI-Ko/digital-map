@@ -1,0 +1,5963 @@
+{
+  "format": "wu77-persisted-authoring-dry-run-v1",
+  "dryRun": true,
+  "executionImplemented": false,
+  "origin": "http://127.0.0.1:3014",
+  "provenance": {
+    "candidateSha": "9d2a1ec196a9bec33d78aaaf1e418b786cb7b21c",
+    "fixturePath": "server/fixtures/wu77-visitor.json",
+    "fixtureSha256": "36e5ea87d9a3297a99821c6e4ad6d2860f9763b611070a0ff3f299090ccf3ffd",
+    "sourceContracts": [
+      {
+        "path": "shared/schemas/auth.ts",
+        "sha256": "2d44ed2c8f489017c751480a3afad2c7e14c6b0e25042701f32aaeae9118e0d4"
+      },
+      {
+        "path": "shared/schemas/map.ts",
+        "sha256": "59f387e1f62d9c0a8e4df0d00584f71b9a3435afc24947df402a389b921b2e11"
+      },
+      {
+        "path": "shared/schemas/seo.ts",
+        "sha256": "571d554de7cfde3e4f20e0b00fdfa07a5271ebdd0aea791c047a97a5903b49b1"
+      },
+      {
+        "path": "shared/schemas/floor.ts",
+        "sha256": "39a831578d77432f000a2421cc983d8ba8605381b421cb0638c32b9ddd4917a4"
+      },
+      {
+        "path": "shared/schemas/category.ts",
+        "sha256": "23d51cecc98f7ef44966d062ac8cc372afa357773740e2ad43f71e34aeac0b67"
+      },
+      {
+        "path": "shared/schemas/spot.ts",
+        "sha256": "a83ff0df4f1c8e8963eb4e684ff0ea40a35f61f6ee269c9ab2042698aa989362"
+      },
+      {
+        "path": "shared/schemas/spot-field.ts",
+        "sha256": "c49b45d814fa92154b3c6723ae4c87d32434bf98b5a216f7244efb79e2f23cc4"
+      },
+      {
+        "path": "shared/schemas/pin-design.ts",
+        "sha256": "aef63dbbeb848234e07375384bd3c5535cfab2831ecfb786531cc8e392e59770"
+      },
+      {
+        "path": "shared/constants/spot.ts",
+        "sha256": "e8db516796dacad3ad86b7af792aee50f661385d849612c26ed94ed23f75da5e"
+      },
+      {
+        "path": "shared/constants/icon-presets.ts",
+        "sha256": "3f1eddea2198898e4a7aa63d6cee9641c794175727a877bc1fe9b71958280d81"
+      },
+      {
+        "path": "shared/constants/category.ts",
+        "sha256": "557aeb06a9495468584a456fb80ee06e532888355664867c788b261df63f12e3"
+      },
+      {
+        "path": "server/api/auth/login.post.ts",
+        "sha256": "9d190bf6f69659c18b3a5a7fc80172a0d9a736e1123f30162fc921cdb5c639ea"
+      },
+      {
+        "path": "server/api/uploads/image.post.ts",
+        "sha256": "f9366eb1d5ff5c15a12ff75e5b73dd6c07355451d192402fad3ffe1fe1cb4700"
+      },
+      {
+        "path": "server/api/maps/index.post.ts",
+        "sha256": "d19d7de5d3fa58f46d301f15631ae2a7abcba28be4457a52b5f679541e06a8b0"
+      },
+      {
+        "path": "server/api/maps/[mapId]/branding.patch.ts",
+        "sha256": "836c5e61dddedd7ae4505d12cde38268eaaebb387fd4e7870140e491b1f848d7"
+      },
+      {
+        "path": "server/api/maps/[mapId]/seo/index.patch.ts",
+        "sha256": "489ceaa4f58f7cb447399cc668d811610b3d2a10d94914ef1f060d22b115a03e"
+      },
+      {
+        "path": "server/api/maps/[mapId]/floors/index.post.ts",
+        "sha256": "478f4bc1cb7f77ab1ceb539209d2b1a19b91ea79b9580df3e1f7b6e3e2634a14"
+      },
+      {
+        "path": "server/api/maps/[mapId]/categories/index.post.ts",
+        "sha256": "f788b8e3115b1215131c1480ed363c401bd69735fe921235aa87b26aeeba2ff9"
+      },
+      {
+        "path": "server/api/maps/[mapId]/spot-fields/index.post.ts",
+        "sha256": "478766d6d648a82b138b614889bf3c30808840a98a5202b6e7df6b4523c19461"
+      },
+      {
+        "path": "server/api/maps/[mapId]/spots/index.post.ts",
+        "sha256": "d18116fb7b98276d2ef6c3bcc70391d75068d16a4767364c6254820525e31baf"
+      },
+      {
+        "path": "server/api/maps/[mapId]/spots/[spotId]/index.patch.ts",
+        "sha256": "d9d264bd6d4d99332257b229c888e966fbc5df5dc5a56f8fc89be0a15b3f98fd"
+      },
+      {
+        "path": "server/api/maps/[mapId]/spots/[spotId]/design.patch.ts",
+        "sha256": "7cf29b81a93f4ffacb7850472458956e3679206031d61035df3b066d5f486ba8"
+      },
+      {
+        "path": "server/api/maps/[mapId]/spots/[spotId]/publish.patch.ts",
+        "sha256": "744e7341ca6e282b4f2d373c7cc39248519f2f7ed666c57615a29384651189e6"
+      },
+      {
+        "path": "server/api/maps/[mapId]/publish.post.ts",
+        "sha256": "3942b73fd0779d339ff38d28e7c71182ac2b4653b2ce6ce78cdf73d3e112fcbe"
+      },
+      {
+        "path": "server/utils/spot-usage.ts",
+        "sha256": "7c700a673c22eb707f067d9f07527cfb0624c7f08471d3d24079e6e073c13d64"
+      },
+      {
+        "path": "server/utils/media-variants.ts",
+        "sha256": "a1dbe2ab8b6310bea58a0b53f430ebfa97febf49696207d25c4f7985bf404b0f"
+      },
+      {
+        "path": "server/utils/public-release.ts",
+        "sha256": "1f2866c673d52002107c84307dce5d9420f1a81685972c04b4fbb73a4bb678a4"
+      },
+      {
+        "path": "server/utils/upload.ts",
+        "sha256": "32449af9ff6854537ca6838ab5ebeb565fcaf4216809f531e29d179ac1e6af63"
+      },
+      {
+        "path": "server/utils/public-map.ts",
+        "sha256": "ec897600c7ac48a5edc6cbb82fbde24fb443a01745c45b37bdb96df68b966b07"
+      }
+    ]
+  },
+  "counts": {
+    "floors": 2,
+    "categories": 4,
+    "spots": 36,
+    "spotCategoryRelations": 36,
+    "expectedUsages": 36,
+    "expectedPrimaryPlacements": 36,
+    "standardFieldsCreatedByMapAPI": 6,
+    "customFields": 1,
+    "customValues": 36,
+    "uploadAssets": 3,
+    "normalAPIPlanOperations": 268,
+    "importance": {
+      "featured": 5,
+      "normal": 31
+    },
+    "sizes": {
+      "small": 12,
+      "medium": 12,
+      "large": 12
+    },
+    "iconTypes": {
+      "preset": 32,
+      "custom": 2,
+      "illustration": 2
+    }
+  },
+  "executionPreconditions": [
+    {
+      "id": "action-time-authorization",
+      "status": "OPEN",
+      "requirement": "Separate explicit authorization for runtime writes; this preparation does not authorize them."
+    },
+    {
+      "id": "transport-and-Secure-cookie",
+      "status": "OPEN",
+      "requirement": "Preserve production Secure/HttpOnly/SameSite flags. Verify browser transport and normal authenticated cookie flow. If blocked, stop for approved secure transport; never set secure=false."
+    },
+    {
+      "id": "fresh-QA-environment",
+      "status": "OPEN",
+      "requirement": "Exact candidate .output; dedicated approved root C:\\DigitalMap\\incoming\\wu77-persisted-20261005; new PostgreSQL17.11/127.0.0.1:5433/wu77_fixture_20261005; no canonical data, credentials or environment reuse."
+    },
+    {
+      "id": "QA-OWNER",
+      "status": "OPEN",
+      "requirement": "Legitimate QA OWNER bootstrap is separate approved work. This script neither creates credentials nor seeds a DB."
+    },
+    {
+      "id": "normal-login",
+      "status": "OPEN",
+      "requirement": "Approved own credential input only; normal POST /api/auth/login and genuine issued cookie. No CLI/env/file secret input, fake session or logs of credential/session/cookie values."
+    },
+    {
+      "id": "derived-media",
+      "status": "OPEN",
+      "requirement": "Produce and inspect same-artwork PNG derivatives, record hashes, upload normally and record generated UUID URLs/asset IDs."
+    },
+    {
+      "id": "server-version-coverage",
+      "status": "LIMITED",
+      "requirement": "Spot content/design accept expectedVersion. Spot/Map publication and Map/Floor/Category create APIs do not; never claim server optimistic guards for those endpoints."
+    }
+  ],
+  "futureCredentialInputDesign": {
+    "implemented": false,
+    "channel": "Approved native secure input or normal browser login; never argv, environment, file or printed prompts containing a value.",
+    "transport": "Same exact approved origin only; verified production-cookie flags; no host widening or redirects to another origin.",
+    "session": "Use only the actual cookie issued by normal login, in memory, in an isolated browser context. Do not persist/copy/replay opaque values into this manifest."
+  },
+  "constraints": {
+    "networkRequestsMade": 0,
+    "databaseAccess": false,
+    "credentialReadOrGenerated": false,
+    "originalFixtureModified": false,
+    "rasterizationPerformed": false,
+    "productRuntimeImported": false,
+    "validatorNote": "Fixed-data structural checks and exact source hashes only. Actual source Zod/API/runtime checks remain unexecuted."
+  },
+  "mediaMapping": [
+    {
+      "key": "aquarium",
+      "sourcePath": "public/__qa__/wu77/aquarium.png",
+      "fixtureUrls": [
+        "/__qa__/wu77/aquarium.svg"
+      ],
+      "sourceSha256": "dd51f2177020810b69e2b5298c3cb4d3278013863fd50fbe6f869af8c058b2c9",
+      "width": 1200,
+      "height": 800,
+      "targetFilename": "wu77-aquarium.png",
+      "preparation": "Use the existing same-artwork PNG unchanged.",
+      "derivativeSha256": "dd51f2177020810b69e2b5298c3cb4d3278013863fd50fbe6f869af8c058b2c9",
+      "uploadUrl": "{{media.aquarium.url}}",
+      "assetId": "{{media.aquarium.assetId}}",
+      "publicReleaseUrl": null,
+      "publicAssetBytesHash": null,
+      "status": "UNCHANGED_PNG_SOURCE_VERIFIED_NOT_UPLOADED"
+    },
+    {
+      "key": "cafe",
+      "sourcePath": "public/__qa__/wu77/cafe.svg",
+      "fixtureUrls": [
+        "/__qa__/wu77/cafe.svg"
+      ],
+      "sourceSha256": "bfda004f2b31195a8cbd6eeba86bbfb7c1ab6df9f5426880f1007deb1c1b5306",
+      "width": 100,
+      "height": 100,
+      "targetFilename": "wu77-cafe.png",
+      "preparation": "Rasterize this fixed self-authored SVG to lossless PNG using approved existing Sharp; retain geometry, color, dimensions and transparency.",
+      "derivativeSha256": null,
+      "uploadUrl": "{{media.cafe.url}}",
+      "assetId": "{{media.cafe.assetId}}",
+      "publicReleaseUrl": null,
+      "publicAssetBytesHash": null,
+      "status": "DERIVATIVE_NOT_CREATED"
+    },
+    {
+      "key": "fish",
+      "sourcePath": "public/__qa__/wu77/fish.svg",
+      "fixtureUrls": [
+        "/__qa__/wu77/fish.svg"
+      ],
+      "sourceSha256": "64117bfc7babde128fa5231a4895ffce672f2be09593b05a0b78c1cb1e2db685",
+      "width": 130,
+      "height": 90,
+      "targetFilename": "wu77-fish.png",
+      "preparation": "Rasterize this fixed self-authored SVG to lossless PNG using approved existing Sharp; retain geometry, color, dimensions and transparency.",
+      "derivativeSha256": null,
+      "uploadUrl": "{{media.fish.url}}",
+      "assetId": "{{media.fish.assetId}}",
+      "publicReleaseUrl": null,
+      "publicAssetBytesHash": null,
+      "status": "DERIVATIVE_NOT_CREATED"
+    }
+  ],
+  "derivativeMapping": {
+    "slug": {
+      "fixture": "__qa_arimatsu",
+      "persisted": "wu77-visitor-quality",
+      "reason": "Normal mapCreate slug contract excludes underscores."
+    },
+    "mapId": {
+      "fixture": "wu77-map",
+      "persisted": "{{map.id}}"
+    },
+    "floors": [
+      {
+        "fixtureId": "wu77-floor-0",
+        "persistedId": "{{floor.wu77-floor-0.id}}"
+      },
+      {
+        "fixtureId": "wu77-floor-1",
+        "persistedId": "{{floor.wu77-floor-1.id}}"
+      }
+    ],
+    "categories": [
+      {
+        "fixtureId": "wu77-cat-0",
+        "persistedId": "{{category.wu77-cat-0.id}}"
+      },
+      {
+        "fixtureId": "wu77-cat-1",
+        "persistedId": "{{category.wu77-cat-1.id}}"
+      },
+      {
+        "fixtureId": "wu77-cat-2",
+        "persistedId": "{{category.wu77-cat-2.id}}"
+      },
+      {
+        "fixtureId": "wu77-cat-3",
+        "persistedId": "{{category.wu77-cat-3.id}}"
+      }
+    ],
+    "field": {
+      "fixtureId": "wu77-hours",
+      "persistedId": "{{field.wu77-hours.id}}",
+      "kind": "custom",
+      "semanticKey": null,
+      "type": "single_line_text"
+    },
+    "spots": [
+      {
+        "fixtureId": "wu77-0-00",
+        "persistedId": "{{spot.wu77-0-00.id}}",
+        "placementId": null
+      },
+      {
+        "fixtureId": "wu77-0-01",
+        "persistedId": "{{spot.wu77-0-01.id}}",
+        "placementId": null
+      },
+      {
+        "fixtureId": "wu77-0-02",
+        "persistedId": "{{spot.wu77-0-02.id}}",
+        "placementId": null
+      },
+      {
+        "fixtureId": "wu77-0-03",
+        "persistedId": "{{spot.wu77-0-03.id}}",
+        "placementId": null
+      },
+      {
+        "fixtureId": "wu77-0-04",
+        "persistedId": "{{spot.wu77-0-04.id}}",
+        "placementId": null,
+        "fixturePinIconId": "material:local_cafe",
+        "persistedPinIconId": null,
+        "reason": "Existing design API clears unused preset ID for image-based PINs; rendered custom/illustration grammar is preserved."
+      },
+      {
+        "fixtureId": "wu77-0-05",
+        "persistedId": "{{spot.wu77-0-05.id}}",
+        "placementId": null,
+        "fixturePinIconId": "kanji:買",
+        "persistedPinIconId": null,
+        "reason": "Existing design API clears unused preset ID for image-based PINs; rendered custom/illustration grammar is preserved."
+      },
+      {
+        "fixtureId": "wu77-0-06",
+        "persistedId": "{{spot.wu77-0-06.id}}",
+        "placementId": null
+      },
+      {
+        "fixtureId": "wu77-0-07",
+        "persistedId": "{{spot.wu77-0-07.id}}",
+        "placementId": null
+      },
+      {
+        "fixtureId": "wu77-0-08",
+        "persistedId": "{{spot.wu77-0-08.id}}",
+        "placementId": null
+      },
+      {
+        "fixtureId": "wu77-0-09",
+        "persistedId": "{{spot.wu77-0-09.id}}",
+        "placementId": null
+      },
+      {
+        "fixtureId": "wu77-0-10",
+        "persistedId": "{{spot.wu77-0-10.id}}",
+        "placementId": null
+      },
+      {
+        "fixtureId": "wu77-0-11",
+        "persistedId": "{{spot.wu77-0-11.id}}",
+        "placementId": null
+      },
+      {
+        "fixtureId": "wu77-0-12",
+        "persistedId": "{{spot.wu77-0-12.id}}",
+        "placementId": null
+      },
+      {
+        "fixtureId": "wu77-0-13",
+        "persistedId": "{{spot.wu77-0-13.id}}",
+        "placementId": null
+      },
+      {
+        "fixtureId": "wu77-0-14",
+        "persistedId": "{{spot.wu77-0-14.id}}",
+        "placementId": null
+      },
+      {
+        "fixtureId": "wu77-0-15",
+        "persistedId": "{{spot.wu77-0-15.id}}",
+        "placementId": null
+      },
+      {
+        "fixtureId": "wu77-0-16",
+        "persistedId": "{{spot.wu77-0-16.id}}",
+        "placementId": null
+      },
+      {
+        "fixtureId": "wu77-0-17",
+        "persistedId": "{{spot.wu77-0-17.id}}",
+        "placementId": null
+      },
+      {
+        "fixtureId": "wu77-0-18",
+        "persistedId": "{{spot.wu77-0-18.id}}",
+        "placementId": null
+      },
+      {
+        "fixtureId": "wu77-0-19",
+        "persistedId": "{{spot.wu77-0-19.id}}",
+        "placementId": null
+      },
+      {
+        "fixtureId": "wu77-0-20",
+        "persistedId": "{{spot.wu77-0-20.id}}",
+        "placementId": null
+      },
+      {
+        "fixtureId": "wu77-0-21",
+        "persistedId": "{{spot.wu77-0-21.id}}",
+        "placementId": null
+      },
+      {
+        "fixtureId": "wu77-0-22",
+        "persistedId": "{{spot.wu77-0-22.id}}",
+        "placementId": null
+      },
+      {
+        "fixtureId": "wu77-0-23",
+        "persistedId": "{{spot.wu77-0-23.id}}",
+        "placementId": null
+      },
+      {
+        "fixtureId": "wu77-1-00",
+        "persistedId": "{{spot.wu77-1-00.id}}",
+        "placementId": null
+      },
+      {
+        "fixtureId": "wu77-1-01",
+        "persistedId": "{{spot.wu77-1-01.id}}",
+        "placementId": null
+      },
+      {
+        "fixtureId": "wu77-1-02",
+        "persistedId": "{{spot.wu77-1-02.id}}",
+        "placementId": null
+      },
+      {
+        "fixtureId": "wu77-1-03",
+        "persistedId": "{{spot.wu77-1-03.id}}",
+        "placementId": null
+      },
+      {
+        "fixtureId": "wu77-1-04",
+        "persistedId": "{{spot.wu77-1-04.id}}",
+        "placementId": null,
+        "fixturePinIconId": "material:local_cafe",
+        "persistedPinIconId": null,
+        "reason": "Existing design API clears unused preset ID for image-based PINs; rendered custom/illustration grammar is preserved."
+      },
+      {
+        "fixtureId": "wu77-1-05",
+        "persistedId": "{{spot.wu77-1-05.id}}",
+        "placementId": null,
+        "fixturePinIconId": "kanji:買",
+        "persistedPinIconId": null,
+        "reason": "Existing design API clears unused preset ID for image-based PINs; rendered custom/illustration grammar is preserved."
+      },
+      {
+        "fixtureId": "wu77-1-06",
+        "persistedId": "{{spot.wu77-1-06.id}}",
+        "placementId": null
+      },
+      {
+        "fixtureId": "wu77-1-07",
+        "persistedId": "{{spot.wu77-1-07.id}}",
+        "placementId": null
+      },
+      {
+        "fixtureId": "wu77-1-08",
+        "persistedId": "{{spot.wu77-1-08.id}}",
+        "placementId": null
+      },
+      {
+        "fixtureId": "wu77-1-09",
+        "persistedId": "{{spot.wu77-1-09.id}}",
+        "placementId": null
+      },
+      {
+        "fixtureId": "wu77-1-10",
+        "persistedId": "{{spot.wu77-1-10.id}}",
+        "placementId": null
+      },
+      {
+        "fixtureId": "wu77-1-11",
+        "persistedId": "{{spot.wu77-1-11.id}}",
+        "placementId": null
+      }
+    ],
+    "expectedSerializerDifferences": [
+      "Generated IDs, explicit placementId and releaseId.",
+      "Upload UUID and public immutable hash URLs instead of fixed /__qa__/ SVG paths.",
+      "Normal serializer uses the first floor artwork as SEO image fallback when no SEO/logo image is configured; fixture SEO imageUrl is null."
+    ],
+    "preserved": [
+      "Original JSON bytes/hash.",
+      "Names, descriptions, category names/order/icons, positions and overlapping groups.",
+      "2F24/3F12 placements, unset georeferences, importance, size, pin type/preset/color.",
+      "Custom field label/type/value and self-authored image geometry."
+    ]
+  },
+  "publicationJourney": {
+    "publicPage": "http://127.0.0.1:3014/wu77-visitor-quality",
+    "authenticatedLivePage": "http://127.0.0.1:3014/admin/maps/{{map.id}}/preview",
+    "readiness": "Normal publish API must create READY release, immutable manifest/assets, current.json and matching Map currentReleaseId/isPublished. Immediately verify returned release ID and anonymous Public after publication. Never inject snapshot or set only DB publication flags.",
+    "optionalLifecycleAfterApproval": [
+      "Normal Map unpublish -> anonymous Public404 while authenticated LIVE remains available.",
+      "Normal republish -> new READY release and equivalent fixture content."
+    ]
+  },
+  "operations": [
+    {
+      "id": "media.aquarium.upload",
+      "method": "POST",
+      "endpoint": "/api/uploads/image",
+      "contentType": "multipart/form-data",
+      "preparationRequired": "Use the existing same-artwork PNG unchanged.",
+      "multipartTemplate": [
+        {
+          "name": "file",
+          "localArtifact": "wu77-aquarium.png",
+          "mimeType": "image/png"
+        }
+      ],
+      "bind": [
+        {
+          "variable": "media.aquarium.assetId",
+          "responseJsonPointer": "/image/assetId"
+        },
+        {
+          "variable": "media.aquarium.url",
+          "responseJsonPointer": "/image/url"
+        }
+      ],
+      "verifyResponse": {
+        "processingStatus": "READY",
+        "width": 1200,
+        "height": 800
+      },
+      "credentialOrCookieOutput": "forbidden"
+    },
+    {
+      "id": "media.cafe.upload",
+      "method": "POST",
+      "endpoint": "/api/uploads/image",
+      "contentType": "multipart/form-data",
+      "preparationRequired": "Rasterize this fixed self-authored SVG to lossless PNG using approved existing Sharp; retain geometry, color, dimensions and transparency.",
+      "multipartTemplate": [
+        {
+          "name": "file",
+          "localArtifact": "wu77-cafe.png",
+          "mimeType": "image/png"
+        }
+      ],
+      "bind": [
+        {
+          "variable": "media.cafe.assetId",
+          "responseJsonPointer": "/image/assetId"
+        },
+        {
+          "variable": "media.cafe.url",
+          "responseJsonPointer": "/image/url"
+        }
+      ],
+      "verifyResponse": {
+        "processingStatus": "READY",
+        "width": 100,
+        "height": 100
+      },
+      "credentialOrCookieOutput": "forbidden"
+    },
+    {
+      "id": "media.fish.upload",
+      "method": "POST",
+      "endpoint": "/api/uploads/image",
+      "contentType": "multipart/form-data",
+      "preparationRequired": "Rasterize this fixed self-authored SVG to lossless PNG using approved existing Sharp; retain geometry, color, dimensions and transparency.",
+      "multipartTemplate": [
+        {
+          "name": "file",
+          "localArtifact": "wu77-fish.png",
+          "mimeType": "image/png"
+        }
+      ],
+      "bind": [
+        {
+          "variable": "media.fish.assetId",
+          "responseJsonPointer": "/image/assetId"
+        },
+        {
+          "variable": "media.fish.url",
+          "responseJsonPointer": "/image/url"
+        }
+      ],
+      "verifyResponse": {
+        "processingStatus": "READY",
+        "width": 130,
+        "height": 90
+      },
+      "credentialOrCookieOutput": "forbidden"
+    },
+    {
+      "id": "map.create",
+      "method": "POST",
+      "endpoint": "/api/maps",
+      "bodyTemplate": {
+        "mapType": "illustration",
+        "name": "海のミュージアム（品質比較用）",
+        "slug": "wu77-visitor-quality"
+      },
+      "bind": [
+        {
+          "variable": "map.id",
+          "responseJsonPointer": "/map/id"
+        }
+      ],
+      "verifyResponse": {
+        "isPublished": false
+      }
+    },
+    {
+      "id": "map.branding",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/branding",
+      "bodyTemplate": {
+        "organizationName": "WU-77 比較fixture",
+        "logoUrl": null,
+        "logoAssetId": null,
+        "websiteUrl": null,
+        "snsUrl": null
+      }
+    },
+    {
+      "id": "map.seo",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/seo",
+      "bodyTemplate": {
+        "title": "品質比較用館内図",
+        "description": "架空の固定比較fixture",
+        "imageAssetId": null
+      }
+    },
+    {
+      "id": "floor.wu77-floor-0.create",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/floors",
+      "bodyTemplate": {
+        "name": "2F",
+        "illustrationUrl": "{{media.aquarium.url}}",
+        "illustrationAssetId": "{{media.aquarium.assetId}}",
+        "imageWidth": 1200,
+        "imageHeight": 800
+      },
+      "bind": [
+        {
+          "variable": "floor.wu77-floor-0.id",
+          "responseJsonPointer": "/floor/id"
+        }
+      ],
+      "verifyResponse": {
+        "order": 0,
+        "imageWidth": 1200,
+        "imageHeight": 800
+      }
+    },
+    {
+      "id": "floor.wu77-floor-1.create",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/floors",
+      "bodyTemplate": {
+        "name": "3F",
+        "illustrationUrl": "{{media.aquarium.url}}",
+        "illustrationAssetId": "{{media.aquarium.assetId}}",
+        "imageWidth": 1200,
+        "imageHeight": 800
+      },
+      "bind": [
+        {
+          "variable": "floor.wu77-floor-1.id",
+          "responseJsonPointer": "/floor/id"
+        }
+      ],
+      "verifyResponse": {
+        "order": 1,
+        "imageWidth": 1200,
+        "imageHeight": 800
+      }
+    },
+    {
+      "id": "category.wu77-cat-0.create",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/categories",
+      "bodyTemplate": {
+        "name": "展示",
+        "order": 0,
+        "iconType": "preset",
+        "iconPresetId": "material:museum",
+        "iconImageUrl": null,
+        "iconAssetId": null
+      },
+      "bind": [
+        {
+          "variable": "category.wu77-cat-0.id",
+          "responseJsonPointer": "/category/id"
+        }
+      ]
+    },
+    {
+      "id": "category.wu77-cat-1.create",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/categories",
+      "bodyTemplate": {
+        "name": "飲食",
+        "order": 1,
+        "iconType": "preset",
+        "iconPresetId": "material:restaurant",
+        "iconImageUrl": null,
+        "iconAssetId": null
+      },
+      "bind": [
+        {
+          "variable": "category.wu77-cat-1.id",
+          "responseJsonPointer": "/category/id"
+        }
+      ]
+    },
+    {
+      "id": "category.wu77-cat-2.create",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/categories",
+      "bodyTemplate": {
+        "name": "ショップ",
+        "order": 2,
+        "iconType": "preset",
+        "iconPresetId": "material:storefront",
+        "iconImageUrl": null,
+        "iconAssetId": null
+      },
+      "bind": [
+        {
+          "variable": "category.wu77-cat-2.id",
+          "responseJsonPointer": "/category/id"
+        }
+      ]
+    },
+    {
+      "id": "category.wu77-cat-3.create",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/categories",
+      "bodyTemplate": {
+        "name": "設備",
+        "order": 3,
+        "iconType": "preset",
+        "iconPresetId": "material:info",
+        "iconImageUrl": null,
+        "iconAssetId": null
+      },
+      "bind": [
+        {
+          "variable": "category.wu77-cat-3.id",
+          "responseJsonPointer": "/category/id"
+        }
+      ]
+    },
+    {
+      "id": "field.wu77-hours.create",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/spot-fields",
+      "bodyTemplate": {
+        "label": "利用時間",
+        "type": "single_line_text",
+        "enabled": true,
+        "publicVisible": true,
+        "required": false,
+        "order": 6,
+        "translations": {}
+      },
+      "bind": [
+        {
+          "variable": "field.wu77-hours.id",
+          "responseJsonPointer": "/field/id"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-00.create",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/spots",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "海の展示A",
+        "importance": "featured",
+        "description": "2Fの海の展示Aです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.14,
+        "y": 0.22,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [],
+        "customValues": {}
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-00.id",
+          "responseJsonPointer": "/spot/id"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-00.read-before-content",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-00.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-00.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "name": "海の展示A",
+        "x": 0.14,
+        "y": 0.22,
+        "pinSourceMode": "standard"
+      }
+    },
+    {
+      "id": "spot.wu77-0-00.content",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-00.id}}",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "海の展示A",
+        "importance": "featured",
+        "description": "2Fの海の展示Aです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.14,
+        "y": 0.22,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [
+          "{{category.wu77-cat-0.id}}"
+        ],
+        "customValues": {
+          "{{field.wu77-hours.id}}": "9:30–17:00（比較用）"
+        },
+        "expectedVersion": "{{spot.wu77-0-00.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-00.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-00.read-before-design",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-00.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-00.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-00.design",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-00.id}}/design",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "pinIconType": "preset",
+        "pinIconId": "material:museum",
+        "pinIconImageUrl": null,
+        "pinIconAssetId": null,
+        "pinColor": "#315B83",
+        "pinSize": "small",
+        "importance": "featured",
+        "expectedVersion": "{{spot.wu77-0-00.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-00.liveVersion",
+          "responseJsonPointer": "/design/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "pinSourceMode": "individual"
+      }
+    },
+    {
+      "id": "spot.wu77-0-00.read-before-publish",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-00.id}}",
+      "verifyResponse": {
+        "positioned": true,
+        "currentVersionBinding": "spot.wu77-0-00.liveVersion",
+        "pinSourceMode": "individual",
+        "matchFixtureAfterDeclaredNormalization": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-00.publish",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-00.id}}/publish",
+      "bodyTemplate": {
+        "isPublished": true
+      },
+      "serverOptimisticGuard": null,
+      "preconditions": [
+        "Exclusive writer; no concurrent fixture changes.",
+        "Immediately preceding authenticated GET matches latest version, position, content and appearance."
+      ],
+      "verifyResponse": {
+        "isPublished": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-01.create",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/spots",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "カフェA",
+        "importance": "normal",
+        "description": "2FのカフェAです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.32,
+        "y": 0.22,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [],
+        "customValues": {}
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-01.id",
+          "responseJsonPointer": "/spot/id"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-01.read-before-content",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-01.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-01.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "name": "カフェA",
+        "x": 0.32,
+        "y": 0.22,
+        "pinSourceMode": "standard"
+      }
+    },
+    {
+      "id": "spot.wu77-0-01.content",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-01.id}}",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "カフェA",
+        "importance": "normal",
+        "description": "2FのカフェAです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.32,
+        "y": 0.22,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [
+          "{{category.wu77-cat-1.id}}"
+        ],
+        "customValues": {
+          "{{field.wu77-hours.id}}": "9:30–17:00（比較用）"
+        },
+        "expectedVersion": "{{spot.wu77-0-01.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-01.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-01.read-before-design",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-01.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-01.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-01.design",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-01.id}}/design",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "pinIconType": "preset",
+        "pinIconId": "material:local_cafe",
+        "pinIconImageUrl": null,
+        "pinIconAssetId": null,
+        "pinColor": "#A84B2B",
+        "pinSize": "medium",
+        "importance": "normal",
+        "expectedVersion": "{{spot.wu77-0-01.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-01.liveVersion",
+          "responseJsonPointer": "/design/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "pinSourceMode": "individual"
+      }
+    },
+    {
+      "id": "spot.wu77-0-01.read-before-publish",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-01.id}}",
+      "verifyResponse": {
+        "positioned": true,
+        "currentVersionBinding": "spot.wu77-0-01.liveVersion",
+        "pinSourceMode": "individual",
+        "matchFixtureAfterDeclaredNormalization": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-01.publish",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-01.id}}/publish",
+      "bodyTemplate": {
+        "isPublished": true
+      },
+      "serverOptimisticGuard": null,
+      "preconditions": [
+        "Exclusive writer; no concurrent fixture changes.",
+        "Immediately preceding authenticated GET matches latest version, position, content and appearance."
+      ],
+      "verifyResponse": {
+        "isPublished": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-02.create",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/spots",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "ショップA",
+        "importance": "normal",
+        "description": "2FのショップAです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.5,
+        "y": 0.22,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [],
+        "customValues": {}
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-02.id",
+          "responseJsonPointer": "/spot/id"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-02.read-before-content",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-02.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-02.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "name": "ショップA",
+        "x": 0.5,
+        "y": 0.22,
+        "pinSourceMode": "standard"
+      }
+    },
+    {
+      "id": "spot.wu77-0-02.content",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-02.id}}",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "ショップA",
+        "importance": "normal",
+        "description": "2FのショップAです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.5,
+        "y": 0.22,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [
+          "{{category.wu77-cat-2.id}}"
+        ],
+        "customValues": {
+          "{{field.wu77-hours.id}}": "9:30–17:00（比較用）"
+        },
+        "expectedVersion": "{{spot.wu77-0-02.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-02.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-02.read-before-design",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-02.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-02.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-02.design",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-02.id}}/design",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "pinIconType": "preset",
+        "pinIconId": "kanji:買",
+        "pinIconImageUrl": null,
+        "pinIconAssetId": null,
+        "pinColor": "#674D83",
+        "pinSize": "large",
+        "importance": "normal",
+        "expectedVersion": "{{spot.wu77-0-02.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-02.liveVersion",
+          "responseJsonPointer": "/design/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "pinSourceMode": "individual"
+      }
+    },
+    {
+      "id": "spot.wu77-0-02.read-before-publish",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-02.id}}",
+      "verifyResponse": {
+        "positioned": true,
+        "currentVersionBinding": "spot.wu77-0-02.liveVersion",
+        "pinSourceMode": "individual",
+        "matchFixtureAfterDeclaredNormalization": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-02.publish",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-02.id}}/publish",
+      "bodyTemplate": {
+        "isPublished": true
+      },
+      "serverOptimisticGuard": null,
+      "preconditions": [
+        "Exclusive writer; no concurrent fixture changes.",
+        "Immediately preceding authenticated GET matches latest version, position, content and appearance."
+      ],
+      "verifyResponse": {
+        "isPublished": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-03.create",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/spots",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "海の展示B",
+        "importance": "normal",
+        "description": "2Fの海の展示Bです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.68,
+        "y": 0.22,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [],
+        "customValues": {}
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-03.id",
+          "responseJsonPointer": "/spot/id"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-03.read-before-content",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-03.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-03.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "name": "海の展示B",
+        "x": 0.68,
+        "y": 0.22,
+        "pinSourceMode": "standard"
+      }
+    },
+    {
+      "id": "spot.wu77-0-03.content",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-03.id}}",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "海の展示B",
+        "importance": "normal",
+        "description": "2Fの海の展示Bです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.68,
+        "y": 0.22,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [
+          "{{category.wu77-cat-0.id}}"
+        ],
+        "customValues": {
+          "{{field.wu77-hours.id}}": "9:30–17:00（比較用）"
+        },
+        "expectedVersion": "{{spot.wu77-0-03.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-03.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-03.read-before-design",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-03.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-03.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-03.design",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-03.id}}/design",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "pinIconType": "preset",
+        "pinIconId": "material:museum",
+        "pinIconImageUrl": null,
+        "pinIconAssetId": null,
+        "pinColor": "#315B83",
+        "pinSize": "small",
+        "importance": "normal",
+        "expectedVersion": "{{spot.wu77-0-03.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-03.liveVersion",
+          "responseJsonPointer": "/design/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "pinSourceMode": "individual"
+      }
+    },
+    {
+      "id": "spot.wu77-0-03.read-before-publish",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-03.id}}",
+      "verifyResponse": {
+        "positioned": true,
+        "currentVersionBinding": "spot.wu77-0-03.liveVersion",
+        "pinSourceMode": "individual",
+        "matchFixtureAfterDeclaredNormalization": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-03.publish",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-03.id}}/publish",
+      "bodyTemplate": {
+        "isPublished": true
+      },
+      "serverOptimisticGuard": null,
+      "preconditions": [
+        "Exclusive writer; no concurrent fixture changes.",
+        "Immediately preceding authenticated GET matches latest version, position, content and appearance."
+      ],
+      "verifyResponse": {
+        "isPublished": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-04.create",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/spots",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "カフェB",
+        "importance": "normal",
+        "description": "2FのカフェBです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.86,
+        "y": 0.22,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [],
+        "customValues": {}
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-04.id",
+          "responseJsonPointer": "/spot/id"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-04.read-before-content",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-04.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-04.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "name": "カフェB",
+        "x": 0.86,
+        "y": 0.22,
+        "pinSourceMode": "standard"
+      }
+    },
+    {
+      "id": "spot.wu77-0-04.content",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-04.id}}",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "カフェB",
+        "importance": "normal",
+        "description": "2FのカフェBです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.86,
+        "y": 0.22,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [
+          "{{category.wu77-cat-1.id}}"
+        ],
+        "customValues": {
+          "{{field.wu77-hours.id}}": "9:30–17:00（比較用）"
+        },
+        "expectedVersion": "{{spot.wu77-0-04.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-04.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-04.read-before-design",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-04.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-04.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-04.design",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-04.id}}/design",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "pinIconType": "custom",
+        "pinIconId": null,
+        "pinIconImageUrl": "{{media.cafe.url}}",
+        "pinIconAssetId": "{{media.cafe.assetId}}",
+        "pinColor": "#A84B2B",
+        "pinSize": "medium",
+        "importance": "normal",
+        "expectedVersion": "{{spot.wu77-0-04.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-04.liveVersion",
+          "responseJsonPointer": "/design/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "pinSourceMode": "individual"
+      }
+    },
+    {
+      "id": "spot.wu77-0-04.read-before-publish",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-04.id}}",
+      "verifyResponse": {
+        "positioned": true,
+        "currentVersionBinding": "spot.wu77-0-04.liveVersion",
+        "pinSourceMode": "individual",
+        "matchFixtureAfterDeclaredNormalization": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-04.publish",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-04.id}}/publish",
+      "bodyTemplate": {
+        "isPublished": true
+      },
+      "serverOptimisticGuard": null,
+      "preconditions": [
+        "Exclusive writer; no concurrent fixture changes.",
+        "Immediately preceding authenticated GET matches latest version, position, content and appearance."
+      ],
+      "verifyResponse": {
+        "isPublished": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-05.create",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/spots",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "ショップB",
+        "importance": "normal",
+        "description": "2FのショップBです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.25,
+        "y": 0.22,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [],
+        "customValues": {}
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-05.id",
+          "responseJsonPointer": "/spot/id"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-05.read-before-content",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-05.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-05.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "name": "ショップB",
+        "x": 0.25,
+        "y": 0.22,
+        "pinSourceMode": "standard"
+      }
+    },
+    {
+      "id": "spot.wu77-0-05.content",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-05.id}}",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "ショップB",
+        "importance": "normal",
+        "description": "2FのショップBです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.25,
+        "y": 0.22,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [
+          "{{category.wu77-cat-2.id}}"
+        ],
+        "customValues": {
+          "{{field.wu77-hours.id}}": "9:30–17:00（比較用）"
+        },
+        "expectedVersion": "{{spot.wu77-0-05.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-05.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-05.read-before-design",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-05.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-05.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-05.design",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-05.id}}/design",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "pinIconType": "illustration",
+        "pinIconId": null,
+        "pinIconImageUrl": "{{media.fish.url}}",
+        "pinIconAssetId": "{{media.fish.assetId}}",
+        "pinColor": "#674D83",
+        "pinSize": "large",
+        "importance": "normal",
+        "expectedVersion": "{{spot.wu77-0-05.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-05.liveVersion",
+          "responseJsonPointer": "/design/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "pinSourceMode": "individual"
+      }
+    },
+    {
+      "id": "spot.wu77-0-05.read-before-publish",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-05.id}}",
+      "verifyResponse": {
+        "positioned": true,
+        "currentVersionBinding": "spot.wu77-0-05.liveVersion",
+        "pinSourceMode": "individual",
+        "matchFixtureAfterDeclaredNormalization": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-05.publish",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-05.id}}/publish",
+      "bodyTemplate": {
+        "isPublished": true
+      },
+      "serverOptimisticGuard": null,
+      "preconditions": [
+        "Exclusive writer; no concurrent fixture changes.",
+        "Immediately preceding authenticated GET matches latest version, position, content and appearance."
+      ],
+      "verifyResponse": {
+        "isPublished": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-06.create",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/spots",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "海の展示C",
+        "importance": "featured",
+        "description": "2Fの海の展示Cです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.14,
+        "y": 0.39,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [],
+        "customValues": {}
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-06.id",
+          "responseJsonPointer": "/spot/id"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-06.read-before-content",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-06.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-06.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "name": "海の展示C",
+        "x": 0.14,
+        "y": 0.39,
+        "pinSourceMode": "standard"
+      }
+    },
+    {
+      "id": "spot.wu77-0-06.content",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-06.id}}",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "海の展示C",
+        "importance": "featured",
+        "description": "2Fの海の展示Cです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.14,
+        "y": 0.39,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [
+          "{{category.wu77-cat-0.id}}"
+        ],
+        "customValues": {
+          "{{field.wu77-hours.id}}": "9:30–17:00（比較用）"
+        },
+        "expectedVersion": "{{spot.wu77-0-06.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-06.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-06.read-before-design",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-06.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-06.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-06.design",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-06.id}}/design",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "pinIconType": "preset",
+        "pinIconId": "material:museum",
+        "pinIconImageUrl": null,
+        "pinIconAssetId": null,
+        "pinColor": "#315B83",
+        "pinSize": "small",
+        "importance": "featured",
+        "expectedVersion": "{{spot.wu77-0-06.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-06.liveVersion",
+          "responseJsonPointer": "/design/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "pinSourceMode": "individual"
+      }
+    },
+    {
+      "id": "spot.wu77-0-06.read-before-publish",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-06.id}}",
+      "verifyResponse": {
+        "positioned": true,
+        "currentVersionBinding": "spot.wu77-0-06.liveVersion",
+        "pinSourceMode": "individual",
+        "matchFixtureAfterDeclaredNormalization": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-06.publish",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-06.id}}/publish",
+      "bodyTemplate": {
+        "isPublished": true
+      },
+      "serverOptimisticGuard": null,
+      "preconditions": [
+        "Exclusive writer; no concurrent fixture changes.",
+        "Immediately preceding authenticated GET matches latest version, position, content and appearance."
+      ],
+      "verifyResponse": {
+        "isPublished": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-07.create",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/spots",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "カフェC",
+        "importance": "normal",
+        "description": "2FのカフェCです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.5,
+        "y": 0.4,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [],
+        "customValues": {}
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-07.id",
+          "responseJsonPointer": "/spot/id"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-07.read-before-content",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-07.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-07.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "name": "カフェC",
+        "x": 0.5,
+        "y": 0.4,
+        "pinSourceMode": "standard"
+      }
+    },
+    {
+      "id": "spot.wu77-0-07.content",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-07.id}}",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "カフェC",
+        "importance": "normal",
+        "description": "2FのカフェCです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.5,
+        "y": 0.4,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [
+          "{{category.wu77-cat-1.id}}"
+        ],
+        "customValues": {
+          "{{field.wu77-hours.id}}": "9:30–17:00（比較用）"
+        },
+        "expectedVersion": "{{spot.wu77-0-07.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-07.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-07.read-before-design",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-07.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-07.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-07.design",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-07.id}}/design",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "pinIconType": "preset",
+        "pinIconId": "material:local_cafe",
+        "pinIconImageUrl": null,
+        "pinIconAssetId": null,
+        "pinColor": "#A84B2B",
+        "pinSize": "medium",
+        "importance": "normal",
+        "expectedVersion": "{{spot.wu77-0-07.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-07.liveVersion",
+          "responseJsonPointer": "/design/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "pinSourceMode": "individual"
+      }
+    },
+    {
+      "id": "spot.wu77-0-07.read-before-publish",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-07.id}}",
+      "verifyResponse": {
+        "positioned": true,
+        "currentVersionBinding": "spot.wu77-0-07.liveVersion",
+        "pinSourceMode": "individual",
+        "matchFixtureAfterDeclaredNormalization": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-07.publish",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-07.id}}/publish",
+      "bodyTemplate": {
+        "isPublished": true
+      },
+      "serverOptimisticGuard": null,
+      "preconditions": [
+        "Exclusive writer; no concurrent fixture changes.",
+        "Immediately preceding authenticated GET matches latest version, position, content and appearance."
+      ],
+      "verifyResponse": {
+        "isPublished": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-08.create",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/spots",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "ショップC",
+        "importance": "normal",
+        "description": "2FのショップCです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.5,
+        "y": 0.4,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [],
+        "customValues": {}
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-08.id",
+          "responseJsonPointer": "/spot/id"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-08.read-before-content",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-08.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-08.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "name": "ショップC",
+        "x": 0.5,
+        "y": 0.4,
+        "pinSourceMode": "standard"
+      }
+    },
+    {
+      "id": "spot.wu77-0-08.content",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-08.id}}",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "ショップC",
+        "importance": "normal",
+        "description": "2FのショップCです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.5,
+        "y": 0.4,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [
+          "{{category.wu77-cat-2.id}}"
+        ],
+        "customValues": {
+          "{{field.wu77-hours.id}}": "9:30–17:00（比較用）"
+        },
+        "expectedVersion": "{{spot.wu77-0-08.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-08.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-08.read-before-design",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-08.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-08.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-08.design",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-08.id}}/design",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "pinIconType": "preset",
+        "pinIconId": "kanji:買",
+        "pinIconImageUrl": null,
+        "pinIconAssetId": null,
+        "pinColor": "#674D83",
+        "pinSize": "large",
+        "importance": "normal",
+        "expectedVersion": "{{spot.wu77-0-08.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-08.liveVersion",
+          "responseJsonPointer": "/design/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "pinSourceMode": "individual"
+      }
+    },
+    {
+      "id": "spot.wu77-0-08.read-before-publish",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-08.id}}",
+      "verifyResponse": {
+        "positioned": true,
+        "currentVersionBinding": "spot.wu77-0-08.liveVersion",
+        "pinSourceMode": "individual",
+        "matchFixtureAfterDeclaredNormalization": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-08.publish",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-08.id}}/publish",
+      "bodyTemplate": {
+        "isPublished": true
+      },
+      "serverOptimisticGuard": null,
+      "preconditions": [
+        "Exclusive writer; no concurrent fixture changes.",
+        "Immediately preceding authenticated GET matches latest version, position, content and appearance."
+      ],
+      "verifyResponse": {
+        "isPublished": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-09.create",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/spots",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "海の展示D",
+        "importance": "normal",
+        "description": "2Fの海の展示Dです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.5,
+        "y": 0.4,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [],
+        "customValues": {}
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-09.id",
+          "responseJsonPointer": "/spot/id"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-09.read-before-content",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-09.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-09.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "name": "海の展示D",
+        "x": 0.5,
+        "y": 0.4,
+        "pinSourceMode": "standard"
+      }
+    },
+    {
+      "id": "spot.wu77-0-09.content",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-09.id}}",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "海の展示D",
+        "importance": "normal",
+        "description": "2Fの海の展示Dです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.5,
+        "y": 0.4,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [
+          "{{category.wu77-cat-0.id}}"
+        ],
+        "customValues": {
+          "{{field.wu77-hours.id}}": "9:30–17:00（比較用）"
+        },
+        "expectedVersion": "{{spot.wu77-0-09.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-09.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-09.read-before-design",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-09.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-09.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-09.design",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-09.id}}/design",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "pinIconType": "preset",
+        "pinIconId": "material:museum",
+        "pinIconImageUrl": null,
+        "pinIconAssetId": null,
+        "pinColor": "#315B83",
+        "pinSize": "small",
+        "importance": "normal",
+        "expectedVersion": "{{spot.wu77-0-09.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-09.liveVersion",
+          "responseJsonPointer": "/design/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "pinSourceMode": "individual"
+      }
+    },
+    {
+      "id": "spot.wu77-0-09.read-before-publish",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-09.id}}",
+      "verifyResponse": {
+        "positioned": true,
+        "currentVersionBinding": "spot.wu77-0-09.liveVersion",
+        "pinSourceMode": "individual",
+        "matchFixtureAfterDeclaredNormalization": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-09.publish",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-09.id}}/publish",
+      "bodyTemplate": {
+        "isPublished": true
+      },
+      "serverOptimisticGuard": null,
+      "preconditions": [
+        "Exclusive writer; no concurrent fixture changes.",
+        "Immediately preceding authenticated GET matches latest version, position, content and appearance."
+      ],
+      "verifyResponse": {
+        "isPublished": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-10.create",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/spots",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "カフェD",
+        "importance": "normal",
+        "description": "2FのカフェDです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.86,
+        "y": 0.39,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [],
+        "customValues": {}
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-10.id",
+          "responseJsonPointer": "/spot/id"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-10.read-before-content",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-10.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-10.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "name": "カフェD",
+        "x": 0.86,
+        "y": 0.39,
+        "pinSourceMode": "standard"
+      }
+    },
+    {
+      "id": "spot.wu77-0-10.content",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-10.id}}",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "カフェD",
+        "importance": "normal",
+        "description": "2FのカフェDです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.86,
+        "y": 0.39,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [
+          "{{category.wu77-cat-1.id}}"
+        ],
+        "customValues": {
+          "{{field.wu77-hours.id}}": "9:30–17:00（比較用）"
+        },
+        "expectedVersion": "{{spot.wu77-0-10.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-10.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-10.read-before-design",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-10.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-10.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-10.design",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-10.id}}/design",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "pinIconType": "preset",
+        "pinIconId": "material:wc",
+        "pinIconImageUrl": null,
+        "pinIconAssetId": null,
+        "pinColor": "#A84B2B",
+        "pinSize": "medium",
+        "importance": "normal",
+        "expectedVersion": "{{spot.wu77-0-10.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-10.liveVersion",
+          "responseJsonPointer": "/design/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "pinSourceMode": "individual"
+      }
+    },
+    {
+      "id": "spot.wu77-0-10.read-before-publish",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-10.id}}",
+      "verifyResponse": {
+        "positioned": true,
+        "currentVersionBinding": "spot.wu77-0-10.liveVersion",
+        "pinSourceMode": "individual",
+        "matchFixtureAfterDeclaredNormalization": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-10.publish",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-10.id}}/publish",
+      "bodyTemplate": {
+        "isPublished": true
+      },
+      "serverOptimisticGuard": null,
+      "preconditions": [
+        "Exclusive writer; no concurrent fixture changes.",
+        "Immediately preceding authenticated GET matches latest version, position, content and appearance."
+      ],
+      "verifyResponse": {
+        "isPublished": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-11.create",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/spots",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "ショップD",
+        "importance": "normal",
+        "description": "2FのショップDです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.25,
+        "y": 0.39,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [],
+        "customValues": {}
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-11.id",
+          "responseJsonPointer": "/spot/id"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-11.read-before-content",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-11.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-11.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "name": "ショップD",
+        "x": 0.25,
+        "y": 0.39,
+        "pinSourceMode": "standard"
+      }
+    },
+    {
+      "id": "spot.wu77-0-11.content",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-11.id}}",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "ショップD",
+        "importance": "normal",
+        "description": "2FのショップDです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.25,
+        "y": 0.39,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [
+          "{{category.wu77-cat-2.id}}"
+        ],
+        "customValues": {
+          "{{field.wu77-hours.id}}": "9:30–17:00（比較用）"
+        },
+        "expectedVersion": "{{spot.wu77-0-11.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-11.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-11.read-before-design",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-11.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-11.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-11.design",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-11.id}}/design",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "pinIconType": "preset",
+        "pinIconId": "kanji:i",
+        "pinIconImageUrl": null,
+        "pinIconAssetId": null,
+        "pinColor": "#674D83",
+        "pinSize": "large",
+        "importance": "normal",
+        "expectedVersion": "{{spot.wu77-0-11.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-11.liveVersion",
+          "responseJsonPointer": "/design/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "pinSourceMode": "individual"
+      }
+    },
+    {
+      "id": "spot.wu77-0-11.read-before-publish",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-11.id}}",
+      "verifyResponse": {
+        "positioned": true,
+        "currentVersionBinding": "spot.wu77-0-11.liveVersion",
+        "pinSourceMode": "individual",
+        "matchFixtureAfterDeclaredNormalization": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-11.publish",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-11.id}}/publish",
+      "bodyTemplate": {
+        "isPublished": true
+      },
+      "serverOptimisticGuard": null,
+      "preconditions": [
+        "Exclusive writer; no concurrent fixture changes.",
+        "Immediately preceding authenticated GET matches latest version, position, content and appearance."
+      ],
+      "verifyResponse": {
+        "isPublished": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-12.create",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/spots",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "北側トイレ",
+        "importance": "featured",
+        "description": "2Fの北側トイレです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.14,
+        "y": 0.56,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [],
+        "customValues": {}
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-12.id",
+          "responseJsonPointer": "/spot/id"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-12.read-before-content",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-12.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-12.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "name": "北側トイレ",
+        "x": 0.14,
+        "y": 0.56,
+        "pinSourceMode": "standard"
+      }
+    },
+    {
+      "id": "spot.wu77-0-12.content",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-12.id}}",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "北側トイレ",
+        "importance": "featured",
+        "description": "2Fの北側トイレです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.14,
+        "y": 0.56,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [
+          "{{category.wu77-cat-3.id}}"
+        ],
+        "customValues": {
+          "{{field.wu77-hours.id}}": "9:30–17:00（比較用）"
+        },
+        "expectedVersion": "{{spot.wu77-0-12.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-12.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-12.read-before-design",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-12.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-12.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-12.design",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-12.id}}/design",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "pinIconType": "preset",
+        "pinIconId": "facility:wc",
+        "pinIconImageUrl": null,
+        "pinIconAssetId": null,
+        "pinColor": "#2C5F78",
+        "pinSize": "small",
+        "importance": "featured",
+        "expectedVersion": "{{spot.wu77-0-12.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-12.liveVersion",
+          "responseJsonPointer": "/design/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "pinSourceMode": "individual"
+      }
+    },
+    {
+      "id": "spot.wu77-0-12.read-before-publish",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-12.id}}",
+      "verifyResponse": {
+        "positioned": true,
+        "currentVersionBinding": "spot.wu77-0-12.liveVersion",
+        "pinSourceMode": "individual",
+        "matchFixtureAfterDeclaredNormalization": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-12.publish",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-12.id}}/publish",
+      "bodyTemplate": {
+        "isPublished": true
+      },
+      "serverOptimisticGuard": null,
+      "preconditions": [
+        "Exclusive writer; no concurrent fixture changes.",
+        "Immediately preceding authenticated GET matches latest version, position, content and appearance."
+      ],
+      "verifyResponse": {
+        "isPublished": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-13.create",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/spots",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "多目的トイレ",
+        "importance": "normal",
+        "description": "2Fの多目的トイレです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.32,
+        "y": 0.56,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [],
+        "customValues": {}
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-13.id",
+          "responseJsonPointer": "/spot/id"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-13.read-before-content",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-13.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-13.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "name": "多目的トイレ",
+        "x": 0.32,
+        "y": 0.56,
+        "pinSourceMode": "standard"
+      }
+    },
+    {
+      "id": "spot.wu77-0-13.content",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-13.id}}",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "多目的トイレ",
+        "importance": "normal",
+        "description": "2Fの多目的トイレです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.32,
+        "y": 0.56,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [
+          "{{category.wu77-cat-3.id}}"
+        ],
+        "customValues": {
+          "{{field.wu77-hours.id}}": "9:30–17:00（比較用）"
+        },
+        "expectedVersion": "{{spot.wu77-0-13.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-13.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-13.read-before-design",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-13.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-13.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-13.design",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-13.id}}/design",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "pinIconType": "preset",
+        "pinIconId": "facility:accessible-wc",
+        "pinIconImageUrl": null,
+        "pinIconAssetId": null,
+        "pinColor": "#2C5F78",
+        "pinSize": "medium",
+        "importance": "normal",
+        "expectedVersion": "{{spot.wu77-0-13.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-13.liveVersion",
+          "responseJsonPointer": "/design/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "pinSourceMode": "individual"
+      }
+    },
+    {
+      "id": "spot.wu77-0-13.read-before-publish",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-13.id}}",
+      "verifyResponse": {
+        "positioned": true,
+        "currentVersionBinding": "spot.wu77-0-13.liveVersion",
+        "pinSourceMode": "individual",
+        "matchFixtureAfterDeclaredNormalization": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-13.publish",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-13.id}}/publish",
+      "bodyTemplate": {
+        "isPublished": true
+      },
+      "serverOptimisticGuard": null,
+      "preconditions": [
+        "Exclusive writer; no concurrent fixture changes.",
+        "Immediately preceding authenticated GET matches latest version, position, content and appearance."
+      ],
+      "verifyResponse": {
+        "isPublished": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-14.create",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/spots",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "エレベーター",
+        "importance": "normal",
+        "description": "2Fのエレベーターです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.5,
+        "y": 0.56,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [],
+        "customValues": {}
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-14.id",
+          "responseJsonPointer": "/spot/id"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-14.read-before-content",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-14.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-14.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "name": "エレベーター",
+        "x": 0.5,
+        "y": 0.56,
+        "pinSourceMode": "standard"
+      }
+    },
+    {
+      "id": "spot.wu77-0-14.content",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-14.id}}",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "エレベーター",
+        "importance": "normal",
+        "description": "2Fのエレベーターです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.5,
+        "y": 0.56,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [
+          "{{category.wu77-cat-3.id}}"
+        ],
+        "customValues": {
+          "{{field.wu77-hours.id}}": "9:30–17:00（比較用）"
+        },
+        "expectedVersion": "{{spot.wu77-0-14.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-14.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-14.read-before-design",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-14.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-14.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-14.design",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-14.id}}/design",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "pinIconType": "preset",
+        "pinIconId": "facility:elevator",
+        "pinIconImageUrl": null,
+        "pinIconAssetId": null,
+        "pinColor": "#2C5F78",
+        "pinSize": "large",
+        "importance": "normal",
+        "expectedVersion": "{{spot.wu77-0-14.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-14.liveVersion",
+          "responseJsonPointer": "/design/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "pinSourceMode": "individual"
+      }
+    },
+    {
+      "id": "spot.wu77-0-14.read-before-publish",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-14.id}}",
+      "verifyResponse": {
+        "positioned": true,
+        "currentVersionBinding": "spot.wu77-0-14.liveVersion",
+        "pinSourceMode": "individual",
+        "matchFixtureAfterDeclaredNormalization": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-14.publish",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-14.id}}/publish",
+      "bodyTemplate": {
+        "isPublished": true
+      },
+      "serverOptimisticGuard": null,
+      "preconditions": [
+        "Exclusive writer; no concurrent fixture changes.",
+        "Immediately preceding authenticated GET matches latest version, position, content and appearance."
+      ],
+      "verifyResponse": {
+        "isPublished": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-15.create",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/spots",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "階段",
+        "importance": "normal",
+        "description": "2Fの階段です。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.73,
+        "y": 0.61,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [],
+        "customValues": {}
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-15.id",
+          "responseJsonPointer": "/spot/id"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-15.read-before-content",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-15.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-15.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "name": "階段",
+        "x": 0.73,
+        "y": 0.61,
+        "pinSourceMode": "standard"
+      }
+    },
+    {
+      "id": "spot.wu77-0-15.content",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-15.id}}",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "階段",
+        "importance": "normal",
+        "description": "2Fの階段です。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.73,
+        "y": 0.61,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [
+          "{{category.wu77-cat-3.id}}"
+        ],
+        "customValues": {
+          "{{field.wu77-hours.id}}": "9:30–17:00（比較用）"
+        },
+        "expectedVersion": "{{spot.wu77-0-15.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-15.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-15.read-before-design",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-15.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-15.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-15.design",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-15.id}}/design",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "pinIconType": "preset",
+        "pinIconId": "facility:stairs",
+        "pinIconImageUrl": null,
+        "pinIconAssetId": null,
+        "pinColor": "#2C5F78",
+        "pinSize": "small",
+        "importance": "normal",
+        "expectedVersion": "{{spot.wu77-0-15.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-15.liveVersion",
+          "responseJsonPointer": "/design/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "pinSourceMode": "individual"
+      }
+    },
+    {
+      "id": "spot.wu77-0-15.read-before-publish",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-15.id}}",
+      "verifyResponse": {
+        "positioned": true,
+        "currentVersionBinding": "spot.wu77-0-15.liveVersion",
+        "pinSourceMode": "individual",
+        "matchFixtureAfterDeclaredNormalization": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-15.publish",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-15.id}}/publish",
+      "bodyTemplate": {
+        "isPublished": true
+      },
+      "serverOptimisticGuard": null,
+      "preconditions": [
+        "Exclusive writer; no concurrent fixture changes.",
+        "Immediately preceding authenticated GET matches latest version, position, content and appearance."
+      ],
+      "verifyResponse": {
+        "isPublished": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-16.create",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/spots",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "エスカレーター",
+        "importance": "normal",
+        "description": "2Fのエスカレーターです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.73,
+        "y": 0.61,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [],
+        "customValues": {}
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-16.id",
+          "responseJsonPointer": "/spot/id"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-16.read-before-content",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-16.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-16.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "name": "エスカレーター",
+        "x": 0.73,
+        "y": 0.61,
+        "pinSourceMode": "standard"
+      }
+    },
+    {
+      "id": "spot.wu77-0-16.content",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-16.id}}",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "エスカレーター",
+        "importance": "normal",
+        "description": "2Fのエスカレーターです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.73,
+        "y": 0.61,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [
+          "{{category.wu77-cat-3.id}}"
+        ],
+        "customValues": {
+          "{{field.wu77-hours.id}}": "9:30–17:00（比較用）"
+        },
+        "expectedVersion": "{{spot.wu77-0-16.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-16.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-16.read-before-design",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-16.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-16.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-16.design",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-16.id}}/design",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "pinIconType": "preset",
+        "pinIconId": "facility:escalator",
+        "pinIconImageUrl": null,
+        "pinIconAssetId": null,
+        "pinColor": "#2C5F78",
+        "pinSize": "medium",
+        "importance": "normal",
+        "expectedVersion": "{{spot.wu77-0-16.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-16.liveVersion",
+          "responseJsonPointer": "/design/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "pinSourceMode": "individual"
+      }
+    },
+    {
+      "id": "spot.wu77-0-16.read-before-publish",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-16.id}}",
+      "verifyResponse": {
+        "positioned": true,
+        "currentVersionBinding": "spot.wu77-0-16.liveVersion",
+        "pinSourceMode": "individual",
+        "matchFixtureAfterDeclaredNormalization": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-16.publish",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-16.id}}/publish",
+      "bodyTemplate": {
+        "isPublished": true
+      },
+      "serverOptimisticGuard": null,
+      "preconditions": [
+        "Exclusive writer; no concurrent fixture changes.",
+        "Immediately preceding authenticated GET matches latest version, position, content and appearance."
+      ],
+      "verifyResponse": {
+        "isPublished": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-17.create",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/spots",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "授乳室",
+        "importance": "normal",
+        "description": "2Fの授乳室です。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.73,
+        "y": 0.61,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [],
+        "customValues": {}
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-17.id",
+          "responseJsonPointer": "/spot/id"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-17.read-before-content",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-17.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-17.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "name": "授乳室",
+        "x": 0.73,
+        "y": 0.61,
+        "pinSourceMode": "standard"
+      }
+    },
+    {
+      "id": "spot.wu77-0-17.content",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-17.id}}",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "授乳室",
+        "importance": "normal",
+        "description": "2Fの授乳室です。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.73,
+        "y": 0.61,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [
+          "{{category.wu77-cat-3.id}}"
+        ],
+        "customValues": {
+          "{{field.wu77-hours.id}}": "9:30–17:00（比較用）"
+        },
+        "expectedVersion": "{{spot.wu77-0-17.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-17.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-17.read-before-design",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-17.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-17.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-17.design",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-17.id}}/design",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "pinIconType": "preset",
+        "pinIconId": "facility:nursing",
+        "pinIconImageUrl": null,
+        "pinIconAssetId": null,
+        "pinColor": "#2C5F78",
+        "pinSize": "large",
+        "importance": "normal",
+        "expectedVersion": "{{spot.wu77-0-17.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-17.liveVersion",
+          "responseJsonPointer": "/design/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "pinSourceMode": "individual"
+      }
+    },
+    {
+      "id": "spot.wu77-0-17.read-before-publish",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-17.id}}",
+      "verifyResponse": {
+        "positioned": true,
+        "currentVersionBinding": "spot.wu77-0-17.liveVersion",
+        "pinSourceMode": "individual",
+        "matchFixtureAfterDeclaredNormalization": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-17.publish",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-17.id}}/publish",
+      "bodyTemplate": {
+        "isPublished": true
+      },
+      "serverOptimisticGuard": null,
+      "preconditions": [
+        "Exclusive writer; no concurrent fixture changes.",
+        "Immediately preceding authenticated GET matches latest version, position, content and appearance."
+      ],
+      "verifyResponse": {
+        "isPublished": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-18.create",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/spots",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "AED",
+        "importance": "normal",
+        "description": "2FのAEDです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.14,
+        "y": 0.73,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [],
+        "customValues": {}
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-18.id",
+          "responseJsonPointer": "/spot/id"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-18.read-before-content",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-18.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-18.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "name": "AED",
+        "x": 0.14,
+        "y": 0.73,
+        "pinSourceMode": "standard"
+      }
+    },
+    {
+      "id": "spot.wu77-0-18.content",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-18.id}}",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "AED",
+        "importance": "normal",
+        "description": "2FのAEDです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.14,
+        "y": 0.73,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [
+          "{{category.wu77-cat-3.id}}"
+        ],
+        "customValues": {
+          "{{field.wu77-hours.id}}": "9:30–17:00（比較用）"
+        },
+        "expectedVersion": "{{spot.wu77-0-18.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-18.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-18.read-before-design",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-18.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-18.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-18.design",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-18.id}}/design",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "pinIconType": "preset",
+        "pinIconId": "facility:aed",
+        "pinIconImageUrl": null,
+        "pinIconAssetId": null,
+        "pinColor": "#2C5F78",
+        "pinSize": "small",
+        "importance": "normal",
+        "expectedVersion": "{{spot.wu77-0-18.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-18.liveVersion",
+          "responseJsonPointer": "/design/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "pinSourceMode": "individual"
+      }
+    },
+    {
+      "id": "spot.wu77-0-18.read-before-publish",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-18.id}}",
+      "verifyResponse": {
+        "positioned": true,
+        "currentVersionBinding": "spot.wu77-0-18.liveVersion",
+        "pinSourceMode": "individual",
+        "matchFixtureAfterDeclaredNormalization": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-18.publish",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-18.id}}/publish",
+      "bodyTemplate": {
+        "isPublished": true
+      },
+      "serverOptimisticGuard": null,
+      "preconditions": [
+        "Exclusive writer; no concurrent fixture changes.",
+        "Immediately preceding authenticated GET matches latest version, position, content and appearance."
+      ],
+      "verifyResponse": {
+        "isPublished": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-19.create",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/spots",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "案内所",
+        "importance": "normal",
+        "description": "2Fの案内所です。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.32,
+        "y": 0.73,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [],
+        "customValues": {}
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-19.id",
+          "responseJsonPointer": "/spot/id"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-19.read-before-content",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-19.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-19.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "name": "案内所",
+        "x": 0.32,
+        "y": 0.73,
+        "pinSourceMode": "standard"
+      }
+    },
+    {
+      "id": "spot.wu77-0-19.content",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-19.id}}",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "案内所",
+        "importance": "normal",
+        "description": "2Fの案内所です。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.32,
+        "y": 0.73,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [
+          "{{category.wu77-cat-3.id}}"
+        ],
+        "customValues": {
+          "{{field.wu77-hours.id}}": "9:30–17:00（比較用）"
+        },
+        "expectedVersion": "{{spot.wu77-0-19.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-19.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-19.read-before-design",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-19.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-19.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-19.design",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-19.id}}/design",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "pinIconType": "preset",
+        "pinIconId": "facility:information",
+        "pinIconImageUrl": null,
+        "pinIconAssetId": null,
+        "pinColor": "#2C5F78",
+        "pinSize": "medium",
+        "importance": "normal",
+        "expectedVersion": "{{spot.wu77-0-19.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-19.liveVersion",
+          "responseJsonPointer": "/design/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "pinSourceMode": "individual"
+      }
+    },
+    {
+      "id": "spot.wu77-0-19.read-before-publish",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-19.id}}",
+      "verifyResponse": {
+        "positioned": true,
+        "currentVersionBinding": "spot.wu77-0-19.liveVersion",
+        "pinSourceMode": "individual",
+        "matchFixtureAfterDeclaredNormalization": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-19.publish",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-19.id}}/publish",
+      "bodyTemplate": {
+        "isPublished": true
+      },
+      "serverOptimisticGuard": null,
+      "preconditions": [
+        "Exclusive writer; no concurrent fixture changes.",
+        "Immediately preceding authenticated GET matches latest version, position, content and appearance."
+      ],
+      "verifyResponse": {
+        "isPublished": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-20.create",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/spots",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "トイレ 2",
+        "importance": "normal",
+        "description": "2Fのトイレ 2です。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.5,
+        "y": 0.73,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [],
+        "customValues": {}
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-20.id",
+          "responseJsonPointer": "/spot/id"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-20.read-before-content",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-20.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-20.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "name": "トイレ 2",
+        "x": 0.5,
+        "y": 0.73,
+        "pinSourceMode": "standard"
+      }
+    },
+    {
+      "id": "spot.wu77-0-20.content",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-20.id}}",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "トイレ 2",
+        "importance": "normal",
+        "description": "2Fのトイレ 2です。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.5,
+        "y": 0.73,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [
+          "{{category.wu77-cat-3.id}}"
+        ],
+        "customValues": {
+          "{{field.wu77-hours.id}}": "9:30–17:00（比較用）"
+        },
+        "expectedVersion": "{{spot.wu77-0-20.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-20.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-20.read-before-design",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-20.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-20.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-20.design",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-20.id}}/design",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "pinIconType": "preset",
+        "pinIconId": "facility:wc",
+        "pinIconImageUrl": null,
+        "pinIconAssetId": null,
+        "pinColor": "#2C5F78",
+        "pinSize": "large",
+        "importance": "normal",
+        "expectedVersion": "{{spot.wu77-0-20.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-20.liveVersion",
+          "responseJsonPointer": "/design/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "pinSourceMode": "individual"
+      }
+    },
+    {
+      "id": "spot.wu77-0-20.read-before-publish",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-20.id}}",
+      "verifyResponse": {
+        "positioned": true,
+        "currentVersionBinding": "spot.wu77-0-20.liveVersion",
+        "pinSourceMode": "individual",
+        "matchFixtureAfterDeclaredNormalization": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-20.publish",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-20.id}}/publish",
+      "bodyTemplate": {
+        "isPublished": true
+      },
+      "serverOptimisticGuard": null,
+      "preconditions": [
+        "Exclusive writer; no concurrent fixture changes.",
+        "Immediately preceding authenticated GET matches latest version, position, content and appearance."
+      ],
+      "verifyResponse": {
+        "isPublished": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-21.create",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/spots",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "多目的トイレ 2",
+        "importance": "normal",
+        "description": "2Fの多目的トイレ 2です。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.68,
+        "y": 0.73,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [],
+        "customValues": {}
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-21.id",
+          "responseJsonPointer": "/spot/id"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-21.read-before-content",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-21.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-21.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "name": "多目的トイレ 2",
+        "x": 0.68,
+        "y": 0.73,
+        "pinSourceMode": "standard"
+      }
+    },
+    {
+      "id": "spot.wu77-0-21.content",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-21.id}}",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "多目的トイレ 2",
+        "importance": "normal",
+        "description": "2Fの多目的トイレ 2です。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.68,
+        "y": 0.73,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [
+          "{{category.wu77-cat-3.id}}"
+        ],
+        "customValues": {
+          "{{field.wu77-hours.id}}": "9:30–17:00（比較用）"
+        },
+        "expectedVersion": "{{spot.wu77-0-21.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-21.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-21.read-before-design",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-21.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-21.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-21.design",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-21.id}}/design",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "pinIconType": "preset",
+        "pinIconId": "facility:accessible-wc",
+        "pinIconImageUrl": null,
+        "pinIconAssetId": null,
+        "pinColor": "#2C5F78",
+        "pinSize": "small",
+        "importance": "normal",
+        "expectedVersion": "{{spot.wu77-0-21.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-21.liveVersion",
+          "responseJsonPointer": "/design/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "pinSourceMode": "individual"
+      }
+    },
+    {
+      "id": "spot.wu77-0-21.read-before-publish",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-21.id}}",
+      "verifyResponse": {
+        "positioned": true,
+        "currentVersionBinding": "spot.wu77-0-21.liveVersion",
+        "pinSourceMode": "individual",
+        "matchFixtureAfterDeclaredNormalization": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-21.publish",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-21.id}}/publish",
+      "bodyTemplate": {
+        "isPublished": true
+      },
+      "serverOptimisticGuard": null,
+      "preconditions": [
+        "Exclusive writer; no concurrent fixture changes.",
+        "Immediately preceding authenticated GET matches latest version, position, content and appearance."
+      ],
+      "verifyResponse": {
+        "isPublished": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-22.create",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/spots",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "エレベーター 2",
+        "importance": "normal",
+        "description": "2Fのエレベーター 2です。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.86,
+        "y": 0.73,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [],
+        "customValues": {}
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-22.id",
+          "responseJsonPointer": "/spot/id"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-22.read-before-content",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-22.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-22.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "name": "エレベーター 2",
+        "x": 0.86,
+        "y": 0.73,
+        "pinSourceMode": "standard"
+      }
+    },
+    {
+      "id": "spot.wu77-0-22.content",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-22.id}}",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "エレベーター 2",
+        "importance": "normal",
+        "description": "2Fのエレベーター 2です。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.86,
+        "y": 0.73,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [
+          "{{category.wu77-cat-3.id}}"
+        ],
+        "customValues": {
+          "{{field.wu77-hours.id}}": "9:30–17:00（比較用）"
+        },
+        "expectedVersion": "{{spot.wu77-0-22.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-22.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-22.read-before-design",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-22.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-22.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-22.design",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-22.id}}/design",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "pinIconType": "preset",
+        "pinIconId": "facility:elevator",
+        "pinIconImageUrl": null,
+        "pinIconAssetId": null,
+        "pinColor": "#2C5F78",
+        "pinSize": "medium",
+        "importance": "normal",
+        "expectedVersion": "{{spot.wu77-0-22.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-22.liveVersion",
+          "responseJsonPointer": "/design/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "pinSourceMode": "individual"
+      }
+    },
+    {
+      "id": "spot.wu77-0-22.read-before-publish",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-22.id}}",
+      "verifyResponse": {
+        "positioned": true,
+        "currentVersionBinding": "spot.wu77-0-22.liveVersion",
+        "pinSourceMode": "individual",
+        "matchFixtureAfterDeclaredNormalization": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-22.publish",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-22.id}}/publish",
+      "bodyTemplate": {
+        "isPublished": true
+      },
+      "serverOptimisticGuard": null,
+      "preconditions": [
+        "Exclusive writer; no concurrent fixture changes.",
+        "Immediately preceding authenticated GET matches latest version, position, content and appearance."
+      ],
+      "verifyResponse": {
+        "isPublished": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-23.create",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/spots",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "階段 2",
+        "importance": "normal",
+        "description": "2Fの階段 2です。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.25,
+        "y": 0.73,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [],
+        "customValues": {}
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-23.id",
+          "responseJsonPointer": "/spot/id"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-23.read-before-content",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-23.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-23.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "name": "階段 2",
+        "x": 0.25,
+        "y": 0.73,
+        "pinSourceMode": "standard"
+      }
+    },
+    {
+      "id": "spot.wu77-0-23.content",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-23.id}}",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-0.id}}",
+        "name": "階段 2",
+        "importance": "normal",
+        "description": "2Fの階段 2です。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.25,
+        "y": 0.73,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [
+          "{{category.wu77-cat-3.id}}"
+        ],
+        "customValues": {
+          "{{field.wu77-hours.id}}": "9:30–17:00（比較用）"
+        },
+        "expectedVersion": "{{spot.wu77-0-23.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-23.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-23.read-before-design",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-23.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-0-23.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-0-23.design",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-23.id}}/design",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "pinIconType": "preset",
+        "pinIconId": "facility:stairs",
+        "pinIconImageUrl": null,
+        "pinIconAssetId": null,
+        "pinColor": "#2C5F78",
+        "pinSize": "large",
+        "importance": "normal",
+        "expectedVersion": "{{spot.wu77-0-23.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-0-23.liveVersion",
+          "responseJsonPointer": "/design/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "pinSourceMode": "individual"
+      }
+    },
+    {
+      "id": "spot.wu77-0-23.read-before-publish",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-23.id}}",
+      "verifyResponse": {
+        "positioned": true,
+        "currentVersionBinding": "spot.wu77-0-23.liveVersion",
+        "pinSourceMode": "individual",
+        "matchFixtureAfterDeclaredNormalization": true
+      }
+    },
+    {
+      "id": "spot.wu77-0-23.publish",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-0-23.id}}/publish",
+      "bodyTemplate": {
+        "isPublished": true
+      },
+      "serverOptimisticGuard": null,
+      "preconditions": [
+        "Exclusive writer; no concurrent fixture changes.",
+        "Immediately preceding authenticated GET matches latest version, position, content and appearance."
+      ],
+      "verifyResponse": {
+        "isPublished": true
+      }
+    },
+    {
+      "id": "spot.wu77-1-00.create",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/spots",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-1.id}}",
+        "name": "海の展示A",
+        "importance": "featured",
+        "description": "3Fの海の展示Aです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.14,
+        "y": 0.22,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [],
+        "customValues": {}
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-1-00.id",
+          "responseJsonPointer": "/spot/id"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-1-00.read-before-content",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-00.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-1-00.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "name": "海の展示A",
+        "x": 0.14,
+        "y": 0.22,
+        "pinSourceMode": "standard"
+      }
+    },
+    {
+      "id": "spot.wu77-1-00.content",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-00.id}}",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-1.id}}",
+        "name": "海の展示A",
+        "importance": "featured",
+        "description": "3Fの海の展示Aです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.14,
+        "y": 0.22,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [
+          "{{category.wu77-cat-0.id}}"
+        ],
+        "customValues": {
+          "{{field.wu77-hours.id}}": "9:30–17:00（比較用）"
+        },
+        "expectedVersion": "{{spot.wu77-1-00.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-1-00.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-1-00.read-before-design",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-00.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-1-00.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-1-00.design",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-00.id}}/design",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "pinIconType": "preset",
+        "pinIconId": "material:museum",
+        "pinIconImageUrl": null,
+        "pinIconAssetId": null,
+        "pinColor": "#315B83",
+        "pinSize": "small",
+        "importance": "featured",
+        "expectedVersion": "{{spot.wu77-1-00.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-1-00.liveVersion",
+          "responseJsonPointer": "/design/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "pinSourceMode": "individual"
+      }
+    },
+    {
+      "id": "spot.wu77-1-00.read-before-publish",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-00.id}}",
+      "verifyResponse": {
+        "positioned": true,
+        "currentVersionBinding": "spot.wu77-1-00.liveVersion",
+        "pinSourceMode": "individual",
+        "matchFixtureAfterDeclaredNormalization": true
+      }
+    },
+    {
+      "id": "spot.wu77-1-00.publish",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-00.id}}/publish",
+      "bodyTemplate": {
+        "isPublished": true
+      },
+      "serverOptimisticGuard": null,
+      "preconditions": [
+        "Exclusive writer; no concurrent fixture changes.",
+        "Immediately preceding authenticated GET matches latest version, position, content and appearance."
+      ],
+      "verifyResponse": {
+        "isPublished": true
+      }
+    },
+    {
+      "id": "spot.wu77-1-01.create",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/spots",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-1.id}}",
+        "name": "カフェA",
+        "importance": "normal",
+        "description": "3FのカフェAです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.32,
+        "y": 0.22,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [],
+        "customValues": {}
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-1-01.id",
+          "responseJsonPointer": "/spot/id"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-1-01.read-before-content",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-01.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-1-01.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "name": "カフェA",
+        "x": 0.32,
+        "y": 0.22,
+        "pinSourceMode": "standard"
+      }
+    },
+    {
+      "id": "spot.wu77-1-01.content",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-01.id}}",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-1.id}}",
+        "name": "カフェA",
+        "importance": "normal",
+        "description": "3FのカフェAです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.32,
+        "y": 0.22,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [
+          "{{category.wu77-cat-1.id}}"
+        ],
+        "customValues": {
+          "{{field.wu77-hours.id}}": "9:30–17:00（比較用）"
+        },
+        "expectedVersion": "{{spot.wu77-1-01.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-1-01.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-1-01.read-before-design",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-01.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-1-01.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-1-01.design",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-01.id}}/design",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "pinIconType": "preset",
+        "pinIconId": "material:local_cafe",
+        "pinIconImageUrl": null,
+        "pinIconAssetId": null,
+        "pinColor": "#A84B2B",
+        "pinSize": "medium",
+        "importance": "normal",
+        "expectedVersion": "{{spot.wu77-1-01.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-1-01.liveVersion",
+          "responseJsonPointer": "/design/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "pinSourceMode": "individual"
+      }
+    },
+    {
+      "id": "spot.wu77-1-01.read-before-publish",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-01.id}}",
+      "verifyResponse": {
+        "positioned": true,
+        "currentVersionBinding": "spot.wu77-1-01.liveVersion",
+        "pinSourceMode": "individual",
+        "matchFixtureAfterDeclaredNormalization": true
+      }
+    },
+    {
+      "id": "spot.wu77-1-01.publish",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-01.id}}/publish",
+      "bodyTemplate": {
+        "isPublished": true
+      },
+      "serverOptimisticGuard": null,
+      "preconditions": [
+        "Exclusive writer; no concurrent fixture changes.",
+        "Immediately preceding authenticated GET matches latest version, position, content and appearance."
+      ],
+      "verifyResponse": {
+        "isPublished": true
+      }
+    },
+    {
+      "id": "spot.wu77-1-02.create",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/spots",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-1.id}}",
+        "name": "ショップA",
+        "importance": "normal",
+        "description": "3FのショップAです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.5,
+        "y": 0.22,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [],
+        "customValues": {}
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-1-02.id",
+          "responseJsonPointer": "/spot/id"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-1-02.read-before-content",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-02.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-1-02.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "name": "ショップA",
+        "x": 0.5,
+        "y": 0.22,
+        "pinSourceMode": "standard"
+      }
+    },
+    {
+      "id": "spot.wu77-1-02.content",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-02.id}}",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-1.id}}",
+        "name": "ショップA",
+        "importance": "normal",
+        "description": "3FのショップAです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.5,
+        "y": 0.22,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [
+          "{{category.wu77-cat-2.id}}"
+        ],
+        "customValues": {
+          "{{field.wu77-hours.id}}": "9:30–17:00（比較用）"
+        },
+        "expectedVersion": "{{spot.wu77-1-02.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-1-02.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-1-02.read-before-design",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-02.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-1-02.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-1-02.design",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-02.id}}/design",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "pinIconType": "preset",
+        "pinIconId": "kanji:買",
+        "pinIconImageUrl": null,
+        "pinIconAssetId": null,
+        "pinColor": "#674D83",
+        "pinSize": "large",
+        "importance": "normal",
+        "expectedVersion": "{{spot.wu77-1-02.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-1-02.liveVersion",
+          "responseJsonPointer": "/design/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "pinSourceMode": "individual"
+      }
+    },
+    {
+      "id": "spot.wu77-1-02.read-before-publish",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-02.id}}",
+      "verifyResponse": {
+        "positioned": true,
+        "currentVersionBinding": "spot.wu77-1-02.liveVersion",
+        "pinSourceMode": "individual",
+        "matchFixtureAfterDeclaredNormalization": true
+      }
+    },
+    {
+      "id": "spot.wu77-1-02.publish",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-02.id}}/publish",
+      "bodyTemplate": {
+        "isPublished": true
+      },
+      "serverOptimisticGuard": null,
+      "preconditions": [
+        "Exclusive writer; no concurrent fixture changes.",
+        "Immediately preceding authenticated GET matches latest version, position, content and appearance."
+      ],
+      "verifyResponse": {
+        "isPublished": true
+      }
+    },
+    {
+      "id": "spot.wu77-1-03.create",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/spots",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-1.id}}",
+        "name": "海の展示B",
+        "importance": "normal",
+        "description": "3Fの海の展示Bです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.68,
+        "y": 0.22,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [],
+        "customValues": {}
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-1-03.id",
+          "responseJsonPointer": "/spot/id"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-1-03.read-before-content",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-03.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-1-03.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "name": "海の展示B",
+        "x": 0.68,
+        "y": 0.22,
+        "pinSourceMode": "standard"
+      }
+    },
+    {
+      "id": "spot.wu77-1-03.content",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-03.id}}",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-1.id}}",
+        "name": "海の展示B",
+        "importance": "normal",
+        "description": "3Fの海の展示Bです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.68,
+        "y": 0.22,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [
+          "{{category.wu77-cat-0.id}}"
+        ],
+        "customValues": {
+          "{{field.wu77-hours.id}}": "9:30–17:00（比較用）"
+        },
+        "expectedVersion": "{{spot.wu77-1-03.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-1-03.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-1-03.read-before-design",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-03.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-1-03.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-1-03.design",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-03.id}}/design",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "pinIconType": "preset",
+        "pinIconId": "material:museum",
+        "pinIconImageUrl": null,
+        "pinIconAssetId": null,
+        "pinColor": "#315B83",
+        "pinSize": "small",
+        "importance": "normal",
+        "expectedVersion": "{{spot.wu77-1-03.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-1-03.liveVersion",
+          "responseJsonPointer": "/design/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "pinSourceMode": "individual"
+      }
+    },
+    {
+      "id": "spot.wu77-1-03.read-before-publish",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-03.id}}",
+      "verifyResponse": {
+        "positioned": true,
+        "currentVersionBinding": "spot.wu77-1-03.liveVersion",
+        "pinSourceMode": "individual",
+        "matchFixtureAfterDeclaredNormalization": true
+      }
+    },
+    {
+      "id": "spot.wu77-1-03.publish",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-03.id}}/publish",
+      "bodyTemplate": {
+        "isPublished": true
+      },
+      "serverOptimisticGuard": null,
+      "preconditions": [
+        "Exclusive writer; no concurrent fixture changes.",
+        "Immediately preceding authenticated GET matches latest version, position, content and appearance."
+      ],
+      "verifyResponse": {
+        "isPublished": true
+      }
+    },
+    {
+      "id": "spot.wu77-1-04.create",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/spots",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-1.id}}",
+        "name": "カフェB",
+        "importance": "normal",
+        "description": "3FのカフェBです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.86,
+        "y": 0.22,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [],
+        "customValues": {}
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-1-04.id",
+          "responseJsonPointer": "/spot/id"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-1-04.read-before-content",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-04.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-1-04.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "name": "カフェB",
+        "x": 0.86,
+        "y": 0.22,
+        "pinSourceMode": "standard"
+      }
+    },
+    {
+      "id": "spot.wu77-1-04.content",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-04.id}}",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-1.id}}",
+        "name": "カフェB",
+        "importance": "normal",
+        "description": "3FのカフェBです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.86,
+        "y": 0.22,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [
+          "{{category.wu77-cat-1.id}}"
+        ],
+        "customValues": {
+          "{{field.wu77-hours.id}}": "9:30–17:00（比較用）"
+        },
+        "expectedVersion": "{{spot.wu77-1-04.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-1-04.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-1-04.read-before-design",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-04.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-1-04.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-1-04.design",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-04.id}}/design",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "pinIconType": "custom",
+        "pinIconId": null,
+        "pinIconImageUrl": "{{media.cafe.url}}",
+        "pinIconAssetId": "{{media.cafe.assetId}}",
+        "pinColor": "#A84B2B",
+        "pinSize": "medium",
+        "importance": "normal",
+        "expectedVersion": "{{spot.wu77-1-04.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-1-04.liveVersion",
+          "responseJsonPointer": "/design/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "pinSourceMode": "individual"
+      }
+    },
+    {
+      "id": "spot.wu77-1-04.read-before-publish",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-04.id}}",
+      "verifyResponse": {
+        "positioned": true,
+        "currentVersionBinding": "spot.wu77-1-04.liveVersion",
+        "pinSourceMode": "individual",
+        "matchFixtureAfterDeclaredNormalization": true
+      }
+    },
+    {
+      "id": "spot.wu77-1-04.publish",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-04.id}}/publish",
+      "bodyTemplate": {
+        "isPublished": true
+      },
+      "serverOptimisticGuard": null,
+      "preconditions": [
+        "Exclusive writer; no concurrent fixture changes.",
+        "Immediately preceding authenticated GET matches latest version, position, content and appearance."
+      ],
+      "verifyResponse": {
+        "isPublished": true
+      }
+    },
+    {
+      "id": "spot.wu77-1-05.create",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/spots",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-1.id}}",
+        "name": "ショップB",
+        "importance": "normal",
+        "description": "3FのショップBです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.25,
+        "y": 0.22,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [],
+        "customValues": {}
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-1-05.id",
+          "responseJsonPointer": "/spot/id"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-1-05.read-before-content",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-05.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-1-05.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "name": "ショップB",
+        "x": 0.25,
+        "y": 0.22,
+        "pinSourceMode": "standard"
+      }
+    },
+    {
+      "id": "spot.wu77-1-05.content",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-05.id}}",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-1.id}}",
+        "name": "ショップB",
+        "importance": "normal",
+        "description": "3FのショップBです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.25,
+        "y": 0.22,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [
+          "{{category.wu77-cat-2.id}}"
+        ],
+        "customValues": {
+          "{{field.wu77-hours.id}}": "9:30–17:00（比較用）"
+        },
+        "expectedVersion": "{{spot.wu77-1-05.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-1-05.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-1-05.read-before-design",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-05.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-1-05.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-1-05.design",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-05.id}}/design",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "pinIconType": "illustration",
+        "pinIconId": null,
+        "pinIconImageUrl": "{{media.fish.url}}",
+        "pinIconAssetId": "{{media.fish.assetId}}",
+        "pinColor": "#674D83",
+        "pinSize": "large",
+        "importance": "normal",
+        "expectedVersion": "{{spot.wu77-1-05.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-1-05.liveVersion",
+          "responseJsonPointer": "/design/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "pinSourceMode": "individual"
+      }
+    },
+    {
+      "id": "spot.wu77-1-05.read-before-publish",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-05.id}}",
+      "verifyResponse": {
+        "positioned": true,
+        "currentVersionBinding": "spot.wu77-1-05.liveVersion",
+        "pinSourceMode": "individual",
+        "matchFixtureAfterDeclaredNormalization": true
+      }
+    },
+    {
+      "id": "spot.wu77-1-05.publish",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-05.id}}/publish",
+      "bodyTemplate": {
+        "isPublished": true
+      },
+      "serverOptimisticGuard": null,
+      "preconditions": [
+        "Exclusive writer; no concurrent fixture changes.",
+        "Immediately preceding authenticated GET matches latest version, position, content and appearance."
+      ],
+      "verifyResponse": {
+        "isPublished": true
+      }
+    },
+    {
+      "id": "spot.wu77-1-06.create",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/spots",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-1.id}}",
+        "name": "北側トイレ",
+        "importance": "featured",
+        "description": "3Fの北側トイレです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.14,
+        "y": 0.39,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [],
+        "customValues": {}
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-1-06.id",
+          "responseJsonPointer": "/spot/id"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-1-06.read-before-content",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-06.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-1-06.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "name": "北側トイレ",
+        "x": 0.14,
+        "y": 0.39,
+        "pinSourceMode": "standard"
+      }
+    },
+    {
+      "id": "spot.wu77-1-06.content",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-06.id}}",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-1.id}}",
+        "name": "北側トイレ",
+        "importance": "featured",
+        "description": "3Fの北側トイレです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.14,
+        "y": 0.39,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [
+          "{{category.wu77-cat-3.id}}"
+        ],
+        "customValues": {
+          "{{field.wu77-hours.id}}": "9:30–17:00（比較用）"
+        },
+        "expectedVersion": "{{spot.wu77-1-06.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-1-06.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-1-06.read-before-design",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-06.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-1-06.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-1-06.design",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-06.id}}/design",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "pinIconType": "preset",
+        "pinIconId": "facility:wc",
+        "pinIconImageUrl": null,
+        "pinIconAssetId": null,
+        "pinColor": "#2C5F78",
+        "pinSize": "small",
+        "importance": "featured",
+        "expectedVersion": "{{spot.wu77-1-06.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-1-06.liveVersion",
+          "responseJsonPointer": "/design/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "pinSourceMode": "individual"
+      }
+    },
+    {
+      "id": "spot.wu77-1-06.read-before-publish",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-06.id}}",
+      "verifyResponse": {
+        "positioned": true,
+        "currentVersionBinding": "spot.wu77-1-06.liveVersion",
+        "pinSourceMode": "individual",
+        "matchFixtureAfterDeclaredNormalization": true
+      }
+    },
+    {
+      "id": "spot.wu77-1-06.publish",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-06.id}}/publish",
+      "bodyTemplate": {
+        "isPublished": true
+      },
+      "serverOptimisticGuard": null,
+      "preconditions": [
+        "Exclusive writer; no concurrent fixture changes.",
+        "Immediately preceding authenticated GET matches latest version, position, content and appearance."
+      ],
+      "verifyResponse": {
+        "isPublished": true
+      }
+    },
+    {
+      "id": "spot.wu77-1-07.create",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/spots",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-1.id}}",
+        "name": "多目的トイレ",
+        "importance": "normal",
+        "description": "3Fの多目的トイレです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.32,
+        "y": 0.39,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [],
+        "customValues": {}
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-1-07.id",
+          "responseJsonPointer": "/spot/id"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-1-07.read-before-content",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-07.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-1-07.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "name": "多目的トイレ",
+        "x": 0.32,
+        "y": 0.39,
+        "pinSourceMode": "standard"
+      }
+    },
+    {
+      "id": "spot.wu77-1-07.content",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-07.id}}",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-1.id}}",
+        "name": "多目的トイレ",
+        "importance": "normal",
+        "description": "3Fの多目的トイレです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.32,
+        "y": 0.39,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [
+          "{{category.wu77-cat-3.id}}"
+        ],
+        "customValues": {
+          "{{field.wu77-hours.id}}": "9:30–17:00（比較用）"
+        },
+        "expectedVersion": "{{spot.wu77-1-07.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-1-07.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-1-07.read-before-design",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-07.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-1-07.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-1-07.design",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-07.id}}/design",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "pinIconType": "preset",
+        "pinIconId": "facility:accessible-wc",
+        "pinIconImageUrl": null,
+        "pinIconAssetId": null,
+        "pinColor": "#2C5F78",
+        "pinSize": "medium",
+        "importance": "normal",
+        "expectedVersion": "{{spot.wu77-1-07.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-1-07.liveVersion",
+          "responseJsonPointer": "/design/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "pinSourceMode": "individual"
+      }
+    },
+    {
+      "id": "spot.wu77-1-07.read-before-publish",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-07.id}}",
+      "verifyResponse": {
+        "positioned": true,
+        "currentVersionBinding": "spot.wu77-1-07.liveVersion",
+        "pinSourceMode": "individual",
+        "matchFixtureAfterDeclaredNormalization": true
+      }
+    },
+    {
+      "id": "spot.wu77-1-07.publish",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-07.id}}/publish",
+      "bodyTemplate": {
+        "isPublished": true
+      },
+      "serverOptimisticGuard": null,
+      "preconditions": [
+        "Exclusive writer; no concurrent fixture changes.",
+        "Immediately preceding authenticated GET matches latest version, position, content and appearance."
+      ],
+      "verifyResponse": {
+        "isPublished": true
+      }
+    },
+    {
+      "id": "spot.wu77-1-08.create",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/spots",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-1.id}}",
+        "name": "エレベーター",
+        "importance": "normal",
+        "description": "3Fのエレベーターです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.5,
+        "y": 0.39,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [],
+        "customValues": {}
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-1-08.id",
+          "responseJsonPointer": "/spot/id"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-1-08.read-before-content",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-08.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-1-08.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "name": "エレベーター",
+        "x": 0.5,
+        "y": 0.39,
+        "pinSourceMode": "standard"
+      }
+    },
+    {
+      "id": "spot.wu77-1-08.content",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-08.id}}",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-1.id}}",
+        "name": "エレベーター",
+        "importance": "normal",
+        "description": "3Fのエレベーターです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.5,
+        "y": 0.39,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [
+          "{{category.wu77-cat-3.id}}"
+        ],
+        "customValues": {
+          "{{field.wu77-hours.id}}": "9:30–17:00（比較用）"
+        },
+        "expectedVersion": "{{spot.wu77-1-08.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-1-08.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-1-08.read-before-design",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-08.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-1-08.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-1-08.design",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-08.id}}/design",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "pinIconType": "preset",
+        "pinIconId": "facility:elevator",
+        "pinIconImageUrl": null,
+        "pinIconAssetId": null,
+        "pinColor": "#2C5F78",
+        "pinSize": "large",
+        "importance": "normal",
+        "expectedVersion": "{{spot.wu77-1-08.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-1-08.liveVersion",
+          "responseJsonPointer": "/design/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "pinSourceMode": "individual"
+      }
+    },
+    {
+      "id": "spot.wu77-1-08.read-before-publish",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-08.id}}",
+      "verifyResponse": {
+        "positioned": true,
+        "currentVersionBinding": "spot.wu77-1-08.liveVersion",
+        "pinSourceMode": "individual",
+        "matchFixtureAfterDeclaredNormalization": true
+      }
+    },
+    {
+      "id": "spot.wu77-1-08.publish",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-08.id}}/publish",
+      "bodyTemplate": {
+        "isPublished": true
+      },
+      "serverOptimisticGuard": null,
+      "preconditions": [
+        "Exclusive writer; no concurrent fixture changes.",
+        "Immediately preceding authenticated GET matches latest version, position, content and appearance."
+      ],
+      "verifyResponse": {
+        "isPublished": true
+      }
+    },
+    {
+      "id": "spot.wu77-1-09.create",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/spots",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-1.id}}",
+        "name": "階段",
+        "importance": "normal",
+        "description": "3Fの階段です。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.68,
+        "y": 0.39,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [],
+        "customValues": {}
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-1-09.id",
+          "responseJsonPointer": "/spot/id"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-1-09.read-before-content",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-09.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-1-09.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "name": "階段",
+        "x": 0.68,
+        "y": 0.39,
+        "pinSourceMode": "standard"
+      }
+    },
+    {
+      "id": "spot.wu77-1-09.content",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-09.id}}",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-1.id}}",
+        "name": "階段",
+        "importance": "normal",
+        "description": "3Fの階段です。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.68,
+        "y": 0.39,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [
+          "{{category.wu77-cat-3.id}}"
+        ],
+        "customValues": {
+          "{{field.wu77-hours.id}}": "9:30–17:00（比較用）"
+        },
+        "expectedVersion": "{{spot.wu77-1-09.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-1-09.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-1-09.read-before-design",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-09.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-1-09.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-1-09.design",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-09.id}}/design",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "pinIconType": "preset",
+        "pinIconId": "facility:stairs",
+        "pinIconImageUrl": null,
+        "pinIconAssetId": null,
+        "pinColor": "#2C5F78",
+        "pinSize": "small",
+        "importance": "normal",
+        "expectedVersion": "{{spot.wu77-1-09.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-1-09.liveVersion",
+          "responseJsonPointer": "/design/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "pinSourceMode": "individual"
+      }
+    },
+    {
+      "id": "spot.wu77-1-09.read-before-publish",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-09.id}}",
+      "verifyResponse": {
+        "positioned": true,
+        "currentVersionBinding": "spot.wu77-1-09.liveVersion",
+        "pinSourceMode": "individual",
+        "matchFixtureAfterDeclaredNormalization": true
+      }
+    },
+    {
+      "id": "spot.wu77-1-09.publish",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-09.id}}/publish",
+      "bodyTemplate": {
+        "isPublished": true
+      },
+      "serverOptimisticGuard": null,
+      "preconditions": [
+        "Exclusive writer; no concurrent fixture changes.",
+        "Immediately preceding authenticated GET matches latest version, position, content and appearance."
+      ],
+      "verifyResponse": {
+        "isPublished": true
+      }
+    },
+    {
+      "id": "spot.wu77-1-10.create",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/spots",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-1.id}}",
+        "name": "エスカレーター",
+        "importance": "normal",
+        "description": "3Fのエスカレーターです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.86,
+        "y": 0.39,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [],
+        "customValues": {}
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-1-10.id",
+          "responseJsonPointer": "/spot/id"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-1-10.read-before-content",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-10.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-1-10.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "name": "エスカレーター",
+        "x": 0.86,
+        "y": 0.39,
+        "pinSourceMode": "standard"
+      }
+    },
+    {
+      "id": "spot.wu77-1-10.content",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-10.id}}",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-1.id}}",
+        "name": "エスカレーター",
+        "importance": "normal",
+        "description": "3Fのエスカレーターです。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.86,
+        "y": 0.39,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [
+          "{{category.wu77-cat-3.id}}"
+        ],
+        "customValues": {
+          "{{field.wu77-hours.id}}": "9:30–17:00（比較用）"
+        },
+        "expectedVersion": "{{spot.wu77-1-10.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-1-10.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-1-10.read-before-design",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-10.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-1-10.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-1-10.design",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-10.id}}/design",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "pinIconType": "preset",
+        "pinIconId": "facility:escalator",
+        "pinIconImageUrl": null,
+        "pinIconAssetId": null,
+        "pinColor": "#2C5F78",
+        "pinSize": "medium",
+        "importance": "normal",
+        "expectedVersion": "{{spot.wu77-1-10.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-1-10.liveVersion",
+          "responseJsonPointer": "/design/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "pinSourceMode": "individual"
+      }
+    },
+    {
+      "id": "spot.wu77-1-10.read-before-publish",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-10.id}}",
+      "verifyResponse": {
+        "positioned": true,
+        "currentVersionBinding": "spot.wu77-1-10.liveVersion",
+        "pinSourceMode": "individual",
+        "matchFixtureAfterDeclaredNormalization": true
+      }
+    },
+    {
+      "id": "spot.wu77-1-10.publish",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-10.id}}/publish",
+      "bodyTemplate": {
+        "isPublished": true
+      },
+      "serverOptimisticGuard": null,
+      "preconditions": [
+        "Exclusive writer; no concurrent fixture changes.",
+        "Immediately preceding authenticated GET matches latest version, position, content and appearance."
+      ],
+      "verifyResponse": {
+        "isPublished": true
+      }
+    },
+    {
+      "id": "spot.wu77-1-11.create",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/spots",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-1.id}}",
+        "name": "授乳室",
+        "importance": "normal",
+        "description": "3Fの授乳室です。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.25,
+        "y": 0.39,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [],
+        "customValues": {}
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-1-11.id",
+          "responseJsonPointer": "/spot/id"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-1-11.read-before-content",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-11.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-1-11.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "name": "授乳室",
+        "x": 0.25,
+        "y": 0.39,
+        "pinSourceMode": "standard"
+      }
+    },
+    {
+      "id": "spot.wu77-1-11.content",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-11.id}}",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "floorId": "{{floor.wu77-floor-1.id}}",
+        "name": "授乳室",
+        "importance": "normal",
+        "description": "3Fの授乳室です。比較用の架空データです。位置と内容はbaselineとcandidateで同一です。",
+        "address": "",
+        "website": "",
+        "hoursText": "",
+        "holidayText": "",
+        "phone": "",
+        "x": 0.25,
+        "y": 0.39,
+        "lat": null,
+        "lng": null,
+        "categoryIds": [
+          "{{category.wu77-cat-3.id}}"
+        ],
+        "customValues": {
+          "{{field.wu77-hours.id}}": "9:30–17:00（比較用）"
+        },
+        "expectedVersion": "{{spot.wu77-1-11.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-1-11.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-1-11.read-before-design",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-11.id}}",
+      "bind": [
+        {
+          "variable": "spot.wu77-1-11.liveVersion",
+          "responseJsonPointer": "/spot/liveVersion"
+        }
+      ]
+    },
+    {
+      "id": "spot.wu77-1-11.design",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-11.id}}/design",
+      "serverOptimisticGuard": "expectedVersion",
+      "bodyTemplate": {
+        "pinIconType": "preset",
+        "pinIconId": "facility:nursing",
+        "pinIconImageUrl": null,
+        "pinIconAssetId": null,
+        "pinColor": "#2C5F78",
+        "pinSize": "large",
+        "importance": "normal",
+        "expectedVersion": "{{spot.wu77-1-11.liveVersion}}"
+      },
+      "bind": [
+        {
+          "variable": "spot.wu77-1-11.liveVersion",
+          "responseJsonPointer": "/design/liveVersion"
+        }
+      ],
+      "verifyResponse": {
+        "pinSourceMode": "individual"
+      }
+    },
+    {
+      "id": "spot.wu77-1-11.read-before-publish",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-11.id}}",
+      "verifyResponse": {
+        "positioned": true,
+        "currentVersionBinding": "spot.wu77-1-11.liveVersion",
+        "pinSourceMode": "individual",
+        "matchFixtureAfterDeclaredNormalization": true
+      }
+    },
+    {
+      "id": "spot.wu77-1-11.publish",
+      "method": "PATCH",
+      "endpoint": "/api/maps/{{map.id}}/spots/{{spot.wu77-1-11.id}}/publish",
+      "bodyTemplate": {
+        "isPublished": true
+      },
+      "serverOptimisticGuard": null,
+      "preconditions": [
+        "Exclusive writer; no concurrent fixture changes.",
+        "Immediately preceding authenticated GET matches latest version, position, content and appearance."
+      ],
+      "verifyResponse": {
+        "isPublished": true
+      }
+    },
+    {
+      "id": "live.before-publish",
+      "method": "GET",
+      "endpoint": "/api/maps/{{map.id}}/visitor-preview",
+      "capture": "Synthetic public DTO only; never session/cookie/auth response.",
+      "verifyResponse": {
+        "floorSpotCounts": [
+          24,
+          12
+        ],
+        "compareToImmutableFixtureUsingDeclaredMapping": true
+      }
+    },
+    {
+      "id": "map.publish",
+      "method": "POST",
+      "endpoint": "/api/maps/{{map.id}}/publish",
+      "bodyTemplate": {
+        "isPublished": true
+      },
+      "serverOptimisticGuard": null,
+      "preconditions": [
+        "All 36 positioned Spot usages are published.",
+        "All original/variant assets exist inside dedicated upload root.",
+        "Local public storage is writable and isolated.",
+        "Authenticated LIVE has passed fixture comparison.",
+        "Exclusive writer; no concurrent authoring."
+      ],
+      "bind": [
+        {
+          "variable": "release.id",
+          "responseJsonPointer": "/publication/releaseId"
+        }
+      ],
+      "verifyResponse": {
+        "isPublished": true,
+        "releaseIdRequired": true
+      }
+    },
+    {
+      "id": "public.after-publish",
+      "method": "GET",
+      "endpoint": "/api/public/wu77-visitor-quality",
+      "authenticated": false,
+      "verifyResponse": {
+        "floorSpotCounts": [
+          24,
+          12
+        ],
+        "compareToLive": "Exclude releaseId only; compare rewritten asset URL bytes/hashes through declared manifest."
+      }
+    }
+  ]
+}

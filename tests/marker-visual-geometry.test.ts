@@ -13,6 +13,36 @@ function marker(x=0, scale=1, type='shape') {
   return {el,art}
 }
 describe('visitor visual geometry separated from interaction targets',()=>{
+  it.each([28,32,36,32*1.08,36*1.08])('measures unrotated facility artwork at %spx without teardrop trim or auxiliary paint',width=>{
+    const {el,art}=marker()
+    el.classList.add('map-viewer-marker--facility')
+    art.getBoundingClientRect=()=>rect(-width/2,-width,width)
+    Object.defineProperty(art,'offsetWidth',{value:32,configurable:true})
+    for(const name of ['ground-shadow','name','collision-badge']) {
+      const extra=document.createElement('span');extra.className='map-viewer-marker__'+name
+      extra.getBoundingClientRect=()=>rect(-100,-100,200);el.append(extra)
+    }
+    expect(measurePinVisualRect(el)).toEqual({left:-width/2,top:-width,right:width/2,bottom:0})
+    expect(el.getBoundingClientRect().width).toBe(60)
+    el.classList.add('map-viewer-marker--selected')
+    const ring=4*width/32
+    expect(measurePinVisualRect(el)).toEqual({left:-width/2-ring,top:-width-ring,right:width/2+ring,bottom:ring})
+  })
+  it('includes the facility focus ring and preserves protected recovery with square bounds',()=>{
+    const a=marker(),b=marker(30)
+    for(const [index,pin] of [a,b].entries()) {
+      pin.el.classList.add('map-viewer-marker--facility')
+      pin.art.getBoundingClientRect=()=>rect(index*30-16,-32,32)
+      Object.defineProperty(pin.art,'offsetWidth',{value:32,configurable:true})
+    }
+    const originalMatches=a.el.matches.bind(a.el)
+    a.el.matches=selector=>selector===':focus-visible'||originalMatches(selector)
+    expect(measurePinVisualRect(a.el)).toEqual({left:-20,top:-36,right:20,bottom:4})
+    const candidates=[a,b].map((pin,index)=>({id:String(index),priority:1,protected:index===0,rect:measurePinVisualRect(pin.el)}))
+    expect([...declutterPins(candidates,0)]).toEqual(['0'])
+    expect(getCollisionRepresentatives(candidates,new Set(['0']),0).get('0')).toBe(2)
+    expect(getCollisionGroup('0',candidates,0)).toHaveLength(2)
+  })
   it.each([.8,1,1.25,1.08,1.25*1.08])('measures the painted shell at scale %s, not its transparent rotated corners',scale=>{
     const {el}=marker(0,scale), r=measurePinVisualRect(el)
     expect(r.right-r.left).toBeCloseTo(40*scale)

@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { DialogContent, DialogPortal, DialogRoot, DialogTitle } from 'reka-ui'
 import { useBottomSheetGesture, type BottomSheetState } from '~/composables/useBottomSheetGesture'
+import { isFacilityPinIcon } from '~~/shared/constants/spot'
 import type { PublicSpot } from '~~/shared/types/public-map'
 
-const props = defineProps<{ spot: PublicSpot }>()
+const props = defineProps<{ spot: PublicSpot, floorName?: string }>()
 const emit = defineEmits<{ close: [source?: 'pointer' | 'other'], expandedChange: [expanded: boolean] }>()
 
 const sheetState = ref<BottomSheetState>('detail')
@@ -70,6 +71,10 @@ function handleKeyboardDismiss(event: Event) {
 function handlePointerDismiss(event: Event) {
   // Keep the sheet open while a pointer gesture starts on the map behind it.
   event.preventDefault()
+}
+
+function isMobileSheet() {
+  return !window.matchMedia('(min-width: 768px)').matches
 }
 
 function addBodyTouchMoveListener() {
@@ -140,18 +145,19 @@ onBeforeUnmount(() => {
         <header
           ref="sheetHeader"
           class="spot-detail-sheet__drag-region shrink-0 border-b border-stone-100 px-4"
-          @pointerdown="gesture.onHeaderPointerDown"
+          @pointerdown="event => { if (isMobileSheet()) gesture.onHeaderPointerDown(event) }"
           @pointermove="gesture.onHeaderPointerMove"
           @pointerup="gesture.onHeaderPointerUp"
           @pointercancel="gesture.onHeaderPointerCancel"
         >
-          <div class="flex h-7 items-center justify-center" aria-hidden="true"><span class="h-1 w-9 rounded-full bg-stone-300" /></div>
-          <div class="flex min-h-14 items-start gap-2 pb-3">
+          <div class="flex h-7 items-center justify-center md:hidden" aria-hidden="true"><span class="h-1 w-9 rounded-full bg-stone-300" /></div>
+          <div class="flex min-h-14 items-start gap-2 pb-3 md:pt-4">
             <div class="min-w-0 flex-1">
-              <div v-if="spot.categories.length" class="flex flex-wrap gap-1.5">
-                <span v-for="category in spot.categories" :key="category.id" class="rounded-full bg-terracotta-50 px-2 py-1 text-xs font-semibold text-terracotta-700">{{ category.name }}</span>
+              <p v-if="floorName" class="mb-1 text-xs font-semibold text-stone-600">{{ floorName }} · {{ isFacilityPinIcon(spot) ? '設備' : '目的地' }}</p>
+              <div v-if="spot.categories.length" class="spot-detail-categories flex gap-1.5 overflow-x-auto pb-1" data-sheet-no-drag tabindex="0" role="group" aria-label="このスポットのカテゴリー">
+                <span v-for="category in spot.categories" :key="category.id" class="shrink-0 whitespace-nowrap rounded-full bg-terracotta-50 px-2 py-1 text-xs font-semibold text-terracotta-700">{{ category.name }}</span>
               </div>
-              <DialogTitle data-spot-detail-title tabindex="-1" class="mt-1 text-[22px] font-bold leading-tight tracking-tight text-stone-900 outline-none">
+              <DialogTitle data-spot-detail-title tabindex="-1" class="mt-1 break-words text-[22px] font-bold leading-tight tracking-tight text-stone-900 outline-none">
                 {{ spot.name }}
               </DialogTitle>
             </div>
@@ -162,12 +168,12 @@ onBeforeUnmount(() => {
           </div>
         </header>
 
-        <div ref="scrollBody" class="spot-detail-sheet__body min-h-0 flex-1 overflow-y-auto overscroll-contain" @touchstart="gesture.onBodyTouchStart" @touchend="gesture.onBodyTouchEnd" @touchcancel="gesture.onBodyTouchCancel">
+        <div ref="scrollBody" class="spot-detail-sheet__body min-h-0 flex-1 overflow-y-auto overscroll-contain" @touchstart="event => { if (isMobileSheet()) gesture.onBodyTouchStart(event) }" @touchend="gesture.onBodyTouchEnd" @touchcancel="gesture.onBodyTouchCancel">
           <div ref="bodyContent">
             <div v-if="$slots.default" class="px-4 pt-4 md:px-6"><slot /></div>
             <div v-if="spot.photos.length" class="flex snap-x snap-mandatory overflow-x-auto bg-stone-100" data-sheet-no-drag>
               <figure v-for="(photo, index) in spot.photos" :key="photo" class="relative w-full shrink-0 snap-center">
-                <img v-if="photoStates[photo] !== 'error'" :src="photo" :alt="`${spot.name}の写真${index + 1}`" class="h-44 w-full object-cover md:h-56" @load="photoStates[photo] = 'loaded'" @error="photoStates[photo] = 'error'">
+                <img v-if="photoStates[photo] !== 'error'" :src="photo" :alt="`${spot.name}の写真${index + 1}`" class="h-44 w-full object-cover md:h-48" :loading="index === 0 ? 'eager' : 'lazy'" decoding="async" @load="photoStates[photo] = 'loaded'" @error="photoStates[photo] = 'error'">
                 <p v-if="!photoStates[photo]" role="status" class="pointer-events-none absolute inset-0 grid place-items-center bg-stone-100 text-sm text-stone-600">写真を読み込み中</p>
                 <p v-else-if="photoStates[photo] === 'error'" class="px-4 py-4 text-sm text-stone-600">写真を表示できませんでした</p>
               </figure>
@@ -206,7 +212,7 @@ onBeforeUnmount(() => {
 }
 
 .spot-detail-sheet__drag-region {
-  touch-action: none;
+  touch-action: pan-x;
   user-select: none;
 }
 
@@ -214,15 +220,19 @@ onBeforeUnmount(() => {
   touch-action: manipulation;
 }
 
+.spot-detail-sheet button:focus-visible,
+.spot-detail-sheet a:focus-visible,
+.spot-detail-categories:focus-visible { outline: 2px solid #9a3412; outline-offset: 2px; }
+
 .spot-detail-sheet__body {
-  touch-action: pan-y;
+  touch-action: pan-x pan-y;
   -webkit-overflow-scrolling: touch;
 }
 
 @media (min-width: 768px) {
   .spot-detail-sheet {
-    inset: 50% 1.25rem auto auto;
-    width: min(32rem, calc(100vw - 2.5rem));
+    inset: 50% max(1rem, env(safe-area-inset-right)) auto auto;
+    width: min(26rem, 44vw);
     height: auto;
     max-height: calc(100dvh - 7rem);
     transform: translate3d(0, -50%, 0) !important;

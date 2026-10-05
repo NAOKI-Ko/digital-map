@@ -4,7 +4,7 @@ import type { IControl, ImageSource, Map as MapLibreMap, Marker, MarkerOptions }
 import { getFloorCorners, imageToRenderCoordinates, isValidImagePosition, renderToImageCoordinates, toImageCoordinates, type ImagePosition, type LatLng } from '~~/lib/geo'
 import { getDecorationRenderCoordinates } from '~~/lib/decoration'
 import type { MapViewerCameraState, MapViewerDecoration, MapViewerFloor, MapViewerSpot } from '~~/shared/types/map-viewer'
-import { createSpotMarkerElement } from '~/utils/marker-element'
+import { createSpotMarkerElement, getSpotMarkerVisitorLabel } from '~/utils/marker-element'
 import { applyMarkerDensityPresentation, getMarkerDensityPresentation } from '~/utils/marker-density'
 import { applyPinVisibility, declutterPins, getCollisionRepresentatives, measurePinRect, measurePinVisualRect, VISITOR_PIN_COLLISION_GAP } from '~/utils/marker-collision'
 import { monitorFloorImage } from '~/utils/floor-image-state'
@@ -518,8 +518,7 @@ export function useMapViewer(
           const count = String(groupSizes.get(spot.id) ?? 1)
           if (badge.textContent !== count) badge.textContent = count
         }
-        const collisionCount = options.visitorOverview?.value ? `（${groupSizes.get(spot.id)}件）` : ''
-        element.setAttribute('aria-label', hasCollision ? `${spot.name}の周辺ピンを表示${collisionCount}` : `${spot.name}の詳細を表示`)
+        element.setAttribute('aria-label', getSpotMarkerVisitorLabel(spot, groupSizes.get(spot.id) ?? 1, options.visitorOverview?.value ?? false))
         if (hasCollision) element.setAttribute('aria-expanded', String(recovery.hasMember(spot.id)))
         else element.removeAttribute('aria-expanded')
       })

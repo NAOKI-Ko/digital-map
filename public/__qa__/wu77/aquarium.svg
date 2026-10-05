@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <rect width="1200" height="800" rx="28" fill="#f5f8fa"/>
+  <path d="M85 112H1090V696H85Z" fill="#fff" stroke="#cbd7de" stroke-width="8"/>
+  <path d="M90 262H1090M90 400H1090M90 535H1090M270 112V696M460 112V696M650 112V696M850 112V696" stroke="#edf2f5" stroke-width="24"/>
+  <g fill="#c4e3ef" stroke="#93bdcd" stroke-width="3">
+    <rect x="110" y="140" width="138" height="98" rx="16"/>
+    <rect x="294" y="140" width="140" height="98" rx="16"/>
+    <rect x="484" y="140" width="140" height="98" rx="16"/>
+    <rect x="674" y="140" width="150" height="98" rx="16"/>
+    <rect x="110" y="290" width="138" height="84" rx="16"/>
+    <rect x="484" y="290" width="140" height="84" rx="16"/>
+    <rect x="674" y="290" width="150" height="84" rx="16"/>
+    <rect x="110" y="430" width="138" height="78" rx="16"/>
+    <rect x="294" y="430" width="140" height="78" rx="16"/>
+    <rect x="484" y="430" width="140" height="78" rx="16"/>
+  </g>
+  <g fill="#e4eef3" stroke="#c4d6df" stroke-width="2">
+    <rect x="880" y="140" width="175" height="98" rx="12"/>
+    <rect x="880" y="290" width="175" height="84" rx="12"/>
+    <rect x="674" y="430" width="150" height="78" rx="12"/>
+    <rect x="880" y="430" width="175" height="78" rx="12"/>
+    <rect x="294" y="563" width="140" height="104" rx="12"/>
+    <rect x="484" y="563" width="140" height="104" rx="12"/>
+    <rect x="674" y="563" width="150" height="104" rx="12"/>
+    <rect x="880" y="563" width="175" height="104" rx="12"/>
+  </g>
+  <rect x="110" y="563" width="138" height="104" rx="12" fill="#f0e4cd" stroke="#d8c5a1" stroke-width="2"/>
+  <rect x="294" y="290" width="140" height="84" rx="12" fill="#eddccf" stroke="#d1b6a4" stroke-width="2"/>
+  <g fill="#486678" font-family="sans-serif" font-size="18" text-anchor="middle">
+    <text x="600" y="76" font-size="30" font-weight="700">海のミュージアム</text>
+    <text x="179" y="224">展示</text><text x="364" y="224">海の展示</text>
+    <text x="554" y="224">水槽</text><text x="749" y="224">展示</text>
+    <text x="364" y="364">カフェ</text><text x="179" y="653">ショップ</text>
+    <text x="968" y="654">サービス</text>
+    <text x="600" y="754" font-size="20">入口・出口</text>
+    <text x="600" y="785" font-size="14" fill="#71828b">品質比較用の架空施設図</text>
+  </g>
+  <path d="M552 698V721H648V698" fill="#d1e6da" stroke="#a6c7b3" stroke-width="3"/>
+</svg>

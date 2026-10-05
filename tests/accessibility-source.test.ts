@@ -8,10 +8,17 @@ describe('WCAG implementation source contract', () => {
     const page = readFileSync(join(process.cwd(), 'app/components/map/VisitorMapExperience.vue'), 'utf8')
     const dialog = readFileSync(join(process.cwd(), 'app/components/map/SpotDetailCard.vue'), 'utf8')
     const map = readFileSync(join(process.cwd(), 'app/composables/useMapViewer.ts'), 'utf8')
+    const collision = readFileSync(join(process.cwd(), 'app/utils/marker-collision.ts'), 'utf8')
     expect(marker).toContain("createElement('button')")
     expect(marker).toContain("image.alt = ''")
     expect(page).not.toContain('SpotAccessibleList')
-    expect(page).toContain('trigger && !trigger.inert')
+    // DOM recovery coverage lives in marker-collision.test.ts; keep the page wiring guarded here.
+    expect(page).toContain("import { restorePinFocus } from '~/utils/marker-collision'")
+    expect(page).toContain('if (!restorePinFocus(trigger)) mapEntry?.focus({ preventScroll: true })')
+    const restoreFocus = collision.match(/export function restorePinFocus\b[\s\S]*?\n\}/)?.[0] ?? ''
+    expect(restoreFocus).toContain('if (!element?.isConnected) return false')
+    expect(restoreFocus).toMatch(/applyPinVisibility\(element, true\)\s*element\.focus\(\{ preventScroll: true \}\)/)
+    expect(restoreFocus).toContain('return element.ownerDocument.activeElement === element')
     expect(page).toContain("querySelectorAll<HTMLElement>('.visitor-map-viewer .map-viewer-marker[data-spot-id]')")
     expect(marker).toContain("element.setAttribute('data-spot-id', spot.id)")
     expect(dialog).toContain('<DialogRoot')

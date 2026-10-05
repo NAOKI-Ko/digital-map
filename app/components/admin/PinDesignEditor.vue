@@ -3,13 +3,16 @@ import UnsavedChangesGuard from '~/components/admin/UnsavedChangesGuard.vue'
 import MediaPicker from '~/components/admin/MediaPicker.vue'
 import type { UploadedImage } from '~~/shared/types/upload'
 import {
+  defaultFacilityIconId,
   defaultMaterialSymbolId,
   defaultPinIconId,
+  facilityIconPresets,
   getPinIconPreset,
   materialSymbolPresets,
   normalizePinIconId,
   pinIconPresets,
   type MaterialSymbolPresetId,
+  type FacilityIconPresetId,
   type PinIconFamily,
   type PinIconPresetId,
   type PinIconType,
@@ -75,6 +78,11 @@ const lastMaterialIconId = ref<MaterialSymbolPresetId>(
     ? selectedPreset.value.id
     : defaultMaterialSymbolId(),
 )
+const lastFacilityIconId = ref<FacilityIconPresetId>(
+  selectedPreset.value.family === 'facility'
+    ? selectedPreset.value.id
+    : defaultFacilityIconId(),
+)
 const usesUploadedImage = computed(() => design.pinIconType === 'custom' || design.pinIconType === 'illustration')
 const uploadHeading = computed(() => design.pinIconType === 'illustration' ? '直置きイラスト' : 'カスタム画像')
 const uploadLabel = computed(() => design.pinIconType === 'illustration' ? '直置きイラスト画像' : 'カスタムピン画像')
@@ -86,6 +94,7 @@ watch(() => props.initialValue, (value) => {
 watch(() => design.pinIconId, (pinIconId) => {
   const preset = getPinIconPreset(pinIconId)
   if (preset.family === 'material') lastMaterialIconId.value = preset.id
+  else if (preset.family === 'facility') lastFacilityIconId.value = preset.id
   else lastKanjiIconId.value = preset.id
 })
 
@@ -94,7 +103,9 @@ watch(design, value => emit('changed', { ...value, importance: value.importance 
 function selectIconFamily(family: PinIconFamily) {
   design.pinIconId = family === 'material'
     ? lastMaterialIconId.value
-    : lastKanjiIconId.value
+    : family === 'facility'
+      ? lastFacilityIconId.value
+      : lastKanjiIconId.value
 }
 
 function useCustomImage(image: UploadedImage) {
@@ -164,7 +175,7 @@ defineExpose({ isDirty: () => isDirty.value, reset, save })
 
         <fieldset v-if="design.pinIconType === 'preset'" class="mt-7">
           <legend class="text-sm font-semibold text-stone-800">プリセットアイコン</legend>
-          <div class="mt-3 inline-flex rounded-lg border border-stone-300 bg-stone-100 p-1" aria-label="アイコンファミリー">
+          <div class="mt-3 inline-flex flex-wrap rounded-lg border border-stone-300 bg-stone-100 p-1" aria-label="アイコンファミリー">
             <button
               type="button"
               class="rounded-md px-4 py-2 text-sm font-semibold transition"
@@ -183,12 +194,33 @@ defineExpose({ isDirty: () => isDirty.value, reset, save })
             >
               Material Symbols
             </button>
+            <button
+              type="button"
+              class="rounded-md px-4 py-2 text-sm font-semibold transition"
+              :class="selectedIconFamily === 'facility' ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-600 hover:text-stone-900'"
+              :aria-pressed="selectedIconFamily === 'facility'"
+              @click="selectIconFamily('facility')"
+            >
+              設備
+            </button>
           </div>
 
           <div v-if="selectedIconFamily === 'kanji'" class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
             <button v-for="preset in pinIconPresets" :key="preset.id" type="button" :aria-label="preset.label" :aria-pressed="design.pinIconId === preset.id" class="grid min-h-12 place-items-center rounded-xl border p-2 text-center transition" :class="design.pinIconId === preset.id ? 'border-terracotta-500 bg-terracotta-50 ring-2 ring-terracotta-100' : 'border-stone-200 hover:border-stone-400'" @click="design.pinIconId = preset.id">
               <span class="grid h-8 w-8 place-items-center rounded-full text-xs font-bold text-white" :style="{ backgroundColor: design.pinColor }" aria-hidden="true">{{ preset.symbol }}</span>
             </button>
+          </div>
+          <div v-else-if="selectedIconFamily === 'facility'" class="mt-3">
+            <p class="mb-3 text-xs text-stone-600">設備は角丸バッジで表示します。</p>
+            <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              <button v-for="preset in facilityIconPresets" :key="preset.id" type="button" :aria-label="preset.label" :aria-pressed="design.pinIconId === preset.id" class="grid min-h-12 place-items-center gap-1 rounded-xl border p-2 text-center transition" :class="design.pinIconId === preset.id ? 'border-terracotta-500 bg-terracotta-50 ring-2 ring-terracotta-100' : 'border-stone-200 hover:border-stone-400'" @click="design.pinIconId = preset.id">
+                <span class="grid h-8 w-8 content-center place-items-center rounded-lg border-2 bg-white text-stone-900" :style="{ borderColor: design.pinColor }" aria-hidden="true">
+                  <img :src="preset.imageUrl" alt="" aria-hidden="true" class="w-6 object-contain" :class="preset.text ? 'h-[18px]' : 'h-6'">
+                  <span v-if="preset.text" class="text-[8px] font-extrabold leading-none">{{ preset.text }}</span>
+                </span>
+                <span class="text-xs font-semibold text-stone-700">{{ preset.label }}</span>
+              </button>
+            </div>
           </div>
           <div v-else class="mt-3 space-y-5">
             <section v-for="[group, presets] in materialPresetGroups" :key="group">
