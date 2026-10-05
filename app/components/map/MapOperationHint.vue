@@ -35,7 +35,7 @@ onBeforeUnmount(() => {
   <Transition name="map-hint">
     <div
       v-if="visible && !suppressed"
-      class="pointer-events-none absolute inset-x-4 bottom-[calc(env(safe-area-inset-bottom)+var(--visitor-category-height,52px)+6rem)] z-30 mx-auto max-w-sm rounded-2xl bg-stone-950/85 px-4 py-3 text-center text-sm font-medium leading-6 text-white shadow-xl backdrop-blur sm:bottom-8"
+      class="visitor-operation-hint pointer-events-none absolute inset-x-4 bottom-[calc(env(safe-area-inset-bottom)+var(--visitor-category-height,52px)+6rem)] z-30 mx-auto max-w-sm rounded-2xl bg-stone-950/85 px-4 py-3 text-center text-sm font-medium leading-6 text-white shadow-xl backdrop-blur sm:bottom-8"
       role="status"
     >
       <p class="font-bold">マップを自由に動かせます</p>
@@ -45,6 +45,8 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
+.visitor-operation-hint { background: rgb(32 52 44 / 94%); }
+
 .map-hint-enter-active,
 .map-hint-leave-active {
   transition: opacity 500ms ease, transform 500ms ease;

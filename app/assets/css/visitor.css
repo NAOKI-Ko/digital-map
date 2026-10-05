@@ -1,0 +1,66 @@
+/* Shared Public / LIVE visitor surfaces, including teleported dialogs.
+   Authored marker colors and map geometry remain independent. */
+.visitor-theme {
+  --visitor-surface: #fff;
+  --visitor-ink: #20342c;
+  --visitor-muted: #52635e;
+  --visitor-border: #d6dedb;
+  --visitor-active: #25483c;
+  --visitor-active-soft: #edf5f1;
+  --visitor-focus: #b45309;
+  --visitor-shadow: 0 2px 8px rgb(32 52 44 / 12%);
+  color: var(--visitor-ink);
+}
+
+.visitor-theme .visitor-surface,
+.visitor-theme .visitor-control {
+  border-color: var(--visitor-border);
+  background: var(--visitor-surface);
+  color: var(--visitor-ink);
+  box-shadow: var(--visitor-shadow);
+}
+
+.visitor-theme .visitor-control:hover { background: #f4f6f7; }
+.visitor-theme .visitor-control[aria-pressed='true'] {
+  border-color: var(--visitor-active);
+  background: var(--visitor-active);
+  color: #fff;
+}
+
+.visitor-theme.visitor-dialog,
+.visitor-theme .visitor-dialog {
+  background: var(--visitor-surface);
+  color: var(--visitor-ink);
+  box-shadow: 0 18px 60px rgb(32 52 44 / 18%);
+}
+
+.visitor-theme .visitor-close {
+  background: #f0f4f2;
+  color: var(--visitor-ink);
+}
+.visitor-theme .visitor-close:hover { background: #e5ede9; }
+.visitor-theme .visitor-muted { color: var(--visitor-muted); }
+.visitor-theme .visitor-active-soft { background: var(--visitor-active-soft); color: var(--visitor-active); }
+.visitor-theme .visitor-action { background: var(--visitor-active); color: #fff; }
+.visitor-theme .visitor-action:hover { background: #1c392f; }
+.visitor-theme .visitor-link { color: var(--visitor-active); text-decoration-color: var(--visitor-active); }
+.visitor-theme .visitor-brand { color: var(--visitor-active); }
+
+.visitor-theme :is(button, a, select):focus-visible {
+  outline: 2px solid var(--visitor-focus);
+  outline-offset: 2px;
+}
+
+/* Existing control borders, dimensions and layout are preserved. */
+.visitor-theme .visitor-map-viewer .map-viewer-navigation-control,
+.visitor-theme .visitor-map-viewer .map-viewer-control-group > .maplibregl-ctrl-group {
+  border-color: var(--visitor-border);
+  background: var(--visitor-surface);
+  color: var(--visitor-ink);
+  box-shadow: var(--visitor-shadow);
+}
+.visitor-theme .visitor-map-viewer .map-viewer-navigation-control button + button { border-color: var(--visitor-border); }
+.visitor-theme .visitor-map-viewer .map-viewer-navigation-control button:focus-visible,
+.visitor-theme .visitor-map-viewer .map-viewer-control-group .maplibregl-ctrl-geolocate:focus-visible {
+  outline-color: var(--visitor-focus);
+}

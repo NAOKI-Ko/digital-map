@@ -265,7 +265,7 @@ onBeforeUnmount(clearPendingSpotClose)
 </script>
 
 <template>
-  <main class="fixed inset-0 h-[100dvh] w-screen overflow-hidden bg-stone-100 text-stone-900 md:static md:w-auto">
+  <main class="visitor-theme fixed inset-0 h-[100dvh] w-screen overflow-hidden bg-stone-100 text-stone-900 md:static md:w-auto">
     <div v-if="status === 'pending' && !data?.map" role="status" aria-live="polite" class="grid h-full place-items-center px-6 text-sm text-stone-600">
       {{ t.loading }}
     </div>
@@ -283,24 +283,24 @@ onBeforeUnmount(clearPendingSpotClose)
       </section>
     </div>
     <template v-else-if="selectedFloor">
-      <header class="hidden h-14 items-center justify-between gap-3 border-b border-white/60 bg-white/75 px-6 backdrop-blur md:flex">
+      <header class="visitor-surface hidden h-14 items-center justify-between gap-3 border-b border-white/60 bg-white/75 px-6 backdrop-blur md:flex">
         <div class="flex min-w-0 items-center gap-3">
           <img v-if="data.map.logoUrl" :src="data.map.logoUrl" :alt="`${data.map.organizationName ?? data.map.name}のロゴ`" class="size-10 shrink-0 rounded-lg object-contain">
           <div class="min-w-0">
-            <p class="truncate text-xs font-semibold tracking-widest text-terracotta-700">{{ data.map.organizationName ?? 'DIGITAL MAP' }}</p>
+            <p class="visitor-brand truncate text-xs font-semibold tracking-widest text-terracotta-700">{{ data.map.organizationName ?? 'DIGITAL MAP' }}</p>
             <h1 class="mt-0.5 truncate text-lg font-bold tracking-tight">{{ data.map.name }}</h1>
           </div>
         </div>
         <nav v-show="!appModalOpen" aria-label="公開マップ操作" class="flex shrink-0 items-center gap-2">
           <label v-if="data.map.enabledLocales.includes('en')" class="sr-only" for="public-locale">{{ t.language }}</label>
-          <select v-if="data.map.enabledLocales.includes('en')" id="public-locale" :value="data.map.locale" class="min-h-11 rounded-full border border-stone-200 px-3 text-xs" @change="switchLocale(($event.target as HTMLSelectElement).value as 'ja' | 'en')"><option value="ja">日本語</option><option value="en">English</option></select>
-          <button type="button" class="grid size-11 place-items-center rounded-full border border-stone-200 bg-white/80 text-sm font-bold" data-visitor-action="info" aria-label="マップ情報を開く" @click="openInfo">i</button>
+          <select v-if="data.map.enabledLocales.includes('en')" id="public-locale" :value="data.map.locale" class="visitor-control min-h-11 rounded-full border border-stone-200 px-3 text-xs" @change="switchLocale(($event.target as HTMLSelectElement).value as 'ja' | 'en')"><option value="ja">日本語</option><option value="en">English</option></select>
+          <button type="button" class="visitor-control grid size-11 place-items-center rounded-full border border-stone-200 bg-white/80 text-sm font-bold" data-visitor-action="info" aria-label="マップ情報を開く" @click="openInfo">i</button>
         </nav>
       </header>
 
       <section class="public-map-stage relative h-[100dvh] min-h-0 md:h-[calc(100dvh-3.5rem)]" :style="{ '--visitor-category-height': `${categoryDockHeight}px` }" :class="{ 'public-map-locked': appModalOpen, 'public-map-has-spot': Boolean(selectedSpot) }">
         <div v-show="!appModalOpen" class="pointer-events-none absolute inset-0 z-20 md:hidden" aria-label="公開マップ操作">
-          <div data-map-fit-edge="top" class="absolute left-[calc(env(safe-area-inset-left)+0.75rem)] top-[calc(env(safe-area-inset-top)+0.75rem)] rounded-xl bg-white/90 px-3 py-2 shadow-sm backdrop-blur" :class="data.map.enabledLocales.includes('en') ? 'max-w-[calc(100vw-10rem)]' : 'max-w-[calc(100vw-7rem)]'">
+          <div data-map-fit-edge="top" class="visitor-surface absolute left-[calc(env(safe-area-inset-left)+0.75rem)] top-[calc(env(safe-area-inset-top)+0.75rem)] rounded-xl bg-white/90 px-3 py-2 shadow-sm backdrop-blur" :class="data.map.enabledLocales.includes('en') ? 'max-w-[calc(100vw-10rem)]' : 'max-w-[calc(100vw-7rem)]'">
             <h1 class="truncate text-sm font-bold">{{ data.map.name }}</h1>
             <p class="truncate text-xs text-stone-600">表示中 · {{ selectedFloor.name }}</p>
           </div>
@@ -308,21 +308,21 @@ onBeforeUnmount(clearPendingSpotClose)
             <span><i class="visitor-marker-legend__destination" aria-hidden="true" />目的地</span><span><i class="visitor-marker-legend__facility" aria-hidden="true" />設備</span>
           </div>
           <div v-if="showFloorSelector" v-show="!selectedSpot" data-map-fit-edge="bottom" class="pointer-events-auto absolute bottom-[calc(env(safe-area-inset-bottom)+2rem+var(--visitor-category-height,52px)+1.5rem)] left-[calc(env(safe-area-inset-left)+0.75rem)] max-w-[calc(100vw-10.5rem)]">
-          <button type="button" class="flex h-11 max-w-full items-center gap-2 rounded-full border border-white/70 bg-white/85 px-4 text-sm font-bold shadow-sm backdrop-blur" data-visitor-action="floor" aria-haspopup="dialog" :aria-expanded="floorSelectorOpen" @click="openFloorSelector">
+          <button type="button" class="visitor-control flex h-11 max-w-full items-center gap-2 rounded-full border border-white/70 bg-white/85 px-4 text-sm font-bold shadow-sm backdrop-blur" data-visitor-action="floor" aria-haspopup="dialog" :aria-expanded="floorSelectorOpen" @click="openFloorSelector">
             <span class="shrink-0 text-xs font-medium text-stone-600">フロア</span><span class="truncate">{{ selectedFloor.name }}</span> <span class="shrink-0" aria-hidden="true">⌄</span>
           </button>
           </div>
 
         <div data-map-fit-edge="top" class="pointer-events-auto absolute right-[calc(env(safe-area-inset-right)+0.75rem)] top-[calc(env(safe-area-inset-top)+0.75rem)] flex items-center gap-2">
           <label v-if="data.map.enabledLocales.includes('en')" class="sr-only" for="public-locale-mobile">{{ t.language }}</label>
-          <select v-if="data.map.enabledLocales.includes('en')" id="public-locale-mobile" :value="data.map.locale" class="h-11 w-16 rounded-full border border-white/70 bg-white/85 px-3 text-xs font-bold shadow-sm backdrop-blur" @change="switchLocale(($event.target as HTMLSelectElement).value as 'ja' | 'en')"><option value="ja">JA</option><option value="en">EN</option></select>
-          <button type="button" class="grid size-11 place-items-center rounded-full border border-white/70 bg-white/85 text-sm font-bold shadow-sm backdrop-blur" data-visitor-action="info" aria-label="マップ情報を開く" @click="openInfo">i</button>
+          <select v-if="data.map.enabledLocales.includes('en')" id="public-locale-mobile" :value="data.map.locale" class="visitor-control h-11 w-16 rounded-full border border-white/70 bg-white/85 px-3 text-xs font-bold shadow-sm backdrop-blur" @change="switchLocale(($event.target as HTMLSelectElement).value as 'ja' | 'en')"><option value="ja">JA</option><option value="en">EN</option></select>
+          <button type="button" class="visitor-control grid size-11 place-items-center rounded-full border border-white/70 bg-white/85 text-sm font-bold shadow-sm backdrop-blur" data-visitor-action="info" aria-label="マップ情報を開く" @click="openInfo">i</button>
         </div>
         </div>
 
         <div v-show="!appModalOpen" data-map-fit-edge="top" class="absolute left-5 top-5 z-20 hidden max-w-[calc(100%_-_10rem)] items-center gap-3 md:flex">
-          <button v-if="showFloorSelector" type="button" class="flex min-h-11 min-w-0 max-w-full items-center gap-2 rounded-full border border-white/70 bg-white/95 px-4 text-sm font-bold shadow-sm backdrop-blur" data-visitor-action="floor" aria-haspopup="dialog" :aria-expanded="floorSelectorOpen" @click="openFloorSelector"><span class="shrink-0 text-xs font-medium text-stone-600">表示中</span><span class="truncate">{{ selectedFloor.name }}</span><span aria-hidden="true">⌄</span></button>
-          <p v-else class="min-w-0 truncate rounded-full bg-white/95 px-4 py-3 text-sm font-semibold shadow-sm">表示中 · {{ selectedFloor.name }}</p>
+          <button v-if="showFloorSelector" type="button" class="visitor-control flex min-h-11 min-w-0 max-w-full items-center gap-2 rounded-full border border-white/70 bg-white/95 px-4 text-sm font-bold shadow-sm backdrop-blur" data-visitor-action="floor" aria-haspopup="dialog" :aria-expanded="floorSelectorOpen" @click="openFloorSelector"><span class="shrink-0 text-xs font-medium text-stone-600">表示中</span><span class="truncate">{{ selectedFloor.name }}</span><span aria-hidden="true">⌄</span></button>
+          <p v-else class="visitor-surface min-w-0 truncate rounded-full bg-white/95 px-4 py-3 text-sm font-semibold shadow-sm">表示中 · {{ selectedFloor.name }}</p>
           <div v-if="hasFloorFacilities" class="visitor-marker-legend shrink-0" role="group" aria-label="マップ記号の凡例">
             <span><i class="visitor-marker-legend__destination" aria-hidden="true" />目的地</span><span><i class="visitor-marker-legend__facility" aria-hidden="true" />設備</span>
           </div>
@@ -335,7 +335,7 @@ onBeforeUnmount(clearPendingSpotClose)
         >
           <div class="pointer-events-auto">
             <CategoryFilter v-model="selectedCategoryIds" :categories="categories" :counts="categoryCounts" />
-            <p v-if="selectedCategoryIds.length" role="status" class="mt-1 flex max-w-full items-start lg:hidden gap-2 rounded-xl bg-white/95 px-3 py-1 text-xs font-semibold leading-5 text-stone-800">
+            <p v-if="selectedCategoryIds.length" role="status" class="visitor-surface mt-1 flex max-w-full items-start lg:hidden gap-2 rounded-xl bg-white/95 px-3 py-1 text-xs font-semibold leading-5 text-stone-800">
               <span class="min-w-0 flex-1 truncate" :title="selectedCategoryNames">{{ selectedCategoryNames }}</span>
               <span class="shrink-0">{{ selectedCategoryIds.length }}カテゴリ · {{ visibleSpots.length }}件</span>
             </p>
@@ -395,13 +395,13 @@ onBeforeUnmount(clearPendingSpotClose)
 </template>
 
 <style scoped>
-.public-map-stage { background: #edf1f0; }
-.visitor-marker-legend { display: flex; align-items: center; gap: .75rem; border-radius: .625rem; background: rgb(255 255 255 / 94%); padding: .375rem .625rem; font-size: .6875rem; font-weight: 600; color: #44403c; box-shadow: 0 1px 3px rgb(28 25 23 / 8%); }
+.public-map-stage { background: #f4f6f7; }
+.visitor-marker-legend { display: flex; align-items: center; gap: .75rem; border-radius: .625rem; background: rgb(255 255 255 / 94%); padding: .375rem .625rem; font-size: .6875rem; font-weight: 600; color: var(--visitor-muted); box-shadow: var(--visitor-shadow); }
 .visitor-marker-legend span { display: inline-flex; align-items: center; gap: .375rem; }
 .visitor-marker-legend i { display: inline-block; width: .75rem; height: .75rem; border: 1.5px solid #44403c; }
 .visitor-marker-legend__destination { border-radius: 50% 50% 50% 0; transform: rotate(-45deg); background: #44403c; }
 .visitor-marker-legend__facility { border-radius: .2rem; background: white; }
-button:focus-visible, select:focus-visible { outline: 2px solid #9a3412; outline-offset: 2px; }
+button:focus-visible, select:focus-visible { outline: 2px solid var(--visitor-focus, #b45309); outline-offset: 2px; }
 
 :deep(.maplibregl-map) {
   border-radius: 0;
