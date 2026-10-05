@@ -67,7 +67,7 @@ describe('MapViewerのカメラ制約', () => {
     const style = createMapViewerStyle('edit')
     expect(style.sources).toEqual({})
     expect(style.layers).toMatchObject([{ paint: { 'background-color': '#f5f5f4' } }])
-    expect(createMapViewerStyle('view', true).layers).toMatchObject([{ paint: { 'background-color': '#eeeae4' } }])
+    expect(createMapViewerStyle('view', true).layers).toMatchObject([{ paint: { 'background-color': '#f4f6f7' } }])
     expect(JSON.stringify(style)).not.toContain('openstreetmap')
   })
 
@@ -176,6 +176,9 @@ describe('Markerの表示内容', () => {
       imageUrl: null,
       iconFamily: 'kanji',
       symbol: '●',
+      text: null,
+      facility: false,
+      facilityImageUrl: null,
     })
   })
 
@@ -203,6 +206,9 @@ describe('Markerの表示内容', () => {
       imageUrl: '/uploads/custom.png',
       iconFamily: null,
       symbol: null,
+      text: null,
+      facility: false,
+      facilityImageUrl: null,
     })
   })
 
@@ -219,6 +225,9 @@ describe('Markerの表示内容', () => {
       imageUrl: '/uploads/illustration.png',
       iconFamily: null,
       symbol: null,
+      text: null,
+      facility: false,
+      facilityImageUrl: null,
     })
   })
 

@@ -1,4 +1,4 @@
-import { materialSymbolPresets as sharedMaterialSymbolPresets, type MaterialSymbolPresetId } from './icon-presets'
+import { facilityIconPresets, materialSymbolPresets as sharedMaterialSymbolPresets, type FacilityIconPresetId, type MaterialSymbolPresetId } from './icon-presets'
 
 export const kanjiIconPresets = [
   { id: 'kanji:食', legacyId: 'food', label: '飲食', symbol: '食' },
@@ -15,14 +15,14 @@ export const pinIconPresets = kanjiIconPresets
 
 export const materialSymbolPresets = sharedMaterialSymbolPresets
 
-export const materialSymbolNames = materialSymbolPresets
-  .map(preset => preset.name)
-  .toSorted()
+export { facilityIconPresets }
+
+export const materialSymbolNames = materialSymbolPresets.map(preset => preset.name).toSorted()
 
 export type PinIconPresetId = typeof pinIconPresets[number]['id']
-export type { MaterialSymbolPresetId }
-export type PinIconId = PinIconPresetId | MaterialSymbolPresetId
-export type PinIconFamily = 'kanji' | 'material'
+export type { FacilityIconPresetId, MaterialSymbolPresetId }
+export type PinIconId = PinIconPresetId | MaterialSymbolPresetId | FacilityIconPresetId
+export type PinIconFamily = 'kanji' | 'material' | 'facility'
 export const pinIconTypes = ['preset', 'custom', 'illustration'] as const
 export type PinIconType = typeof pinIconTypes[number]
 export const spotImportances = ['normal', 'featured'] as const
@@ -50,7 +50,17 @@ export function defaultMaterialSymbolId(): MaterialSymbolPresetId {
   return 'material:directions_walk'
 }
 
+export function defaultFacilityIconId(): FacilityIconPresetId {
+  return 'facility:wc'
+}
+
+export function isFacilityPinIcon(appearance: { pinIconType: string, pinIconId?: string | null }) {
+  return appearance.pinIconType === 'preset'
+    && facilityIconPresets.some(preset => preset.id === appearance.pinIconId)
+}
+
 export function isSupportedPinIconId(id: string) {
+  if (facilityIconPresets.some(preset => preset.id === id)) return true
   if (materialSymbolPresets.some(preset => preset.id === id)) return true
   return kanjiIconPresets.some(preset =>
     preset.id === id
@@ -63,6 +73,12 @@ export function getPinIconPreset(id: string | null | undefined) {
   const fallbackId = defaultPinIconId()
   const fallback = kanjiIconPresets.find(preset => preset.id === fallbackId)!
 
+  const facilityPreset = facilityIconPresets.find(preset => preset.id === id)
+  if (facilityPreset) {
+    return { family: 'facility' as const, id: facilityPreset.id, label: facilityPreset.label,
+      symbol: facilityPreset.name, text: facilityPreset.text, imageUrl: facilityPreset.imageUrl }
+  }
+
   if (id?.startsWith('material:')) {
     const materialPreset = materialSymbolPresets.find(preset => preset.id === id)
     if (materialPreset) {
@@ -71,6 +87,8 @@ export function getPinIconPreset(id: string | null | undefined) {
         id: materialPreset.id,
         label: materialPreset.label,
         symbol: materialPreset.name,
+        text: null,
+        imageUrl: null,
       }
     }
   }
@@ -87,6 +105,8 @@ export function getPinIconPreset(id: string | null | undefined) {
     id: kanjiPreset.id,
     label: kanjiPreset.label,
     symbol: kanjiPreset.symbol,
+    text: null,
+    imageUrl: null,
   }
 }
 

@@ -368,6 +368,61 @@ defineExpose({
   border-radius: 0.5rem;
 }
 
+/* Equipment keeps the 60px button and ground contact; only its explicit preset
+   changes the painted grammar. The entrance paint copy inherits these rules. */
+.map-viewer-marker--facility {
+  --facility-paint-scale: clamp(0.875, var(--marker-size-scale, 1), 1.125);
+}
+.map-viewer-marker--facility .map-viewer-marker__shape {
+  box-sizing: border-box;
+  left: calc(50% - 1rem);
+  width: 2rem;
+  height: 2rem;
+  border: 2px solid var(--pin-color);
+  border-radius: 0.5rem;
+  background: white;
+  box-shadow: 0 2px 4px rgb(37 48 58 / 22%);
+  color: #1c1917;
+  transform: none;
+  transform-origin: bottom center;
+  scale: var(--facility-paint-scale);
+}
+.map-viewer-marker--facility .map-viewer-marker__content {
+  width: 1.5rem;
+  height: 1.5rem;
+  overflow: hidden;
+  border-radius: 0;
+  background: transparent;
+  color: #1c1917;
+  transform: none;
+  object-fit: contain;
+}
+.map-viewer-marker--facility .map-viewer-marker__shape--with-text {
+  align-content: center;
+}
+.map-viewer-marker--facility .map-viewer-marker__shape--with-text .map-viewer-marker__content {
+  height: 1.125rem;
+}
+.map-viewer-marker__facility-text {
+  color: #1c1917;
+  font-family: system-ui, sans-serif;
+  font-size: 0.5rem;
+  font-weight: 800;
+  line-height: 1;
+}
+.map-viewer-marker--facility.map-viewer-marker--selected .map-viewer-marker__shape,
+.map-viewer-marker--facility.map-viewer-marker--candidate .map-viewer-marker__shape,
+.map-viewer-marker--facility:focus-visible .map-viewer-marker__shape {
+  outline: 2px solid #25483c;
+  outline-offset: 2px;
+  box-shadow: 0 2px 4px rgb(37 48 58 / 22%);
+  scale: calc(var(--facility-paint-scale) * 1.08);
+}
+.map-viewer-marker--facility .map-viewer-marker__featured {
+  bottom: 1.5rem;
+  left: calc(50% + 0.625rem);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .public-map-viewer .map-viewer-marker__shape,
   .public-map-viewer .map-viewer-marker__illustration { transition: none; }
@@ -563,6 +618,9 @@ defineExpose({
   }
 }
 @media (prefers-reduced-motion: reduce) {
+  .visitor-map-viewer .animate-pulse {
+    animation: none;
+  }
   .visitor-map-viewer [role="region"] {
     transition: none;
   }

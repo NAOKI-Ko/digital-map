@@ -7,6 +7,7 @@ import PublicMapInfo from '~/components/map/PublicMapInfo.vue'
 import SpotDetailCard from '~/components/map/SpotDetailCard.vue'
 import { collectSpotCategories, filterSpotsByCategoryIds } from '~/utils/category-filter'
 import { closeFilteredSpot, createFloorSwitchState, selectedSpotIdFromOverlay, shouldShowFloorSelector, type PublicOverlay } from '~/utils/public-map-ui'
+import { isFacilityPinIcon } from '~~/shared/constants/spot'
 import type { MapViewerSpot } from '~~/shared/types/map-viewer'
 import type { PublicMapResponse } from '~~/shared/types/public-map'
 import { messages, normalizeLocale } from '~~/shared/i18n/messages'
@@ -79,6 +80,7 @@ const selectedFloor = computed(() => (
   data.value?.map.floors.find(floor => floor.id === selectedFloorId.value)
   ?? data.value?.map.floors[0]
 ))
+const hasFloorFacilities = computed(() => selectedFloor.value?.spots.some(isFacilityPinIcon) ?? false)
 const selectedSpot = computed(() => (
   selectedFloor.value?.spots.find(spot => spot.id === selectedSpotId.value)
   ?? null
@@ -239,6 +241,10 @@ function openInfo(event: MouseEvent) {
   overlay.value = { type: 'info' }
 }
 
+function retryMap() {
+  window.location.reload()
+}
+
 function selectFloor(floorId: string) {
   overlay.value = null
   const state = createFloorSwitchState(selectedFloorId.value, floorId)
@@ -259,13 +265,14 @@ onBeforeUnmount(clearPendingSpotClose)
 
 <template>
   <main class="fixed inset-0 h-[100dvh] w-screen overflow-hidden bg-stone-100 text-stone-900 md:static md:w-auto">
-    <div v-if="status === 'pending' && !data?.map" class="grid h-full place-items-center px-6 text-sm text-stone-600">
+    <div v-if="status === 'pending' && !data?.map" role="status" aria-live="polite" class="grid h-full place-items-center px-6 text-sm text-stone-600">
       {{ t.loading }}
     </div>
     <div v-else-if="error" class="grid h-full place-items-center px-6">
-      <section class="max-w-md rounded-2xl bg-white p-8 text-center shadow-sm">
+      <section role="alert" class="max-w-md rounded-2xl bg-white p-8 text-center shadow-sm">
         <p class="text-sm font-semibold text-red-700">{{ t.error }}</p>
         <p class="mt-3 text-sm leading-6 text-stone-600">URLが正しいか、マップが公開中かをご確認ください。</p>
+        <button type="button" class="mt-5 min-h-11 rounded-xl bg-stone-900 px-5 text-sm font-semibold text-white" @click="retryMap">再読み込み</button>
       </section>
     </div>
     <div v-else-if="!data?.map.floors.length" class="grid h-full place-items-center px-6">
@@ -285,7 +292,7 @@ onBeforeUnmount(clearPendingSpotClose)
         </div>
         <nav v-show="!appModalOpen" aria-label="公開マップ操作" class="flex shrink-0 items-center gap-2">
           <label v-if="data.map.enabledLocales.includes('en')" class="sr-only" for="public-locale">{{ t.language }}</label>
-          <select v-if="data.map.enabledLocales.includes('en')" id="public-locale" :value="data.map.locale" class="rounded-full border border-stone-200 px-2.5 py-1.5 text-xs" @change="switchLocale(($event.target as HTMLSelectElement).value as 'ja' | 'en')"><option value="ja">日本語</option><option value="en">English</option></select>
+          <select v-if="data.map.enabledLocales.includes('en')" id="public-locale" :value="data.map.locale" class="min-h-11 rounded-full border border-stone-200 px-3 text-xs" @change="switchLocale(($event.target as HTMLSelectElement).value as 'ja' | 'en')"><option value="ja">日本語</option><option value="en">English</option></select>
           <button type="button" class="grid size-11 place-items-center rounded-full border border-stone-200 bg-white/80 text-sm font-bold" data-visitor-action="info" aria-label="マップ情報を開く" @click="openInfo">i</button>
         </nav>
       </header>
@@ -294,11 +301,14 @@ onBeforeUnmount(clearPendingSpotClose)
         <div v-show="!appModalOpen" class="pointer-events-none absolute inset-0 z-20 md:hidden" aria-label="公開マップ操作">
           <div data-map-fit-edge="top" class="absolute left-[calc(env(safe-area-inset-left)+0.75rem)] top-[calc(env(safe-area-inset-top)+0.75rem)] rounded-xl bg-white/90 px-3 py-2 shadow-sm backdrop-blur" :class="data.map.enabledLocales.includes('en') ? 'max-w-[calc(100vw-10rem)]' : 'max-w-[calc(100vw-7rem)]'">
             <h1 class="truncate text-sm font-bold">{{ data.map.name }}</h1>
-            <p v-if="!showFloorSelector" class="truncate text-xs text-stone-600">{{ selectedFloor.name }}</p>
+            <p class="truncate text-xs text-stone-600">表示中 · {{ selectedFloor.name }}</p>
+          </div>
+          <div v-if="hasFloorFacilities" class="visitor-marker-legend absolute left-[calc(env(safe-area-inset-left)+0.75rem)] top-[calc(env(safe-area-inset-top)+4.5rem)]" role="group" aria-label="マップ記号の凡例">
+            <span><i class="visitor-marker-legend__destination" aria-hidden="true" />目的地</span><span><i class="visitor-marker-legend__facility" aria-hidden="true" />設備</span>
           </div>
           <div v-if="showFloorSelector" v-show="!selectedSpot" data-map-fit-edge="bottom" class="pointer-events-auto absolute bottom-[calc(env(safe-area-inset-bottom)+2rem+var(--visitor-category-height,52px)+1.5rem)] left-[calc(env(safe-area-inset-left)+0.75rem)] max-w-[calc(100vw-10.5rem)]">
           <button type="button" class="flex h-11 max-w-full items-center gap-2 rounded-full border border-white/70 bg-white/85 px-4 text-sm font-bold shadow-sm backdrop-blur" data-visitor-action="floor" aria-haspopup="dialog" :aria-expanded="floorSelectorOpen" @click="openFloorSelector">
-            <span class="truncate">{{ selectedFloor.name }}</span> <span class="shrink-0" aria-hidden="true">⌄</span>
+            <span class="shrink-0 text-xs font-medium text-stone-600">フロア</span><span class="truncate">{{ selectedFloor.name }}</span> <span class="shrink-0" aria-hidden="true">⌄</span>
           </button>
           </div>
 
@@ -309,20 +319,23 @@ onBeforeUnmount(clearPendingSpotClose)
         </div>
         </div>
 
-        <div v-if="showFloorSelector && !appModalOpen" data-map-fit-edge="top" class="absolute left-5 top-5 z-20 hidden md:block">
-          <button type="button" class="flex min-h-11 max-w-full items-center gap-2 rounded-full border border-white/70 bg-white/80 px-4 text-sm font-bold shadow-sm backdrop-blur" data-visitor-action="floor" aria-haspopup="dialog" :aria-expanded="floorSelectorOpen" @click="openFloorSelector"><span class="truncate">{{ selectedFloor.name }}</span><span aria-hidden="true">⌄</span></button>
+        <div v-show="!appModalOpen" data-map-fit-edge="top" class="absolute left-5 top-5 z-20 hidden max-w-[calc(100%_-_10rem)] items-center gap-3 md:flex">
+          <button v-if="showFloorSelector" type="button" class="flex min-h-11 min-w-0 max-w-full items-center gap-2 rounded-full border border-white/70 bg-white/95 px-4 text-sm font-bold shadow-sm backdrop-blur" data-visitor-action="floor" aria-haspopup="dialog" :aria-expanded="floorSelectorOpen" @click="openFloorSelector"><span class="shrink-0 text-xs font-medium text-stone-600">表示中</span><span class="truncate">{{ selectedFloor.name }}</span><span aria-hidden="true">⌄</span></button>
+          <p v-else class="min-w-0 truncate rounded-full bg-white/95 px-4 py-3 text-sm font-semibold shadow-sm">表示中 · {{ selectedFloor.name }}</p>
+          <div v-if="hasFloorFacilities" class="visitor-marker-legend shrink-0" role="group" aria-label="マップ記号の凡例">
+            <span><i class="visitor-marker-legend__destination" aria-hidden="true" />目的地</span><span><i class="visitor-marker-legend__facility" aria-hidden="true" />設備</span>
+          </div>
         </div>
 
         <div
           ref="categoryDock"
           v-show="!appModalOpen && !selectedSpot"
           class="pointer-events-none absolute bottom-[calc(env(safe-area-inset-bottom)+2rem)] left-[calc(env(safe-area-inset-left)+0.75rem)] right-[calc(env(safe-area-inset-right)+0.75rem)] z-20 md:left-1/2 md:right-auto md:w-[min(50vw,44rem)] md:-translate-x-1/2 lg:bottom-auto lg:left-5 lg:right-auto lg:top-20 lg:w-60 lg:translate-x-0 lg:[--category-fit-height:52px]"
-          :class="{ 'lg:!top-5': !showFloorSelector }"
         >
           <div class="pointer-events-auto">
             <CategoryFilter v-model="selectedCategoryIds" :categories="categories" :counts="categoryCounts" />
             <p v-if="selectedCategoryIds.length" role="status" class="mt-1 flex max-w-full items-start lg:hidden gap-2 rounded-xl bg-white/95 px-3 py-1 text-xs font-semibold leading-5 text-stone-800">
-              <span class="min-w-0 flex-1 break-words">{{ selectedCategoryNames }}</span>
+              <span class="min-w-0 flex-1 truncate" :title="selectedCategoryNames">{{ selectedCategoryNames }}</span>
               <span class="shrink-0">{{ selectedCategoryIds.length }}カテゴリ · {{ visibleSpots.length }}件</span>
             </p>
           </div>
@@ -349,7 +362,7 @@ onBeforeUnmount(clearPendingSpotClose)
             @collision-started="beginMapRecovery"
           />
           <template #fallback>
-            <div class="h-full animate-pulse bg-stone-200" />
+            <div role="status" class="grid h-full place-items-center bg-stone-100 text-sm text-stone-600">{{ t.loading }}</div>
           </template>
         </ClientOnly>
 
@@ -363,13 +376,14 @@ onBeforeUnmount(clearPendingSpotClose)
         </div>
 
         <ClientOnly>
-          <MapOperationHint :storage-key="`digital-map:operation-hint:${data.map.slug}`" />
+          <MapOperationHint :storage-key="`digital-map:operation-hint:${data.map.slug}`" :suppressed="appModalOpen || Boolean(selectedSpot)" />
         </ClientOnly>
       </section>
 
       <SpotDetailCard
         v-if="selectedSpot"
         :spot="selectedSpot"
+        :floor-name="selectedFloor.name"
         @close="closeSpot"
         @expanded-change="() => nextTick(ensureSelectedSpotVisible)"
       />
@@ -380,13 +394,21 @@ onBeforeUnmount(clearPendingSpotClose)
 </template>
 
 <style scoped>
+.public-map-stage { background: #edf1f0; }
+.visitor-marker-legend { display: flex; align-items: center; gap: .75rem; border-radius: .625rem; background: rgb(255 255 255 / 94%); padding: .375rem .625rem; font-size: .6875rem; font-weight: 600; color: #44403c; box-shadow: 0 1px 3px rgb(28 25 23 / 8%); }
+.visitor-marker-legend span { display: inline-flex; align-items: center; gap: .375rem; }
+.visitor-marker-legend i { display: inline-block; width: .75rem; height: .75rem; border: 1.5px solid #44403c; }
+.visitor-marker-legend__destination { border-radius: 50% 50% 50% 0; transform: rotate(-45deg); background: #44403c; }
+.visitor-marker-legend__facility { border-radius: .2rem; background: white; }
+button:focus-visible, select:focus-visible { outline: 2px solid #9a3412; outline-offset: 2px; }
+
 :deep(.maplibregl-map) {
   border-radius: 0;
 }
 
 @media (min-width: 768px) {
   .public-map-has-spot :deep(.maplibregl-ctrl-top-right) {
-    right: calc(min(32rem, 100vw - 2.5rem) + 2rem);
+    right: calc(min(26rem, 44vw) + 2rem);
   }
 }
 </style>

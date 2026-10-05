@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getPinIconPreset } from '~~/shared/constants/spot'
+import { getPinIconPreset, isFacilityPinIcon } from '~~/shared/constants/spot'
 import type { AdminSpotDetail, SpotPublishResponse } from '~~/shared/types/spot'
 import type { SpotFieldDefinitionItem } from '~~/shared/types/spot-field'
 import { getPinColorVariants } from '~~/shared/utils/pin-style'
@@ -24,6 +24,7 @@ const isPreviewOpen = ref(false)
 const errorMessage = ref('')
 const { success } = useToast()
 const pinPreset = computed(() => getPinIconPreset(props.spot.pinIconId))
+const facility = computed(() => isFacilityPinIcon(props.spot))
 const hasCoordinates = computed(() => props.spot.hasPositionedPlacement ?? (props.spot.x !== null && props.spot.y !== null))
 const pinStyle = computed(() => {
   const colors = getPinColorVariants(props.spot.pinColor)
@@ -97,16 +98,19 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleKeydown))
             <img v-if="spot.photos[0]" :src="spot.photos[0]" :alt="`${spot.name}の代表写真`" class="h-full w-full object-cover">
             <div v-else class="grid h-full place-items-center text-sm text-stone-500">写真は登録されていません</div>
             <div class="absolute bottom-0 left-5 translate-y-1/2">
-              <div class="spot-preview-marker" :class="{ 'spot-preview-marker--illustration': spot.pinIconType === 'illustration' }">
+              <div class="spot-preview-marker" :class="{ 'spot-preview-marker--illustration': spot.pinIconType === 'illustration', 'spot-preview-marker--facility': facility }">
                 <span class="spot-preview-shadow" aria-hidden="true" />
                 <img v-if="spot.pinIconType === 'illustration' && spot.pinIconImageUrl" :src="spot.pinIconImageUrl" alt="" class="spot-preview-illustration">
-                <div v-else class="spot-preview-pin" :style="pinStyle">
+                <div v-else class="spot-preview-pin" :class="{ 'spot-preview-pin--with-text': facility && pinPreset.text }" :style="pinStyle">
                   <img v-if="spot.pinIconType === 'custom' && spot.pinIconImageUrl" :src="spot.pinIconImageUrl" alt="" class="spot-preview-pin__content spot-preview-pin__content--custom">
+                  <img v-else-if="facility && pinPreset.imageUrl" :src="pinPreset.imageUrl" alt="" aria-hidden="true" class="spot-preview-pin__content spot-preview-pin__content--facility">
                   <span
                     v-else
                     class="spot-preview-pin__content"
                     :class="pinPreset.family === 'material' ? 'material-symbols-outlined spot-preview-pin__content--material' : 'spot-preview-pin__content--kanji'"
+                    aria-hidden="true"
                   >{{ pinPreset.symbol }}</span>
+                  <span v-if="facility && pinPreset.text" class="spot-preview-pin__facility-text" aria-hidden="true">{{ pinPreset.text }}</span>
                 </div>
               </div>
             </div>
@@ -212,6 +216,34 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleKeydown))
 .spot-preview-pin__content--custom {
   object-fit: cover;
   object-position: center;
+}
+
+.spot-preview-marker--facility .spot-preview-pin {
+  align-content: center;
+  border-color: var(--pin-color);
+  border-radius: 0.75rem;
+  background: white;
+  box-shadow: 0 2px 4px rgb(37 48 58 / 22%);
+  color: #1c1917;
+  transform: none;
+}
+.spot-preview-marker--facility .spot-preview-pin__content {
+  overflow: hidden;
+  border-radius: 0;
+  background: transparent;
+  color: #1c1917;
+  transform: none;
+  object-fit: contain;
+}
+.spot-preview-marker--facility .spot-preview-pin--with-text .spot-preview-pin__content {
+  height: 2rem;
+}
+.spot-preview-pin__facility-text {
+  color: #1c1917;
+  font-size: 0.75rem;
+  font-weight: 800;
+  line-height: 1;
+  transform: none;
 }
 
 .spot-preview-illustration {

@@ -49,7 +49,7 @@ export function createMapViewerStyle(_mode: MapViewerMode, visitor = false): Sty
     layers: [{
       id: 'background',
       type: 'background',
-      paint: { 'background-color': visitor ? '#eeeae4' : '#f5f5f4' },
+      paint: { 'background-color': visitor ? '#f4f6f7' : '#f5f5f4' },
     }],
   }
 }

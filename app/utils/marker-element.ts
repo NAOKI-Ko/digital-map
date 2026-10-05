@@ -1,5 +1,5 @@
 import { bindVisitorMarkerInteraction } from './marker-interaction'
-import { getPinIconPreset } from '~~/shared/constants/spot'
+import { getPinIconPreset, isFacilityPinIcon } from '~~/shared/constants/spot'
 import type { MapViewerSpot } from '~~/shared/types/map-viewer'
 import { getPinColorVariants } from '~~/shared/utils/pin-style'
 
@@ -23,7 +23,24 @@ export function getSpotMarkerPresentation(spot: MapViewerSpot) {
     imageUrl: type === 'preset' ? null : spot.pinIconImageUrl,
     iconFamily: preset?.family ?? null,
     symbol: preset?.symbol ?? null,
+    text: preset?.text ?? null,
+    facility: isFacilityPinIcon(spot),
+    facilityImageUrl: isFacilityPinIcon(spot) ? preset?.imageUrl ?? null : null,
   }
+}
+
+/** Reused when collision recovery changes the action, so equipment meaning survives. */
+export function getSpotMarkerAccessibleName(spot: MapViewerSpot) {
+  return isFacilityPinIcon(spot)
+    ? `${spot.name}（設備・${getPinIconPreset(spot.pinIconId).label}）`
+    : spot.name
+}
+
+export function getSpotMarkerVisitorLabel(spot: MapViewerSpot, collisionCount = 1, includeCount = true) {
+  const name = getSpotMarkerAccessibleName(spot)
+  return collisionCount > 1
+    ? `${name}の周辺ピンを表示${includeCount ? `（${collisionCount}件）` : ''}`
+    : `${name}の詳細を表示`
 }
 
 export interface CreateSpotMarkerElementOptions {
@@ -50,6 +67,7 @@ export function createSpotMarkerElement(
   element.type = 'button'
   element.className = 'map-viewer-marker'
   element.classList.toggle('map-viewer-marker--illustration', presentation.type === 'illustration')
+  element.classList.toggle('map-viewer-marker--facility', presentation.facility)
   element.classList.toggle('map-viewer-marker--selected', options.selected)
   element.classList.toggle('map-viewer-marker--featured', spot.importance === 'featured')
   element.classList.toggle('map-viewer-marker--dimmed', Boolean(options.dimmed))
@@ -64,15 +82,16 @@ export function createSpotMarkerElement(
   element.style.setProperty('--pin-color-light', presentation.lightColor)
   element.style.setProperty('--pin-color-dark', presentation.darkColor)
   const candidateLabel = options.candidate === 'move' ? '移動先' : '仮配置'
+  const accessibleName = getSpotMarkerAccessibleName(spot)
   element.setAttribute('aria-label', options.candidate
-    ? `${spot.name}の${candidateLabel}ピンをドラッグして位置調整`
+    ? `${accessibleName}の${candidateLabel}ピンをドラッグして位置調整`
     : options.ghost
-      ? `${spot.name}の元の位置`
+      ? `${accessibleName}の元の位置`
       : options.mode === 'edit'
         ? options.draggable
-          ? `${spot.name}をドラッグして位置調整`
-          : `${spot.name}を選択`
-        : `${spot.name}の詳細を表示`)
+          ? `${accessibleName}をドラッグして位置調整`
+          : `${accessibleName}を選択`
+        : getSpotMarkerVisitorLabel(spot))
   element.title = spot.name
 
   if (options.candidate) {
@@ -100,7 +119,15 @@ export function createSpotMarkerElement(
   else {
     const shape = ownerDocument.createElement('span')
     shape.className = 'map-viewer-marker__shape'
-    if (presentation.type === 'custom' && presentation.imageUrl) {
+    if (presentation.facility && presentation.facilityImageUrl) {
+      const image = ownerDocument.createElement('img')
+      image.className = 'map-viewer-marker__content map-viewer-marker__content--facility'
+      image.src = presentation.facilityImageUrl
+      image.alt = ''
+      image.setAttribute('aria-hidden', 'true')
+      shape.append(image)
+    }
+    else if (presentation.type === 'custom' && presentation.imageUrl) {
       const image = ownerDocument.createElement('img')
       image.className = 'map-viewer-marker__content'
       image.src = presentation.imageUrl
@@ -113,7 +140,16 @@ export function createSpotMarkerElement(
         ? 'map-viewer-marker__content map-viewer-marker__content--material material-symbols-outlined'
         : 'map-viewer-marker__content'
       content.textContent = presentation.symbol
+      content.setAttribute('aria-hidden', 'true')
       shape.append(content)
+    }
+    if (presentation.facility && presentation.text) {
+      shape.classList.toggle('map-viewer-marker__shape--with-text', true)
+      const text = ownerDocument.createElement('span')
+      text.className = 'map-viewer-marker__facility-text'
+      text.textContent = presentation.text
+      text.setAttribute('aria-hidden', 'true')
+      shape.append(text)
     }
     element.append(shape)
   }

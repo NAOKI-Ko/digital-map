@@ -2,8 +2,10 @@
 const props = withDefaults(defineProps<{
   storageKey: string
   duration?: number
+  suppressed?: boolean
 }>(), {
   duration: 4200,
+  suppressed: false,
 })
 
 const visible = ref(false)
@@ -32,8 +34,8 @@ onBeforeUnmount(() => {
 <template>
   <Transition name="map-hint">
     <div
-      v-if="visible"
-      class="pointer-events-none absolute inset-x-4 bottom-[max(5.5rem,calc(env(safe-area-inset-bottom)+5.5rem))] z-30 mx-auto max-w-lg rounded-2xl bg-stone-950/85 px-5 py-4 text-center text-sm font-medium leading-6 text-white shadow-xl backdrop-blur sm:bottom-8"
+      v-if="visible && !suppressed"
+      class="pointer-events-none absolute inset-x-4 bottom-[calc(env(safe-area-inset-bottom)+var(--visitor-category-height,52px)+6rem)] z-30 mx-auto max-w-sm rounded-2xl bg-stone-950/85 px-4 py-3 text-center text-sm font-medium leading-6 text-white shadow-xl backdrop-blur sm:bottom-8"
       role="status"
     >
       <p class="font-bold">マップを自由に動かせます</p>
@@ -52,5 +54,10 @@ onBeforeUnmount(() => {
 .map-hint-leave-to {
   opacity: 0;
   transform: translateY(0.75rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .map-hint-enter-active, .map-hint-leave-active { transition: none; }
+  .map-hint-enter-from, .map-hint-leave-to { transform: none; }
 }
 </style>

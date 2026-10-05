@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { SpotCategorySummary } from '~~/shared/types/category'
+import { nextCategoryScrollLeft } from '~/utils/category-scroll'
 
 const props = defineProps<{ categories: readonly SpotCategorySummary[], modelValue: string[], counts?: Readonly<Record<string, number>> }>()
 const emit = defineEmits<{ 'update:modelValue': [categoryIds: string[]] }>()
@@ -20,6 +21,11 @@ function measure() {
 function reveal(event: FocusEvent) {
   ;(event.target as HTMLElement).scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'instant' })
 }
+function scrollCategories() {
+  const el = scroller.value
+  if (!el) return
+  el.scrollTo({ left: nextCategoryScrollLeft(el, canForward.value), behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })
+}
 function toggleCategory(categoryId: string) {
   emit('update:modelValue', props.modelValue.includes(categoryId)
     ? props.modelValue.filter(id => id !== categoryId)
@@ -34,35 +40,51 @@ onBeforeUnmount(() => {
   observer?.disconnect()
   if (measureFrame !== null) cancelAnimationFrame(measureFrame)
 })
-watch(() => props.categories, () => nextTick(() => { scroller.value?.scrollTo({ left: 0 }); measure() }))
+watch(() => props.categories, () => nextTick(() => {
+  observer?.disconnect()
+  if (scroller.value) observer?.observe(scroller.value)
+  scroller.value?.scrollTo({ left: 0 })
+  measure()
+}))
 </script>
 
 <template>
-  <div v-if="categories.length" class="category-filter flex min-w-0 items-center gap-2" role="group" aria-label="カテゴリで絞り込み">
+  <div v-if="categories.length" class="category-filter min-w-0" role="group" aria-label="カテゴリで絞り込み（複数選択可・いずれかに一致）">
+    <div class="category-mobile-heading"><span>カテゴリー</span><span>複数選択可 · いずれかに一致</span></div>
     <div class="category-palette-heading hidden"><span>カテゴリー</span><button type="button" :aria-pressed="modelValue.length === 0" @click="emit('update:modelValue', [])">すべて</button></div>
+    <div class="category-filter-options flex min-w-0 items-center gap-2">
     <button type="button" class="category-mobile-clear flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full border border-white/70 px-3 text-sm font-semibold shadow-sm backdrop-blur" :class="modelValue.length === 0 ? 'bg-stone-900 text-white' : 'bg-white/95 text-stone-800'" :aria-pressed="modelValue.length === 0" :aria-label="modelValue.length ? 'カテゴリの絞り込みを解除' : 'すべてのカテゴリを表示'" @click="emit('update:modelValue', [])">
       {{ modelValue.length ? 'クリア' : 'すべて' }}
     </button>
     <div class="category-list-frame relative min-w-0 flex-1">
       <div ref="scroller" class="category-chip-scroller flex min-w-0 gap-2 overflow-x-auto overscroll-x-contain py-1" @scroll="measure" @focusin="reveal">
-        <button v-for="category in categories" :key="category.id" type="button" class="category-item flex min-h-11 min-w-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-white/70 px-3 text-sm font-semibold shadow-sm backdrop-blur" :class="modelValue.includes(category.id) ? 'bg-terracotta-600 text-white' : 'bg-white/95 text-stone-700 hover:bg-white'" :aria-pressed="modelValue.includes(category.id)" @click="toggleCategory(category.id)">
-          <span class="category-check hidden" aria-hidden="true">{{ modelValue.includes(category.id) ? '✓' : '' }}</span>
+        <button v-for="category in categories" :key="category.id" type="button" class="category-item flex min-h-11 min-w-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-white/70 px-3 text-sm font-semibold shadow-sm backdrop-blur" :class="modelValue.includes(category.id) ? 'bg-terracotta-600 text-white' : 'bg-white/95 text-stone-700 hover:bg-white'" :aria-pressed="modelValue.includes(category.id)" :title="category.name" @click="toggleCategory(category.id)">
+          <span class="category-check" aria-hidden="true">{{ modelValue.includes(category.id) ? '✓' : '' }}</span>
           <CategoryIcon :icon-type="category.iconType" :icon-preset-id="category.iconPresetId" :icon-image-url="category.iconImageUrl" size="sm" />
           <span class="category-label">{{ category.name }}</span>
-          <span v-if="counts" class="category-count hidden">{{ counts[category.id] ?? 0 }}</span>
+          <span v-if="counts" class="category-count">{{ counts[category.id] ?? 0 }}</span>
         </button>
       </div>
       <span v-if="canBack" class="pointer-events-none absolute inset-y-1 lg:hidden left-0 w-4 rounded-l-full bg-gradient-to-r from-stone-100/90 to-transparent" aria-hidden="true" />
       <span v-if="canForward" class="pointer-events-none absolute inset-y-1 lg:hidden right-0 w-4 rounded-r-full bg-gradient-to-l from-stone-100/90 to-transparent" aria-hidden="true" />
     </div>
+    <button v-if="canBack || canForward" type="button" class="category-scroll-button grid size-11 shrink-0 place-items-center rounded-full border border-white/70 bg-white/95 text-lg text-stone-700 shadow-sm lg:hidden" :aria-label="canForward ? '次のカテゴリを表示' : '先頭のカテゴリへ戻る'" @click="scrollCategories"><span aria-hidden="true">{{ canForward ? '›' : '‹' }}</span></button>
+    </div>
     <div class="category-palette-footer hidden">
-      <span role="status">{{ modelValue.length ? `選択中 ${modelValue.length}件` : 'すべて表示' }}</span>
+      <span role="status">{{ modelValue.length ? `選択中 ${modelValue.length}カテゴリ` : 'すべて表示' }}</span>
       <button type="button" :disabled="!modelValue.length" aria-label="カテゴリの絞り込みを解除" @click="emit('update:modelValue', [])">クリア</button>
     </div>
   </div>
 </template>
 
 <style scoped>
+.category-mobile-heading { display: flex; align-items: baseline; flex-wrap: wrap; justify-content: space-between; gap: .5rem; margin-bottom: .125rem; padding: .125rem .25rem; font-size: .6875rem; font-weight: 600; color: #44403c; }
+.category-mobile-heading span { padding: .125rem .375rem; border-radius: .5rem; background: rgb(255 255 255 / 94%); }
+.category-check { display: inline-grid; place-items: center; width: .875rem; height: .875rem; flex: none; border: 1px solid currentColor; border-radius: .25rem; font-size: .6875rem; line-height: 1; }
+.category-count { flex: none; font-size: .75rem; font-variant-numeric: tabular-nums; opacity: .85; }
+.category-filter button:focus-visible { outline: 2px solid #9a3412; outline-offset: -2px; }
+.category-label { max-width: 15rem; overflow: hidden; text-overflow: ellipsis; }
+
 .category-chip-scroller {
   scrollbar-width: thin;
   scrollbar-color: #a8a29e transparent;
@@ -73,10 +95,12 @@ watch(() => props.categories, () => nextTick(() => { scroller.value?.scrollTo({ 
 /* Tailwind's existing lg breakpoint; no separate JS viewport state. */
 @screen lg {
   .category-filter { display: flex; flex-direction: column; align-items: stretch; gap: 0; width: 15rem; max-height: 50dvh; border: 1px solid rgb(255 255 255 / 85%); border-radius: 1rem; background: rgb(255 255 255 / 94%); box-shadow: 0 4px 18px rgb(28 25 23 / 8%); backdrop-filter: blur(12px); }
-  .category-mobile-clear { display: none; }
+  .category-mobile-clear, .category-mobile-heading { display: none; }
+  .category-filter-options { display: flex; min-height: 0; flex: 1; align-items: stretch; }
   .category-palette-heading, .category-palette-footer { display: flex; flex: none; align-items: center; justify-content: space-between; gap: .5rem; padding: .25rem .75rem; }
   .category-palette-heading { font-size: .875rem; font-weight: 700; border-bottom: 1px solid #e7e5e4; }
-  .category-palette-footer { border-top: 1px solid #e7e5e4; color: #57534e; font-size: .75rem; }
+  .category-palette-footer::before { content: '複数選択可 · いずれかに一致'; display: block; font-size: .6875rem; width: 100%; }
+  .category-palette-footer { flex-wrap: wrap; border-top: 1px solid #e7e5e4; color: #57534e; font-size: .75rem; }
   .category-palette-heading button, .category-palette-footer button { min-height: 44px; padding: 0 .5rem; border-radius: .5rem; font-weight: 600; }
   .category-palette-heading button[aria-pressed="true"] { color: #a9361c; }
   .category-palette-footer button:disabled { opacity: .45; }
@@ -86,8 +110,8 @@ watch(() => props.categories, () => nextTick(() => { scroller.value?.scrollTo({ 
   .category-item { width: 100%; gap: .5rem; padding: .5rem; white-space: normal; border-radius: .625rem; border: 0; box-shadow: none; backdrop-filter: none; background: transparent; text-align: left; }
   .category-item:hover { background: #f5f5f4; }
   .category-item[aria-pressed="true"] { background: #fbe8e3; color: #8c311f; }
-  .category-check { display: block; flex: 0 0 .875rem; font-weight: 800; }
-  .category-label { flex: 1; min-width: 0; overflow-wrap: anywhere; line-height: 1.4; }
+  .category-check { flex: 0 0 .875rem; font-weight: 800; }
+  .category-label { overflow: visible; flex: 1; min-width: 0; max-width: none; overflow-wrap: anywhere; line-height: 1.4; }
   .category-count { display: block; flex: none; font-size: .75rem; font-variant-numeric: tabular-nums; color: #78716c; }
 }
 </style>

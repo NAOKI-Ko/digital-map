@@ -1,0 +1,5 @@
+Material Symbols by Google, Apache License 2.0.
+Source repository: https://github.com/google/material-design-icons
+Pinned source revision: 737e3324305806514d7909874fa1818ae1808232
+Original files: symbols/web/<name>/materialsymbolsoutlined/<name>_24px.svg
+Modification: fixed dark fill #17384d for visitor contrast. Geometry unmodified.

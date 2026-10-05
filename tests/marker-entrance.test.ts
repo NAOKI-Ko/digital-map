@@ -26,13 +26,16 @@ describe('visitor floor entrance', () => {
     expect(planPinEntrance(pins)[0]!.id).toBe('1')
     expect(pins[0]!.id).toBe('0')
   })
-  it('animates only inert paint copies; collision geometry stays at final bounds', () => {
+  it.each([false, true])('animates only inert paint copies; collision geometry stays at final bounds (facility %s)', (facility) => {
     const animate = vi.spyOn(Element.prototype, 'animate').mockReturnValue({ onfinish: null, oncancel: null } as Animation)
     const entrance = createPinEntrance(), a = pin('a')
+    a.element.classList.toggle('map-viewer-marker--facility', facility)
     const before = measurePinVisualRect(a.element)
     entrance.prepare('floor-a', [a.element]); entrance.play([a], false)
     expect(animate).toHaveBeenCalledTimes(1)
     expect(a.element.querySelector('.map-viewer-marker__entrance')?.getAttribute('aria-hidden')).toBe('true')
+    expect(a.element.classList.contains('map-viewer-marker--facility')).toBe(facility)
+    expect(a.element.querySelector('.map-viewer-marker__entrance .map-viewer-marker__shape')).not.toBeNull()
     expect(measurePinVisualRect(a.element)).toEqual(before)
     a.element.dispatchEvent(new Event('pointerdown'))
     expect(a.element.querySelector('.map-viewer-marker__entrance')).toBeNull()
