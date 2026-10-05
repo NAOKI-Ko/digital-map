@@ -1,6 +1,6 @@
 # BB003 / BB004 overview assistance — source review snapshot
 
-This batch follows the immutable bacbf691 visual polish candidate. It has not been installed in Windows or checked in a browser. It does not claim that BB003/BB004 quality findings are closed.
+This batch adds explicit Overview assistance to the visitor visual polish. Independent browser QA must judge the final candidate; this design does not claim that BB003/BB004 quality findings are closed.
 
 ## BB003: one recommendation after a larger viewport
 
@@ -14,7 +14,7 @@ The camera and painted map occupancy remain unchanged until an explicit Overview
 
 Only one existing category whose every member placement has an explicit supported facility preset qualifies, and it must contain every explicitly supported facility placement on that floor. An uncategorized facility or one only in a different mixed category suppresses the shortcut; no subset is described as all equipment. The helper evaluates all memberships on the selected floor. Mixed categories, unknown/legacy IDs, custom/illustration appearances, no category and multiple qualifying categories produce no shortcut. Names are never classification evidence. The current fixture qualifies `wu77-cat-3` on both floors with 12 and 6 placements respectively.
 
-`設備を全体で見る` is a fixed 44px button inside the existing mobile CategoryFilter options row, outside the chip scroller. It is hidden at md, while loading, when its category is already selected, and whenever the existing category dock is hidden for Detail or a modal. It preserves the current row height, heading, 52px desktop band and sentinel. No extra overlay or fit edge is added. Available horizontal chip space becomes narrower; the existing pager, fades and keyboard focus scrolling remain available without reordering categories.
+`設備を全体で見る` is a fixed 44px button inside the existing mobile CategoryFilter options row, outside the chip scroller. It is hidden at md, while loading, when its category is already selected, and whenever the existing category dock is hidden for Detail or a modal. It preserves the current row height, heading, 52px desktop band and sentinel. No extra overlay or fit edge is added. Available horizontal chip space becomes narrower; the existing pager, fades and keyboard focus scrolling remain available without reordering categories. At viewport widths of 359 CSS pixels or below, only this supplemental shortcut is hidden so the primary Category controls and pager retain their existing single row. The 390px and 430px layouts keep the shortcut when otherwise eligible. No second row or fit reserve is added. Actual browser 200% zoom and text-only enlargement still require independent QA; a width rule alone does not prove accessibility.
 
 An explicit shortcut click appends the category to existing OR selections. It then waits for Vue rendering, one animation frame, actual dock measurement and another Vue render to update the existing fit sentinel and controls. It finally focuses the existing native Overview button with preventScroll and invokes its click, preserving the original showWholeFloor path. Floor/category/Detail/modal/readiness changes during that wait cancel the fit. This focus transfer prevents keyboard focus from remaining on the disappearing shortcut; it is not a marker-selection change.
 
