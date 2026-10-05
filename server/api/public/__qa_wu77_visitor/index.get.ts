@@ -5,6 +5,8 @@ import type { PublicMapResponse } from '~~/shared/types/public-map'
 export function createWu77VisitorFixture(baseline = false): PublicMapResponse {
   if (!import.meta.dev) throw createError({ statusCode: 404 })
   const response = structuredClone(fixture) as PublicMapResponse
+  // Same fixed artwork rasterized for MapLibre's image source, which cannot decode SVG.
+  for (const floor of response.map.floors) floor.illustrationUrl = '/__qa__/wu77/aquarium.png'
   if (baseline) {
     const legacy: Record<string, string> = {
       'facility:wc': 'material:wc',
