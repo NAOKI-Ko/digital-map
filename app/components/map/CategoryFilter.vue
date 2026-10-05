@@ -51,10 +51,13 @@ watch(() => props.categories, () => nextTick(() => {
 <template>
   <div v-if="categories.length" class="category-filter min-w-0" role="group" aria-label="カテゴリで絞り込み（複数選択可・いずれかに一致）">
     <div class="category-mobile-heading"><span>カテゴリー</span><span>複数選択可 · いずれかに一致</span></div>
-    <div class="category-palette-heading hidden"><span>カテゴリー</span><button type="button" :aria-pressed="modelValue.length === 0" @click="emit('update:modelValue', [])">すべて</button></div>
     <div class="category-filter-options flex min-w-0 items-center gap-2">
-    <button type="button" class="category-mobile-clear flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full border border-white/70 px-3 text-sm font-semibold shadow-sm backdrop-blur" :class="modelValue.length === 0 ? 'bg-stone-900 text-white' : 'bg-white/95 text-stone-800'" :aria-pressed="modelValue.length === 0" :aria-label="modelValue.length ? 'カテゴリの絞り込みを解除' : 'すべてのカテゴリを表示'" @click="emit('update:modelValue', [])">
-      {{ modelValue.length ? 'クリア' : 'すべて' }}
+    <button type="button" class="category-mobile-clear flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full border border-white/70 px-3 text-sm font-semibold shadow-sm backdrop-blur" :class="modelValue.length === 0 ? 'bg-stone-900 text-white' : 'bg-white/95 text-stone-800'" :aria-pressed="modelValue.length === 0" title="選んだいずれかのカテゴリーに一致するスポットを表示します" :aria-label="modelValue.length ? 'カテゴリの絞り込みを解除' : 'すべてのカテゴリを表示'" @click="emit('update:modelValue', [])">
+      <span class="lg:hidden">{{ modelValue.length ? 'クリア' : 'すべて' }}</span>
+      <span class="hidden flex-col items-center leading-tight lg:flex">
+        <span class="text-[10px] font-medium">カテゴリー · 複数選択可</span>
+        <span class="mt-0.5">{{ modelValue.length ? `クリア (${modelValue.length})` : 'すべて' }}</span>
+      </span>
     </button>
     <div class="category-list-frame relative min-w-0 flex-1">
       <div ref="scroller" class="category-chip-scroller flex min-w-0 gap-2 overflow-x-auto overscroll-x-contain py-1" @scroll="measure" @focusin="reveal">
@@ -65,15 +68,12 @@ watch(() => props.categories, () => nextTick(() => {
           <span v-if="counts" class="category-count">{{ counts[category.id] ?? 0 }}</span>
         </button>
       </div>
-      <span v-if="canBack" class="pointer-events-none absolute inset-y-1 lg:hidden left-0 w-4 rounded-l-full bg-gradient-to-r from-stone-100/90 to-transparent" aria-hidden="true" />
-      <span v-if="canForward" class="pointer-events-none absolute inset-y-1 lg:hidden right-0 w-4 rounded-r-full bg-gradient-to-l from-stone-100/90 to-transparent" aria-hidden="true" />
+      <span v-if="canBack" class="pointer-events-none absolute inset-y-1 left-0 w-4 rounded-l-full bg-gradient-to-r from-stone-100/90 to-transparent" aria-hidden="true" />
+      <span v-if="canForward" class="pointer-events-none absolute inset-y-1 right-0 w-4 rounded-r-full bg-gradient-to-l from-stone-100/90 to-transparent" aria-hidden="true" />
     </div>
-    <button v-if="canBack || canForward" type="button" class="category-scroll-button grid size-11 shrink-0 place-items-center rounded-full border border-white/70 bg-white/95 text-lg text-stone-700 shadow-sm lg:hidden" :aria-label="canForward ? '次のカテゴリを表示' : '先頭のカテゴリへ戻る'" @click="scrollCategories"><span aria-hidden="true">{{ canForward ? '›' : '‹' }}</span></button>
+    <button v-if="canBack || canForward" type="button" class="category-scroll-button grid size-11 shrink-0 place-items-center rounded-full border border-white/70 bg-white/95 text-lg text-stone-700 shadow-sm" :aria-label="canForward ? '次のカテゴリを表示' : '先頭のカテゴリへ戻る'" @click="scrollCategories"><span aria-hidden="true">{{ canForward ? '›' : '‹' }}</span></button>
     </div>
-    <div class="category-palette-footer hidden">
-      <span role="status">{{ modelValue.length ? `選択中 ${modelValue.length}カテゴリ` : 'すべて表示' }}</span>
-      <button type="button" :disabled="!modelValue.length" aria-label="カテゴリの絞り込みを解除" @click="emit('update:modelValue', [])">クリア</button>
-    </div>
+    <p class="sr-only hidden lg:block" role="status">{{ modelValue.length ? `選択中 ${modelValue.length}カテゴリ` : 'すべて表示' }}</p>
   </div>
 </template>
 
@@ -92,26 +92,11 @@ watch(() => props.categories, () => nextTick(() => {
 }
 .category-chip-scroller::-webkit-scrollbar { height: 3px; }
 .category-chip-scroller::-webkit-scrollbar-thumb { background: #a8a29e; border-radius: 999px; }
-/* Tailwind's existing lg breakpoint; no separate JS viewport state. */
+/* Keep the desktop dock inside its existing 52px reserved band. */
 @screen lg {
-  .category-filter { display: flex; flex-direction: column; align-items: stretch; gap: 0; width: 15rem; max-height: 50dvh; border: 1px solid rgb(255 255 255 / 85%); border-radius: 1rem; background: rgb(255 255 255 / 94%); box-shadow: 0 4px 18px rgb(28 25 23 / 8%); backdrop-filter: blur(12px); }
-  .category-mobile-clear, .category-mobile-heading { display: none; }
-  .category-filter-options { display: flex; min-height: 0; flex: 1; align-items: stretch; }
-  .category-palette-heading, .category-palette-footer { display: flex; flex: none; align-items: center; justify-content: space-between; gap: .5rem; padding: .25rem .75rem; }
-  .category-palette-heading { font-size: .875rem; font-weight: 700; border-bottom: 1px solid #e7e5e4; }
-  .category-palette-footer::before { content: '複数選択可 · いずれかに一致'; display: block; font-size: .6875rem; width: 100%; }
-  .category-palette-footer { flex-wrap: wrap; border-top: 1px solid #e7e5e4; color: #57534e; font-size: .75rem; }
-  .category-palette-heading button, .category-palette-footer button { min-height: 44px; padding: 0 .5rem; border-radius: .5rem; font-weight: 600; }
-  .category-palette-heading button[aria-pressed="true"] { color: #a9361c; }
-  .category-palette-footer button:disabled { opacity: .45; }
-  .category-filter button:focus-visible { outline: 2px solid #b45309; outline-offset: -2px; }
-  .category-list-frame { min-height: 0; display: flex; }
-  .category-chip-scroller { flex: 1; flex-direction: column; gap: .25rem; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; padding: .5rem; scroll-padding: .5rem; }
-  .category-item { width: 100%; gap: .5rem; padding: .5rem; white-space: normal; border-radius: .625rem; border: 0; box-shadow: none; backdrop-filter: none; background: transparent; text-align: left; }
-  .category-item:hover { background: #f5f5f4; }
-  .category-item[aria-pressed="true"] { background: #fbe8e3; color: #8c311f; }
-  .category-check { flex: 0 0 .875rem; font-weight: 800; }
-  .category-label { overflow: visible; flex: 1; min-width: 0; max-width: none; overflow-wrap: anywhere; line-height: 1.4; }
-  .category-count { display: block; flex: none; font-size: .75rem; font-variant-numeric: tabular-nums; color: #78716c; }
+  .category-mobile-heading { display: none; }
+  .category-filter-options, .category-chip-scroller { height: 52px; }
+  .category-chip-scroller { box-sizing: border-box; scrollbar-width: none; }
+  .category-chip-scroller::-webkit-scrollbar { display: none; }
 }
 </style>

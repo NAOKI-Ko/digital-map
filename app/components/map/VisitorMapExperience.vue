@@ -330,7 +330,7 @@ onBeforeUnmount(clearPendingSpotClose)
         <div
           ref="categoryDock"
           v-show="!appModalOpen && !selectedSpot"
-          class="pointer-events-none absolute bottom-[calc(env(safe-area-inset-bottom)+2rem)] left-[calc(env(safe-area-inset-left)+0.75rem)] right-[calc(env(safe-area-inset-right)+0.75rem)] z-20 md:left-1/2 md:right-auto md:w-[min(50vw,44rem)] md:-translate-x-1/2 lg:bottom-auto lg:left-5 lg:right-auto lg:top-20 lg:w-60 lg:translate-x-0 lg:[--category-fit-height:52px]"
+          class="pointer-events-none absolute bottom-[calc(env(safe-area-inset-bottom)+2rem)] left-[calc(env(safe-area-inset-left)+0.75rem)] right-[calc(env(safe-area-inset-right)+0.75rem)] z-20 md:left-1/2 md:right-auto md:w-[min(50vw,44rem)] md:-translate-x-1/2 lg:[--category-fit-height:52px]"
         >
           <div class="pointer-events-auto">
             <CategoryFilter v-model="selectedCategoryIds" :categories="categories" :counts="categoryCounts" />
