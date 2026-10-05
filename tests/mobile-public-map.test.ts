@@ -49,7 +49,8 @@ describe('公開Mapのモバイル契約', () => {
     expect(detail).toContain('<DialogContent')
     expect(detail).toContain('spot-detail-sheet__body min-h-0 flex-1 overflow-y-auto')
     expect(detail).not.toContain('詳細を見る')
-    expect(detail).not.toContain('summary')
+    // Forbid the retired sheet state, while allowing equipment-summary imports.
+    expect(detail).not.toMatch(/['"]summary['"]/)
     expect(publicPage).toContain('v-if="selectedSpot"')
     expect(publicPage).toContain('v-show="!appModalOpen"')
   })
