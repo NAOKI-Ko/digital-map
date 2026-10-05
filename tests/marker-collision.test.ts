@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
 import { describe, expect, it } from 'vitest'
-import { applyPinVisibility, declutterPins, getCollisionGroup, getCollisionRepresentatives, measurePinRect } from '../app/utils/marker-collision'
+import { applyPinVisibility, declutterPins, getCollisionGroup, getCollisionRepresentatives, measurePinRect, restorePinFocus } from '../app/utils/marker-collision'
+import { getMarkerDensityPresentation } from '../app/utils/marker-density'
 const pin = (id: string, priority: number, left = 0, size = 60) => ({ id, priority, rect: { left, top: 0, right: left + size, bottom: size } })
 describe('screen-space decluttering', () => {
   it('a chain with two visible winners shows one count without changing visibility or recovery membership', () => {
@@ -27,6 +28,55 @@ describe('screen-space decluttering', () => {
     expect([...declutterPins([pin('a-featured', 2, 80), focused])]).toEqual(['z-focused'])
     expect([...declutterPins([pin('selected', 4), focused])]).toEqual(['selected', 'z-focused'])
     expect([...declutterPins([pin('a-featured', 2, 80), { ...focused, protected: false }])]).toEqual(['a-featured'])
+  })
+  it.each(['spot-01', 'spot-02'])('returns Detail focus to lower-priority coincident %s after deselection has hidden it', closingId => {
+    // The real coincident fixture has a featured representative and two normal members.
+    const spots = [
+      { id: 'spot-00', importance: 'featured' as const, size: 'small' as const },
+      { id: 'spot-01', importance: 'normal' as const, size: 'medium' as const },
+      { id: 'spot-02', importance: 'normal' as const, size: 'large' as const },
+    ]
+    const before = JSON.stringify(spots)
+    const frame = document.createElement('div'), canvas = document.createElement('canvas')
+    canvas.tabIndex = 0; frame.append(canvas)
+    const elements = spots.map(spot => {
+      const button = document.createElement('button')
+      button.dataset.spotId = spot.id; frame.append(button)
+      return button
+    })
+    document.body.append(frame)
+    const update = (selectedId: string | null) => {
+      const candidates = spots.map((spot, index) => ({
+        ...pin(spot.id, getMarkerDensityPresentation(spot.importance, spot.size, 1, 1, spot.id === selectedId, false, true).priority),
+        protected: document.activeElement === elements[index],
+      }))
+      const visible = declutterPins(candidates)
+      elements.forEach((element, index) => applyPinVisibility(element, visible.has(spots[index]!.id)))
+      return [...visible]
+    }
+    try {
+      canvas.focus()
+      expect(update(null)).toEqual(['spot-00'])
+      expect(update(closingId)).toEqual([closingId])
+      // Dismissal clears selection before its delayed focus callback runs.
+      expect(update(null)).toEqual(['spot-00'])
+      const closingPin = elements[spots.findIndex(spot => spot.id === closingId)]!
+      expect(closingPin.inert).toBe(true)
+      expect(restorePinFocus(closingPin)).toBe(true)
+      expect(document.activeElement).toBe(closingPin)
+      expect(closingPin.inert).toBe(false)
+      expect(update(null)).toEqual([closingId])
+      expect(document.activeElement).toBe(closingPin)
+      canvas.focus()
+      expect(update(null)).toEqual(['spot-00'])
+      expect(JSON.stringify(spots)).toBe(before)
+    }
+    finally { frame.remove() }
+  })
+  it('does not recover focus to a removed Detail PIN', () => {
+    const removed = document.createElement('button')
+    expect(restorePinFocus(removed)).toBe(false)
+    expect(restorePinFocus(null)).toBe(false)
   })
   it('recovers all actual overlaps, even unequal nearby positions and density-hidden candidates', () => {
     const candidates=[pin('selected',4),pin('near',1,.001),pin('edge',2,65),pin('far',1,80)]

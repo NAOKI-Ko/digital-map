@@ -91,6 +91,17 @@ export function applyPinVisibility(element: HTMLElement, visible: boolean) {
   }
 }
 
+/** Detail dismissal returns to its own PIN even if deselection already suppressed it.
+ * Reveal and focus in one task so the viewer's focusin refresh protects that PIN.
+ * Ordinary hidden PINs remain inert; callers must identify the closing Detail's PIN.
+ */
+export function restorePinFocus(element: HTMLElement | null | undefined) {
+  if (!element?.isConnected) return false
+  applyPinVisibility(element, true)
+  element.focus({ preventScroll: true })
+  return element.ownerDocument.activeElement === element
+}
+
 /** Connected screen-space overlaps, including density-hidden members; no canonical writes. */
 export function getCollisionGroup(id: string, candidates: readonly CollisionCandidate[], gap = PIN_COLLISION_GAP) {
   const first = candidates.find(pin => pin.id === id)

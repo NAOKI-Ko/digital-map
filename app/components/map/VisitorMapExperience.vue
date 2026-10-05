@@ -8,6 +8,7 @@ import SpotDetailCard from '~/components/map/SpotDetailCard.vue'
 import { collectSpotCategories, filterSpotsByCategoryIds } from '~/utils/category-filter'
 import { closeFilteredSpot, createFloorSwitchState, selectedSpotIdFromOverlay, shouldShowFloorSelector, type PublicOverlay } from '~/utils/public-map-ui'
 import { isFacilityPinIcon } from '~~/shared/constants/spot'
+import { restorePinFocus } from '~/utils/marker-collision'
 import type { MapViewerSpot } from '~~/shared/types/map-viewer'
 import type { PublicMapResponse } from '~~/shared/types/public-map'
 import { messages, normalizeLocale } from '~~/shared/i18n/messages'
@@ -173,7 +174,7 @@ function closeSpot(source: 'pointer' | 'other' = 'other') {
       .find(element => element.dataset.spotId === closingSpotId)
     const mapEntry = document.querySelector<HTMLElement>('.visitor-map-viewer canvas[tabindex="0"]')
     const trigger = closingTrigger?.isConnected ? closingTrigger : fallbackMarker
-    ;(trigger && !trigger.inert && getComputedStyle(trigger).visibility !== 'hidden' ? trigger : mapEntry)?.focus({ preventScroll: true })
+    if (!restorePinFocus(trigger)) mapEntry?.focus({ preventScroll: true })
     if (spotTriggerId === closingSpotId) {
       spotTrigger = null
       spotTriggerId = null
