@@ -1,6 +1,12 @@
 # WU-77 independent black-box candidate packet
 
-Prepared2026-10-05. This packet is a test entrypoint, not Acceptance. Implementation authors' screenshots/source review do not establish independent QA PASS.
+Prepared2026-10-05; updated15:22UTC with the repair candidate below. This packet is a test entrypoint, not Acceptance. Implementation authors' screenshots/source review do not establish independent QA PASS.
+
+Current repair candidate: `94ca6d75f30a6f5960d1e6df5d0dccab81547c0b`. New Windows loopback3016 / Mac loopback58123 at `http://127.0.0.1:58123/__qa_wu77_visitor`; coincident fixture `http://127.0.0.1:58123/__qa_wu68_coincident`. Existing fixtures keep their paths with the new port. Old3013/58120 stays on9d2 for history. [Serving attestations](replay/windows-fix-serving-attestation-94ca6d7.json) verify1364 sources, unchanged F1,24+12 spots, actual PNG and owned listener. Started15:16:03UTC, own foreground lease up to19:16UTC; notify root before extending/stopping. CI828 PASS/1 existing skip; Windows noDB796 PASS/33 DB-dependent skips and build/typecheck/Prisma/security pass. Details and retained failure history are in implementation-record.md.
+
+Independent round1 on9d2 is NO-GO with WU77-BB-001/002. Retest BB001 at1024×768 and1440×900 cold/Overview/Detail-return/Tab focus, then all five fixed A/B viewports. Retest BB002 count3→spiderfy→each member Detail→Escape/pointer close, native focus/selected ring, normal/reduced motion and keyboard. Verify priority recovers when focus leaves. No fixture explanation waives these findings. Authenticated LIVE, persisted publication, full maxZoom/AT/performance and fixed-rubric Acceptance remain outstanding.
+
+The remainder records the original9d2 handoff and is historical unless explicitly shared by the repair packet.
 
 Candidate code `9d2a1ec196a9bec33d78aaaf1e418b786cb7b21c`; draft PR33 targets dev. Exact Verify run37308503847 succeeded. Windows security/Prisma/typecheck/nonDB tests/build passed, all1346 source files reverified after gates, and the synthetic runtime renders. Production-build runtime with isolated actual data/auth remains pending.
 

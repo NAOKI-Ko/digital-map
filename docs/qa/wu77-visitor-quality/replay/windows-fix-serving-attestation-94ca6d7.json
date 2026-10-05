@@ -1,0 +1,44 @@
+{
+  "sourceAttestation": {
+    "sourceFiles": 1364,
+    "servingSourceVerified": true,
+    "fixtureSha256": "36e5ea87d9a3297a99821c6e4ad6d2860f9763b611070a0ff3f299090ccf3ffd",
+    "verifiedUTC": "2026-10-05T15:18:40.2794672+00:00",
+    "source": "94ca6d75f30a6f5960d1e6df5d0dccab81547c0b"
+  },
+  "runtimeAttestation": {
+    "canonicalSha": "9403d32fff4f5d0a84f3ba2c1212391ddf6c1f9d",
+    "oldCandidatePreserved": true,
+    "ownedPids": [
+      13208,
+      18652,
+      23320,
+      25328,
+      7580,
+      17952,
+      27620
+    ],
+    "canonicalDtoSha256": "8b4df738764bb4ddd2949c1403fd2f41e65f6c15c8d469714e511282404b2b35",
+    "servedPngSha256": "dd51f2177020810b69e2b5298c3cb4d3278013863fd50fbe6f869af8c058b2c9",
+    "floorCounts": [
+      24,
+      12
+    ],
+    "runtime": {
+      "port": 3016,
+      "host": "127.0.0.1",
+      "source": "94ca6d75f30a6f5960d1e6df5d0dccab81547c0b",
+      "ownerPid": 13208,
+      "lifetime": "owned SSH foreground up to4h",
+      "mode": "dev-synthetic-noDB",
+      "root": "C:\\DigitalMap\\incoming\\wu77-fix-20261005",
+      "startedUTC": "2026-10-05T15:16:03.2218296+00:00"
+    },
+    "source": "94ca6d75f30a6f5960d1e6df5d0dccab81547c0b",
+    "servedPngBytes": 52956,
+    "canonicalPid": 19992,
+    "runtimeVerified": true,
+    "listenerPid": 25328,
+    "verifiedUTC": "2026-10-05T15:19:50.8073033+00:00"
+  }
+}
