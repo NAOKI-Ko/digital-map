@@ -143,6 +143,69 @@ onMounted(() => {
 })
 onBeforeUnmount(() => suggestionObserver?.disconnect())
 
+const initErrorStyle = ref<{ top: string, bottom: string, '--init-error-padding': string }>()
+watch([container, mapError, visitorOverview], ([element, error, visitor], _previous, onCleanup) => {
+  initErrorStyle.value = undefined
+  if (!element || !error || !visitor) return
+  const frame = element.closest<HTMLElement>('.map-viewer-frame')
+  const stage = element.closest<HTMLElement>('.public-map-stage') ?? frame
+  if (!frame || !stage) return
+  let pendingFrame: number | null = null
+  const chrome = new Set<HTMLElement>()
+  // Error text uses the actual free strip; camera padding may shrink on short screens.
+  function measureErrorSpace() {
+    const bounds = frame!.getBoundingClientRect()
+    let top = bounds.top + 16
+    let bottom = bounds.bottom - 16
+    for (const item of chrome) {
+      const rect = item.getBoundingClientRect()
+      if (!item.getClientRects().length || rect.width <= 0 || rect.height <= 0) continue
+      if (item.dataset.mapFitEdge === 'bottom') bottom = Math.min(bottom, rect.top - 4)
+      else top = Math.max(top, rect.bottom + 4)
+    }
+    const height = Math.max(0, bottom - top)
+    initErrorStyle.value = {
+      top: `${Math.max(0, top - bounds.top)}px`,
+      bottom: `${Math.max(0, bounds.bottom - bottom)}px`,
+      '--init-error-padding': height < 64 ? '4px' : '1rem',
+    }
+  }
+  function scheduleMeasurement() {
+    if (pendingFrame !== null) return
+    pendingFrame = requestAnimationFrame(() => {
+      pendingFrame = null
+      measureErrorSpace()
+    })
+  }
+  const observer = new ResizeObserver(scheduleMeasurement)
+  function observeChrome() {
+    const current = new Set(stage!.querySelectorAll<HTMLElement>('[data-map-fit-edge], .visitor-marker-legend'))
+    for (const item of chrome) {
+      if (current.has(item)) continue
+      observer.unobserve(item)
+      chrome.delete(item)
+    }
+    for (const item of current) {
+      if (chrome.has(item)) continue
+      chrome.add(item)
+      observer.observe(item)
+    }
+  }
+  observer.observe(stage)
+  observeChrome()
+  measureErrorSpace()
+  const additions = new MutationObserver(() => {
+    observeChrome()
+    scheduleMeasurement()
+  })
+  additions.observe(stage, { childList: true, subtree: true })
+  onCleanup(() => {
+    observer.disconnect()
+    additions.disconnect()
+    if (pendingFrame !== null) cancelAnimationFrame(pendingFrame)
+  })
+}, { flush: 'post' })
+
 defineExpose({
   showWholeFloor,
   focusSpot: viewer.focusSpot,
@@ -170,8 +233,8 @@ defineExpose({
       <p v-if="visitorOverview && (!isReady || floorImageState === 'loading') && !mapError" role="status" class="pointer-events-none absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 rounded-xl bg-white/95 px-4 py-3 text-sm text-stone-700 shadow">
         {{ locale === 'en' ? 'Loading map…' : '地図を読み込み中…' }}
       </p>
-      <div v-if="visitorOverview && mapError" role="alert" tabindex="0" class="map-viewer-init-error rounded-xl bg-white/95 text-sm text-red-700 shadow">
-        <p class="p-4">{{ mapError }}</p>
+      <div v-if="visitorOverview && mapError" role="alert" tabindex="0" class="map-viewer-init-error rounded-xl bg-white/95 text-sm text-red-700 shadow" :style="initErrorStyle">
+        <p class="map-viewer-init-error__message">{{ mapError }}</p>
       </div>
       <div v-if="visitorOverview && floorImageState === 'error'" role="alert" class="absolute inset-x-4 top-1/2 z-10 mx-auto max-w-sm -translate-y-1/2 rounded-xl bg-white/95 p-4 text-center text-sm text-stone-700 shadow">
         <p>{{ locale === 'en' ? 'The map image could not be loaded.' : '地図画像を読み込めませんでした。' }}</p>
@@ -214,6 +277,10 @@ defineExpose({
   margin-inline: auto;
   overflow: auto;
   overflow-wrap: anywhere;
+}
+
+.map-viewer-init-error__message {
+  padding: var(--init-error-padding, 1rem) 1rem;
 }
 
 .map-viewer-init-error:focus-visible {
