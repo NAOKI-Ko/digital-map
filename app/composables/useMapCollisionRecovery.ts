@@ -66,12 +66,18 @@ export function useMapCollisionRecovery(options: RecoveryOptions) {
     const center = { x: centers.reduce((sum,p) => sum+p.x,0)/centers.length, y: centers.reduce((sum,p) => sum+p.y,0)/centers.length }
     const size = Math.max(76, ...group.map(pin => Math.max(pin.rect.right-pin.rect.left, pin.rect.bottom-pin.rect.top)+16))
     const layout = spiderfyLayout(spots.length, center, frame.clientWidth, frame.clientHeight, size)
+    // The visitor name sits 30px above its 60px button. Reserve room inside
+    // the bounded scroller without changing PIN spacing or its bottom edge.
+    const labelSpace = options.visitor?.() ? 32 : 0
+    const top = Math.max(60, layout.top - labelSpace)
+    const height = layout.height + layout.top - top
+    const contentHeight = layout.contentHeight + labelSpace
     overlay = document.createElement('div')
     overlay.className = 'map-viewer-spiderfy'
     overlay.dataset.spiderfy = 'open'
     overlay.setAttribute('role','group')
     overlay.setAttribute('aria-label','重なったスポットのピン')
-    overlay.style.cssText = `position:absolute;z-index:40;left:${layout.left}px;top:${layout.top}px;width:${layout.width}px;height:${layout.height}px;overflow:auto;border-radius:16px;background:${layout.contentHeight>layout.height?'rgba(255,255,255,.94)':'transparent'};overscroll-behavior:contain`
+    overlay.style.cssText = `position:absolute;z-index:40;left:${layout.left}px;top:${top}px;width:${layout.width}px;height:${height}px;overflow:auto;scroll-padding-top:${labelSpace}px;border-radius:16px;background:${contentHeight>height?'rgba(255,255,255,.94)':'transparent'};overscroll-behavior:contain`
     // MapLibre handles mouse/touch events as well as pointer events. Keep spread
     // scrolling and PIN taps from starting a map drag/pinch gesture.
     for (const name of ['pointerdown','mousedown','touchstart','touchmove','touchend']) {
@@ -79,21 +85,21 @@ export function useMapCollisionRecovery(options: RecoveryOptions) {
     }
     overlay.addEventListener('wheel', event => event.stopPropagation())
     const content = document.createElement('div')
-    content.style.cssText = `position:relative;width:${layout.width}px;height:${layout.contentHeight}px`
+    content.style.cssText = `position:relative;width:${layout.width}px;height:${contentHeight}px`
     const svg = document.createElementNS('http://www.w3.org/2000/svg','svg')
-    svg.setAttribute('width',String(layout.width)); svg.setAttribute('height',String(layout.contentHeight))
+    svg.setAttribute('width',String(layout.width)); svg.setAttribute('height',String(contentHeight))
     svg.style.cssText = 'position:absolute;pointer-events:none'
     content.append(svg)
     spots.forEach((spot,index) => {
       const point = layout.points[index]!
       const line = document.createElementNS(svg.namespaceURI,'line')
-      line.setAttribute('x1',String(layout.width/2)); line.setAttribute('y1',String(layout.contentHeight/2))
-      line.setAttribute('x2',String(point.x)); line.setAttribute('y2',String(point.y)); line.setAttribute('stroke','#78716c')
+      line.setAttribute('x1',String(layout.width/2)); line.setAttribute('y1',String(layout.contentHeight/2 + labelSpace))
+      line.setAttribute('x2',String(point.x)); line.setAttribute('y2',String(point.y + labelSpace)); line.setAttribute('stroke','#78716c')
       svg.append(line)
       const pin = createSpotMarkerElement(spot, { mode:'view', visitor:options.visitor?.(), selected:false, onSelected:() => { close(true); options.select(spot) } })
       pin.classList.add('maplibregl-marker')
       pin.dataset.spiderfied = 'true'
-      pin.style.left = `${point.x}px`; pin.style.top = `${point.y}px`
+      pin.style.left = `${point.x}px`; pin.style.top = `${point.y + labelSpace}px`
       pin.style.transform = 'translate(-50%,-100%)'
       pin.style.setProperty('--marker-size-scale',String(PIN_SIZE_SCALES[spot.pinSize ?? 'medium']))
       applyPinVisibility(pin,true)
