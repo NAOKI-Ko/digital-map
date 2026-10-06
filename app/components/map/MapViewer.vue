@@ -53,6 +53,7 @@ const emit = defineEmits<{
   'cameraChanged': [camera: MapViewerCameraState]
   'overviewSuggested': [suggested: boolean]
   'readyChange': [ready: boolean]
+  'initErrorChange': [failed: boolean]
 }>()
 
 const container = useTemplateRef<HTMLDivElement>('container')
@@ -130,6 +131,7 @@ function showWholeFloor() {
 }
 watch(overviewSuggested, value => emit('overviewSuggested', value))
 watch(visitorReady, ready => emit('readyChange', ready), { immediate: true })
+watch(mapError, error => emit('initErrorChange', Boolean(error)), { immediate: true })
 watch([overviewAssistanceEnabled, selectedSpotId, () => props.floor.id], () => {
   resizeSuggestion.reset(viewportSize())
   if (!overviewAssistanceEnabled.value) overviewSuggested.value = false
