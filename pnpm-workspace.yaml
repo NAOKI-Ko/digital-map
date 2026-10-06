@@ -9,6 +9,7 @@ overrides:
   mysql2@^3.0.0: 3.23.1
   '@nuxt/devtools>simple-git': 4.0.2
   'source-map-js@<1.2.2': 1.2.2
+  'launch-editor>shell-quote': 1.11.0
 patchedDependencies:
   '@nuxt/devtools@3.3.1': patches/@nuxt__devtools@3.3.1.patch
   '@nuxt/devtools@3.4.2': patches/@nuxt__devtools@3.4.2.patch
