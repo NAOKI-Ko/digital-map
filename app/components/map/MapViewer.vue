@@ -156,7 +156,7 @@ defineExpose({
 
 <template>
   <div @click.capture="dismissOverviewSuggestion" :class="{ 'public-map-viewer h-full': mode === 'view', 'visitor-map-viewer': visitorOverview, 'visitor-overview-suggested': overviewSuggested && overviewAssistanceEnabled }">
-    <div class="map-viewer-frame relative overflow-hidden rounded-xl border border-stone-300 bg-stone-100" :style="{ height }" :aria-busy="!isReady || floorImageState === 'loading'">
+    <div class="map-viewer-frame relative overflow-hidden rounded-xl border border-stone-300 bg-stone-100" :style="{ height }" :aria-busy="!mapError && (!isReady || floorImageState === 'loading')">
       <div
         ref="container"
         class="h-full w-full transition-opacity duration-150"
@@ -169,6 +169,9 @@ defineExpose({
       <p v-if="visitorOverview && (!isReady || floorImageState === 'loading') && !mapError" role="status" class="pointer-events-none absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 rounded-xl bg-white/95 px-4 py-3 text-sm text-stone-700 shadow">
         {{ locale === 'en' ? 'Loading map…' : '地図を読み込み中…' }}
       </p>
+      <div v-if="visitorOverview && mapError" role="alert" tabindex="0" class="map-viewer-init-error rounded-xl bg-white/95 text-sm text-red-700 shadow">
+        <p class="p-4">{{ mapError }}</p>
+      </div>
       <div v-if="visitorOverview && floorImageState === 'error'" role="alert" class="absolute inset-x-4 top-1/2 z-10 mx-auto max-w-sm -translate-y-1/2 rounded-xl bg-white/95 p-4 text-center text-sm text-stone-700 shadow">
         <p>{{ locale === 'en' ? 'The map image could not be loaded.' : '地図画像を読み込めませんでした。' }}</p>
         <button type="button" class="mt-3 min-h-11 rounded-lg bg-stone-800 px-4 font-semibold text-white" @click="viewer.showFloor(floor, false, false)">{{ locale === 'en' ? 'Try again' : '再読み込み' }}</button>
@@ -195,13 +198,28 @@ defineExpose({
         {{ geolocationAreaMessage }}
       </p>
     </div>
-    <p v-if="mapError" role="alert" class="mt-3 text-sm text-red-600">
+    <p v-if="mapError && !visitorOverview" role="alert" class="mt-3 text-sm text-red-600">
       {{ mapError }}
     </p>
   </div>
 </template>
 
 <style>
+.map-viewer-init-error {
+  position: absolute;
+  inset: 25% 1rem;
+  z-index: 10;
+  max-width: 28rem;
+  margin-inline: auto;
+  overflow: auto;
+  overflow-wrap: anywhere;
+}
+
+.map-viewer-init-error:focus-visible {
+  outline: 2px solid var(--visitor-focus, #b45309);
+  outline-offset: -4px;
+}
+
 .maplibregl-marker.map-viewer-marker {
   position: absolute;
   display: flex;
