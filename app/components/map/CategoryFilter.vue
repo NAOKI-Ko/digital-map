@@ -106,6 +106,12 @@ watch(() => props.categories, () => nextTick(() => {
 @media (max-width: 359px) {
   .category-facility-overview { display: none; }
 }
+/* Give enlarged controls a full category row at narrow CSS widths. */
+@media (max-width: 279px) {
+  .category-filter-options { flex-wrap: wrap; }
+  .category-list-frame { flex-basis: 100%; }
+  .category-scroll-button { display: none; }
+}
 /* Keep the desktop dock inside its existing 52px reserved band. */
 @screen lg {
   .category-mobile-heading { display: none; }

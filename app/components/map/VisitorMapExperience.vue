@@ -402,7 +402,7 @@ onBeforeUnmount(clearPendingSpotClose)
         </div>
 
         <ClientOnly>
-          <MapOperationHint :storage-key="`digital-map:operation-hint:${data.map.slug}`" :suppressed="appModalOpen || Boolean(selectedSpot)" :overview-suggested="overviewSuggested" />
+          <MapOperationHint :storage-key="`digital-map:operation-hint:${data.map.slug}`" :suppressed="!visitorReady || appModalOpen || Boolean(selectedSpot)" :overview-suggested="overviewSuggested" />
         </ClientOnly>
       </section>
 
