@@ -83,6 +83,7 @@ const viewer = useMapViewer(container, {
   prioritizeVisibleSpots,
   mobileCover,
   visitorOverview,
+  overviewAssistanceBlocked: toRef(props, 'overviewAssistanceBlocked'),
   locale: toRef(props, 'locale'),
   initialSpots: computed(() => props.initialSpots ?? props.spots),
   mode: props.mode,

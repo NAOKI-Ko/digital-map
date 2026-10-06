@@ -1,6 +1,7 @@
 import type { Ref } from 'vue'
 import { canUseVisitorContentCamera, clampVisitorInitialZoom, getVisitorContentBounds, VISITOR_INITIAL_PITCH, VISITOR_INITIAL_ZOOM_ALLOWANCE, VISITOR_MOBILE_INITIAL_ZOOM_ALLOWANCE, VISITOR_INITIAL_FALLBACK_ZOOM_OFFSET, VISITOR_MOBILE_INITIAL_FALLBACK_ZOOM_OFFSET } from '~/utils/visitor-initial-camera'
 import { measureVisitorFitPadding } from '~/utils/visitor-floor-fit'
+import { createVisitorInitialViewportLease, visitorFloorGeometryKey } from '~/utils/visitor-initial-viewport'
 import type { Map as MapLibreMap, MapOptions, StyleSpecification } from 'maplibre-gl'
 import { getFloorCorners, getGeoReferenceBounds, toImageCoordinates, type FloorCorners } from '~~/lib/geo'
 import type { MapViewerCameraState, MapViewerFloor, MapViewerSpot } from '~~/shared/types/map-viewer'
@@ -173,6 +174,9 @@ interface UseMapCameraOptions {
   spots?: Readonly<Ref<readonly MapViewerSpot[]>>
   mobileCover?: Readonly<Ref<boolean>>
   isReady: Readonly<Ref<boolean>>
+  initialViewportReady?: Readonly<Ref<boolean>>
+  initialViewportBlocked?: Readonly<Ref<boolean>>
+  initialCamera?: MapViewerCameraState | null
 }
 
 export function useMapCamera(
@@ -186,6 +190,37 @@ export function useMapCamera(
   let largeViewportOrientation = ''
   let constraintLayoutKey = ''
   let homePitch: number = VIEWER_CAMERA_CONSTRAINTS[options.mode].pitch
+  const initialViewport = createVisitorInitialViewportLease(options.mode === 'view'
+    && Boolean(options.visitorOverview?.value && options.initialViewportReady)
+    && !options.initialCamera && !options.initialViewportBlocked?.value)
+  let initialViewportFrame: number | null = null
+
+  function cancelInitialViewportFit() {
+    initialViewport.cancel()
+    if (initialViewportFrame !== null) window.cancelAnimationFrame(initialViewportFrame)
+    initialViewportFrame = null
+  }
+
+  function releaseInitialViewport() {
+    cancelInitialViewportFit()
+    initialViewport.release()
+  }
+
+  function initialViewportEligible() {
+    const frame = container.value
+    return Boolean(options.mode === 'view' && options.visitorOverview?.value
+      && options.isReady.value && options.initialViewportReady?.value
+      && !options.initialViewportBlocked?.value && frame
+      && !(typeof document !== 'undefined' && frame.contains(document.activeElement)
+        && document.activeElement?.closest('.map-viewer-marker, .map-viewer-spiderfy'))
+      && hasInitialViewportFrame())
+  }
+
+  function hasInitialViewportFrame() {
+    const frame = container.value
+    return Boolean(frame && Number.isFinite(frame.clientWidth) && frame.clientWidth > 0
+      && Number.isFinite(frame.clientHeight) && frame.clientHeight > 0)
+  }
 
   function usesMobileCover() {
     return options.mode === 'view'
@@ -354,7 +389,8 @@ export function useMapCamera(
 
   /**
    * Automatic camera mutations are limited to initial/Floor load, explicit Floor switch,
-   * one-shot explicit location policy, explicit focus commands, and an invalid hard-bound clamp.
+   * pristine initial viewport adaptation, one-shot explicit location policy,
+   * explicit focus commands, and an invalid hard-bound clamp.
    */
   function fitFloorBounds(corners: FloorCorners, animate: boolean) {
     const instance = map.value
@@ -381,7 +417,8 @@ export function useMapCamera(
         instance.jumpTo({ center: content?.center ?? result.camera.center, zoom, bearing: 0, pitch: homePitch })
       }
       constraintLayoutKey = getConstraintLayoutKey()
-      return
+      if (result && hasInitialViewportFrame()) initialViewport.noteInitialFit(constraintLayoutKey)
+      return Boolean(result)
     }
     constraintLayoutKey = getConstraintLayoutKey()
     if (usesMobileCover()) {
@@ -408,6 +445,7 @@ export function useMapCamera(
   }
 
   function showWholeFloor() {
+    releaseInitialViewport()
     const instance = map.value
     const corners = getFloorCorners(options.floor.value)
     if (!instance || !corners || options.mode !== 'view') return
@@ -427,6 +465,7 @@ export function useMapCamera(
   }
 
   function comparePitch(pitch: 0 | 20 | 25 | 45, fit: boolean, baseline?: MapViewerCameraState) {
+    releaseInitialViewport()
     const instance = map.value
     const corners = getFloorCorners(options.floor.value)
     if (!instance || !corners || options.mode !== 'view') return
@@ -439,10 +478,32 @@ export function useMapCamera(
   }
 
   function resize() {
+    cancelInitialViewportFit()
     const instance = map.value
     if (!instance) return
     const corners = getFloorCorners(options.floor.value)
     const nextLayoutKey = getConstraintLayoutKey()
+    if (initialViewport.isAvailable()) {
+      // MapLibre updates its canvas immediately; camera framing waits for the
+      // latest settled layout and never runs through loading/hidden/error UI.
+      instance.resize()
+      const token = initialViewport.request(nextLayoutKey, Boolean(corners && initialViewportEligible()))
+      if (!token) return
+      const geometry = visitorFloorGeometryKey(options.floor.value)
+      initialViewportFrame = window.requestAnimationFrame(() => {
+        initialViewportFrame = null
+        if (map.value !== instance || geometry !== visitorFloorGeometryKey(options.floor.value)
+          || !initialViewport.canCommit(token, getConstraintLayoutKey(), initialViewportEligible())) return
+        initialViewportFrame = window.requestAnimationFrame(() => {
+          initialViewportFrame = null
+          if (map.value !== instance || geometry !== visitorFloorGeometryKey(options.floor.value)
+            || !initialViewport.canCommit(token, getConstraintLayoutKey(), initialViewportEligible())) return
+          const currentCorners = getFloorCorners(options.floor.value)
+          if (currentCorners && fitFloorBounds(currentCorners, false)) initialViewport.committed(token)
+        })
+      })
+      return
+    }
     if (!corners || !options.isReady.value) {
       instance.resize()
       constraintLayoutKey = nextLayoutKey
@@ -462,6 +523,7 @@ export function useMapCamera(
   }
 
   function resetFloorCamera() {
+    cancelInitialViewportFit()
     coverCameraKey = ''
     constraintLayoutKey = ''
   }
@@ -472,6 +534,7 @@ export function useMapCamera(
   }
 
   function restore(camera: MapViewerCameraState) {
+    releaseInitialViewport()
     if (map.value) restoreMapViewerCamera(map.value, camera)
   }
 
@@ -484,5 +547,7 @@ export function useMapCamera(
     resetFloorCamera,
     resize,
     restore,
+    cancelInitialViewportFit,
+    releaseInitialViewport,
   }
 }

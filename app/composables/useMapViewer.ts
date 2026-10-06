@@ -1,5 +1,5 @@
 import { createPinEntrance } from '~/utils/marker-entrance'
-import { onBeforeUnmount, onMounted, readonly, ref, shallowRef, watch, type Ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, readonly, ref, shallowRef, watch, type Ref } from 'vue'
 import type { IControl, ImageSource, Map as MapLibreMap, Marker, MarkerOptions } from 'maplibre-gl'
 import { getFloorCorners, imageToRenderCoordinates, isValidImagePosition, renderToImageCoordinates, toImageCoordinates, type ImagePosition, type LatLng } from '~~/lib/geo'
 import { getDecorationRenderCoordinates } from '~~/lib/decoration'
@@ -10,6 +10,7 @@ import { applyPinVisibility, declutterPins, getCollisionRepresentatives, measure
 import { monitorFloorImage } from '~/utils/floor-image-state'
 import { getMinimalSpotPan, needsHeadingReset } from '~/utils/public-map-exploration'
 import { measureVisitorFitPadding } from '~/utils/visitor-floor-fit'
+import { bindVisitorInitialViewportIntents, visitorFloorGeometryKey } from '~/utils/visitor-initial-viewport'
 import {
   createMapViewerOptions,
   createOneShotLocationCameraPolicy,
@@ -34,6 +35,7 @@ export interface UseMapViewerOptions {
   candidateKind?: Readonly<Ref<'placement' | 'move' | null>>
   prioritizeVisibleSpots?: Readonly<Ref<boolean>>
   visitorOverview?: Readonly<Ref<boolean>>
+  overviewAssistanceBlocked?: Readonly<Ref<boolean>>
   locale?: Readonly<Ref<'ja' | 'en'>>
   initialSpots?: Readonly<Ref<readonly MapViewerSpot[]>>
   mobileCover?: Readonly<Ref<boolean>>
@@ -248,6 +250,7 @@ export function useMapViewer(
   let previousWinners = new Set<string>()
   const pinEntrance = createPinEntrance()
   let localeObserver: MutationObserver | null = null
+  let detachInitialViewportIntents: (() => void) | null = null
   function syncVisitorControlLabels() {
     if (!options.visitorOverview?.value) return
     if (container.value) syncMapNavigationLabels(container.value, options.locale?.value ?? 'ja')
@@ -264,12 +267,14 @@ export function useMapViewer(
   let detailCamera: (MapViewerCameraState & { bearing: number, pitch: number }) | null = null
   const discardDetailContext = () => { detailCamera = null }
   function captureDetailContext() {
+    mapCamera.releaseInitialViewport()
     const instance = map.value
     if (!instance || detailCamera) return
     instance.stop()
     detailCamera = { ...getMapViewerCameraState(instance), bearing: instance.getBearing(), pitch: instance.getPitch() }
   }
   function restoreDetailContext() {
+    mapCamera.releaseInitialViewport()
     const instance = map.value
     const saved = detailCamera
     detailCamera = null
@@ -282,10 +287,13 @@ export function useMapViewer(
     map: () => map.value, frame: () => container.value, candidates: () => collisionCandidates,
     spots: () => options.spots.value, position: spot => imageToRenderCoordinates(options.floor.value, spot),
     visitor: () => Boolean(options.visitorOverview?.value),
-    onStarted: () => options.onCollisionStarted?.(),
+    onStarted: () => { mapCamera.releaseInitialViewport(); options.onCollisionStarted?.() },
     select: spot => options.onSpotSelected?.(spot), refresh: () => syncMarkerDensity(),
   })
   let comparisonBaseline: MapViewerCameraState | null = null
+  const initialViewportReady = computed(() => Boolean(isReady.value && floorImageState.value === 'loaded' && !mapError.value && !floorError.value))
+  const initialViewportBlocked = computed(() => Boolean(options.selectedSpotId.value
+    || options.prioritizeVisibleSpots?.value || options.overviewAssistanceBlocked?.value))
 
   const mapCamera = useMapCamera(container, map, {
     mode: options.mode,
@@ -294,6 +302,9 @@ export function useMapViewer(
     visitorOverview: options.visitorOverview,
     spots: options.initialSpots ?? options.spots,
     isReady,
+    initialViewportReady,
+    initialViewportBlocked,
+    initialCamera: options.initialCamera,
   })
   const locationCameraPolicy = createOneShotLocationCameraPolicy(
     () => {
@@ -310,7 +321,7 @@ export function useMapViewer(
     createBaseControls: () => [new MapNavigationControl(mapCamera.getHomePitch, options.mode === 'view' ? () => {
       if (options.visitorOverview?.value) options.onCollisionStarted?.()
       mapCamera.showWholeFloor()
-    } : undefined, discardDetailContext, Boolean(options.visitorOverview?.value), () => options.locale?.value ?? 'ja')],
+    } : undefined, () => { mapCamera.releaseInitialViewport(); discardDetailContext() }, Boolean(options.visitorOverview?.value), () => options.locale?.value ?? 'ja')],
     createControlGroup: controls => {
       const group = new HorizontalMapControlGroup(controls)
       return {
@@ -323,7 +334,7 @@ export function useMapViewer(
         getElement: () => group.getElement(),
       }
     },
-    onExplicitRequest: () => { discardDetailContext(); locationCameraPolicy.beginRequest() },
+    onExplicitRequest: () => { mapCamera.releaseInitialViewport(); discardDetailContext(); locationCameraPolicy.beginRequest() },
     onOutsideResult: result => locationCameraPolicy.consumeOutsideResult(result.firstForRequest),
     onReset: () => locationCameraPolicy.reset(),
   })
@@ -343,6 +354,13 @@ export function useMapViewer(
       maplibre.value = maplibregl
       const instance = new maplibregl.Map(createMapViewerOptions(container.value, options.mode, Boolean(options.visitorOverview?.value), options.locale?.value))
       map.value = instance
+      if (options.mode === 'view' && options.visitorOverview?.value) {
+        const stage = container.value.closest<HTMLElement>('.public-map-stage')
+        const intentRoot = stage?.closest<HTMLElement>('.visitor-theme') ?? stage ?? container.value
+        // Capture before Category/Info/Floor handlers can change layout or selection,
+        // including explicit DOM .click() and filters with identical visible IDs.
+        detachInitialViewportIntents = bindVisitorInitialViewportIntents(intentRoot, mapCamera.releaseInitialViewport)
+      }
       const controls = container.value.querySelector('.maplibregl-control-container')
       if (controls && options.visitorOverview?.value) {
         localeObserver = new MutationObserver(syncVisitorControlLabels)
@@ -353,7 +371,7 @@ export function useMapViewer(
       container.value.addEventListener('keydown', pinEntrance.finish, true)
       instance.on('movestart', recovery.onMotion)
       instance.on('movestart', event => { if (event.originalEvent) pinEntrance.finish() })
-      instance.on('movestart', event => { if (event.originalEvent) discardDetailContext() })
+      instance.on('movestart', event => { if (event.originalEvent) { mapCamera.releaseInitialViewport(); discardDetailContext() } })
       instance.on('click', () => recovery.close())
       container.value.addEventListener('focusin', syncMarkerDensity)
       container.value.addEventListener('focusout', syncMarkerDensity)
@@ -396,6 +414,9 @@ export function useMapViewer(
   }
 
   function destroy() {
+    mapCamera.releaseInitialViewport()
+    detachInitialViewportIntents?.()
+    detachInitialViewportIntents = null
     pinEntrance.finish()
     localeObserver?.disconnect()
     localeObserver = null
@@ -573,6 +594,7 @@ export function useMapViewer(
   }
 
   function focusSpot(spotId: string) {
+    mapCamera.releaseInitialViewport()
     const instance = map.value
     const spot = options.spots.value.find(item => item.id === spotId)
     const renderPosition = spot && imageToRenderCoordinates(options.floor.value, spot)
@@ -589,6 +611,7 @@ export function useMapViewer(
   }
 
   function ensureSpotVisible(spotId: string, panel: DOMRect | null) {
+    mapCamera.releaseInitialViewport()
     const instance = map.value
     const frame = container.value
     const spot = options.spots.value.find(item => item.id === spotId)
@@ -718,6 +741,12 @@ export function useMapViewer(
   })
 
   watch(floorImageState, syncMarkerDensity)
+  // These synchronous guards also cover state changes that have no DOM event.
+  watch(initialViewportBlocked, blocked => { if (blocked) mapCamera.releaseInitialViewport() }, { flush: 'sync' })
+  watch(() => options.selectedSpotId.value, () => mapCamera.releaseInitialViewport(), { flush: 'sync' })
+  watch(() => visitorFloorGeometryKey(options.floor.value), () => mapCamera.releaseInitialViewport(), { flush: 'sync' })
+  watch(() => JSON.stringify(options.spots.value.map(spot => spot.id).sort()), () => mapCamera.releaseInitialViewport(), { flush: 'sync' })
+  watch(initialViewportReady, ready => { if (ready) resize(); else mapCamera.cancelInitialViewportFit() }, { flush: 'post' })
   watch(() => options.spots.value, syncSpotMarkers, { deep: true })
   if (options.locale) watch(options.locale, syncVisitorControlLabels)
   watch(() => options.decorations.value, syncDecorations, { deep: true })
