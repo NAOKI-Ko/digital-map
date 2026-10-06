@@ -64,6 +64,19 @@ function setup(initialCamera: MapViewerCameraState | null = null, initialSize: r
 afterEach(() => { vi.restoreAllMocks(); document.body.innerHTML = '' })
 
 describe('untouched initial viewport framing through the actual camera composable', () => {
+  it.each(viewports.slice(0, 2))('keeps the initial mobile floor inside the frame at %ix%i without flattening it', (width, height) => {
+    const h = setup(null, [width, height])
+    for (const point of h.corners()) {
+      expect(point.x).toBeGreaterThanOrEqual(24)
+      expect(point.x).toBeLessThanOrEqual(width - 24)
+      expect(point.y).toBeGreaterThanOrEqual(24)
+      expect(point.y).toBeLessThanOrEqual(height - 24)
+    }
+    expect(h.snapshot().pitch).toBe(25)
+    expect(h.camera.getHomePitch()).toBe(25)
+    expect(h.instance.easeTo).not.toHaveBeenCalled()
+  })
+
   it('recovers an uncomputable cold zero-size fit only after loaded positive layout, then deduplicates it', () => {
     const h = setup(null, [0,0])
     h.instance.cameraForBounds.mockClear(); h.instance.jumpTo.mockClear()

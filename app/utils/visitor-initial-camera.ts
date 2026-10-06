@@ -3,9 +3,11 @@ import type { MapViewerFloor, MapViewerSpot } from '~~/shared/types/map-viewer'
 
 export const VISITOR_INITIAL_PITCH = 25
 export const VISITOR_INITIAL_ZOOM_ALLOWANCE = 0.65
-export const VISITOR_MOBILE_INITIAL_ZOOM_ALLOWANCE = VISITOR_INITIAL_ZOOM_ALLOWANCE
+// Keep mobile edge facilities inside the initial frame; their controls need no
+// discovery zoom before the visitor starts exploring.
+export const VISITOR_MOBILE_INITIAL_ZOOM_ALLOWANCE = 0
 export const VISITOR_INITIAL_FALLBACK_ZOOM_OFFSET = 0.2
-export const VISITOR_MOBILE_INITIAL_FALLBACK_ZOOM_OFFSET = 0.65
+export const VISITOR_MOBILE_INITIAL_FALLBACK_ZOOM_OFFSET = 0
 export const VISITOR_INITIAL_ZOOM_MINIMUM = 0.55
 
 /** Full Floor's unfiltered content only; filter/detail never feeds initial framing. */
