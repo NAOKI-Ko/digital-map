@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useMapViewer } from '~/composables/useMapViewer'
+import { createVisitorOverviewSuggestion, isVisitorOverviewAssistanceEnabled } from '~/utils/visitor-overview-assistance'
 import type { MapViewerMode } from '~/composables/useMapCamera'
 import { getFloorCorners, toImageCoordinates, type ImagePosition } from '~~/lib/geo'
 import type { MapViewerCameraState, MapViewerDecoration, MapViewerFloor, MapViewerSpot } from '~~/shared/types/map-viewer'
@@ -20,6 +21,7 @@ const props = withDefaults(defineProps<{
   initialCamera?: MapViewerCameraState | null
   prioritizeVisibleSpots?: boolean
   visitorOverview?: boolean
+  overviewAssistanceBlocked?: boolean
   locale?: 'ja' | 'en'
   initialSpots?: readonly MapViewerSpot[]
   mobileCover?: boolean
@@ -39,6 +41,7 @@ const props = withDefaults(defineProps<{
   prioritizeVisibleSpots: false,
   mobileCover: false,
   visitorOverview: false,
+  overviewAssistanceBlocked: false,
   locale: 'ja',
 })
 
@@ -48,6 +51,9 @@ const emit = defineEmits<{
   'spotSelected': [spot: MapViewerSpot]
   'collisionStarted': []
   'cameraChanged': [camera: MapViewerCameraState]
+  'overviewSuggested': [suggested: boolean]
+  'readyChange': [ready: boolean]
+  'initErrorChange': [failed: boolean]
 }>()
 
 const container = useTemplateRef<HTMLDivElement>('container')
@@ -78,6 +84,7 @@ const viewer = useMapViewer(container, {
   prioritizeVisibleSpots,
   mobileCover,
   visitorOverview,
+  overviewAssistanceBlocked: toRef(props, 'overviewAssistanceBlocked'),
   locale: toRef(props, 'locale'),
   initialSpots: computed(() => props.initialSpots ?? props.spots),
   mode: props.mode,
@@ -100,8 +107,109 @@ const viewer = useMapViewer(container, {
   onCollisionStarted: () => emit('collisionStarted'),
 })
 const { floorError, floorImageState, geolocationAreaMessage, isReady, mapError } = viewer
+const visitorReady = computed(() => Boolean(isReady.value && floorImageState.value === 'loaded' && !mapError.value && !floorError.value))
+const overviewSuggested = ref(false)
+const overviewAssistanceEnabled = computed(() => isVisitorOverviewAssistanceEnabled(visitorReady.value, selectedSpotId.value, props.overviewAssistanceBlocked))
+const resizeSuggestion = createVisitorOverviewSuggestion()
+let suggestionObserver: ResizeObserver | null = null
+function viewportSize() {
+  // Use the stage breakpoint width; its bordered canvas can be 766px at a 768px viewport.
+  const frame = container.value?.closest<HTMLElement>('.public-map-stage') ?? container.value
+  return { width: frame?.clientWidth ?? 0, height: frame?.clientHeight ?? 0 }
+}
+function dismissOverviewSuggestion(event: MouseEvent) {
+  if ((event.target as HTMLElement).closest('.map-viewer-overview-control')) {
+    overviewSuggested.value = false
+    resizeSuggestion.reset(viewportSize())
+  }
+}
+// Reuse the normal control's interaction/context recovery and showWholeFloor path.
+function showWholeFloor() {
+  const button = container.value?.querySelector<HTMLButtonElement>('.map-viewer-overview-control')
+  button?.focus({ preventScroll: true })
+  button?.click()
+}
+watch(overviewSuggested, value => emit('overviewSuggested', value))
+watch(visitorReady, ready => emit('readyChange', ready), { immediate: true })
+watch(mapError, error => emit('initErrorChange', Boolean(error)), { immediate: true })
+watch([overviewAssistanceEnabled, selectedSpotId, () => props.floor.id], () => {
+  resizeSuggestion.reset(viewportSize())
+  if (!overviewAssistanceEnabled.value) overviewSuggested.value = false
+})
+onMounted(() => {
+  if (!props.visitorOverview || !container.value) return
+  suggestionObserver = new ResizeObserver(() => {
+    if (resizeSuggestion.measure(viewportSize(), overviewAssistanceEnabled.value)) overviewSuggested.value = true
+  })
+  suggestionObserver.observe(container.value)
+})
+onBeforeUnmount(() => suggestionObserver?.disconnect())
+
+const initErrorStyle = ref<{ top: string, bottom: string, '--init-error-padding': string }>()
+watch([container, mapError, visitorOverview], ([element, error, visitor], _previous, onCleanup) => {
+  initErrorStyle.value = undefined
+  if (!element || !error || !visitor) return
+  const frame = element.closest<HTMLElement>('.map-viewer-frame')
+  const stage = element.closest<HTMLElement>('.public-map-stage') ?? frame
+  if (!frame || !stage) return
+  let pendingFrame: number | null = null
+  const chrome = new Set<HTMLElement>()
+  // Error text uses the actual free strip; camera padding may shrink on short screens.
+  function measureErrorSpace() {
+    const bounds = frame!.getBoundingClientRect()
+    let top = bounds.top + 16
+    let bottom = bounds.bottom - 16
+    for (const item of chrome) {
+      const rect = item.getBoundingClientRect()
+      if (!item.getClientRects().length || rect.width <= 0 || rect.height <= 0) continue
+      if (item.dataset.mapFitEdge === 'bottom') bottom = Math.min(bottom, rect.top - 4)
+      else top = Math.max(top, rect.bottom + 4)
+    }
+    const height = Math.max(0, bottom - top)
+    initErrorStyle.value = {
+      top: `${Math.max(0, top - bounds.top)}px`,
+      bottom: `${Math.max(0, bounds.bottom - bottom)}px`,
+      '--init-error-padding': height < 64 ? '4px' : '1rem',
+    }
+  }
+  function scheduleMeasurement() {
+    if (pendingFrame !== null) return
+    pendingFrame = requestAnimationFrame(() => {
+      pendingFrame = null
+      measureErrorSpace()
+    })
+  }
+  const observer = new ResizeObserver(scheduleMeasurement)
+  function observeChrome() {
+    const current = new Set(stage!.querySelectorAll<HTMLElement>('[data-map-fit-edge], .visitor-marker-legend'))
+    for (const item of chrome) {
+      if (current.has(item)) continue
+      observer.unobserve(item)
+      chrome.delete(item)
+    }
+    for (const item of current) {
+      if (chrome.has(item)) continue
+      chrome.add(item)
+      observer.observe(item)
+    }
+  }
+  observer.observe(stage)
+  observeChrome()
+  measureErrorSpace()
+  const additions = new MutationObserver(() => {
+    observeChrome()
+    scheduleMeasurement()
+  })
+  additions.observe(stage, { childList: true, subtree: true })
+  onCleanup(() => {
+    observer.disconnect()
+    additions.disconnect()
+    if (pendingFrame !== null) cancelAnimationFrame(pendingFrame)
+  })
+}, { flush: 'post' })
 
 defineExpose({
+  showWholeFloor,
   focusSpot: viewer.focusSpot,
   resize: viewer.resize,
   ensureSpotVisible: viewer.ensureSpotVisible,
@@ -113,8 +221,8 @@ defineExpose({
 </script>
 
 <template>
-  <div :class="{ 'public-map-viewer h-full': mode === 'view', 'visitor-map-viewer': visitorOverview }">
-    <div class="map-viewer-frame relative overflow-hidden rounded-xl border border-stone-300 bg-stone-100" :style="{ height }" :aria-busy="!isReady || floorImageState === 'loading'">
+  <div @click.capture="dismissOverviewSuggestion" :class="{ 'public-map-viewer h-full': mode === 'view', 'visitor-map-viewer': visitorOverview, 'visitor-overview-suggested': overviewSuggested && overviewAssistanceEnabled }">
+    <div class="map-viewer-frame relative overflow-hidden rounded-xl border border-stone-300 bg-stone-100" :style="{ height }" :aria-busy="!mapError && (!isReady || floorImageState === 'loading')">
       <div
         ref="container"
         class="h-full w-full transition-opacity duration-150"
@@ -127,6 +235,9 @@ defineExpose({
       <p v-if="visitorOverview && (!isReady || floorImageState === 'loading') && !mapError" role="status" class="pointer-events-none absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 rounded-xl bg-white/95 px-4 py-3 text-sm text-stone-700 shadow">
         {{ locale === 'en' ? 'Loading map…' : '地図を読み込み中…' }}
       </p>
+      <div v-if="visitorOverview && mapError" role="alert" tabindex="0" class="map-viewer-init-error rounded-xl bg-white/95 text-sm text-red-700 shadow" :style="initErrorStyle">
+        <p class="map-viewer-init-error__message">{{ mapError }}</p>
+      </div>
       <div v-if="visitorOverview && floorImageState === 'error'" role="alert" class="absolute inset-x-4 top-1/2 z-10 mx-auto max-w-sm -translate-y-1/2 rounded-xl bg-white/95 p-4 text-center text-sm text-stone-700 shadow">
         <p>{{ locale === 'en' ? 'The map image could not be loaded.' : '地図画像を読み込めませんでした。' }}</p>
         <button type="button" class="mt-3 min-h-11 rounded-lg bg-stone-800 px-4 font-semibold text-white" @click="viewer.showFloor(floor, false, false)">{{ locale === 'en' ? 'Try again' : '再読み込み' }}</button>
@@ -153,13 +264,32 @@ defineExpose({
         {{ geolocationAreaMessage }}
       </p>
     </div>
-    <p v-if="mapError" role="alert" class="mt-3 text-sm text-red-600">
+    <p v-if="mapError && !visitorOverview" role="alert" class="mt-3 text-sm text-red-600">
       {{ mapError }}
     </p>
   </div>
 </template>
 
 <style>
+.map-viewer-init-error {
+  position: absolute;
+  inset: 25% 1rem;
+  z-index: 10;
+  max-width: 28rem;
+  margin-inline: auto;
+  overflow: auto;
+  overflow-wrap: anywhere;
+}
+
+.map-viewer-init-error__message {
+  padding: var(--init-error-padding, 1rem) 1rem;
+}
+
+.map-viewer-init-error:focus-visible {
+  outline: 2px solid var(--visitor-focus, #b45309);
+  outline-offset: -4px;
+}
+
 .maplibregl-marker.map-viewer-marker {
   position: absolute;
   display: flex;
@@ -534,6 +664,10 @@ defineExpose({
   display: none;
 }
 
+/* Keep marker priorities inside the map canvas, below the native controls. */
+.visitor-map-viewer .maplibregl-canvas-container {
+  isolation: isolate;
+}
 .visitor-map-viewer .maplibregl-ctrl-top-right {
   top: auto;
   bottom: calc(env(safe-area-inset-bottom) + 2rem + var(--visitor-category-height, 52px) + 1.5rem);
@@ -552,6 +686,16 @@ defineExpose({
   padding: 0 0.75rem;
   font-size: 0.875rem;
   font-weight: 700;
+}
+.visitor-map-viewer.visitor-overview-suggested .map-viewer-overview-control {
+  background: #20342c;
+  color: white;
+  box-shadow: inset 0 0 0 2px #88bda5;
+}
+.visitor-theme .visitor-map-viewer.visitor-overview-suggested .map-viewer-overview-control:focus-visible {
+  outline: 2px solid var(--visitor-focus, #b45309);
+  outline-offset: -4px;
+  box-shadow: inset 0 0 0 6px white;
 }
 .visitor-map-viewer .map-viewer-control-group > .maplibregl-ctrl-group {
   overflow: hidden;
@@ -601,7 +745,7 @@ defineExpose({
   box-shadow: 0 1px 4px rgb(28 25 23 / 20%);
   pointer-events: none;
 }
-.visitor-map-viewer .map-viewer-marker:focus-visible .map-viewer-marker__name,
+.visitor-map-viewer .map-viewer-marker:focus .map-viewer-marker__name,
 .visitor-map-viewer .map-viewer-marker--selected .map-viewer-marker__name {
   display: block;
 }

@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { DialogContent, DialogPortal, DialogRoot, DialogTitle } from 'reka-ui'
 import { useBottomSheetGesture, type BottomSheetState } from '~/composables/useBottomSheetGesture'
-import { isFacilityPinIcon } from '~~/shared/constants/spot'
+import FacilitySymbol from '~/components/map/FacilitySymbol.vue'
+import { getVisitorFacilityPreset } from '~/utils/visitor-facility-summary'
 import type { PublicSpot } from '~~/shared/types/public-map'
 
 const props = defineProps<{ spot: PublicSpot, floorName?: string }>()
 const emit = defineEmits<{ close: [source?: 'pointer' | 'other'], expandedChange: [expanded: boolean] }>()
+const facility = computed(() => getVisitorFacilityPreset(props.spot))
 
 const sheetState = ref<BottomSheetState>('detail')
 const scrollBody = useTemplateRef<HTMLElement>('scrollBody')
@@ -133,7 +135,7 @@ onBeforeUnmount(() => {
   <DialogRoot :open="true" :modal="false">
     <DialogPortal>
       <DialogContent
-        class="spot-detail-sheet fixed inset-x-0 z-50 flex min-h-0 w-full flex-col overflow-hidden rounded-t-[20px] bg-white shadow-xl outline-none transition-transform ease-out"
+        class="visitor-theme visitor-dialog spot-detail-sheet fixed inset-x-0 z-50 flex min-h-0 w-full flex-col overflow-hidden rounded-t-[20px] bg-white shadow-xl outline-none transition-transform ease-out"
         :style="[viewportStyle, sheetMotionStyle]"
         :aria-describedby="undefined"
         aria-modal="false"
@@ -153,18 +155,19 @@ onBeforeUnmount(() => {
           <div class="flex h-7 items-center justify-center md:hidden" aria-hidden="true"><span class="h-1 w-9 rounded-full bg-stone-300" /></div>
           <div class="flex min-h-14 items-start gap-2 pb-3 md:pt-4">
             <div class="min-w-0 flex-1">
-              <p v-if="floorName" class="mb-1 text-xs font-semibold text-stone-600">{{ floorName }} · {{ isFacilityPinIcon(spot) ? '設備' : '目的地' }}</p>
+              <p v-if="floorName" class="visitor-muted mb-1 text-xs font-semibold">{{ floorName }} · {{ facility ? '設備' : '目的地' }}</p>
               <div v-if="spot.categories.length" class="spot-detail-categories flex gap-1.5 overflow-x-auto pb-1" data-sheet-no-drag tabindex="0" role="group" aria-label="このスポットのカテゴリー">
-                <span v-for="category in spot.categories" :key="category.id" class="shrink-0 whitespace-nowrap rounded-full bg-terracotta-50 px-2 py-1 text-xs font-semibold text-terracotta-700">{{ category.name }}</span>
+                <span v-for="category in spot.categories" :key="category.id" class="visitor-detail-category shrink-0 whitespace-nowrap rounded-full px-2 py-1 text-xs font-semibold">{{ category.name }}</span>
               </div>
-              <DialogTitle data-spot-detail-title tabindex="-1" class="mt-1 break-words text-[22px] font-bold leading-tight tracking-tight text-stone-900 outline-none">
-                {{ spot.name }}
+              <DialogTitle data-spot-detail-title tabindex="-1" class="mt-1 flex items-start gap-2.5 break-words text-[22px] font-bold leading-tight tracking-tight outline-none">
+                <FacilitySymbol v-if="facility" :appearance="spot" />
+                <span class="min-w-0 flex-1 [overflow-wrap:anywhere]">{{ spot.name }}</span>
               </DialogTitle>
             </div>
-            <button v-if="needsExpansion" type="button" class="grid size-11 shrink-0 place-items-center rounded-full text-lg text-stone-700 hover:bg-stone-100 md:hidden" :aria-label="sheetState === 'expanded' ? 'スポット詳細の高さを戻す' : 'スポット詳細を大きく表示'" @click="setExpanded(sheetState !== 'expanded')">
+            <button v-if="needsExpansion" type="button" class="visitor-detail-expand grid size-11 shrink-0 place-items-center rounded-full text-lg hover:bg-stone-100 md:hidden" :aria-label="sheetState === 'expanded' ? 'スポット詳細の高さを戻す' : 'スポット詳細を大きく表示'" @click="setExpanded(sheetState !== 'expanded')">
               <span aria-hidden="true">{{ sheetState === 'expanded' ? '⌄' : '⌃' }}</span>
             </button>
-            <button type="button" class="grid size-11 shrink-0 place-items-center rounded-full bg-stone-100 text-xl leading-none text-stone-700 hover:bg-stone-200" aria-label="スポット詳細を閉じる" @click="requestClose('other')">×</button>
+            <button type="button" class="visitor-close grid size-11 shrink-0 place-items-center rounded-full bg-stone-100 text-xl leading-none text-stone-700 hover:bg-stone-200" aria-label="スポット詳細を閉じる" @click="requestClose('other')">×</button>
           </div>
         </header>
 
@@ -174,23 +177,23 @@ onBeforeUnmount(() => {
             <div v-if="spot.photos.length" class="flex snap-x snap-mandatory overflow-x-auto bg-stone-100" data-sheet-no-drag>
               <figure v-for="(photo, index) in spot.photos" :key="photo" class="relative w-full shrink-0 snap-center">
                 <img v-if="photoStates[photo] !== 'error'" :src="photo" :alt="`${spot.name}の写真${index + 1}`" class="h-44 w-full object-cover md:h-48" :loading="index === 0 ? 'eager' : 'lazy'" decoding="async" @load="photoStates[photo] = 'loaded'" @error="photoStates[photo] = 'error'">
-                <p v-if="!photoStates[photo]" role="status" class="pointer-events-none absolute inset-0 grid place-items-center bg-stone-100 text-sm text-stone-600">写真を読み込み中</p>
-                <p v-else-if="photoStates[photo] === 'error'" class="px-4 py-4 text-sm text-stone-600">写真を表示できませんでした</p>
+                <p v-if="!photoStates[photo]" role="status" class="visitor-muted pointer-events-none absolute inset-0 grid place-items-center bg-stone-100 text-sm">写真を読み込み中</p>
+                <p v-else-if="photoStates[photo] === 'error'" class="visitor-muted px-4 py-4 text-sm">写真を表示できませんでした</p>
               </figure>
             </div>
             <div class="px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-4 md:p-6">
-              <p v-if="spot.description" class="whitespace-pre-line text-sm leading-7 text-stone-700">{{ spot.description }}</p>
-              <p v-else class="text-sm text-stone-500">説明は登録されていません。</p>
+              <p v-if="spot.description" class="whitespace-pre-line text-sm leading-7">{{ spot.description }}</p>
+              <p v-else class="visitor-muted text-sm">説明は登録されていません。</p>
               <dl v-if="spot.informationFields.length" class="mt-6 divide-y divide-stone-200 border-y border-stone-200 text-sm">
                 <div v-for="field in spot.informationFields" :key="field.id" class="grid grid-cols-[5.5rem_1fr] gap-3 py-3">
-                  <dt class="font-semibold text-stone-500">{{ field.label }}</dt>
-                  <dd class="min-w-0 whitespace-pre-line text-stone-800">
-                    <a v-if="field.href" :href="field.href" class="break-words font-semibold text-terracotta-700 underline decoration-terracotta-300 underline-offset-4" :target="field.type === 'url' ? '_blank' : undefined" :rel="field.type === 'url' ? 'noopener noreferrer' : undefined">{{ field.value }}</a>
+                  <dt class="visitor-muted font-semibold">{{ field.label }}</dt>
+                  <dd class="min-w-0 whitespace-pre-line">
+                    <a v-if="field.href" :href="field.href" class="visitor-link break-words font-semibold underline underline-offset-4" :target="field.type === 'url' ? '_blank' : undefined" :rel="field.type === 'url' ? 'noopener noreferrer' : undefined">{{ field.value }}</a>
                     <template v-else>{{ field.value }}</template>
                   </dd>
                 </div>
               </dl>
-              <a v-if="spot.websiteAction" :href="spot.websiteAction.url" target="_blank" rel="noopener noreferrer" class="mt-5 inline-flex min-h-11 items-center rounded-lg bg-terracotta-600 px-4 py-2.5 text-sm font-semibold text-white">{{ spot.websiteAction.label }}を見る</a>
+              <a v-if="spot.websiteAction" :href="spot.websiteAction.url" target="_blank" rel="noopener noreferrer" class="visitor-action mt-5 inline-flex min-h-11 items-center rounded-lg px-4 py-2.5 text-sm font-semibold text-white">{{ spot.websiteAction.label }}を見る</a>
             </div>
           </div>
         </div>
@@ -205,6 +208,9 @@ onBeforeUnmount(() => {
   height: var(--spot-sheet-height, 60dvh);
   --sheet-motion-duration: 180ms;
 }
+.spot-detail-sheet__drag-region { border-color: var(--visitor-border); }
+.visitor-detail-category { color: var(--visitor-active); background: var(--visitor-active-soft); }
+.visitor-detail-expand { color: var(--visitor-ink); }
 
 /* The title receives announcement focus; only actionable controls need a ring. */
 .spot-detail-sheet [data-spot-detail-title]:focus {
@@ -222,7 +228,7 @@ onBeforeUnmount(() => {
 
 .spot-detail-sheet button:focus-visible,
 .spot-detail-sheet a:focus-visible,
-.spot-detail-categories:focus-visible { outline: 2px solid #9a3412; outline-offset: 2px; }
+.spot-detail-categories:focus-visible { outline: 2px solid var(--visitor-focus); outline-offset: 2px; }
 
 .spot-detail-sheet__body {
   touch-action: pan-x pan-y;

@@ -8,6 +8,7 @@ import SpotDetailCard from '~/components/map/SpotDetailCard.vue'
 import { collectSpotCategories, filterSpotsByCategoryIds } from '~/utils/category-filter'
 import { closeFilteredSpot, createFloorSwitchState, selectedSpotIdFromOverlay, shouldShowFloorSelector, type PublicOverlay } from '~/utils/public-map-ui'
 import { isFacilityPinIcon } from '~~/shared/constants/spot'
+import { getExclusiveFacilityCategoryId, showOverviewAfterDockUpdate } from '~/utils/visitor-overview-assistance'
 import { restorePinFocus } from '~/utils/marker-collision'
 import type { MapViewerSpot } from '~~/shared/types/map-viewer'
 import type { PublicMapResponse } from '~~/shared/types/public-map'
@@ -38,27 +39,32 @@ const selectedSpotId = computed(() => selectedSpotIdFromOverlay(overlay.value))
 const selectedCategoryIds = ref<string[]>([])
 const categoryDock = useTemplateRef<HTMLElement>('categoryDock')
 const categoryDockHeight = ref(52)
+const visitorReady = ref(false)
+const viewerInitializationFailed = ref(false)
+const overviewSuggested = ref(false)
+function measureCategoryDock() {
+  const element = categoryDock.value
+  if (!element) return
+  const height = Number.parseFloat(getComputedStyle(element).getPropertyValue('--category-fit-height')) || Math.ceil(element.getBoundingClientRect().height)
+  if (height > 0 || !categories.value.length) categoryDockHeight.value = height
+}
 // Selection names may wrap. Keep Map controls above the actual Category dock,
 // without refitting or moving the user's camera when this UI changes height.
 watch(categoryDock, (element, _previous, onCleanup) => {
   if (!element) return
   let frame: number | null = null
-  const measure = () => {
-    const height = Number.parseFloat(getComputedStyle(element).getPropertyValue('--category-fit-height')) || Math.ceil(element.getBoundingClientRect().height)
-    if (height > 0 || !categories.value.length) categoryDockHeight.value = height
-  }
   const observer = new ResizeObserver(() => {
     if (frame !== null) cancelAnimationFrame(frame)
-    frame = requestAnimationFrame(() => { frame = null; measure() })
+    frame = requestAnimationFrame(() => { frame = null; measureCategoryDock() })
   })
-  measure()
+  measureCategoryDock()
   observer.observe(element)
   onCleanup(() => {
     observer.disconnect()
     if (frame !== null) cancelAnimationFrame(frame)
   })
 }, { flush: 'post' })
-const mapViewerRef = ref<{ ensureSpotVisible: (spotId: string, panel: DOMRect | null) => boolean, compareCamera: (pitch: 0 | 20 | 25 | 45, fit: boolean) => void, captureDetailContext: () => void, restoreDetailContext: () => void, discardDetailContext: () => void } | null>(null)
+const mapViewerRef = ref<{ showWholeFloor: () => void, ensureSpotVisible: (spotId: string, panel: DOMRect | null) => boolean, compareCamera: (pitch: 0 | 20 | 25 | 45, fit: boolean) => void, captureDetailContext: () => void, restoreDetailContext: () => void, discardDetailContext: () => void } | null>(null)
 const cameraComparisonEnabled = computed(() => import.meta.dev && route.query.cameraCompare === '1')
 const cameraComparisonMode = ref<'same' | 'fit'>('same')
 const floorSelectorOpen = computed(() => overlay.value?.type === 'floor')
@@ -102,6 +108,23 @@ const categoryCounts = computed(() => {
   return counts
 })
 const visibleSpots = computed(() => filterSpotsByCategoryIds(selectedFloor.value?.spots ?? [], selectedCategoryIds.value))
+const facilityCategoryId = computed(() => getExclusiveFacilityCategoryId(selectedFloor.value?.spots ?? []))
+const facilityOverviewAvailable = computed(() => Boolean(visitorReady.value && facilityCategoryId.value && !selectedCategoryIds.value.includes(facilityCategoryId.value)))
+async function showFacilitiesOverview() {
+  const categoryId = facilityCategoryId.value
+  const floorId = selectedFloor.value?.id
+  if (!visitorReady.value || !categoryId || selectedSpot.value || appModalOpen.value) return
+  clearPendingSpotClose()
+  if (!selectedCategoryIds.value.includes(categoryId)) selectedCategoryIds.value = [...selectedCategoryIds.value, categoryId]
+  await showOverviewAfterDockUpdate({
+    nextRender: () => nextTick(),
+    nextFrame: () => new Promise<void>(resolve => requestAnimationFrame(() => resolve())),
+    measureDock: measureCategoryDock,
+    isCurrent: () => selectedFloor.value?.id === floorId && facilityCategoryId.value === categoryId
+      && selectedCategoryIds.value.includes(categoryId) && !selectedSpot.value && !appModalOpen.value && visitorReady.value,
+    showWholeFloor: () => mapViewerRef.value?.showWholeFloor(),
+  })
+}
 const selectedCategoryNames = computed(() => categories.value.filter(category => selectedCategoryIds.value.includes(category.id)).map(category => category.name).join('・'))
 const showFloorSelector = computed(() => shouldShowFloorSelector(data.value?.map.floors.length ?? 0))
 const appModalOpen = computed(() => overlay.value?.type === 'floor' || overlay.value?.type === 'info')
@@ -265,7 +288,7 @@ onBeforeUnmount(clearPendingSpotClose)
 </script>
 
 <template>
-  <main class="fixed inset-0 h-[100dvh] w-screen overflow-hidden bg-stone-100 text-stone-900 md:static md:w-auto">
+  <main class="visitor-theme fixed inset-0 h-[100dvh] w-screen overflow-hidden bg-stone-100 text-stone-900 md:static md:w-auto" :class="{ 'visitor-init-failed': viewerInitializationFailed }">
     <div v-if="status === 'pending' && !data?.map" role="status" aria-live="polite" class="grid h-full place-items-center px-6 text-sm text-stone-600">
       {{ t.loading }}
     </div>
@@ -283,46 +306,46 @@ onBeforeUnmount(clearPendingSpotClose)
       </section>
     </div>
     <template v-else-if="selectedFloor">
-      <header class="hidden h-14 items-center justify-between gap-3 border-b border-white/60 bg-white/75 px-6 backdrop-blur md:flex">
+      <header class="visitor-surface hidden h-14 items-center justify-between gap-3 border-b border-white/60 bg-white/75 px-6 backdrop-blur md:flex">
         <div class="flex min-w-0 items-center gap-3">
           <img v-if="data.map.logoUrl" :src="data.map.logoUrl" :alt="`${data.map.organizationName ?? data.map.name}のロゴ`" class="size-10 shrink-0 rounded-lg object-contain">
           <div class="min-w-0">
-            <p class="truncate text-xs font-semibold tracking-widest text-terracotta-700">{{ data.map.organizationName ?? 'DIGITAL MAP' }}</p>
+            <p class="visitor-brand truncate text-xs font-semibold tracking-widest text-terracotta-700">{{ data.map.organizationName ?? 'DIGITAL MAP' }}</p>
             <h1 class="mt-0.5 truncate text-lg font-bold tracking-tight">{{ data.map.name }}</h1>
           </div>
         </div>
         <nav v-show="!appModalOpen" aria-label="公開マップ操作" class="flex shrink-0 items-center gap-2">
           <label v-if="data.map.enabledLocales.includes('en')" class="sr-only" for="public-locale">{{ t.language }}</label>
-          <select v-if="data.map.enabledLocales.includes('en')" id="public-locale" :value="data.map.locale" class="min-h-11 rounded-full border border-stone-200 px-3 text-xs" @change="switchLocale(($event.target as HTMLSelectElement).value as 'ja' | 'en')"><option value="ja">日本語</option><option value="en">English</option></select>
-          <button type="button" class="grid size-11 place-items-center rounded-full border border-stone-200 bg-white/80 text-sm font-bold" data-visitor-action="info" aria-label="マップ情報を開く" @click="openInfo">i</button>
+          <select v-if="data.map.enabledLocales.includes('en')" id="public-locale" :value="data.map.locale" class="visitor-control min-h-11 rounded-full border border-stone-200 px-3 text-xs" @change="switchLocale(($event.target as HTMLSelectElement).value as 'ja' | 'en')"><option value="ja">日本語</option><option value="en">English</option></select>
+          <button type="button" class="visitor-control grid size-11 place-items-center rounded-full border border-stone-200 bg-white/80 text-sm font-bold" data-visitor-action="info" aria-label="マップ情報を開く" @click="openInfo">i</button>
         </nav>
       </header>
 
-      <section class="public-map-stage relative h-[100dvh] min-h-0 md:h-[calc(100dvh-3.5rem)]" :style="{ '--visitor-category-height': `${categoryDockHeight}px` }" :class="{ 'public-map-locked': appModalOpen, 'public-map-has-spot': Boolean(selectedSpot) }">
-        <div v-show="!appModalOpen" class="pointer-events-none absolute inset-0 z-20 md:hidden" aria-label="公開マップ操作">
-          <div data-map-fit-edge="top" class="absolute left-[calc(env(safe-area-inset-left)+0.75rem)] top-[calc(env(safe-area-inset-top)+0.75rem)] rounded-xl bg-white/90 px-3 py-2 shadow-sm backdrop-blur" :class="data.map.enabledLocales.includes('en') ? 'max-w-[calc(100vw-10rem)]' : 'max-w-[calc(100vw-7rem)]'">
+      <section class="public-map-stage relative h-[100dvh] min-h-0 md:h-[calc(100dvh-3.5rem)]" :style="{ '--visitor-category-height': `${categoryDockHeight}px` }" :class="{ 'public-map-locked': appModalOpen, 'public-map-has-spot': Boolean(selectedSpot), 'public-map-init-failed': viewerInitializationFailed }">
+        <div v-show="!appModalOpen" class="visitor-mobile-controls pointer-events-none absolute inset-0 z-20 md:hidden" aria-label="公開マップ操作">
+          <div data-map-fit-edge="top" class="visitor-map-title visitor-surface absolute left-[calc(env(safe-area-inset-left)+0.75rem)] top-[calc(env(safe-area-inset-top)+0.75rem)] rounded-xl bg-white/90 px-3 py-2 shadow-sm backdrop-blur" :class="data.map.enabledLocales.includes('en') ? 'max-w-[calc(100vw-10rem)]' : 'max-w-[calc(100vw-7rem)]'">
             <h1 class="truncate text-sm font-bold">{{ data.map.name }}</h1>
             <p class="truncate text-xs text-stone-600">表示中 · {{ selectedFloor.name }}</p>
           </div>
           <div v-if="hasFloorFacilities" class="visitor-marker-legend absolute left-[calc(env(safe-area-inset-left)+0.75rem)] top-[calc(env(safe-area-inset-top)+4.5rem)]" role="group" aria-label="マップ記号の凡例">
             <span><i class="visitor-marker-legend__destination" aria-hidden="true" />目的地</span><span><i class="visitor-marker-legend__facility" aria-hidden="true" />設備</span>
           </div>
-          <div v-if="showFloorSelector" v-show="!selectedSpot" data-map-fit-edge="bottom" class="pointer-events-auto absolute bottom-[calc(env(safe-area-inset-bottom)+2rem+var(--visitor-category-height,52px)+1.5rem)] left-[calc(env(safe-area-inset-left)+0.75rem)] max-w-[calc(100vw-10.5rem)]">
-          <button type="button" class="flex h-11 max-w-full items-center gap-2 rounded-full border border-white/70 bg-white/85 px-4 text-sm font-bold shadow-sm backdrop-blur" data-visitor-action="floor" aria-haspopup="dialog" :aria-expanded="floorSelectorOpen" @click="openFloorSelector">
+          <div v-if="showFloorSelector" v-show="!selectedSpot" data-map-fit-edge="bottom" class="visitor-floor-control pointer-events-auto absolute bottom-[calc(env(safe-area-inset-bottom)+2rem+var(--visitor-category-height,52px)+1.5rem)] left-[calc(env(safe-area-inset-left)+0.75rem)] max-w-[calc(100vw-10.5rem)]">
+          <button type="button" class="visitor-control flex h-11 max-w-full items-center gap-2 rounded-full border border-white/70 bg-white/85 px-4 text-sm font-bold shadow-sm backdrop-blur" data-visitor-action="floor" aria-haspopup="dialog" :aria-expanded="floorSelectorOpen" @click="openFloorSelector">
             <span class="shrink-0 text-xs font-medium text-stone-600">フロア</span><span class="truncate">{{ selectedFloor.name }}</span> <span class="shrink-0" aria-hidden="true">⌄</span>
           </button>
           </div>
 
-        <div data-map-fit-edge="top" class="pointer-events-auto absolute right-[calc(env(safe-area-inset-right)+0.75rem)] top-[calc(env(safe-area-inset-top)+0.75rem)] flex items-center gap-2">
+        <div data-map-fit-edge="top" class="visitor-map-info pointer-events-auto absolute right-[calc(env(safe-area-inset-right)+0.75rem)] top-[calc(env(safe-area-inset-top)+0.75rem)] flex items-center gap-2">
           <label v-if="data.map.enabledLocales.includes('en')" class="sr-only" for="public-locale-mobile">{{ t.language }}</label>
-          <select v-if="data.map.enabledLocales.includes('en')" id="public-locale-mobile" :value="data.map.locale" class="h-11 w-16 rounded-full border border-white/70 bg-white/85 px-3 text-xs font-bold shadow-sm backdrop-blur" @change="switchLocale(($event.target as HTMLSelectElement).value as 'ja' | 'en')"><option value="ja">JA</option><option value="en">EN</option></select>
-          <button type="button" class="grid size-11 place-items-center rounded-full border border-white/70 bg-white/85 text-sm font-bold shadow-sm backdrop-blur" data-visitor-action="info" aria-label="マップ情報を開く" @click="openInfo">i</button>
+          <select v-if="data.map.enabledLocales.includes('en')" id="public-locale-mobile" :value="data.map.locale" class="visitor-control h-11 w-16 rounded-full border border-white/70 bg-white/85 px-3 text-xs font-bold shadow-sm backdrop-blur" @change="switchLocale(($event.target as HTMLSelectElement).value as 'ja' | 'en')"><option value="ja">JA</option><option value="en">EN</option></select>
+          <button type="button" class="visitor-control grid size-11 place-items-center rounded-full border border-white/70 bg-white/85 text-sm font-bold shadow-sm backdrop-blur" data-visitor-action="info" aria-label="マップ情報を開く" @click="openInfo">i</button>
         </div>
         </div>
 
-        <div v-show="!appModalOpen" data-map-fit-edge="top" class="absolute left-5 top-5 z-20 hidden max-w-[calc(100%_-_10rem)] items-center gap-3 md:flex">
-          <button v-if="showFloorSelector" type="button" class="flex min-h-11 min-w-0 max-w-full items-center gap-2 rounded-full border border-white/70 bg-white/95 px-4 text-sm font-bold shadow-sm backdrop-blur" data-visitor-action="floor" aria-haspopup="dialog" :aria-expanded="floorSelectorOpen" @click="openFloorSelector"><span class="shrink-0 text-xs font-medium text-stone-600">表示中</span><span class="truncate">{{ selectedFloor.name }}</span><span aria-hidden="true">⌄</span></button>
-          <p v-else class="min-w-0 truncate rounded-full bg-white/95 px-4 py-3 text-sm font-semibold shadow-sm">表示中 · {{ selectedFloor.name }}</p>
+        <div v-show="!appModalOpen" data-map-fit-edge="top" class="visitor-desktop-controls absolute left-5 top-5 z-20 hidden max-w-[calc(100%_-_10rem)] items-center gap-3 md:flex">
+          <button v-if="showFloorSelector" type="button" class="visitor-control flex min-h-11 min-w-0 max-w-full items-center gap-2 rounded-full border border-white/70 bg-white/95 px-4 text-sm font-bold shadow-sm backdrop-blur" data-visitor-action="floor" aria-haspopup="dialog" :aria-expanded="floorSelectorOpen" @click="openFloorSelector"><span class="shrink-0 text-xs font-medium text-stone-600">表示中</span><span class="truncate">{{ selectedFloor.name }}</span><span aria-hidden="true">⌄</span></button>
+          <p v-else class="visitor-surface min-w-0 truncate rounded-full bg-white/95 px-4 py-3 text-sm font-semibold shadow-sm">表示中 · {{ selectedFloor.name }}</p>
           <div v-if="hasFloorFacilities" class="visitor-marker-legend shrink-0" role="group" aria-label="マップ記号の凡例">
             <span><i class="visitor-marker-legend__destination" aria-hidden="true" />目的地</span><span><i class="visitor-marker-legend__facility" aria-hidden="true" />設備</span>
           </div>
@@ -331,23 +354,23 @@ onBeforeUnmount(clearPendingSpotClose)
         <div
           ref="categoryDock"
           v-show="!appModalOpen && !selectedSpot"
-          class="pointer-events-none absolute bottom-[calc(env(safe-area-inset-bottom)+2rem)] left-[calc(env(safe-area-inset-left)+0.75rem)] right-[calc(env(safe-area-inset-right)+0.75rem)] z-20 md:left-1/2 md:right-auto md:w-[min(50vw,44rem)] md:-translate-x-1/2 lg:[--category-fit-height:52px]"
+          class="visitor-category-dock pointer-events-none absolute bottom-[calc(env(safe-area-inset-bottom)+2rem)] left-[calc(env(safe-area-inset-left)+0.75rem)] right-[calc(env(safe-area-inset-right)+0.75rem)] z-20 md:left-1/2 md:right-auto md:w-[min(50vw,44rem)] md:-translate-x-1/2 lg:[--category-fit-height:52px]"
         >
           <div class="pointer-events-auto">
-            <CategoryFilter v-model="selectedCategoryIds" :categories="categories" :counts="categoryCounts" />
-            <p v-if="selectedCategoryIds.length" role="status" class="mt-1 flex max-w-full items-start lg:hidden gap-2 rounded-xl bg-white/95 px-3 py-1 text-xs font-semibold leading-5 text-stone-800">
+            <CategoryFilter v-model="selectedCategoryIds" :categories="categories" :counts="categoryCounts" :facility-overview-available="facilityOverviewAvailable" @facility-overview="showFacilitiesOverview" />
+            <p v-if="selectedCategoryIds.length" role="status" class="visitor-surface mt-1 flex max-w-full items-start lg:hidden gap-2 rounded-xl bg-white/95 px-3 py-1 text-xs font-semibold leading-5 text-stone-800">
               <span class="min-w-0 flex-1 truncate" :title="selectedCategoryNames">{{ selectedCategoryNames }}</span>
               <span class="shrink-0">{{ selectedCategoryIds.length }}カテゴリ · {{ visibleSpots.length }}件</span>
             </p>
           </div>
         </div>
 
-        <div v-show="!appModalOpen && !selectedSpot && categories.length" data-map-fit-edge="bottom" aria-hidden="true" class="pointer-events-none absolute bottom-[calc(env(safe-area-inset-bottom)+2rem)] left-3 right-3 lg:!h-[52px]" :style="{ height: `${categoryDockHeight}px` }" />
+        <div v-show="!appModalOpen && !selectedSpot && categories.length" data-map-fit-edge="bottom" aria-hidden="true" class="visitor-category-inset pointer-events-none absolute bottom-[calc(env(safe-area-inset-bottom)+2rem)] left-3 right-3 lg:!h-[52px]" :style="{ height: `${categoryDockHeight}px` }" />
 
         <ClientOnly>
           <LazyMapViewer
             ref="mapViewerRef"
-            class="h-full"
+            class="visitor-viewer-panel h-full"
             :floor="selectedFloor"
             :locale="data.map.locale"
             :spots="visibleSpots"
@@ -357,10 +380,14 @@ onBeforeUnmount(clearPendingSpotClose)
             :selected-spot-id="selectedSpotId"
             :prioritize-visible-spots="selectedCategoryIds.length > 0"
             visitor-overview
-            height="100%"
+            :overview-assistance-blocked="appModalOpen"
+            :height="viewerInitializationFailed ? '12rem' : '100%'"
             :label="`${data.map.name} ${selectedFloor.name}`"
             @spot-selected="selectSpot"
             @collision-started="beginMapRecovery"
+            @overview-suggested="overviewSuggested = $event"
+            @ready-change="visitorReady = $event"
+            @init-error-change="viewerInitializationFailed = $event"
           />
           <template #fallback>
             <div role="status" class="grid h-full place-items-center bg-stone-100 text-sm text-stone-600">{{ t.loading }}</div>
@@ -377,7 +404,7 @@ onBeforeUnmount(clearPendingSpotClose)
         </div>
 
         <ClientOnly>
-          <MapOperationHint :storage-key="`digital-map:operation-hint:${data.map.slug}`" :suppressed="appModalOpen || Boolean(selectedSpot)" />
+          <MapOperationHint :storage-key="`digital-map:operation-hint:${data.map.slug}`" :suppressed="!visitorReady || appModalOpen || Boolean(selectedSpot)" :overview-suggested="overviewSuggested" />
         </ClientOnly>
       </section>
 
@@ -395,13 +422,45 @@ onBeforeUnmount(clearPendingSpotClose)
 </template>
 
 <style scoped>
-.public-map-stage { background: #edf1f0; }
-.visitor-marker-legend { display: flex; align-items: center; gap: .75rem; border-radius: .625rem; background: rgb(255 255 255 / 94%); padding: .375rem .625rem; font-size: .6875rem; font-weight: 600; color: #44403c; box-shadow: 0 1px 3px rgb(28 25 23 / 8%); }
+.public-map-stage { background: #f4f6f7; }
+/* Keep the same mounted controls; an unavailable map gets a readable, scrolling layout. */
+.visitor-init-failed { overflow-x: hidden; overflow-y: auto; }
+.public-map-init-failed {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: 'title info' 'legend legend' 'viewer viewer' 'floor floor' 'category category';
+  height: auto;
+  gap: .75rem;
+  padding: calc(env(safe-area-inset-top) + .75rem) calc(env(safe-area-inset-right) + .75rem) calc(env(safe-area-inset-bottom) + .75rem) calc(env(safe-area-inset-left) + .75rem);
+}
+.public-map-init-failed .visitor-viewer-panel { grid-area: viewer; min-width: 0; }
+.public-map-init-failed .visitor-category-dock {
+  grid-area: category;
+  position: static;
+  width: 100%;
+  max-width: 44rem;
+  min-width: 0;
+  transform: none;
+  translate: none;
+}
+.public-map-init-failed .visitor-category-inset { display: none; }
+@media (max-width: 767px) {
+  .public-map-init-failed .visitor-mobile-controls { display: contents; }
+  .public-map-init-failed .visitor-map-title { grid-area: title; position: static; min-width: 0; max-width: none; }
+  .public-map-init-failed .visitor-map-info { grid-area: info; position: static; }
+  .public-map-init-failed .visitor-marker-legend { grid-area: legend; position: static; justify-self: start; }
+  .public-map-init-failed .visitor-floor-control { grid-area: floor; position: static; min-width: 0; max-width: none; }
+}
+@media (min-width: 768px) {
+  .public-map-init-failed { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'desktop' 'viewer' 'category'; }
+  .public-map-init-failed .visitor-desktop-controls { grid-area: desktop; position: static; min-width: 0; max-width: none; flex-wrap: wrap; }
+}
+.visitor-marker-legend { display: flex; align-items: center; gap: .75rem; border-radius: .625rem; background: rgb(255 255 255 / 94%); padding: .375rem .625rem; font-size: .6875rem; font-weight: 600; color: var(--visitor-muted); box-shadow: var(--visitor-shadow); }
 .visitor-marker-legend span { display: inline-flex; align-items: center; gap: .375rem; }
 .visitor-marker-legend i { display: inline-block; width: .75rem; height: .75rem; border: 1.5px solid #44403c; }
 .visitor-marker-legend__destination { border-radius: 50% 50% 50% 0; transform: rotate(-45deg); background: #44403c; }
 .visitor-marker-legend__facility { border-radius: .2rem; background: white; }
-button:focus-visible, select:focus-visible { outline: 2px solid #9a3412; outline-offset: 2px; }
+button:focus-visible, select:focus-visible { outline: 2px solid var(--visitor-focus, #b45309); outline-offset: 2px; }
 
 :deep(.maplibregl-map) {
   border-radius: 0;
