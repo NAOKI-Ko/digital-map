@@ -745,7 +745,7 @@ defineExpose({
   box-shadow: 0 1px 4px rgb(28 25 23 / 20%);
   pointer-events: none;
 }
-.visitor-map-viewer .map-viewer-marker:focus-visible .map-viewer-marker__name,
+.visitor-map-viewer .map-viewer-marker:focus .map-viewer-marker__name,
 .visitor-map-viewer .map-viewer-marker--selected .map-viewer-marker__name {
   display: block;
 }
